@@ -2,34 +2,34 @@
     <div class="page_wrap_vue">
         <v-tabs color="primary" v-model="active">
 
-            <v-tab key="files" href="#files" ripple>
-                Files
+            <v-tab key="gps" href="#gps" ripple>
+                GPS
             </v-tab>
             <v-tab key="manage-groups" href="#manage-groups" ripple>
-                Manage File Groups
+                Administra Grupos GPS
             </v-tab>
             <v-tab key="upload" href="#upload" ripple>
                 Upload
             </v-tab>
 
-            <v-tab-item value="files">
+            <v-tab-item value="gps">
                 <v-card flat>
                     <v-card-text>
-                        <file-lists></file-lists>
+                        <gps-lists></gps-lists>
                     </v-card-text>
                 </v-card>
             </v-tab-item>
             <v-tab-item value="manage-groups">
                 <v-card flat>
                     <v-card-text>
-                        <file-group-lists></file-group-lists>
+                        <gps-group-lists></gps-group-lists>
                     </v-card-text>
                 </v-card>
             </v-tab-item>
             <v-tab-item value="upload">
                 <v-card flat>
                     <v-card-text>
-                        <file-upload></file-upload>
+                        <gps-upload></gps-upload>
                     </v-card-text>
                 </v-card>
             </v-tab-item>
@@ -38,22 +38,22 @@
 </template>
 
 <script>
-    import FileGroupLists from './components/FileGroupLists.vue';
-    import FileUpload from './components/FileUpload.vue';
-    import FileLists from './components/FileLists.vue';
+    import GpsGroupLists from './components/GpsGroupLists.vue';
+    import GpsUpload from './components/GpsUpload.vue';
+    import GpsLists from './components/GpsLists.vue';
     export default {
         components: {
-            FileUpload,
-            FileGroupLists,
-            FileLists
+            GpsUpload,
+            GpsGroupLists,
+            GpsLists
         },
         mounted() {
-            console.log('pages.FileManager.vue');
+            console.log('pages.GpsManager.vue');
 
             const self = this;
 
             self.$store.commit('setBreadcrumbs',[
-                {label:'Files',name:''}
+                {label:'GPS',name:''}
             ]);
         },
         data() {

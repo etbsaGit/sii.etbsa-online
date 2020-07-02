@@ -88,8 +88,8 @@
                     <router-view></router-view>
                 </transition>
             </v-main>
-            <v-footer fixed>
-                <span>&copy; {{ date('Y') }}</span>
+            <v-footer app fixed>
+                <span>Equipos y Tractores del Bajio &copy; {{ date('Y') }}</span>
             </v-footer>
         </v-app>
 

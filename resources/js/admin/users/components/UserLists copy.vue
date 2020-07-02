@@ -1,46 +1,49 @@
 <template>
   <div class="component-wrap">
     <!-- search -->
-    <v-card class="pt-2">
-      <div class="d-flex flex-md-row flex-sm-column flex-wrap align-center">
-        <v-btn
-          @click="$router.push({ name: 'users.create' })"
-          class="primary lighten-1 flex-grow-1 ma-1"
-          dark
-        >
-          Usuario Nuevo
-          <v-icon right dark>mdi-plus</v-icon>
-        </v-btn>
-
-        <v-btn
-          @click="$router.push({ name: 'users.groups.list' })"
-          class="primary lighten-1 float-right flex-grow-1 ma-1"
-          dark
-        >
-          Administrar Grupos <v-icon right dark>mdi-account-multiple</v-icon>
-        </v-btn>
-        <v-btn
-          @click="$router.push({ name: 'users.permissions.list' })"
-          class="primary lighten-1 float-right mr-2 flex-grow-1 ma-1"
-          dark
-        >
-          Administra Permisos <v-icon right dark>mdi-key</v-icon>
-        </v-btn>
+    <v-card class="pt-3">
+      <div class="d-flex flex-row">
+        <div class="flex-grow-1 pa-2">
+          <v-btn
+            @click="$router.push({ name: 'users.create' })"
+            class="primary lighten-1"
+            dark
+          >
+            New User
+            <v-icon right dark>add</v-icon>
+          </v-btn>
+        </div>
+        <div class="flex-grow-1 pa-2">
+          <v-btn
+            @click="$router.push({ name: 'users.groups.list' })"
+            class="primary lighten-1 float-right"
+            dark
+          >
+            Manage Groups <v-icon right dark>group</v-icon>
+          </v-btn>
+          <v-btn
+            @click="$router.push({ name: 'users.permissions.list' })"
+            class="primary lighten-1 float-right mr-2"
+            dark
+          >
+            Manage Permissions <v-icon right dark>vpn_key</v-icon>
+          </v-btn>
+        </div>
       </div>
-      <div class="d-flex flex-lg-row flex-sm-column flex-wrap align-center">
+      <div class="d-flex flex-lg-row flex-sm-column">
         <div class="flex-grow-1 pa-2">
           <v-text-field
             filled
-            prepend-icon="mdi-magnify"
-            label="Filtrar por Nombre"
+            prepend-icon="search"
+            label="Filter By Name"
             v-model="filters.name"
           ></v-text-field>
         </div>
         <div class="flex-grow-1 pa-2">
           <v-text-field
             filled
-            prepend-icon="mdi-magnify"
-            label="Filtrar por Email"
+            prepend-icon="search"
+            label="Filter By Email"
             v-model="filters.email"
           ></v-text-field>
         </div>
@@ -51,8 +54,8 @@
             chips
             deletable-chips
             clearable
-            prepend-icon="mdi-filter-variant"
-            label="Filtrar por Grupos"
+            prepend-icon="filter_list"
+            label="Filter By Groups"
             :items="filters.groupOptions"
             item-text="name"
             item-value="id"
@@ -65,6 +68,7 @@
     <v-divider class="pb-2" />
 
     <!-- data table -->
+    <!-- hide-default-header -->
     <v-data-table
       v-bind:headers="headers"
       :options.sync="pagination"
@@ -72,78 +76,120 @@
       :server-items-length="totalItems"
       dense
       fixed-header
-      class="elevation-1 text-uppercase"
+      show-group-by
+      class="elevation-1"
     >
-      <!-- Headers -->
-      <template v-slot:header.name="{ header }" class="align-center">
-        <v-icon small>mdi-account</v-icon>{{ header.text }}
+      <!-- <template v-slot:header="{ props: { headers } }">
+        <thead>
+          <tr>
+            <th v-for="header in headers" :key="header.value">
+              <div
+                v-if="header.value == 'name'"
+                :class="`text-${header.align}`"
+              >
+                <v-icon>mdi-account</v-icon> {{ header.text }}
+              </div>
+              <div
+                v-else-if="header.value == 'email'"
+                :class="`text-${header.align}`"
+              >
+                <v-icon>mdi-email</v-icon> {{ header.text }}
+              </div>
+              <div
+                v-else-if="header.value == 'permissions'"
+                :class="`text-${header.align}`"
+              >
+                <v-icon>mdi-key</v-icon> {{ header.text }}
+              </div>
+              <div
+                v-else-if="header.value == 'groups'"
+                :class="`text-${header.align}`"
+              >
+                <v-icon>mdi-group</v-icon> {{ header.text }}
+              </div>
+              <div
+                v-else-if="header.value == 'last_login'"
+                :class="`text-${header.align}`"
+              >
+                <v-icon>mdi-av-timer</v-icon> {{ header.text }}
+              </div>
+              <div v-else :class="`text-${header.align}`">
+                {{ header.text }}
+              </div>
+            </th>
+          </tr>
+        </thead>
       </template>
-      <template v-slot:header.email="{ header }" class="align-center">
-        <v-icon small>mdi-email</v-icon>{{ header.text }}
-      </template>
-      <template v-slot:header.permissions="{ header }" class="align-center">
-        <v-icon small>mdi-key</v-icon>{{ header.text }}
-      </template>
-      <template v-slot:header.groups="{ header }" class="align-center">
-        <v-icon small>mdi-account-multiple</v-icon>{{ header.text }}
-      </template>
-      <template v-slot:header.last_login="{ header }" class="align-center">
-        <v-icon small>mdi-av-timer</v-icon>{{ header.text }}
-      </template>
-
-      <!-- Body  -->
-      <template v-slot:item.action="{ item }">
-        <v-btn
-          @click="
-            $router.push({
-              name: 'users.edit',
-              params: { id: item.id }
-            })
-          "
-          x-small
-          outlined
-          icon
-          color="info"
-        >
-          <v-icon small>mdi-pencil</v-icon>
-        </v-btn>
-        <v-btn @click="trash(item)" x-small outlined icon color="red">
-          <v-icon small>mdi-delete</v-icon>
-        </v-btn>
-      </template>
-      <template v-slot:item.permissions="{ item }">
-        <v-btn
-          small
-          @click="showDialog('user_permissions', item.permissions)"
-          outlined
-          rounded
-          color="grey"
-          dark
-          >Mostrar</v-btn
-        >
-      </template>
-      <template v-slot:item.groups="{ item }">
-        <v-chip
-          v-for="group in item.groups"
-          :key="group.id"
-          outlined
-          color="secondary"
-          text-color="accent"
-        >
-          {{ group.name }}
-        </v-chip>
-      </template>
-      <template v-slot:item.last_login="{ item }">
-        {{ $appFormatters.formatDate(item.last_login) }}
-      </template>
-      <template v-slot:item.active="{ item }">
-        <v-avatar outlined>
-          <v-icon v-if="item.active != null" class="green--text"
-            >check_circle</v-icon
-          >
-          <v-icon class="grey--text" v-else>error_outline</v-icon>
-        </v-avatar>
-      </template>
+      <template v-slot:body="{ items }">
+        <tbody>
+          <tr v-for="item in items" :key="item.id">
+            <td>
+              <div
+                class="ml-n1 my-1 d-flex justify-space-between align-content-space-around flex-wrap"
+              >
+                <v-btn
+                  @click="
+                    $router.push({
+                      name: 'users.edit',
+                      params: { id: item.id }
+                    })
+                  "
+                  class="ma-1"
+                  small
+                  outlined
+                  icon
+                  color="info"
+                >
+                  <v-icon small>mdi-pencil</v-icon>
+                </v-btn>
+                <v-btn
+                  @click="trash(item)"
+                  class="ma-1"
+                  small
+                  outlined
+                  icon
+                  color="red"
+                >
+                  <v-icon small>mdi-delete</v-icon>
+                </v-btn>
+              </div>
+            </td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.email }}</td>
+            <td>
+              <v-btn
+                small
+                @click="showDialog('user_permissions', item.permissions)"
+                outlined
+                rounded
+                color="grey"
+                dark
+                >Show</v-btn
+              >
+            </td>
+            <td>
+              <v-chip
+                v-for="group in item.groups"
+                :key="group.id"
+                outlined
+                color="secondary"
+                text-color="accent"
+              >
+                {{ group.name }}
+              </v-chip>
+            </td>
+            <td>{{ $appFormatters.formatDate(item.last_login) }}</td>
+            <td class="text-center">
+              <v-avatar outlined>
+                <v-icon v-if="item.active != null" class="green--text"
+                  >check_circle</v-icon
+                >
+                <v-icon class="grey--text" v-else>error_outline</v-icon>
+              </v-avatar>
+            </td>
+          </tr>
+        </tbody>
+      </template> -->
     </v-data-table>
 
     <v-divider class="py-5" />
@@ -200,39 +246,23 @@ export default {
   data() {
     return {
       headers: [
-        {
-          text: "Accion",
-          value: "action",
-          align: "center",
-          sortable: false
-        },
-        {
-          text: "Nombre",
-          value: "name",
-          align: "left",
-          sortable: true
-        },
+        { text: "Action", value: false, align: "left", sortable: false },
+        { text: "Name", value: "name", align: "left", sortable: true },
         { text: "Email", value: "email", align: "left", sortable: false },
         {
-          text: "Permisos",
+          text: "Permissions",
           value: "permissions",
-          align: "center",
+          align: "left",
           sortable: false
         },
-        { text: "Grupos", value: "groups", align: "center", sortable: false },
+        { text: "Groups", value: "groups", align: "left", sortable: false },
         {
-          text: "Ultimo inicio",
+          text: "Last Login",
           value: "last_login",
-          align: "right",
-          sortable: true
-        },
-        {
-          text: "Activo",
-          value: "active",
-          align: "center",
-          width: 10,
+          align: "left",
           sortable: false
-        }
+        },
+        { text: "Active", value: "active", align: "center", sortable: false }
       ],
       items: [],
       totalItems: 0,

@@ -77,19 +77,20 @@
                 <a href="{{ url('/admin') }}">Dashboard</a>
                 @else
                     <a href="{{ route('login') }}">Login</a>
-                    <a href="{{ route('register') }}">Register</a>
+                    {{-- <a href="{{ route('register') }}">Register</a> --}}
                     @endauth
         </div>
     @endif
 
     <div class="content">
-        <div class="title m-b-md">
-            <img class="swiss" src="{{url('img/camper-swiss-knife.jpg')}}">
+        <div class="title m-b-md align-center">
+            <img class="swiss" src="{{url('img/etbsa-logo-agricola.png')}}">
+            <img class="swiss" src="{{url('img/etbsa-logo-construccion.png')}}">
         </div>
 
         <div class="links">
-            <h1>Laravel <span style="color: #F4D8D8">Starter Kit</span></h1>
-            <h4>Powered by VueJS + Material Design</h4>
+            <h1>SII <span style="color: #F4D8D8">ETBSA</span></h1>
+            {{-- <h4>Powered by VueJS + Material Design</h4> --}}
         </div>
     </div>
 </div>

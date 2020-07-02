@@ -4,6 +4,7 @@ export default {
 
         Vue.prototype.$appFormatters = {
             formatDate: function(dateString,format) {
+                moment.locale('es');
                 return moment(dateString).format(format ? format : 'MMMM DD, YYYY');
             },
             formatByteToMB (sizeInBytes) {

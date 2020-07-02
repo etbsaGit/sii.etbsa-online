@@ -70,6 +70,11 @@ const router = new Router({
             ]
         },
         {
+            name: 'gps',
+            path: '/gps',
+            component: require('@admin/gps/Gps').default,
+        },
+        {
             name: 'files',
             path: '/files',
             component: require('@admin/files/Files').default,
