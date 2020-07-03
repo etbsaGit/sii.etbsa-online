@@ -61,9 +61,9 @@ class UserSeeder extends Seeder
 
         // create admin account
         $AdminUser = User::create([
-            'name' => 'John Doe',
-            'email' => 'admin@gmail.com',
-            'password' => '12345678',
+            'name' => 'Admin ETBSA',
+            'email' => 'admin@etbsa.com.mx',
+            'password' => 'secret',
             'remember_token' => Str::random(10),
             'permissions' => [],
             'last_login' => \Carbon\Carbon::now(),
@@ -75,7 +75,7 @@ class UserSeeder extends Seeder
         $AdminUser->groups()->attach($groupSuperUser);
 
         // generate random users
-        $users = factory(User::class,30)->create();
+        $users = factory(User::class,5)->create();
         $users->each(function($u) use ($groupDefaultUser)
         {
             $u->groups()->attach($groupDefaultUser);

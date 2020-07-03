@@ -1,42 +1,46 @@
 class AxiosAjaxDetect {
+  init(startCb, endCb) {
+    let count = 0;
 
-    init (startCb, endCb) {
+    // Add a request interceptor
+    window.axios.interceptors.request.use(
+      function(config) {
+        count++;
 
-        let count = 0;
+        if (count === 1) startCb();
 
-        // Add a request interceptor
-        window.axios.interceptors.request.use(function (config) {
-            count++;
+        return config;
+      },
+      function(error) {
+        return Promise.reject(error);
+      }
+    );
 
-            if(count === 1) startCb();
+    // Add a response interceptor
+    window.axios.interceptors.response.use(
+      function(response) {
+        count--;
 
-            return config;
-        }, function (error) {
-            return Promise.reject(error);
-        });
+        if (count === 0) {
+          endCb();
+        }
 
-        // Add a response interceptor
-        window.axios.interceptors.response.use(function (response) {
+        return response;
+      },
+      function(error) {
+        if (error.response.status === 401) {
+          window.location.href = "/login";
+        }
 
-            count--;
+        count--;
+        if (count === 0) {
+          endCb();
+        }
 
-            if (count === 0) {
-                endCb();
-            }
-
-            return response;
-
-        }, function (error) {
-
-            count--;
-
-            if (count === 0) {
-                endCb();
-            }
-
-            return Promise.reject(error);
-        });
-    }
+        return Promise.reject(error);
+      }
+    );
+  }
 }
 
-export default new AxiosAjaxDetect;
+export default new AxiosAjaxDetect();

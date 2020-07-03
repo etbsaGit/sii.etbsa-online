@@ -1210,6 +1210,35 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/quote/Quote.vue?vue&type=script&lang=js&":
+/*!*****************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/admin/quote/Quote.vue?vue&type=script&lang=js& ***!
+  \*****************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  mounted: function mounted() {
+    var self = this;
+    self.$store.commit('setBreadcrumbs', [{
+      label: 'Settings',
+      name: ''
+    }]);
+  }
+});
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/settings/Settings.vue?vue&type=script&lang=js&":
 /*!***********************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/admin/settings/Settings.vue?vue&type=script&lang=js& ***!
@@ -2495,44 +2524,103 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     var self = this;
     return {
       valid: false,
-      name: '',
+      name: "",
       nameRules: [function (v) {
-        return !!v || 'Name is required';
+        return !!v || "Name is required";
       }],
-      email: '',
+      email: "",
       emailRules: [function (v) {
-        return !!v || 'E-mail is required';
+        return !!v || "E-mail is required";
       }, function (v) {
-        return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'E-mail must be valid';
+        return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(v) || "E-mail must be valid";
       }],
-      password: '',
+      password: "",
       passwordRules: [function (v) {
-        return !!v || 'Password is required';
+        return !!v || "Password is required";
       }, function (v) {
-        return v && v.length >= 8 || 'Password must be atleast 8 characters.';
+        return v && v.length >= 8 || "Password must be atleast 8 characters.";
       }],
-      passwordConfirm: '',
+      passwordConfirm: "",
       passwordConfirmRules: [function (v) {
-        return !(v !== self.password) || 'Password do not match.';
+        return !(v !== self.password) || "Password do not match.";
       }],
       permissions: [],
       groups: [],
-      active: '',
+      active: "",
       options: {
         permissions: [],
         permissionValues: [{
-          label: 'Allow',
+          label: "Allow",
           value: 1
         }, {
-          label: 'Deny',
+          label: "Deny",
           value: -1
         }, {
-          label: 'Inherit',
+          label: "Inherit",
           value: 0
         }],
         groups: []
@@ -2541,25 +2629,25 @@ __webpack_require__.r(__webpack_exports__);
       selectedPermissionValue: 0,
       alert: {
         show: false,
-        icon: '',
-        color: '',
-        message: ''
+        icon: "",
+        color: "",
+        message: ""
       }
     };
   },
   mounted: function mounted() {
-    console.log('components.UserFormAdd.vue');
+    console.log("components.UserFormAdd.vue");
     var self = this;
     self.loadPermissions(function (cb) {});
     self.loadGroups(function (cb) {});
-    self.$store.commit('setBreadcrumbs', [{
-      label: 'Users',
+    self.$store.commit("setBreadcrumbs", [{
+      label: "Users",
       to: {
-        name: 'users.list'
+        name: "users.list"
       }
     }, {
-      label: 'Create',
-      to: ''
+      label: "Create",
+      to: ""
     }]);
   },
   methods: {
@@ -2573,35 +2661,35 @@ __webpack_require__.r(__webpack_exports__);
         name: self.name,
         email: self.email,
         password: self.password,
-        active: self.active ? moment().format('YYYY-MM-DD') : null,
+        active: self.active ? moment().format("YYYY-MM-DD") : null,
         permissions: self.permissions,
         groups: self.groups
       };
-      self.$store.commit('showLoader');
-      axios.post('/admin/users', payload).then(function (response) {
-        self.$store.commit('showSnackbar', {
+      self.$store.commit("showLoader");
+      axios.post("/admin/users", payload).then(function (response) {
+        self.$store.commit("showSnackbar", {
           message: response.data.message,
-          color: 'success',
+          color: "success",
           duration: 3000
         });
-        self.$eventBus.$emit('USER_ADDED');
-        self.$store.commit('hideLoader'); // reset
+        self.$eventBus.$emit("USER_ADDED");
+        self.$store.commit("hideLoader"); // reset
 
         self.$refs.userFormAdd.reset();
         self.permissions = [];
       })["catch"](function (error) {
-        self.$store.commit('hideLoader');
+        self.$store.commit("hideLoader");
 
         if (error.response) {
-          self.$store.commit('showSnackbar', {
+          self.$store.commit("showSnackbar", {
             message: error.response.data.message,
-            color: 'error',
+            color: "error",
             duration: 3000
           });
         } else if (error.request) {
           console.log(error.request);
         } else {
-          console.log('Error', error.message);
+          console.log("Error", error.message);
         }
       });
     },
@@ -2630,9 +2718,9 @@ __webpack_require__.r(__webpack_exports__);
     loadPermissions: function loadPermissions(cb) {
       var self = this;
       var params = {
-        paginate: 'no'
+        paginate: "no"
       };
-      axios.get('/admin/permissions', {
+      axios.get("/admin/permissions", {
         params: params
       }).then(function (response) {
         self.options.permissions = response.data.data;
@@ -2642,9 +2730,9 @@ __webpack_require__.r(__webpack_exports__);
     loadGroups: function loadGroups(cb) {
       var self = this;
       var params = {
-        paginate: 'no'
+        paginate: "no"
       };
-      axios.get('/admin/groups', {
+      axios.get("/admin/groups", {
         params: params
       }).then(function (response) {
         self.options.groups = response.data.data;
@@ -2762,6 +2850,66 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
     propUserId: {
@@ -2772,41 +2920,41 @@ __webpack_require__.r(__webpack_exports__);
     var self = this;
     return {
       valid: false,
-      name: '',
+      name: "",
       nameRules: [function (v) {
-        return !!v || 'Name is required';
+        return !!v || "Nombre Requerido";
       }],
-      email: '',
+      email: "",
       emailRules: [function (v) {
-        return !!v || 'E-mail is required';
+        return !!v || "E-mail is required";
       }, function (v) {
-        return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'E-mail must be valid';
+        return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(v) || "E-mail debe ser valido";
       }],
-      password: '',
+      password: "",
       passwordRules: [function (v) {
         if (v && v.length > 0 && v.length < 8) {
-          return 'Password needs minimum of 8 characters.';
+          return "La contraseña necesita un mínimo de 8 caracteres.";
         }
 
         return true;
       }],
-      passwordConfirm: '',
+      passwordConfirm: "",
       passwordConfirmRules: [function (v) {
-        return !(v !== self.password) || 'Password do not match.';
+        return !(v !== self.password) || "Contraseña no coincide.";
       }],
       permissions: [],
       groups: [],
-      active: '',
+      active: "",
       options: {
         permissions: [],
         permissionValues: [{
-          label: 'Allow',
+          label: "Permitir",
           value: 1
         }, {
-          label: 'Deny',
+          label: "Denegar",
           value: -1
         }, {
-          label: 'Inherit',
+          label: "Heredar",
           value: 0
         }],
         groups: []
@@ -2815,19 +2963,18 @@ __webpack_require__.r(__webpack_exports__);
       selectedPermissionValue: 0,
       alert: {
         show: false,
-        icon: '',
-        color: '',
-        message: ''
+        icon: "",
+        color: "",
+        message: ""
       }
     };
   },
   mounted: function mounted() {
-    console.log('components.UserFormAdd.vue');
     var self = this;
     self.loadPermissions(function () {
       self.loadGroups(function () {});
     });
-    self.$eventBus.$on(['GROUP_ADDED'], function () {
+    self.$eventBus.$on(["GROUP_ADDED"], function () {
       self.loadGroups(function () {});
     });
     this.loadUser(function () {});
@@ -2843,32 +2990,32 @@ __webpack_require__.r(__webpack_exports__);
         name: self.name,
         email: self.email,
         password: self.password ? self.password : null,
-        active: self.active ? moment().format('YYYY-MM-DD') : null,
+        active: self.active ? moment().format("YYYY-MM-DD") : null,
         permissions: self.permissions,
         groups: self.groups
       };
-      self.$store.commit('showLoader');
-      axios.put('/admin/users/' + self.propUserId, payload).then(function (response) {
-        self.$store.commit('showSnackbar', {
+      self.$store.commit("showLoader");
+      axios.put("/admin/users/" + self.propUserId, payload).then(function (response) {
+        self.$store.commit("showSnackbar", {
           message: response.data.message,
-          color: 'success',
+          color: "success",
           duration: 3000
         });
-        self.$eventBus.$emit('USER_UPDATED');
-        self.$store.commit('hideLoader');
+        self.$eventBus.$emit("USER_UPDATED");
+        self.$store.commit("hideLoader");
       })["catch"](function (error) {
-        self.$store.commit('hideLoader');
+        self.$store.commit("hideLoader");
 
         if (error.response) {
-          self.$store.commit('showSnackbar', {
+          self.$store.commit("showSnackbar", {
             message: error.response.data.message,
-            color: 'error',
+            color: "error",
             duration: 3000
           });
         } else if (error.request) {
           console.log(error.request);
         } else {
-          console.log('Error', error.message);
+          console.log("Error", error.message);
         }
       });
     },
@@ -2900,7 +3047,7 @@ __webpack_require__.r(__webpack_exports__);
       var self = this; // reset first
 
       self.groups = [];
-      axios.get('/admin/users/' + self.propUserId).then(function (response) {
+      axios.get("/admin/users/" + self.propUserId).then(function (response) {
         var User = response.data.data;
         self.name = User.name;
         self.email = User.email;
@@ -2911,17 +3058,17 @@ __webpack_require__.r(__webpack_exports__);
           self.groups[g.id] = true;
         });
 
-        self.$store.commit('setBreadcrumbs', [{
-          label: 'Users',
+        self.$store.commit("setBreadcrumbs", [{
+          label: "Users",
           to: {
-            name: 'users.list'
+            name: "users.list"
           }
         }, {
           label: User.name,
-          to: ''
+          to: ""
         }, {
-          label: 'Edit',
-          to: ''
+          label: "Perfil",
+          to: ""
         }]);
         cb();
       });
@@ -2929,9 +3076,9 @@ __webpack_require__.r(__webpack_exports__);
     loadPermissions: function loadPermissions(cb) {
       var self = this;
       var params = {
-        paginate: 'no'
+        paginate: "no"
       };
-      axios.get('/admin/permissions', {
+      axios.get("/admin/permissions", {
         params: params
       }).then(function (response) {
         self.options.permissions = response.data.data;
@@ -2941,9 +3088,9 @@ __webpack_require__.r(__webpack_exports__);
     loadGroups: function loadGroups(cb) {
       var self = this;
       var params = {
-        paginate: 'no'
+        paginate: "no"
       };
-      axios.get('/admin/groups', {
+      axios.get("/admin/groups", {
         params: params
       }).then(function (response) {
         self.options.groups = response.data.data;
@@ -3264,8 +3411,8 @@ __webpack_require__.r(__webpack_exports__);
       self.$store.commit("showDialog", {
         type: "confirm",
         icon: "warning",
-        title: "Confirm Deletion",
-        message: "Are you sure you want to delete this user?",
+        title: "Confirmar Eliminacion",
+        message: "¿Esta seguro en eliminar al usuario?",
         okCb: function okCb() {
           axios["delete"]("/admin/users/" + user.id).then(function (response) {
             self.$store.commit("showSnackbar", {
@@ -20041,6 +20188,49 @@ render._withStripped = true
 
 /***/ }),
 
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/quote/Quote.vue?vue&type=template&id=3383718a&":
+/*!*********************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/admin/quote/Quote.vue?vue&type=template&id=3383718a& ***!
+  \*********************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _vm._m(0)
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "page_wrap_vue pa-3" }, [
+      _c("h2", [_vm._v("COTIZADOR PAGE")]),
+      _vm._v(" "),
+      _c("p", [
+        _vm._v("I am located at "),
+        _c("b", [_vm._v("resources/js/admin/settings/Settings.vue")])
+      ]),
+      _vm._v(" "),
+      _c("p", [
+        _vm._v("single page routes for admin can be found at "),
+        _c("b", [_vm._v("resources/js/admin/router.js")])
+      ])
+    ])
+  }
+]
+render._withStripped = true
+
+
+
+/***/ }),
+
 /***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/settings/Settings.vue?vue&type=template&id=3c237f3e&":
 /*!***************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/admin/settings/Settings.vue?vue&type=template&id=3c237f3e& ***!
@@ -21562,10 +21752,7 @@ var render = function() {
         [
           _c(
             "v-card-title",
-            [
-              _c("v-icon", [_vm._v("person")]),
-              _vm._v(" Create User\n        ")
-            ],
+            [_c("v-icon", [_vm._v("person")]), _vm._v(" Create User ")],
             1
           ),
           _vm._v(" "),
@@ -21710,7 +21897,7 @@ var render = function() {
                             { staticClass: "title" },
                             [
                               _c("v-icon", [_vm._v("vpn_key")]),
-                              _vm._v(" Special Permissions")
+                              _vm._v(" Special Permissions\n            ")
                             ],
                             1
                           ),
@@ -21726,7 +21913,7 @@ var render = function() {
                             },
                             [
                               _vm._v(
-                                '\n                        Special Permissions are permission exclusive to this user. Permissions defined here\n                        are more superior than any permission that is in his group. So if the User belongs to a group that has permission to "create something"\n                        but then is denied to "create something" here, the user will be denied on that permission. In short, special permissions\n                        has high priority that group permissions.\n                    '
+                                '\n              Los permisos especiales son permisos exclusivos para este\n              usuario. Permisos definidos aquí. Son más superiores que\n              cualquier permiso que tenga en su grupo. Así que si el usuario\n              pertenece a un grupo que tiene permiso para "hacer algo" pero\n              luego se le niega "hacer algo" aquí, al usuario se le negará ese\n              permiso. En definitiva, permisos especiales.Tiene alta prioridad\n              que los permisos de grupo.\n            '
                               )
                             ]
                           ),
@@ -21799,7 +21986,7 @@ var render = function() {
                             },
                             [
                               _vm._v(
-                                "\n                        Add Permission\n                        "
+                                "\n              Add Permission\n              "
                               ),
                               _c("v-icon", { attrs: { right: "" } }, [
                                 _vm._v("add")
@@ -21872,9 +22059,9 @@ var render = function() {
                                       )
                                     : _vm._e(),
                                   _vm._v(
-                                    "\n                            " +
+                                    "\n                " +
                                       _vm._s(p.title) +
-                                      "\n                        "
+                                      "\n              "
                                   )
                                 ],
                                 1
@@ -21883,7 +22070,9 @@ var render = function() {
                             _vm._v(" "),
                             _vm.permissions.length === 0
                               ? _c("div", { staticClass: "info pa-2" }, [
-                                  _vm._v("No special permissions assigned.")
+                                  _vm._v(
+                                    "\n                No special permissions assigned.\n              "
+                                  )
                                 ])
                               : _vm._e()
                           ],
@@ -21918,20 +22107,26 @@ var render = function() {
                       ),
                       _vm._v(" "),
                       _c(
-                        "v-flex",
-                        { attrs: { xs12: "" } },
+                        "v-layout",
+                        { attrs: { wrap: "", "mx-2": "" } },
                         _vm._l(_vm.options.groups, function(g, k) {
-                          return _c("v-switch", {
-                            key: k,
-                            attrs: { label: g.name },
-                            model: {
-                              value: _vm.groups[g.id],
-                              callback: function($$v) {
-                                _vm.$set(_vm.groups, g.id, $$v)
-                              },
-                              expression: "groups[g.id]"
-                            }
-                          })
+                          return _c(
+                            "v-flex",
+                            { key: k, attrs: { xs6: "", md3: "" } },
+                            [
+                              _c("v-switch", {
+                                attrs: { label: g.name },
+                                model: {
+                                  value: _vm.groups[g.id],
+                                  callback: function($$v) {
+                                    _vm.$set(_vm.groups, g.id, $$v)
+                                  },
+                                  expression: "groups[g.id]"
+                                }
+                              })
+                            ],
+                            1
+                          )
                         }),
                         1
                       ),
@@ -22005,7 +22200,10 @@ var render = function() {
         [
           _c(
             "v-card-title",
-            [_c("v-icon", [_vm._v("person")]), _vm._v(" Edit User\n        ")],
+            [
+              _c("v-icon", [_vm._v("mdi-badge-account")]),
+              _vm._v(" Perfil Usuario ")
+            ],
             1
           ),
           _vm._v(" "),
@@ -22038,10 +22236,7 @@ var render = function() {
                         { attrs: { xs12: "", sm6: "" } },
                         [
                           _c("v-text-field", {
-                            attrs: {
-                              label: "First Name",
-                              rules: _vm.nameRules
-                            },
+                            attrs: { label: "Nombre", rules: _vm.nameRules },
                             model: {
                               value: _vm.name,
                               callback: function($$v) {
@@ -22078,7 +22273,8 @@ var render = function() {
                         [
                           _c("v-text-field", {
                             attrs: {
-                              label: "Password (Leave blank if unchange)",
+                              label:
+                                "Contraseña (dejar en blanco si no se cambia)",
                               type: "password",
                               rules: _vm.passwordRules
                             },
@@ -22099,7 +22295,7 @@ var render = function() {
                         { attrs: { xs12: "", sm6: "" } },
                         [
                           _c("v-switch", {
-                            attrs: { label: "Pre-Activate Account" },
+                            attrs: { label: "Cuenta Preactivada" },
                             model: {
                               value: _vm.active,
                               callback: function($$v) {
@@ -22127,8 +22323,8 @@ var render = function() {
                             "h1",
                             { staticClass: "title" },
                             [
-                              _c("v-icon", [_vm._v("vpn_key")]),
-                              _vm._v(" Special Permissions")
+                              _c("v-icon", [_vm._v("mdi-key")]),
+                              _vm._v(" Permisos Especiales\n            ")
                             ],
                             1
                           ),
@@ -22144,7 +22340,7 @@ var render = function() {
                             },
                             [
                               _vm._v(
-                                '\n                        Special Permissions are permission exclusive to this user. Permissions defined here\n                        are more superior than any permission that is in his group. So if the User belongs to a group that has permission to "create something"\n                        but then is denied to "create something" here, the user will be denied on that permission. In short, special permissions\n                        has high priority that group permissions.\n                    '
+                                '\n              Los permisos especiales son permisos exclusivos para este\n              usuario. Permisos definidos aquí. Son más superiores que\n              cualquier permiso que tenga en su grupo. Así que si el usuario\n              pertenece a un grupo que tiene permiso para "hacer algo" pero\n              luego se le niega "hacer algo" aquí, al usuario se le negará ese\n              permiso. En definitiva, permisos especiales.Tiene alta prioridad\n              que los permisos de grupo.\n            '
                               )
                             ]
                           ),
@@ -22160,7 +22356,7 @@ var render = function() {
                         [
                           _c("v-select", {
                             attrs: {
-                              label: "Select Permission",
+                              label: "Selecciona Permisos",
                               items: _vm.options.permissions,
                               "item-text": "title",
                               "item-value": "key"
@@ -22183,7 +22379,7 @@ var render = function() {
                         [
                           _c("v-select", {
                             attrs: {
-                              label: "Permission Value",
+                              label: "Valor del Permiso",
                               items: _vm.options.permissionValues,
                               "item-text": "label",
                               "item-value": "value"
@@ -22217,7 +22413,7 @@ var render = function() {
                             },
                             [
                               _vm._v(
-                                "\n                        Add Permission\n                        "
+                                "\n              Agregar Permiso\n              "
                               ),
                               _c("v-icon", { attrs: { right: "" } }, [
                                 _vm._v("add")
@@ -22257,10 +22453,10 @@ var render = function() {
                                     ? _c(
                                         "v-avatar",
                                         {
-                                          staticClass: "red darken-4",
+                                          staticClass: "red darken-1",
                                           attrs: { title: "Deny" }
                                         },
-                                        [_c("v-icon", [_vm._v("block")])],
+                                        [_c("v-icon", [_vm._v("mdi-cancel")])],
                                         1
                                       )
                                     : _vm._e(),
@@ -22269,11 +22465,13 @@ var render = function() {
                                     ? _c(
                                         "v-avatar",
                                         {
-                                          staticClass: "green darken-4",
+                                          staticClass: "green darken-1",
                                           attrs: { title: "Allow" }
                                         },
                                         [
-                                          _c("v-icon", [_vm._v("check_circle")])
+                                          _c("v-icon", [
+                                            _vm._v("mdi-check-circle-outline")
+                                          ])
                                         ],
                                         1
                                       )
@@ -22283,17 +22481,21 @@ var render = function() {
                                     ? _c(
                                         "v-avatar",
                                         {
-                                          staticClass: "blue darken-4",
+                                          staticClass: "blue darken-1",
                                           attrs: { title: "Inherit" }
                                         },
-                                        [_c("v-icon", [_vm._v("swap_horiz")])],
+                                        [
+                                          _c("v-icon", [
+                                            _vm._v("mdi-swap-horizontal")
+                                          ])
+                                        ],
                                         1
                                       )
                                     : _vm._e(),
                                   _vm._v(
-                                    "\n                            " +
+                                    "\n                " +
                                       _vm._s(p.title) +
-                                      "\n                        "
+                                      "\n              "
                                   )
                                 ],
                                 1
@@ -22302,7 +22504,9 @@ var render = function() {
                             _vm._v(" "),
                             _vm.permissions && _vm.permissions.length === 0
                               ? _c("div", [
-                                  _vm._v("No special permissions assigned.")
+                                  _vm._v(
+                                    "\n                No hay permisos especiales asignados.\n              "
+                                  )
                                 ])
                               : _vm._e()
                           ],
@@ -22326,7 +22530,7 @@ var render = function() {
                             { staticClass: "title" },
                             [
                               _c("v-icon", [_vm._v("people")]),
-                              _vm._v(" Groups")
+                              _vm._v(" Grupos")
                             ],
                             1
                           ),
@@ -22337,20 +22541,26 @@ var render = function() {
                       ),
                       _vm._v(" "),
                       _c(
-                        "v-flex",
-                        { attrs: { xs12: "" } },
+                        "v-layout",
+                        { attrs: { wrap: "", "mx-2": "" } },
                         _vm._l(_vm.options.groups, function(g, k) {
-                          return _c("v-switch", {
-                            key: k,
-                            attrs: { label: g.name },
-                            model: {
-                              value: _vm.groups[g.id],
-                              callback: function($$v) {
-                                _vm.$set(_vm.groups, g.id, $$v)
-                              },
-                              expression: "groups[g.id]"
-                            }
-                          })
+                          return _c(
+                            "v-flex",
+                            { key: k, attrs: { xs6: "", md3: "" } },
+                            [
+                              _c("v-switch", {
+                                attrs: { label: g.name },
+                                model: {
+                                  value: _vm.groups[g.id],
+                                  callback: function($$v) {
+                                    _vm.$set(_vm.groups, g.id, $$v)
+                                  },
+                                  expression: "groups[g.id]"
+                                }
+                              })
+                            ],
+                            1
+                          )
                         }),
                         1
                       ),
@@ -22363,6 +22573,7 @@ var render = function() {
                             "v-btn",
                             {
                               attrs: {
+                                block: "",
                                 disabled: !_vm.valid,
                                 color: "primary",
                                 dark: ""
@@ -24454,12 +24665,12 @@ module.exports = function(module) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _mdi_font_css_materialdesignicons_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @mdi/font/css/materialdesignicons.css */ "./node_modules/@mdi/font/css/materialdesignicons.css");
 /* harmony import */ var _mdi_font_css_materialdesignicons_css__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_mdi_font_css_materialdesignicons_css__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var vuetify_dist_vuetify_min_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vuetify/dist/vuetify.min.css */ "./node_modules/vuetify/dist/vuetify.min.css");
-/* harmony import */ var vuetify_dist_vuetify_min_css__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(vuetify_dist_vuetify_min_css__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js");
-/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(vue__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var vuetify__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vuetify */ "./node_modules/vuetify/dist/vuetify.js");
-/* harmony import */ var vuetify__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(vuetify__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js");
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(vue__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var vuetify__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vuetify */ "./node_modules/vuetify/dist/vuetify.js");
+/* harmony import */ var vuetify__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(vuetify__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var vuetify_dist_vuetify_min_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vuetify/dist/vuetify.min.css */ "./node_modules/vuetify/dist/vuetify.min.css");
+/* harmony import */ var vuetify_dist_vuetify_min_css__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(vuetify_dist_vuetify_min_css__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var vue_progressbar__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! vue-progressbar */ "./node_modules/vue-progressbar/dist/vue-progressbar.js");
 /* harmony import */ var vue_progressbar__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(vue_progressbar__WEBPACK_IMPORTED_MODULE_4__);
 /* harmony import */ var _plugins__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ~/plugins */ "./resources/js/plugins/index.js");
@@ -24487,11 +24698,11 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
 // you can change colors here based on your needs
 // and please dont forget to recompile scripts
 
-vue__WEBPACK_IMPORTED_MODULE_2___default.a.use(vuetify__WEBPACK_IMPORTED_MODULE_3___default.a); // this is the progress bar settings, you
+vue__WEBPACK_IMPORTED_MODULE_1___default.a.use(vuetify__WEBPACK_IMPORTED_MODULE_2___default.a); // this is the progress bar settings, you
 // can change colors here to fit on your needs or match
 // your theming above
 
-vue__WEBPACK_IMPORTED_MODULE_2___default.a.use(vue_progressbar__WEBPACK_IMPORTED_MODULE_4___default.a, {
+vue__WEBPACK_IMPORTED_MODULE_1___default.a.use(vue_progressbar__WEBPACK_IMPORTED_MODULE_4___default.a, {
   color: "#3f51b5",
   failedColor: "#b71c1c",
   thickness: "5px",
@@ -24504,17 +24715,17 @@ vue__WEBPACK_IMPORTED_MODULE_2___default.a.use(vue_progressbar__WEBPACK_IMPORTED
   inverse: false
 }); // global component registrations here
 
-vue__WEBPACK_IMPORTED_MODULE_2___default.a.component("moon-loader", __webpack_require__(/*! vue-spinner/src/MoonLoader.vue */ "./node_modules/vue-spinner/src/MoonLoader.vue")["default"]); // app
+vue__WEBPACK_IMPORTED_MODULE_1___default.a.component("moon-loader", __webpack_require__(/*! vue-spinner/src/MoonLoader.vue */ "./node_modules/vue-spinner/src/MoonLoader.vue")["default"]); // app
 
 
 
 
 
 
-vue__WEBPACK_IMPORTED_MODULE_2___default.a.use(_common_Formatters__WEBPACK_IMPORTED_MODULE_9__["default"]);
-vue__WEBPACK_IMPORTED_MODULE_2___default.a.use(_common_Event__WEBPACK_IMPORTED_MODULE_8__["default"]);
-var admin = new vue__WEBPACK_IMPORTED_MODULE_2___default.a({
-  vuetify: new vuetify__WEBPACK_IMPORTED_MODULE_3___default.a({
+vue__WEBPACK_IMPORTED_MODULE_1___default.a.use(_common_Formatters__WEBPACK_IMPORTED_MODULE_9__["default"]);
+vue__WEBPACK_IMPORTED_MODULE_1___default.a.use(_common_Event__WEBPACK_IMPORTED_MODULE_8__["default"]);
+var admin = new vue__WEBPACK_IMPORTED_MODULE_1___default.a({
+  vuetify: new vuetify__WEBPACK_IMPORTED_MODULE_2___default.a({
     theme: {
       dark: false,
       themes: {
@@ -25465,6 +25676,75 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/admin/quote/Quote.vue":
+/*!********************************************!*\
+  !*** ./resources/js/admin/quote/Quote.vue ***!
+  \********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _Quote_vue_vue_type_template_id_3383718a___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Quote.vue?vue&type=template&id=3383718a& */ "./resources/js/admin/quote/Quote.vue?vue&type=template&id=3383718a&");
+/* harmony import */ var _Quote_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Quote.vue?vue&type=script&lang=js& */ "./resources/js/admin/quote/Quote.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _Quote_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _Quote_vue_vue_type_template_id_3383718a___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _Quote_vue_vue_type_template_id_3383718a___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/admin/quote/Quote.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/admin/quote/Quote.vue?vue&type=script&lang=js&":
+/*!*********************************************************************!*\
+  !*** ./resources/js/admin/quote/Quote.vue?vue&type=script&lang=js& ***!
+  \*********************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Quote_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib??vue-loader-options!./Quote.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/quote/Quote.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Quote_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/admin/quote/Quote.vue?vue&type=template&id=3383718a&":
+/*!***************************************************************************!*\
+  !*** ./resources/js/admin/quote/Quote.vue?vue&type=template&id=3383718a& ***!
+  \***************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Quote_vue_vue_type_template_id_3383718a___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib??vue-loader-options!./Quote.vue?vue&type=template&id=3383718a& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/quote/Quote.vue?vue&type=template&id=3383718a&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Quote_vue_vue_type_template_id_3383718a___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Quote_vue_vue_type_template_id_3383718a___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
 /***/ "./resources/js/admin/router.js":
 /*!**************************************!*\
   !*** ./resources/js/admin/router.js ***!
@@ -25549,6 +25829,10 @@ var router = new vue_router__WEBPACK_IMPORTED_MODULE_1__["default"]({
     name: 'gps',
     path: '/gps',
     component: __webpack_require__(/*! @admin/gps/Gps */ "./resources/js/admin/gps/Gps.vue")["default"]
+  }, {
+    name: 'quote',
+    path: '/cotizador',
+    component: __webpack_require__(/*! @admin/quote/Quote */ "./resources/js/admin/quote/Quote.vue")["default"]
   }, {
     name: 'files',
     path: '/files',
@@ -26430,6 +26714,10 @@ var AxiosAjaxDetect = /*#__PURE__*/function () {
 
         return response;
       }, function (error) {
+        if (error.response.status === 401) {
+          window.location.href = "/login";
+        }
+
         count--;
 
         if (count === 0) {

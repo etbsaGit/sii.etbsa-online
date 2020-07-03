@@ -75,6 +75,11 @@ const router = new Router({
             component: require('@admin/gps/Gps').default,
         },
         {
+            name: 'quote',
+            path: '/cotizador',
+            component: require('@admin/quote/Quote').default,
+        },
+        {
             name: 'files',
             path: '/files',
             component: require('@admin/files/Files').default,

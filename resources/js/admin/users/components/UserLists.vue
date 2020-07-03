@@ -298,8 +298,8 @@ export default {
       self.$store.commit("showDialog", {
         type: "confirm",
         icon: "warning",
-        title: "Confirm Deletion",
-        message: "Are you sure you want to delete this user?",
+        title: "Confirmar Eliminacion",
+        message: "¿Esta seguro en eliminar al usuario?",
         okCb: () => {
           axios
             .delete("/admin/users/" + user.id)
