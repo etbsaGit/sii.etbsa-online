@@ -13,6 +13,7 @@ import "@mdi/font/css/materialdesignicons.css";
 import Vue from "vue";
 import Vuetify from "vuetify";
 import "vuetify/dist/vuetify.min.css";
+import es from "vuetify/es5/locale/es";
 import VueProgressBar from "vue-progressbar";
 import "~/plugins";
 
@@ -75,6 +76,10 @@ const admin = new Vue({
     },
     icons: {
       iconfont: "mdi",
+    },
+    lang: {
+      locales: { es },
+      current: "es",
     },
   }),
   el: "#admin",

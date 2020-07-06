@@ -11,7 +11,7 @@ class GpsGroup extends Model
     protected $fillable = [
         'name',
         'agency',
-        'departament',
+        'department',
         'description',
     ];
 

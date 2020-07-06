@@ -740,39 +740,58 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {},
   data: function data() {
     return {
       headers: [{
-        text: 'Action',
+        text: "Action",
         value: false,
-        align: 'left',
+        align: "left",
         sortable: false
       }, {
-        text: 'Thumb',
-        value: 'thumb',
-        align: 'left',
+        text: "Thumb",
+        value: "thumb",
+        align: "left",
         sortable: false
       }, {
-        text: 'Name',
-        value: 'name',
-        align: 'left',
+        text: "Name",
+        value: "name",
+        align: "left",
         sortable: false
       }, {
-        text: 'Size',
-        value: 'size',
-        align: 'left',
+        text: "Size",
+        value: "size",
+        align: "left",
         sortable: false
       }, {
-        text: 'Found In',
-        value: 'group',
-        align: 'left',
+        text: "Found In",
+        value: "group",
+        align: "left",
         sortable: false
       }, {
-        text: 'Date Created',
-        value: 'created_at',
-        align: 'left',
+        text: "Date Created",
+        value: "created_at",
+        align: "left",
         sortable: false
       }],
       items: [],
@@ -781,8 +800,8 @@ __webpack_require__.r(__webpack_exports__);
         rowsPerPage: 10
       },
       filters: {
-        name: '',
-        selectedGroupIds: '',
+        name: "",
+        selectedGroupIds: "",
         fileGroupId: [],
         fileGroupsHolder: []
       },
@@ -795,49 +814,50 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   mounted: function mounted() {
-    console.log('pages.files.components.FileLists.vue');
+    console.log("pages.files.components.FileLists.vue");
     var self = this;
-    self.$eventBus.$on(['FILE_DELETED', 'FILE_UPLOADED'], function () {
+    self.$eventBus.$on(["FILE_DELETED", "FILE_UPLOADED"], function () {
       self.loadFiles(function () {});
     });
+    self.loadFileGroups(function () {});
   },
   watch: {
-    'filters.fileGroupId': _.debounce(function (v) {
+    "filters.fileGroupId": _.debounce(function (v) {
       var selected = [];
 
       _.each(v, function (v, k) {
         if (v) selected.push(k);
       });
 
-      this.filters.selectedGroupIds = selected.join(',');
+      this.filters.selectedGroupIds = selected.join(",");
     }, 500),
-    'filters.selectedGroupIds': function filtersSelectedGroupIds(v) {
+    "filters.selectedGroupIds": function filtersSelectedGroupIds(v) {
       this.loadFiles(function () {});
     },
-    'filters.name': _.debounce(function (v) {
+    "filters.name": _.debounce(function (v) {
       this.loadFiles(function () {});
     }, 500),
-    'pagination.page': function paginationPage() {
+    "pagination.page": function paginationPage() {
       this.loadFiles(function () {});
     },
-    'pagination.rowsPerPage': function paginationRowsPerPage() {
+    "pagination.rowsPerPage": function paginationRowsPerPage() {
       this.loadFiles(function () {});
     }
   },
   methods: {
     getFullUrl: function getFullUrl(file, width, action) {
       var w = width || 4000;
-      var act = action || 'resize';
+      var act = action || "resize";
       return LSK_APP.APP_URL + "/files/" + file.id + "/preview?w=" + w + "&action=" + act;
     },
     downloadFile: function downloadFile(file) {
-      window.open(LSK_APP.APP_URL + '/files/' + file.id + '/download?file_token=' + file.file_token);
+      window.open(LSK_APP.APP_URL + "/files/" + file.id + "/download?file_token=" + file.file_token);
     },
     showDialog: function showDialog(dialog, data) {
       var self = this;
 
       switch (dialog) {
-        case 'file_show':
+        case "file_show":
           self.dialogs.view.file = data;
           setTimeout(function () {
             self.dialogs.view.show = true;
@@ -847,32 +867,32 @@ __webpack_require__.r(__webpack_exports__);
     },
     trash: function trash(file) {
       var self = this;
-      self.$store.commit('showDialog', {
+      self.$store.commit("showDialog", {
         type: "confirm",
         title: "Confirm Deletion",
         message: "Are you sure you want to delete this file?",
         okCb: function okCb() {
-          axios["delete"]('/admin/files/' + file.id).then(function (response) {
-            self.$store.commit('showSnackbar', {
+          axios["delete"]("/admin/files/" + file.id).then(function (response) {
+            self.$store.commit("showSnackbar", {
               message: response.data.message,
-              color: 'success',
+              color: "success",
               duration: 3000
             });
-            self.$eventBus.$emit('FILE_DELETED'); // maybe the action took place from view file
+            self.$eventBus.$emit("FILE_DELETED"); // maybe the action took place from view file
             // lets close it.
 
             self.dialogs.view.show = false;
           })["catch"](function (error) {
             if (error.response) {
-              self.$store.commit('showSnackbar', {
+              self.$store.commit("showSnackbar", {
                 message: error.response.data.message,
-                color: 'error',
+                color: "error",
                 duration: 3000
               });
             } else if (error.request) {
               console.log(error.request);
             } else {
-              console.log('Error', error.message);
+              console.log("Error", error.message);
             }
           });
         },
@@ -884,9 +904,9 @@ __webpack_require__.r(__webpack_exports__);
     loadFileGroups: function loadFileGroups(cb) {
       var self = this;
       var params = {
-        paginate: 'no'
+        paginate: "no"
       };
-      axios.get('/admin/file-groups', {
+      axios.get("/admin/file-groups", {
         params: params
       }).then(function (response) {
         self.filters.fileGroupsHolder = response.data.data;
@@ -901,7 +921,7 @@ __webpack_require__.r(__webpack_exports__);
         page: self.pagination.page,
         per_page: self.pagination.rowsPerPage
       };
-      axios.get('/admin/files', {
+      axios.get("/admin/files", {
         params: params
       }).then(function (response) {
         self.items = response.data.data.data;
@@ -1058,9 +1078,9 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _components_GpsGroupLists_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./components/GpsGroupLists.vue */ "./resources/js/admin/gps/components/GpsGroupLists.vue");
-/* harmony import */ var _components_GpsUpload_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./components/GpsUpload.vue */ "./resources/js/admin/gps/components/GpsUpload.vue");
-/* harmony import */ var _components_GpsLists_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./components/GpsLists.vue */ "./resources/js/admin/gps/components/GpsLists.vue");
+/* harmony import */ var _admin_gps_components_GpsGroupLists_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @admin/gps/components/GpsGroupLists.vue */ "./resources/js/admin/gps/components/GpsGroupLists.vue");
+/* harmony import */ var _admin_gps_components_GpsUpload_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @admin/gps/components/GpsUpload.vue */ "./resources/js/admin/gps/components/GpsUpload.vue");
+/* harmony import */ var _admin_gps_components_GpsLists_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @admin/gps/components/GpsLists.vue */ "./resources/js/admin/gps/components/GpsLists.vue");
 //
 //
 //
@@ -1105,12 +1125,11 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {
-    GpsUpload: _components_GpsUpload_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
-    GpsGroupLists: _components_GpsGroupLists_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
-    GpsLists: _components_GpsLists_vue__WEBPACK_IMPORTED_MODULE_2__["default"]
+    GpsUpload: _admin_gps_components_GpsUpload_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
+    GpsGroupLists: _admin_gps_components_GpsGroupLists_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
+    GpsLists: _admin_gps_components_GpsLists_vue__WEBPACK_IMPORTED_MODULE_2__["default"]
   },
   mounted: function mounted() {
-    console.log('pages.GpsManager.vue');
     var self = this;
     self.$store.commit('setBreadcrumbs', [{
       label: 'GPS',
@@ -1119,7 +1138,7 @@ __webpack_require__.r(__webpack_exports__);
   },
   data: function data() {
     return {
-      active: 'files'
+      active: 'gps'
     };
   },
   watch: {
@@ -1128,6 +1147,585 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   methods: {}
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/gps/components/GpsAdd.vue?vue&type=script&lang=js&":
+/*!***************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/admin/gps/components/GpsAdd.vue?vue&type=script&lang=js& ***!
+  \***************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      valid: false,
+      isLoading: false,
+      fieldRules: [function (v) {
+        return !!v || "Campo requerido";
+      }],
+      name: "",
+      sim: null,
+      imei: null,
+      cost: null,
+      amount: null,
+      activation_date: null,
+      due_date: null,
+      comment: ""
+    };
+  },
+  mounted: function mounted() {
+    var self = this;
+    self.$refs.gpsFormEdit.reset();
+  },
+  methods: {
+    save: function save() {
+      var self = this;
+
+      if (self.$refs.gpsFormEdit.validate()) {
+        var payload = {
+          name: self.name,
+          sim: self.sim,
+          imei: self.imei,
+          cost: self.cost,
+          amount: self.amount,
+          activation_date: self.activation_date,
+          due_date: self.due_date,
+          currency: self.currency,
+          exchange_rate: self.exchange_rate,
+          comment: self.comment,
+          uploaded_by: LSK_APP.AUTH_USER.id
+        };
+        axios.post("/admin/gps", payload).then(function (response) {
+          self.$store.commit("showSnackbar", {
+            message: response.data.message,
+            color: "success",
+            duration: 3000
+          });
+          self.$eventBus.$emit("GPS_ADDED");
+        })["catch"](function (error) {
+          if (error.response) {
+            self.$store.commit("showSnackbar", {
+              message: error.response.data.message,
+              color: "error",
+              duration: 3000
+            });
+          } else if (error.request) {
+            console.log(error.request);
+          } else {
+            console.log("Error", error.message);
+          }
+        });
+      }
+    }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/gps/components/GpsEdit.vue?vue&type=script&lang=js&":
+/*!****************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/admin/gps/components/GpsEdit.vue?vue&type=script&lang=js& ***!
+  \****************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  props: {
+    propGpsId: {
+      required: true
+    }
+  },
+  data: function data() {
+    return {
+      valid: false,
+      isLoading: false,
+      fieldRules: [function (v) {
+        return !!v || "Campo requerido";
+      }],
+      name: "",
+      sim: null,
+      imei: null,
+      cost: null,
+      amount: null,
+      activation_date: null,
+      due_date: null,
+      comment: ""
+    };
+  },
+  mounted: function mounted() {
+    var self = this;
+    self.loadGps(function () {});
+  },
+  methods: {
+    save: function save() {
+      var self = this;
+
+      if (self.$refs.gpsFormEdit.validate()) {
+        var payload = {
+          name: self.name,
+          sim: self.sim,
+          imei: self.imei,
+          cost: self.cost,
+          amount: self.amount,
+          activation_date: self.activation_date,
+          due_date: self.due_date,
+          currency: self.currency,
+          exchange_rate: self.exchange_rate,
+          comment: self.comment
+        };
+        axios.put("/admin/gps/" + self.propGpsId, payload).then(function (response) {
+          self.$store.commit("showSnackbar", {
+            message: response.data.message,
+            color: "success",
+            duration: 3000
+          });
+          self.$eventBus.$emit("GPS_UPDATED");
+        })["catch"](function (error) {
+          if (error.response) {
+            self.$store.commit("showSnackbar", {
+              message: error.response.data.message,
+              color: "error",
+              duration: 3000
+            });
+          } else if (error.request) {
+            console.log(error.request);
+          } else {
+            console.log("Error", error.message);
+          }
+        });
+      }
+    },
+    loadGps: function loadGps(cb) {
+      var self = this;
+      axios.get("/admin/gps/" + self.propGpsId).then(function (response) {
+        var Gps = response.data.data;
+        self.name = Gps.name;
+        self.sim = Gps.sim;
+        self.imei = Gps.imei;
+        self.cost = Gps.cost;
+        self.amount = Gps.amount;
+        self.activation_date = self.$appFormatters.formatDate(Gps.activation_date, "yyyy-MM-DD");
+        self.due_date = self.$appFormatters.formatDate(Gps.due_date, "yyyy-MM-DD");
+        self.comment = Gps.comment;
+        cb();
+      });
+    }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/gps/components/GpsGroupAdd.vue?vue&type=script&lang=js&":
+/*!********************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/admin/gps/components/GpsGroupAdd.vue?vue&type=script&lang=js& ***!
+  \********************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      valid: false,
+      isLoading: false,
+      name: "",
+      nameRules: [function (v) {
+        return !!v || "Name is required";
+      }],
+      agency: "CELAYA",
+      agencyRules: [function (v) {
+        return !!v || "Agencia is required";
+      }],
+      department: "SERVICIO",
+      // departmentRules: [v => !!v || "departmento is required"],
+      description: "",
+      descriptionRules: [function (v) {
+        return !!v || "Description is required";
+      }]
+    };
+  },
+  mounted: function mounted() {
+    var self = this;
+    self.$refs.gpsGroupFormAdd.reset();
+  },
+  methods: {
+    save: function save() {
+      var self = this;
+
+      if (self.$refs.gpsGroupFormAdd.validate()) {
+        var payload = {
+          name: self.name,
+          agency: self.agency,
+          department: self.department,
+          description: self.description
+        };
+        self.isLoading = true;
+        axios.post("/admin/gps-groups", payload).then(function (response) {
+          self.$store.commit("showSnackbar", {
+            message: response.data.message,
+            color: "success",
+            duration: 3000
+          });
+          self.isLoading = false;
+          self.$eventBus.$emit("GPS_GROUP_ADDED"); // reset
+
+          self.$refs.gpsGroupFormAdd.reset();
+        })["catch"](function (error) {
+          self.isLoading = false;
+
+          if (error.response) {
+            self.$store.commit("showSnackbar", {
+              message: error.response.data.message,
+              color: "error",
+              duration: 3000
+            });
+          } else if (error.request) {
+            console.log(error.request);
+          } else {
+            console.log("Error", error.message);
+          }
+        });
+      }
+    }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/gps/components/GpsGroupEdit.vue?vue&type=script&lang=js&":
+/*!*********************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/admin/gps/components/GpsGroupEdit.vue?vue&type=script&lang=js& ***!
+  \*********************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  props: {
+    propGpsGroupId: {
+      required: true
+    }
+  },
+  data: function data() {
+    return {
+      valid: false,
+      isLoading: false,
+      name: "",
+      nameRules: [function (v) {
+        return !!v || "Name is required";
+      }],
+      description: "",
+      descriptionRules: [function (v) {
+        return !!v || "Description is required";
+      }]
+    };
+  },
+  mounted: function mounted() {
+    var self = this;
+    self.loadGpsGroup(function () {});
+  },
+  methods: {
+    save: function save() {
+      var self = this;
+      var payload = {
+        name: self.name,
+        description: self.description
+      };
+      self.isLoading = true;
+      axios.put("/admin/gps-groups/" + self.propGpsGroupId, payload).then(function (response) {
+        self.$store.commit("showSnackbar", {
+          message: response.data.message,
+          color: "success",
+          duration: 3000
+        });
+        self.$eventBus.$emit("GPS_GROUP_UPDATED");
+      })["catch"](function (error) {
+        if (error.response) {
+          self.$store.commit("showSnackbar", {
+            message: error.response.data.message,
+            color: "error",
+            duration: 3000
+          });
+        } else if (error.request) {
+          console.log(error.request);
+        } else {
+          console.log("Error", error.message);
+        }
+      })["finally"](function () {
+        self.isLoading = false;
+      });
+    },
+    loadGpsGroup: function loadGpsGroup(cb) {
+      var self = this;
+      axios.get("/admin/gps-groups/" + self.propGpsGroupId).then(function (response) {
+        var Group = response.data.data;
+        self.name = Group.name;
+        self.description = Group.description;
+        cb();
+      });
+    }
+  }
 });
 
 /***/ }),
@@ -1141,6 +1739,8 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _admin_gps_components_GpsGroupAdd_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @admin/gps/components/GpsGroupAdd.vue */ "./resources/js/admin/gps/components/GpsGroupAdd.vue");
+/* harmony import */ var _admin_gps_components_GpsGroupEdit_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @admin/gps/components/GpsGroupEdit.vue */ "./resources/js/admin/gps/components/GpsGroupEdit.vue");
 //
 //
 //
@@ -1152,8 +1752,224 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
 /* harmony default export */ __webpack_exports__["default"] = ({
-  mounted: function mounted() {}
+  components: {
+    GpsGroupAdd: _admin_gps_components_GpsGroupAdd_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
+    GpsGroupEdit: _admin_gps_components_GpsGroupEdit_vue__WEBPACK_IMPORTED_MODULE_1__["default"]
+  },
+  data: function data() {
+    return {
+      headers: [{
+        text: "Accion",
+        value: "action",
+        align: "center",
+        sortable: false
+      }, {
+        text: "Nombre",
+        value: "name",
+        align: "left",
+        sortable: true
+      }, {
+        text: "Sucursal",
+        value: "agency",
+        align: "left",
+        sortable: true
+      }, {
+        text: "Total GPS",
+        value: "gps_count",
+        align: "center",
+        sortable: false
+      }],
+      items: [],
+      totalItems: 0,
+      pagination: {
+        itemsPerPage: 10
+      },
+      editedIndex: -1,
+      dialogs: {
+        title: "",
+        show: false,
+        gpsGroup: null
+      },
+      filters: {
+        name: ""
+      }
+    };
+  },
+  mounted: function mounted() {
+    var self = this;
+    self.$eventBus.$on(["GPS_GROUP_ADDED", "GPS_GROUP_UPDATED", "GPS_GROUP_DELETED"], function () {
+      self.loadGpsGroup(function () {});
+    });
+  },
+  watch: {
+    pagination: {
+      handler: _.debounce(function () {
+        this.loadGpsGroup(function () {});
+      }, 700),
+      deep: true
+    },
+    "filters.name": _.debounce(function (v) {
+      this.loadGpsGroup(function () {});
+    }, 700)
+  },
+  computed: {
+    formTitle: function formTitle() {
+      return this.editedIndex === -1 ? "Registrar Grupo GPS" : "Editar Grupo GPS";
+    },
+    formAdd: function formAdd() {
+      return this.editedIndex === -1;
+    }
+  },
+  methods: {
+    editItem: function editItem(item) {
+      var self = this;
+      self.editedIndex = self.items.indexOf(item);
+      self.dialogs.gpsGroup = item;
+      self.dialogs.show = true;
+    },
+    showDialog: function showDialog(dialog, data) {
+      var self = this;
+
+      switch (dialog) {
+        case "gps_group_edit":
+          self.dialogs.edit.gpsGroup = data;
+          setTimeout(function () {
+            self.dialogs.edit.show = true;
+          }, 500);
+          break;
+
+        case "gps_group_add":
+          setTimeout(function () {
+            self.dialogs.add.show = true;
+          }, 500);
+          break;
+      }
+    },
+    loadGpsGroup: function loadGpsGroup(cb) {
+      var self = this;
+      var params = {
+        name: self.filters.name,
+        order_sort: self.pagination.sortDesc[0] ? "desc" : "asc",
+        order_by: self.pagination.sortBy[0] || "name",
+        page: self.pagination.page,
+        per_page: self.pagination.itemsPerPage
+      };
+      axios.get("/admin/gps-groups", {
+        params: params
+      }).then(function (response) {
+        self.items = response.data.data.data;
+        self.totalItems = response.data.data.total;
+        self.pagination.totalItems = response.data.data.total;
+        (cb || Function)();
+      });
+    },
+    trash: function trash(group) {
+      var self = this;
+      self.$store.commit("showDialog", {
+        type: "confirm",
+        title: "Confirm Deletion",
+        message: "Are you sure you want to delete this gps group?",
+        okCb: function okCb() {
+          axios["delete"]("/admin/gps-groups/" + group.id).then(function (response) {
+            self.$store.commit("showSnackbar", {
+              message: response.data.message,
+              color: "success",
+              duration: 3000
+            });
+            self.$eventBus.$emit("GPS_GROUP_DELETED");
+          })["catch"](function (error) {
+            if (error.response) {
+              self.$store.commit("showSnackbar", {
+                message: error.response.data.message,
+                color: "error",
+                duration: 3000
+              });
+            } else if (error.request) {
+              console.log(error.request);
+            } else {
+              console.log("Error", error.message);
+            }
+          });
+        },
+        cancelCb: function cancelCb() {
+          console.log("CANCEL");
+        }
+      });
+    }
+  }
 });
 
 /***/ }),
@@ -1167,6 +1983,12 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _admin_gps_components_GpsAdd_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @admin/gps/components/GpsAdd.vue */ "./resources/js/admin/gps/components/GpsAdd.vue");
+/* harmony import */ var _admin_gps_components_GpsEdit_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @admin/gps/components/GpsEdit.vue */ "./resources/js/admin/gps/components/GpsEdit.vue");
+/* harmony import */ var _api_moths_json__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ~/api/moths.json */ "./resources/js/api/moths.json");
+var _api_moths_json__WEBPACK_IMPORTED_MODULE_2___namespace = /*#__PURE__*/__webpack_require__.t(/*! ~/api/moths.json */ "./resources/js/api/moths.json", 1);
+/* harmony import */ var _api_years_json__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ~/api/years.json */ "./resources/js/api/years.json");
+var _api_years_json__WEBPACK_IMPORTED_MODULE_3___namespace = /*#__PURE__*/__webpack_require__.t(/*! ~/api/years.json */ "./resources/js/api/years.json", 1);
 //
 //
 //
@@ -1178,8 +2000,398 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+
 /* harmony default export */ __webpack_exports__["default"] = ({
-  mounted: function mounted() {}
+  components: {
+    GpsAdd: _admin_gps_components_GpsAdd_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
+    GpsEdit: _admin_gps_components_GpsEdit_vue__WEBPACK_IMPORTED_MODULE_1__["default"]
+  },
+  data: function data() {
+    return {
+      headers: [{
+        text: "Accion",
+        value: "action",
+        align: "center",
+        sortable: false
+      }, {
+        text: "Nombre GPS",
+        value: "name",
+        align: "left",
+        sortable: true
+      }, {
+        text: "Grupo",
+        value: "gps_group",
+        align: "left",
+        sortable: false
+      }, {
+        text: "Costo",
+        value: "cost",
+        align: "right",
+        sortable: false
+      }, {
+        text: "Fecha de Activacion",
+        value: "activation_date",
+        align: "center",
+        sortable: false
+      }, {
+        text: "Fecha Vencimiento",
+        value: "due_date",
+        align: "center",
+        sortable: false
+      }],
+      items: [],
+      totalItems: 0,
+      pagination: {
+        itemsPerPage: 10
+      },
+      editedIndex: -1,
+      dialogs: {
+        show: false,
+        gps: null
+      },
+      options: {
+        months: _api_moths_json__WEBPACK_IMPORTED_MODULE_2__,
+        years: _api_years_json__WEBPACK_IMPORTED_MODULE_3__,
+        gpsGroup: []
+      },
+      filters: {
+        name: null,
+        month: null,
+        year: null,
+        groupId: [],
+        groupOptions: []
+      }
+    };
+  },
+  mounted: function mounted() {
+    var self = this;
+    self.$eventBus.$on(["GPS_ADDED", "GPS_UPDATED", "GPS_DELETED"], function () {
+      self.loadGps(function () {});
+    });
+    self.loadGpsGroup(function () {});
+  },
+  watch: {
+    pagination: {
+      handler: _.debounce(function () {
+        this.loadGps(function () {});
+      }, 700),
+      deep: true
+    },
+    filters: {
+      handler: _.debounce(function (v) {
+        this.loadGps(function () {});
+      }, 700),
+      deep: true
+    }
+  },
+  computed: {
+    formTitle: function formTitle() {
+      return this.editedIndex === -1 ? "Registrar Nuevo GPS" : "Editar GPS";
+    },
+    formEdit: function formEdit() {
+      return this.editedIndex !== -1;
+    }
+  },
+  methods: {
+    editItem: function editItem(item) {
+      var self = this;
+      self.editedIndex = self.items.indexOf(item);
+      self.dialogs.gps = item;
+      self.dialogs.show = true;
+    },
+    loadGps: function loadGps(cb) {
+      var self = this;
+      var params = {
+        name: self.filters.name,
+        month: self.filters.month,
+        year: self.filters.year,
+        group_id: self.filters.groupId.join(","),
+        order_sort: self.pagination.sortDesc[0] ? "desc" : "asc",
+        order_by: self.pagination.sortBy[0] || "name",
+        page: self.pagination.page,
+        per_page: self.pagination.itemsPerPage
+      };
+      axios.get("/admin/gps", {
+        params: params
+      }).then(function (response) {
+        self.items = response.data.data.data;
+        self.totalItems = response.data.data.total;
+        self.pagination.totalItems = response.data.data.total;
+        (cb || Function)();
+      });
+    },
+    loadGpsGroup: function loadGpsGroup(cb) {
+      var self = this;
+      var params = {
+        per_page: -1
+      };
+      axios.get("/admin/gps-groups", {
+        params: params
+      }).then(function (response) {
+        self.filters.groupOptions = response.data.data.data;
+        cb();
+      });
+    },
+    customFilter: function customFilter(item, queryText, itemText) {
+      var textOne = item.name.toLowerCase();
+      var searchText = queryText.toLowerCase();
+      return textOne.indexOf(searchText) > -1;
+    },
+    trash: function trash(gps) {
+      var self = this;
+      self.$store.commit("showDialog", {
+        type: "confirm",
+        title: "Confirm Deletion",
+        message: "Are you sure you want to delete this GPS?",
+        okCb: function okCb() {
+          axios["delete"]("/admin/gps/" + gps.id).then(function (response) {
+            self.$store.commit("showSnackbar", {
+              message: response.data.message,
+              color: "success",
+              duration: 3000
+            });
+            self.$eventBus.$emit("GPS_DELETED");
+            self.$eventBus.$emit("GPS_GROUP_DELETED");
+          })["catch"](function (error) {
+            if (error.response) {
+              self.$store.commit("showSnackbar", {
+                message: error.response.data.message,
+                color: "error",
+                duration: 3000
+              });
+            } else if (error.request) {
+              console.log(error.request);
+            } else {
+              console.log("Error", error.message);
+            }
+          });
+        },
+        cancelCb: function cancelCb() {
+          console.log("CANCEL");
+        }
+      });
+    },
+    saveInLine: function saveInLine(item) {
+      var self = this;
+      axios.put("/admin/gps/" + item.id, item).then(function (response) {
+        self.$store.commit("showSnackbar", {
+          message: response.data.message,
+          color: "success",
+          duration: 3000
+        });
+        self.$eventBus.$emit("GPS_UPDATED");
+        self.$eventBus.$emit("GPS_GROUP_UPDATED");
+      })["catch"](function (error) {
+        if (error.response) {
+          self.$store.commit("showSnackbar", {
+            message: error.response.data.message,
+            color: "error",
+            duration: 3000
+          });
+        } else if (error.request) {
+          console.log(error.request);
+        } else {
+          console.log("Error", error.message);
+        }
+      });
+    },
+    cancel: function cancel() {
+      var self = this;
+      self.$store.commit("showSnackbar", {
+        message: "Cancel",
+        color: "error",
+        duration: 3000
+      });
+    }
+  }
 });
 
 /***/ }),
@@ -6152,7 +7364,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../../node_modules/c
 
 
 // module
-exports.push([module.i, "\n.file_view_popup[data-v-39380b76] {\n    min-width: 500px;\n    text-align: center;\n}\n", ""]);
+exports.push([module.i, "\n.file_view_popup[data-v-39380b76] {\n  min-width: 500px;\n  text-align: center;\n}\n", ""]);
 
 // exports
 
@@ -19217,8 +20429,8 @@ var render = function() {
     "div",
     { staticClass: "component-wrap" },
     [
-      _c("v-card", [
-        _c("div", { staticClass: "d-flex flex-row" }, [
+      _c("v-card", { attrs: { flat: "" } }, [
+        _c("div", { staticClass: "d-flex flex-row align-center px-4" }, [
           _c(
             "div",
             { staticClass: "flex-grow-1" },
@@ -19256,7 +20468,7 @@ var render = function() {
                   _vm._v(
                     "\n                    New File Group\n                    "
                   ),
-                  _c("v-icon", { attrs: { right: "" } }, [_vm._v("mdi-add")])
+                  _c("v-icon", { attrs: { right: "" } }, [_vm._v("mdi-plus")])
                 ],
                 1
               )
@@ -19316,7 +20528,7 @@ var render = function() {
                               attrs: { icon: "", small: "" },
                               on: {
                                 click: function($event) {
-                                  return _vm.trash(_vm.props.item)
+                                  return _vm.trash(item)
                                 }
                               }
                             },
@@ -19558,16 +20770,16 @@ var render = function() {
           ),
           _vm._v(" "),
           _c("div", { staticClass: "flex-grow-1 pa-2" }, [
-            _vm._v("\n                Show Only:\n            ")
+            _vm._v("\n        Show Only:\n      ")
           ]),
           _vm._v(" "),
           _c(
             "div",
-            { staticClass: "flex-grow-1 pa-2" },
+            { staticClass: "d-flex flex-xs-row flex-wrap align-center" },
             _vm._l(_vm.filters.fileGroupsHolder, function(group, i) {
               return _c(
                 "span",
-                { key: i },
+                { key: i, staticClass: "px-2" },
                 [
                   _c("v-checkbox", {
                     attrs: { label: group.name },
@@ -19676,11 +20888,13 @@ var render = function() {
                       _vm._v(" "),
                       _c("td", [
                         _vm._v(
-                          _vm._s(
-                            _vm.$appFormatters
-                              .formatByteToMB(item.size)
-                              .toString() + " MB"
-                          )
+                          "\n            " +
+                            _vm._s(
+                              _vm.$appFormatters
+                                .formatByteToMB(item.size)
+                                .toString() + " MB"
+                            ) +
+                            "\n          "
                         )
                       ]),
                       _vm._v(" "),
@@ -19760,9 +20974,7 @@ var render = function() {
                           }
                         },
                         [
-                          _vm._v(
-                            "\n                        Download\n                        "
-                          ),
+                          _vm._v("\n            Download\n            "),
                           _c("v-icon", { attrs: { right: "", dark: "" } }, [
                             _vm._v("file_download")
                           ])
@@ -19787,9 +20999,7 @@ var render = function() {
                           }
                         },
                         [
-                          _vm._v(
-                            "\n                        Delete\n                        "
-                          ),
+                          _vm._v("\n            Delete\n            "),
                           _c("v-icon", { attrs: { right: "", dark: "" } }, [
                             _vm._v("delete")
                           ])
@@ -19992,8 +21202,8 @@ var render = function() {
           _c(
             "v-tab",
             {
-              key: "manage-groups",
-              attrs: { href: "#manage-groups", ripple: "" }
+              key: "manage-gps-groups",
+              attrs: { href: "#manage-gps-groups", ripple: "" }
             },
             [_vm._v("\n            Administra Grupos GPS\n        ")]
           ),
@@ -20020,7 +21230,7 @@ var render = function() {
           _vm._v(" "),
           _c(
             "v-tab-item",
-            { attrs: { value: "manage-groups" } },
+            { attrs: { value: "manage-gps-groups" } },
             [
               _c(
                 "v-card",
@@ -20059,6 +21269,840 @@ render._withStripped = true
 
 /***/ }),
 
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/gps/components/GpsAdd.vue?vue&type=template&id=11287946&":
+/*!*******************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/admin/gps/components/GpsAdd.vue?vue&type=template&id=11287946& ***!
+  \*******************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "div",
+    { staticClass: "component-wrap" },
+    [
+      _c(
+        "v-card",
+        [
+          _c(
+            "v-form",
+            {
+              ref: "gpsFormEdit",
+              attrs: { "lazy-validation": "" },
+              model: {
+                value: _vm.valid,
+                callback: function($$v) {
+                  _vm.valid = $$v
+                },
+                expression: "valid"
+              }
+            },
+            [
+              _c(
+                "v-container",
+                { attrs: { "grid-list-lg": "" } },
+                [
+                  _c("v-row", { attrs: { dense: "" } }, [
+                    _c("div", { staticClass: "text-h5" }, [
+                      _vm._v("Detalle GPS")
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c(
+                    "v-row",
+                    { attrs: { dense: "" } },
+                    [
+                      _c("v-text-field", {
+                        attrs: { label: "Nombre GPS", rules: _vm.fieldRules },
+                        model: {
+                          value: _vm.name,
+                          callback: function($$v) {
+                            _vm.name = $$v
+                          },
+                          expression: "name"
+                        }
+                      })
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-row",
+                    { attrs: { dense: "" } },
+                    [
+                      _c(
+                        "v-col",
+                        { attrs: { cols: "12", md: "6" } },
+                        [
+                          _c("v-text-field", {
+                            attrs: { label: "SIM", rules: _vm.fieldRules },
+                            model: {
+                              value: _vm.sim,
+                              callback: function($$v) {
+                                _vm.sim = $$v
+                              },
+                              expression: "sim"
+                            }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-col",
+                        { attrs: { cols: "12", md: "6" } },
+                        [
+                          _c("v-text-field", {
+                            attrs: { label: "IMEI", rules: _vm.fieldRules },
+                            model: {
+                              value: _vm.imei,
+                              callback: function($$v) {
+                                _vm.imei = $$v
+                              },
+                              expression: "imei"
+                            }
+                          })
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-row",
+                    { attrs: { dense: "" } },
+                    [
+                      _c(
+                        "v-col",
+                        { attrs: { cols: "12", md: "3" } },
+                        [
+                          _c("v-text-field", {
+                            attrs: { label: "Costo", rules: _vm.fieldRules },
+                            model: {
+                              value: _vm.cost,
+                              callback: function($$v) {
+                                _vm.cost = $$v
+                              },
+                              expression: "cost"
+                            }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-col",
+                        { attrs: { cols: "12", md: "3" } },
+                        [
+                          _c("v-text-field", {
+                            attrs: { label: "Importe", rules: _vm.fieldRules },
+                            model: {
+                              value: _vm.amount,
+                              callback: function($$v) {
+                                _vm.amount = $$v
+                              },
+                              expression: "amount"
+                            }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-col",
+                        { attrs: { cols: "6", md: "3" } },
+                        [_c("v-text-field", { attrs: { label: "Moneda" } })],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-col",
+                        { attrs: { cols: "6", md: "3" } },
+                        [
+                          _c("v-text-field", {
+                            attrs: { label: "Tipo Cambio" }
+                          })
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-row",
+                    { attrs: { dense: "" } },
+                    [
+                      _c(
+                        "v-col",
+                        { attrs: { cols: "12", md: "6" } },
+                        [
+                          _c("v-text-field", {
+                            attrs: {
+                              label: "Fecha Activacion",
+                              type: "date",
+                              rules: _vm.fieldRules
+                            },
+                            model: {
+                              value: _vm.activation_date,
+                              callback: function($$v) {
+                                _vm.activation_date = $$v
+                              },
+                              expression: "activation_date"
+                            }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-col",
+                        { attrs: { cols: "12", md: "6" } },
+                        [
+                          _c("v-text-field", {
+                            attrs: {
+                              label: "Fecha Vencimiento",
+                              type: "date",
+                              rules: _vm.fieldRules
+                            },
+                            model: {
+                              value: _vm.due_date,
+                              callback: function($$v) {
+                                _vm.due_date = $$v
+                              },
+                              expression: "due_date"
+                            }
+                          })
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-col",
+                    { attrs: { cols: "12" } },
+                    [
+                      _c("v-textarea", {
+                        attrs: { label: "Comentario:", outlined: "" },
+                        model: {
+                          value: _vm.comment,
+                          callback: function($$v) {
+                            _vm.comment = $$v
+                          },
+                          expression: "comment"
+                        }
+                      })
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-row",
+                    [
+                      _c(
+                        "v-btn",
+                        {
+                          attrs: {
+                            block: "",
+                            disabled: !_vm.valid,
+                            color: "primary"
+                          },
+                          on: {
+                            click: function($event) {
+                              return _vm.save()
+                            }
+                          }
+                        },
+                        [_vm._v("\n            Registrar Nuevo\n          ")]
+                      )
+                    ],
+                    1
+                  )
+                ],
+                1
+              )
+            ],
+            1
+          )
+        ],
+        1
+      )
+    ],
+    1
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/gps/components/GpsEdit.vue?vue&type=template&id=bc596104&":
+/*!********************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/admin/gps/components/GpsEdit.vue?vue&type=template&id=bc596104& ***!
+  \********************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "div",
+    { staticClass: "component-wrap" },
+    [
+      _c(
+        "v-card",
+        [
+          _c(
+            "v-form",
+            {
+              ref: "gpsFormEdit",
+              attrs: { "lazy-validation": "" },
+              model: {
+                value: _vm.valid,
+                callback: function($$v) {
+                  _vm.valid = $$v
+                },
+                expression: "valid"
+              }
+            },
+            [
+              _c(
+                "v-container",
+                { attrs: { "grid-list-lg": "" } },
+                [
+                  _c("v-row", { attrs: { dense: "" } }, [
+                    _c("div", { staticClass: "text-h5" }, [
+                      _vm._v("Detalle GPS")
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c(
+                    "v-row",
+                    { attrs: { dense: "" } },
+                    [
+                      _c("v-text-field", {
+                        attrs: { label: "Nombre GPS", rules: _vm.fieldRules },
+                        model: {
+                          value: _vm.name,
+                          callback: function($$v) {
+                            _vm.name = $$v
+                          },
+                          expression: "name"
+                        }
+                      })
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-row",
+                    { attrs: { dense: "" } },
+                    [
+                      _c(
+                        "v-col",
+                        { attrs: { cols: "12", md: "6" } },
+                        [
+                          _c("v-text-field", {
+                            attrs: { label: "SIM", rules: _vm.fieldRules },
+                            model: {
+                              value: _vm.sim,
+                              callback: function($$v) {
+                                _vm.sim = $$v
+                              },
+                              expression: "sim"
+                            }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-col",
+                        { attrs: { cols: "12", md: "6" } },
+                        [
+                          _c("v-text-field", {
+                            attrs: { label: "IMEI", rules: _vm.fieldRules },
+                            model: {
+                              value: _vm.imei,
+                              callback: function($$v) {
+                                _vm.imei = $$v
+                              },
+                              expression: "imei"
+                            }
+                          })
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-row",
+                    { attrs: { dense: "" } },
+                    [
+                      _c(
+                        "v-col",
+                        { attrs: { cols: "12", md: "3" } },
+                        [
+                          _c("v-text-field", {
+                            attrs: { label: "Costo", rules: _vm.fieldRules },
+                            model: {
+                              value: _vm.cost,
+                              callback: function($$v) {
+                                _vm.cost = $$v
+                              },
+                              expression: "cost"
+                            }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-col",
+                        { attrs: { cols: "12", md: "3" } },
+                        [
+                          _c("v-text-field", {
+                            attrs: { label: "Importe", rules: _vm.fieldRules },
+                            model: {
+                              value: _vm.amount,
+                              callback: function($$v) {
+                                _vm.amount = $$v
+                              },
+                              expression: "amount"
+                            }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-col",
+                        { attrs: { cols: "6", md: "3" } },
+                        [_c("v-text-field", { attrs: { label: "Moneda" } })],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-col",
+                        { attrs: { cols: "6", md: "3" } },
+                        [
+                          _c("v-text-field", {
+                            attrs: { label: "Tipo Cambio" }
+                          })
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-row",
+                    { attrs: { dense: "" } },
+                    [
+                      _c(
+                        "v-col",
+                        { attrs: { cols: "12", md: "6" } },
+                        [
+                          _c("v-text-field", {
+                            attrs: {
+                              label: "Fecha Activacion",
+                              type: "date",
+                              rules: _vm.fieldRules
+                            },
+                            model: {
+                              value: _vm.activation_date,
+                              callback: function($$v) {
+                                _vm.activation_date = $$v
+                              },
+                              expression: "activation_date"
+                            }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-col",
+                        { attrs: { cols: "12", md: "6" } },
+                        [
+                          _c("v-text-field", {
+                            attrs: {
+                              label: "Fecha Vencimiento",
+                              type: "date",
+                              rules: _vm.fieldRules
+                            },
+                            model: {
+                              value: _vm.due_date,
+                              callback: function($$v) {
+                                _vm.due_date = $$v
+                              },
+                              expression: "due_date"
+                            }
+                          })
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-col",
+                    { attrs: { cols: "12" } },
+                    [
+                      _c("v-textarea", {
+                        attrs: { label: "Comentario:", outlined: "" },
+                        model: {
+                          value: _vm.comment,
+                          callback: function($$v) {
+                            _vm.comment = $$v
+                          },
+                          expression: "comment"
+                        }
+                      })
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-row",
+                    [
+                      _c(
+                        "v-btn",
+                        {
+                          attrs: {
+                            block: "",
+                            disabled: !_vm.valid,
+                            color: "primary"
+                          },
+                          on: {
+                            click: function($event) {
+                              return _vm.save()
+                            }
+                          }
+                        },
+                        [_vm._v("\n            Modificar\n          ")]
+                      )
+                    ],
+                    1
+                  )
+                ],
+                1
+              )
+            ],
+            1
+          )
+        ],
+        1
+      )
+    ],
+    1
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/gps/components/GpsGroupAdd.vue?vue&type=template&id=19cf0d16&":
+/*!************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/admin/gps/components/GpsGroupAdd.vue?vue&type=template&id=19cf0d16& ***!
+  \************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "div",
+    { staticClass: "component-wrap" },
+    [
+      _c(
+        "v-card",
+        [
+          _c(
+            "v-form",
+            {
+              ref: "gpsGroupFormAdd",
+              attrs: { "lazy-validation": "" },
+              model: {
+                value: _vm.valid,
+                callback: function($$v) {
+                  _vm.valid = $$v
+                },
+                expression: "valid"
+              }
+            },
+            [
+              _c(
+                "v-container",
+                { attrs: { "grid-list-md": "" } },
+                [
+                  _c(
+                    "v-layout",
+                    { attrs: { row: "", wrap: "" } },
+                    [
+                      _c("v-flex", { attrs: { xs12: "" } }, [
+                        _c("div", { staticClass: "title" }, [
+                          _vm._v("Grupo GPS Detalle")
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c(
+                        "v-flex",
+                        { attrs: { xs12: "" } },
+                        [
+                          _c("v-text-field", {
+                            attrs: {
+                              label: "Group Name",
+                              rules: _vm.nameRules
+                            },
+                            model: {
+                              value: _vm.name,
+                              callback: function($$v) {
+                                _vm.name = $$v
+                              },
+                              expression: "name"
+                            }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-flex",
+                        { attrs: { xs12: "" } },
+                        [
+                          _c("v-textarea", {
+                            attrs: {
+                              label: "Group Description",
+                              rules: _vm.descriptionRules
+                            },
+                            model: {
+                              value: _vm.description,
+                              callback: function($$v) {
+                                _vm.description = $$v
+                              },
+                              expression: "description"
+                            }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-flex",
+                        { attrs: { xs12: "" } },
+                        [
+                          _c(
+                            "v-btn",
+                            {
+                              attrs: {
+                                block: "",
+                                disabled: !_vm.valid,
+                                color: "primary"
+                              },
+                              on: {
+                                click: function($event) {
+                                  return _vm.save()
+                                }
+                              }
+                            },
+                            [_vm._v("Guardar")]
+                          )
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  )
+                ],
+                1
+              )
+            ],
+            1
+          )
+        ],
+        1
+      )
+    ],
+    1
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/gps/components/GpsGroupEdit.vue?vue&type=template&id=684d8636&":
+/*!*************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/admin/gps/components/GpsGroupEdit.vue?vue&type=template&id=684d8636& ***!
+  \*************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "div",
+    { staticClass: "component-wrap" },
+    [
+      _c(
+        "v-card",
+        [
+          _c(
+            "v-form",
+            {
+              ref: "gpsGroupFormEdit",
+              attrs: { "lazy-validation": "" },
+              model: {
+                value: _vm.valid,
+                callback: function($$v) {
+                  _vm.valid = $$v
+                },
+                expression: "valid"
+              }
+            },
+            [
+              _c(
+                "v-container",
+                { attrs: { "grid-list-md": "" } },
+                [
+                  _c(
+                    "v-layout",
+                    { attrs: { row: "", wrap: "" } },
+                    [
+                      _c("v-flex", { attrs: { xs12: "" } }, [
+                        _c("div", { staticClass: "body-2 white--text" }, [
+                          _vm._v("Gps Group Details")
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c(
+                        "v-flex",
+                        { attrs: { xs12: "" } },
+                        [
+                          _c("v-text-field", {
+                            attrs: {
+                              label: "Group Name",
+                              rules: _vm.nameRules
+                            },
+                            model: {
+                              value: _vm.name,
+                              callback: function($$v) {
+                                _vm.name = $$v
+                              },
+                              expression: "name"
+                            }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-flex",
+                        { attrs: { xs12: "" } },
+                        [
+                          _c("v-textarea", {
+                            attrs: {
+                              label: "Group Description",
+                              rules: _vm.descriptionRules
+                            },
+                            model: {
+                              value: _vm.description,
+                              callback: function($$v) {
+                                _vm.description = $$v
+                              },
+                              expression: "description"
+                            }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-flex",
+                        { attrs: { xs12: "" } },
+                        [
+                          _c(
+                            "v-btn",
+                            {
+                              attrs: {
+                                block: "",
+                                disabled: !_vm.valid,
+                                color: "primary"
+                              },
+                              on: {
+                                click: function($event) {
+                                  return _vm.save()
+                                }
+                              }
+                            },
+                            [_vm._v("Modificar")]
+                          )
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  )
+                ],
+                1
+              )
+            ],
+            1
+          )
+        ],
+        1
+      )
+    ],
+    1
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
 /***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/gps/components/GpsGroupLists.vue?vue&type=template&id=4d858a6c&":
 /*!**************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/admin/gps/components/GpsGroupLists.vue?vue&type=template&id=4d858a6c& ***!
@@ -20074,28 +22118,237 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _vm._m(0)
-}
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "page_wrap_vue pa-3" }, [
-      _c("h2", [_vm._v("GRUPOS GPS PAGE")]),
-      _vm._v(" "),
-      _c("p", [
-        _vm._v("I am located at "),
-        _c("b", [_vm._v("resources/js/admin/settings/Settings.vue")])
+  return _c(
+    "div",
+    { staticClass: "component-wrap" },
+    [
+      _c("v-card", { attrs: { flat: "" } }, [
+        _c("div", { staticClass: "d-flex flex-row align-center px-4" }, [
+          _c(
+            "div",
+            { staticClass: "flex-grow-1" },
+            [
+              _c("v-text-field", {
+                attrs: {
+                  "prepend-icon": "mdi-magnify",
+                  label: "Filtar por Nombre",
+                  clearable: ""
+                },
+                model: {
+                  value: _vm.filters.name,
+                  callback: function($$v) {
+                    _vm.$set(_vm.filters, "name", $$v)
+                  },
+                  expression: "filters.name"
+                }
+              })
+            ],
+            1
+          ),
+          _vm._v(" "),
+          _c(
+            "div",
+            { staticClass: "flex-grow-1 text-right" },
+            [
+              _c(
+                "v-dialog",
+                {
+                  attrs: {
+                    fullscreen: "",
+                    transition: "dialog-bottom-transition",
+                    overlay: false
+                  },
+                  scopedSlots: _vm._u([
+                    {
+                      key: "activator",
+                      fn: function(ref) {
+                        var on = ref.on
+                        var attrs = ref.attrs
+                        return [
+                          _c(
+                            "v-btn",
+                            _vm._g(
+                              _vm._b(
+                                {
+                                  staticClass: "mb-2",
+                                  attrs: { color: "primary" }
+                                },
+                                "v-btn",
+                                attrs,
+                                false
+                              ),
+                              on
+                            ),
+                            [
+                              _vm._v(
+                                "\n              Nuevo Grupo GPS\n              "
+                              ),
+                              _c("v-icon", { attrs: { right: "" } }, [
+                                _vm._v("mdi-plus")
+                              ])
+                            ],
+                            1
+                          )
+                        ]
+                      }
+                    }
+                  ]),
+                  model: {
+                    value: _vm.dialogs.show,
+                    callback: function($$v) {
+                      _vm.$set(_vm.dialogs, "show", $$v)
+                    },
+                    expression: "dialogs.show"
+                  }
+                },
+                [
+                  _vm._v(" "),
+                  _c(
+                    "v-card",
+                    [
+                      _c(
+                        "v-toolbar",
+                        { staticClass: "primary" },
+                        [
+                          _c(
+                            "v-btn",
+                            {
+                              attrs: { icon: "" },
+                              nativeOn: {
+                                click: function($event) {
+                                  ;(_vm.dialogs.show = false),
+                                    (_vm.editedIndex = -1)
+                                }
+                              }
+                            },
+                            [_c("v-icon", [_vm._v("mdi-close")])],
+                            1
+                          ),
+                          _vm._v(" "),
+                          _c("v-toolbar-title", [
+                            _vm._v(_vm._s(_vm.formTitle))
+                          ]),
+                          _vm._v(" "),
+                          _c("v-spacer"),
+                          _vm._v(" "),
+                          _c(
+                            "v-toolbar-items",
+                            [
+                              _c(
+                                "v-btn",
+                                {
+                                  attrs: { text: "" },
+                                  nativeOn: {
+                                    click: function($event) {
+                                      ;(_vm.dialogs.show = false),
+                                        (_vm.editedIndex = -1)
+                                    }
+                                  }
+                                },
+                                [_vm._v("Done")]
+                              )
+                            ],
+                            1
+                          )
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-card-text",
+                        [
+                          _vm.formAdd
+                            ? _c("gps-group-add")
+                            : _c("gps-group-edit", {
+                                attrs: {
+                                  propGpsGroupId: _vm.dialogs.gpsGroup.id
+                                }
+                              })
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  )
+                ],
+                1
+              )
+            ],
+            1
+          )
+        ])
       ]),
       _vm._v(" "),
-      _c("p", [
-        _vm._v("\n    single page routes for admin can be found at\n    "),
-        _c("b", [_vm._v("resources/js/admin/router.js")])
-      ])
-    ])
-  }
-]
+      _c("v-data-table", {
+        staticClass: "elevation-1 text-uppercase",
+        attrs: {
+          headers: _vm.headers,
+          options: _vm.pagination,
+          items: _vm.items,
+          "server-items-length": _vm.totalItems,
+          dense: "",
+          "fixed-header": ""
+        },
+        on: {
+          "update:options": function($event) {
+            _vm.pagination = $event
+          }
+        },
+        scopedSlots: _vm._u([
+          {
+            key: "item.action",
+            fn: function(ref) {
+              var item = ref.item
+              return [
+                _c(
+                  "v-btn",
+                  {
+                    attrs: { icon: "", small: "" },
+                    on: {
+                      click: function($event) {
+                        return _vm.editItem(item)
+                      }
+                    }
+                  },
+                  [
+                    _c(
+                      "v-icon",
+                      { staticClass: "blue--text", attrs: { small: "" } },
+                      [_vm._v("edit")]
+                    )
+                  ],
+                  1
+                ),
+                _vm._v(" "),
+                _c(
+                  "v-btn",
+                  {
+                    attrs: { icon: "", small: "" },
+                    on: {
+                      click: function($event) {
+                        return _vm.trash(item)
+                      }
+                    }
+                  },
+                  [
+                    _c(
+                      "v-icon",
+                      { staticClass: "red--text", attrs: { small: "" } },
+                      [_vm._v("delete")]
+                    )
+                  ],
+                  1
+                )
+              ]
+            }
+          }
+        ])
+      })
+    ],
+    1
+  )
+}
+var staticRenderFns = []
 render._withStripped = true
 
 
@@ -20117,28 +22370,529 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _vm._m(0)
-}
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "page_wrap_vue pa-3" }, [
-      _c("h2", [_vm._v("GPS PAGE")]),
-      _vm._v(" "),
-      _c("p", [
-        _vm._v("I am located at "),
-        _c("b", [_vm._v("resources/js/admin/settings/Settings.vue")])
+  return _c(
+    "div",
+    { staticClass: "component-wrap" },
+    [
+      _c("v-card", { attrs: { flat: "" } }, [
+        _c(
+          "div",
+          {
+            staticClass:
+              "d-flex flex-lg-row flex-sm-column flex-wrap align-center"
+          },
+          [
+            _c(
+              "div",
+              { staticClass: "flex-grow-1 px-2" },
+              [
+                _c("v-text-field", {
+                  attrs: {
+                    "prepend-icon": "mdi-magnify",
+                    label: "Filtar por Nombre",
+                    clearable: ""
+                  },
+                  model: {
+                    value: _vm.filters.name,
+                    callback: function($$v) {
+                      _vm.$set(_vm.filters, "name", $$v)
+                    },
+                    expression: "filters.name"
+                  }
+                })
+              ],
+              1
+            ),
+            _vm._v(" "),
+            _c(
+              "div",
+              { staticClass: "flex-grow-1 px-2" },
+              [
+                _c("v-select", {
+                  attrs: {
+                    items: _vm.options.months,
+                    "item-text": "name",
+                    "item-value": "value",
+                    label: "Mes Vencimiento",
+                    clearable: ""
+                  },
+                  model: {
+                    value: _vm.filters.month,
+                    callback: function($$v) {
+                      _vm.$set(_vm.filters, "month", $$v)
+                    },
+                    expression: "filters.month"
+                  }
+                })
+              ],
+              1
+            ),
+            _vm._v(" "),
+            _c(
+              "div",
+              { staticClass: "flex-grow-1 px-2" },
+              [
+                _c("v-select", {
+                  attrs: {
+                    items: _vm.options.years,
+                    "item-text": "name",
+                    "item-value": "name",
+                    label: "Año Vencimiento",
+                    clearable: ""
+                  },
+                  model: {
+                    value: _vm.filters.year,
+                    callback: function($$v) {
+                      _vm.$set(_vm.filters, "year", $$v)
+                    },
+                    expression: "filters.year"
+                  }
+                })
+              ],
+              1
+            ),
+            _vm._v(" "),
+            _c(
+              "div",
+              { staticClass: "flex-grow-1 px-2" },
+              [
+                _c("v-autocomplete", {
+                  attrs: {
+                    filled: "",
+                    multiple: "",
+                    chips: "",
+                    "deletable-chips": "",
+                    clearable: "",
+                    "prepend-icon": "mdi-filter-variant",
+                    label: "Filtrar por Grupos",
+                    items: _vm.filters.groupOptions,
+                    "item-text": "name",
+                    "item-value": "id"
+                  },
+                  model: {
+                    value: _vm.filters.groupId,
+                    callback: function($$v) {
+                      _vm.$set(_vm.filters, "groupId", $$v)
+                    },
+                    expression: "filters.groupId"
+                  }
+                })
+              ],
+              1
+            )
+          ]
+        ),
+        _vm._v(" "),
+        _c(
+          "div",
+          {
+            staticClass:
+              "d-flex flex-md-row flex-sm-column flex-wrap align-center"
+          },
+          [
+            _c(
+              "div",
+              { staticClass: "flex-grow-1 px-2 text-right" },
+              [
+                _c(
+                  "v-btn",
+                  { attrs: { color: "accent" } },
+                  [
+                    _vm._v("\n          EXCEL\n          "),
+                    _c("v-icon", { attrs: { right: "" } }, [
+                      _vm._v("mdi-file-excel-outline")
+                    ])
+                  ],
+                  1
+                ),
+                _vm._v(" "),
+                _c(
+                  "v-dialog",
+                  {
+                    attrs: {
+                      fullscreen: "",
+                      transition: "dialog-bottom-transition",
+                      overlay: false
+                    },
+                    scopedSlots: _vm._u([
+                      {
+                        key: "activator",
+                        fn: function(ref) {
+                          var on = ref.on
+                          var attrs = ref.attrs
+                          return [
+                            _c(
+                              "v-btn",
+                              _vm._g(
+                                _vm._b(
+                                  { attrs: { color: "primary" } },
+                                  "v-btn",
+                                  attrs,
+                                  false
+                                ),
+                                on
+                              ),
+                              [
+                                _vm._v(
+                                  "\n              Nuevo GPS\n              "
+                                ),
+                                _c("v-icon", { attrs: { right: "" } }, [
+                                  _vm._v("mdi-plus")
+                                ])
+                              ],
+                              1
+                            )
+                          ]
+                        }
+                      }
+                    ]),
+                    model: {
+                      value: _vm.dialogs.show,
+                      callback: function($$v) {
+                        _vm.$set(_vm.dialogs, "show", $$v)
+                      },
+                      expression: "dialogs.show"
+                    }
+                  },
+                  [
+                    _vm._v(" "),
+                    _c(
+                      "v-card",
+                      [
+                        _c(
+                          "v-toolbar",
+                          { staticClass: "primary" },
+                          [
+                            _c(
+                              "v-btn",
+                              {
+                                attrs: { icon: "" },
+                                nativeOn: {
+                                  click: function($event) {
+                                    ;(_vm.dialogs.show = false),
+                                      (_vm.editedIndex = -1)
+                                  }
+                                }
+                              },
+                              [_c("v-icon", [_vm._v("mdi-close")])],
+                              1
+                            ),
+                            _vm._v(" "),
+                            _c(
+                              "v-toolbar-title",
+                              { staticClass: "white--text" },
+                              [_vm._v(_vm._s(_vm.formTitle))]
+                            ),
+                            _vm._v(" "),
+                            _c("v-spacer"),
+                            _vm._v(" "),
+                            _c(
+                              "v-toolbar-items",
+                              [
+                                _c(
+                                  "v-btn",
+                                  {
+                                    attrs: { text: "" },
+                                    nativeOn: {
+                                      click: function($event) {
+                                        ;(_vm.dialogs.show = false),
+                                          (_vm.editedIndex = -1)
+                                      }
+                                    }
+                                  },
+                                  [_vm._v("Done")]
+                                )
+                              ],
+                              1
+                            )
+                          ],
+                          1
+                        ),
+                        _vm._v(" "),
+                        _c(
+                          "v-card-text",
+                          [
+                            _vm.formEdit
+                              ? _c("gps-edit", {
+                                  attrs: { propGpsId: _vm.dialogs.gps.id }
+                                })
+                              : _vm.dialogs.show
+                              ? _c("gps-add")
+                              : _vm._e()
+                          ],
+                          1
+                        )
+                      ],
+                      1
+                    )
+                  ],
+                  1
+                )
+              ],
+              1
+            )
+          ]
+        )
       ]),
       _vm._v(" "),
-      _c("p", [
-        _vm._v("\n    single page routes for admin can be found at\n    "),
-        _c("b", [_vm._v("resources/js/admin/router.js")])
-      ])
-    ])
-  }
-]
+      _c("v-data-table", {
+        staticClass: "elevation-1 text-uppercase",
+        attrs: {
+          headers: _vm.headers,
+          options: _vm.pagination,
+          items: _vm.items,
+          "server-items-length": _vm.totalItems,
+          dense: "",
+          "fixed-header": ""
+        },
+        on: {
+          "update:options": function($event) {
+            _vm.pagination = $event
+          }
+        },
+        scopedSlots: _vm._u([
+          {
+            key: "item.gps_group",
+            fn: function(ref) {
+              var item = ref.item
+              return [
+                item.gps_group
+                  ? [
+                      _vm._v(
+                        "\n        " + _vm._s(item.gps_group.name) + "\n      "
+                      )
+                    ]
+                  : [
+                      _c(
+                        "v-edit-dialog",
+                        {
+                          attrs: {
+                            "return-value": item.gps_group_id,
+                            large: "",
+                            persistent: ""
+                          },
+                          on: {
+                            "update:returnValue": function($event) {
+                              return _vm.$set(item, "gps_group_id", $event)
+                            },
+                            "update:return-value": function($event) {
+                              return _vm.$set(item, "gps_group_id", $event)
+                            },
+                            save: function($event) {
+                              return _vm.saveInLine(item)
+                            },
+                            cancel: _vm.cancel
+                          },
+                          scopedSlots: _vm._u(
+                            [
+                              {
+                                key: "input",
+                                fn: function() {
+                                  return [
+                                    _c("div", { staticClass: "mt-4 title" }, [
+                                      _vm._v("Asignar a Grupo")
+                                    ]),
+                                    _vm._v(" "),
+                                    _c("v-autocomplete", {
+                                      attrs: {
+                                        filled: "",
+                                        clearable: "",
+                                        "prepend-icon": "mdi-filter-variant",
+                                        label: "Filtrar por Grupos",
+                                        items: _vm.filters.groupOptions,
+                                        "item-text": "name",
+                                        "item-value": "id"
+                                      },
+                                      model: {
+                                        value: item.gps_group_id,
+                                        callback: function($$v) {
+                                          _vm.$set(item, "gps_group_id", $$v)
+                                        },
+                                        expression: "item.gps_group_id"
+                                      }
+                                    })
+                                  ]
+                                },
+                                proxy: true
+                              }
+                            ],
+                            null,
+                            true
+                          )
+                        },
+                        [
+                          _c(
+                            "v-btn",
+                            {
+                              attrs: {
+                                outlined: "",
+                                small: "",
+                                color: "primary",
+                                "pa-0": ""
+                              }
+                            },
+                            [_vm._v("Asignar a Grupo")]
+                          )
+                        ],
+                        1
+                      )
+                    ]
+              ]
+            }
+          },
+          {
+            key: "item.action",
+            fn: function(ref) {
+              var item = ref.item
+              return [
+                _c(
+                  "v-btn",
+                  {
+                    attrs: { icon: "", small: "" },
+                    on: {
+                      click: function($event) {
+                        return _vm.editItem(item)
+                      }
+                    }
+                  },
+                  [
+                    _c(
+                      "v-icon",
+                      { staticClass: "blue--text", attrs: { small: "" } },
+                      [_vm._v("edit")]
+                    )
+                  ],
+                  1
+                ),
+                _vm._v(" "),
+                _c(
+                  "v-btn",
+                  {
+                    attrs: { icon: "", small: "" },
+                    on: {
+                      click: function($event) {
+                        return _vm.trash(item)
+                      }
+                    }
+                  },
+                  [
+                    _c(
+                      "v-icon",
+                      { staticClass: "red--text", attrs: { small: "" } },
+                      [_vm._v("delete")]
+                    )
+                  ],
+                  1
+                )
+              ]
+            }
+          },
+          {
+            key: "item.activation_date",
+            fn: function(ref) {
+              var item = ref.item
+              return [
+                _vm._v(
+                  "\n      " +
+                    _vm._s(
+                      _vm.$appFormatters.formatDate(item.activation_date)
+                    ) +
+                    "\n    "
+                )
+              ]
+            }
+          },
+          {
+            key: "item.due_date",
+            fn: function(ref) {
+              var item = ref.item
+              return [
+                _c("span", { staticClass: "overline text-capitalize" }, [
+                  _vm._v(
+                    _vm._s(_vm.$appFormatters.formatTimeFromNow(item.due_date))
+                  )
+                ])
+              ]
+            }
+          },
+          {
+            key: "item.cost",
+            fn: function(ref) {
+              var item = ref.item
+              return [
+                _c(
+                  "v-edit-dialog",
+                  {
+                    attrs: {
+                      "return-value": item.cost,
+                      large: "",
+                      persistent: ""
+                    },
+                    on: {
+                      "update:returnValue": function($event) {
+                        return _vm.$set(item, "cost", $event)
+                      },
+                      "update:return-value": function($event) {
+                        return _vm.$set(item, "cost", $event)
+                      },
+                      save: function($event) {
+                        return _vm.saveInLine(item)
+                      },
+                      cancel: _vm.cancel
+                    },
+                    scopedSlots: _vm._u(
+                      [
+                        {
+                          key: "input",
+                          fn: function() {
+                            return [
+                              _c("div", { staticClass: "mt-4 title" }, [
+                                _vm._v("Modifica Costo $")
+                              ]),
+                              _vm._v(" "),
+                              _c("v-text-field", {
+                                attrs: {
+                                  label: "Valor",
+                                  "single-line": "",
+                                  counter: "",
+                                  autofocus: ""
+                                },
+                                model: {
+                                  value: item.cost,
+                                  callback: function($$v) {
+                                    _vm.$set(item, "cost", $$v)
+                                  },
+                                  expression: "item.cost"
+                                }
+                              })
+                            ]
+                          },
+                          proxy: true
+                        }
+                      ],
+                      null,
+                      true
+                    )
+                  },
+                  [
+                    _c(
+                      "v-btn",
+                      { attrs: { outlined: "", small: "", "pa-0": "" } },
+                      [_vm._v("$" + _vm._s(item.cost))]
+                    )
+                  ],
+                  1
+                )
+              ]
+            }
+          }
+        ])
+      })
+    ],
+    1
+  )
+}
+var staticRenderFns = []
 render._withStripped = true
 
 
@@ -24671,14 +27425,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vuetify__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(vuetify__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var vuetify_dist_vuetify_min_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vuetify/dist/vuetify.min.css */ "./node_modules/vuetify/dist/vuetify.min.css");
 /* harmony import */ var vuetify_dist_vuetify_min_css__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(vuetify_dist_vuetify_min_css__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var vue_progressbar__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! vue-progressbar */ "./node_modules/vue-progressbar/dist/vue-progressbar.js");
-/* harmony import */ var vue_progressbar__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(vue_progressbar__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var _plugins__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ~/plugins */ "./resources/js/plugins/index.js");
-/* harmony import */ var _admin_router__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @admin/router */ "./resources/js/admin/router.js");
-/* harmony import */ var _common_Store__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ~/common/Store */ "./resources/js/common/Store.js");
-/* harmony import */ var _common_Event__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ~/common/Event */ "./resources/js/common/Event.js");
-/* harmony import */ var _common_Formatters__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ~/common/Formatters */ "./resources/js/common/Formatters.js");
-/* harmony import */ var _common_AxiosAjaxDetect__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ~/common/AxiosAjaxDetect */ "./resources/js/common/AxiosAjaxDetect.js");
+/* harmony import */ var vuetify_es5_locale_es__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! vuetify/es5/locale/es */ "./node_modules/vuetify/es5/locale/es.js");
+/* harmony import */ var vuetify_es5_locale_es__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(vuetify_es5_locale_es__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var vue_progressbar__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! vue-progressbar */ "./node_modules/vue-progressbar/dist/vue-progressbar.js");
+/* harmony import */ var vue_progressbar__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(vue_progressbar__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _plugins__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ~/plugins */ "./resources/js/plugins/index.js");
+/* harmony import */ var _admin_router__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @admin/router */ "./resources/js/admin/router.js");
+/* harmony import */ var _common_Store__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ~/common/Store */ "./resources/js/common/Store.js");
+/* harmony import */ var _common_Event__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ~/common/Event */ "./resources/js/common/Event.js");
+/* harmony import */ var _common_Formatters__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ~/common/Formatters */ "./resources/js/common/Formatters.js");
+/* harmony import */ var _common_AxiosAjaxDetect__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ~/common/AxiosAjaxDetect */ "./resources/js/common/AxiosAjaxDetect.js");
 /**
  * First we will load all of this project's JavaScript dependencies which
  * includes Vue and other libraries. It is a great starting point when
@@ -24694,6 +27450,7 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
 
 
 
+
  // this is the vuetify theming options
 // you can change colors here based on your needs
 // and please dont forget to recompile scripts
@@ -24702,7 +27459,7 @@ vue__WEBPACK_IMPORTED_MODULE_1___default.a.use(vuetify__WEBPACK_IMPORTED_MODULE_
 // can change colors here to fit on your needs or match
 // your theming above
 
-vue__WEBPACK_IMPORTED_MODULE_1___default.a.use(vue_progressbar__WEBPACK_IMPORTED_MODULE_4___default.a, {
+vue__WEBPACK_IMPORTED_MODULE_1___default.a.use(vue_progressbar__WEBPACK_IMPORTED_MODULE_5___default.a, {
   color: "#3f51b5",
   failedColor: "#b71c1c",
   thickness: "5px",
@@ -24722,8 +27479,8 @@ vue__WEBPACK_IMPORTED_MODULE_1___default.a.component("moon-loader", __webpack_re
 
 
 
-vue__WEBPACK_IMPORTED_MODULE_1___default.a.use(_common_Formatters__WEBPACK_IMPORTED_MODULE_9__["default"]);
-vue__WEBPACK_IMPORTED_MODULE_1___default.a.use(_common_Event__WEBPACK_IMPORTED_MODULE_8__["default"]);
+vue__WEBPACK_IMPORTED_MODULE_1___default.a.use(_common_Formatters__WEBPACK_IMPORTED_MODULE_10__["default"]);
+vue__WEBPACK_IMPORTED_MODULE_1___default.a.use(_common_Event__WEBPACK_IMPORTED_MODULE_9__["default"]);
 var admin = new vue__WEBPACK_IMPORTED_MODULE_1___default.a({
   vuetify: new vuetify__WEBPACK_IMPORTED_MODULE_2___default.a({
     theme: {
@@ -24749,12 +27506,18 @@ var admin = new vue__WEBPACK_IMPORTED_MODULE_1___default.a({
     },
     icons: {
       iconfont: "mdi"
+    },
+    lang: {
+      locales: {
+        es: vuetify_es5_locale_es__WEBPACK_IMPORTED_MODULE_4___default.a
+      },
+      current: "es"
     }
   }),
   el: "#admin",
-  eventBus: _common_Event__WEBPACK_IMPORTED_MODULE_8__["default"],
-  router: _admin_router__WEBPACK_IMPORTED_MODULE_6__["default"],
-  store: _common_Store__WEBPACK_IMPORTED_MODULE_7__["default"],
+  eventBus: _common_Event__WEBPACK_IMPORTED_MODULE_9__["default"],
+  router: _admin_router__WEBPACK_IMPORTED_MODULE_7__["default"],
+  store: _common_Store__WEBPACK_IMPORTED_MODULE_8__["default"],
   data: function data() {
     return {
       drawer: true
@@ -24763,7 +27526,7 @@ var admin = new vue__WEBPACK_IMPORTED_MODULE_1___default.a({
   mounted: function mounted() {
     var self = this; // progress bar top
 
-    _common_AxiosAjaxDetect__WEBPACK_IMPORTED_MODULE_10__["default"].init(function () {
+    _common_AxiosAjaxDetect__WEBPACK_IMPORTED_MODULE_11__["default"].init(function () {
       self.$Progress.start();
     }, function () {
       self.$Progress.finish();
@@ -24771,48 +27534,48 @@ var admin = new vue__WEBPACK_IMPORTED_MODULE_1___default.a({
   },
   computed: {
     getBreadcrumbs: function getBreadcrumbs() {
-      return _common_Store__WEBPACK_IMPORTED_MODULE_7__["default"].getters.getBreadcrumbs;
+      return _common_Store__WEBPACK_IMPORTED_MODULE_8__["default"].getters.getBreadcrumbs;
     },
     showLoader: function showLoader() {
-      return _common_Store__WEBPACK_IMPORTED_MODULE_7__["default"].getters.showLoader;
+      return _common_Store__WEBPACK_IMPORTED_MODULE_8__["default"].getters.showLoader;
     },
     showSnackbar: {
       get: function get() {
-        return _common_Store__WEBPACK_IMPORTED_MODULE_7__["default"].getters.showSnackbar;
+        return _common_Store__WEBPACK_IMPORTED_MODULE_8__["default"].getters.showSnackbar;
       },
       set: function set(val) {
-        if (!val) _common_Store__WEBPACK_IMPORTED_MODULE_7__["default"].commit("hideSnackbar");
+        if (!val) _common_Store__WEBPACK_IMPORTED_MODULE_8__["default"].commit("hideSnackbar");
       }
     },
     snackbarMessage: function snackbarMessage() {
-      return _common_Store__WEBPACK_IMPORTED_MODULE_7__["default"].getters.snackbarMessage;
+      return _common_Store__WEBPACK_IMPORTED_MODULE_8__["default"].getters.snackbarMessage;
     },
     snackbarColor: function snackbarColor() {
-      return _common_Store__WEBPACK_IMPORTED_MODULE_7__["default"].getters.snackbarColor;
+      return _common_Store__WEBPACK_IMPORTED_MODULE_8__["default"].getters.snackbarColor;
     },
     snackbarDuration: function snackbarDuration() {
-      return _common_Store__WEBPACK_IMPORTED_MODULE_7__["default"].getters.snackbarDuration;
+      return _common_Store__WEBPACK_IMPORTED_MODULE_8__["default"].getters.snackbarDuration;
     },
     // dialog
     showDialog: {
       get: function get() {
-        return _common_Store__WEBPACK_IMPORTED_MODULE_7__["default"].getters.showDialog;
+        return _common_Store__WEBPACK_IMPORTED_MODULE_8__["default"].getters.showDialog;
       },
       set: function set(val) {
-        if (!val) _common_Store__WEBPACK_IMPORTED_MODULE_7__["default"].commit("hideDialog");
+        if (!val) _common_Store__WEBPACK_IMPORTED_MODULE_8__["default"].commit("hideDialog");
       }
     },
     dialogType: function dialogType() {
-      return _common_Store__WEBPACK_IMPORTED_MODULE_7__["default"].getters.dialogType;
+      return _common_Store__WEBPACK_IMPORTED_MODULE_8__["default"].getters.dialogType;
     },
     dialogTitle: function dialogTitle() {
-      return _common_Store__WEBPACK_IMPORTED_MODULE_7__["default"].getters.dialogTitle;
+      return _common_Store__WEBPACK_IMPORTED_MODULE_8__["default"].getters.dialogTitle;
     },
     dialogMessage: function dialogMessage() {
-      return _common_Store__WEBPACK_IMPORTED_MODULE_7__["default"].getters.dialogMessage;
+      return _common_Store__WEBPACK_IMPORTED_MODULE_8__["default"].getters.dialogMessage;
     },
     dialogIcon: function dialogIcon() {
-      return _common_Store__WEBPACK_IMPORTED_MODULE_7__["default"].getters.dialogIcon;
+      return _common_Store__WEBPACK_IMPORTED_MODULE_8__["default"].getters.dialogIcon;
     }
   },
   methods: {
@@ -24835,10 +27598,10 @@ var admin = new vue__WEBPACK_IMPORTED_MODULE_1___default.a({
       });
     },
     dialogOk: function dialogOk() {
-      _common_Store__WEBPACK_IMPORTED_MODULE_7__["default"].commit("dialogOk");
+      _common_Store__WEBPACK_IMPORTED_MODULE_8__["default"].commit("dialogOk");
     },
     dialogCancel: function dialogCancel() {
-      _common_Store__WEBPACK_IMPORTED_MODULE_7__["default"].commit("dialogCancel");
+      _common_Store__WEBPACK_IMPORTED_MODULE_8__["default"].commit("dialogCancel");
     }
   }
 });
@@ -25464,6 +28227,282 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Gps_vue_vue_type_template_id_64cad2d7_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Gps_vue_vue_type_template_id_64cad2d7_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
+/***/ "./resources/js/admin/gps/components/GpsAdd.vue":
+/*!******************************************************!*\
+  !*** ./resources/js/admin/gps/components/GpsAdd.vue ***!
+  \******************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _GpsAdd_vue_vue_type_template_id_11287946___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./GpsAdd.vue?vue&type=template&id=11287946& */ "./resources/js/admin/gps/components/GpsAdd.vue?vue&type=template&id=11287946&");
+/* harmony import */ var _GpsAdd_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./GpsAdd.vue?vue&type=script&lang=js& */ "./resources/js/admin/gps/components/GpsAdd.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _GpsAdd_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _GpsAdd_vue_vue_type_template_id_11287946___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _GpsAdd_vue_vue_type_template_id_11287946___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/admin/gps/components/GpsAdd.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/admin/gps/components/GpsAdd.vue?vue&type=script&lang=js&":
+/*!*******************************************************************************!*\
+  !*** ./resources/js/admin/gps/components/GpsAdd.vue?vue&type=script&lang=js& ***!
+  \*******************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_GpsAdd_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../node_modules/vue-loader/lib??vue-loader-options!./GpsAdd.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/gps/components/GpsAdd.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_GpsAdd_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/admin/gps/components/GpsAdd.vue?vue&type=template&id=11287946&":
+/*!*************************************************************************************!*\
+  !*** ./resources/js/admin/gps/components/GpsAdd.vue?vue&type=template&id=11287946& ***!
+  \*************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_GpsAdd_vue_vue_type_template_id_11287946___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../node_modules/vue-loader/lib??vue-loader-options!./GpsAdd.vue?vue&type=template&id=11287946& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/gps/components/GpsAdd.vue?vue&type=template&id=11287946&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_GpsAdd_vue_vue_type_template_id_11287946___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_GpsAdd_vue_vue_type_template_id_11287946___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
+/***/ "./resources/js/admin/gps/components/GpsEdit.vue":
+/*!*******************************************************!*\
+  !*** ./resources/js/admin/gps/components/GpsEdit.vue ***!
+  \*******************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _GpsEdit_vue_vue_type_template_id_bc596104___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./GpsEdit.vue?vue&type=template&id=bc596104& */ "./resources/js/admin/gps/components/GpsEdit.vue?vue&type=template&id=bc596104&");
+/* harmony import */ var _GpsEdit_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./GpsEdit.vue?vue&type=script&lang=js& */ "./resources/js/admin/gps/components/GpsEdit.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _GpsEdit_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _GpsEdit_vue_vue_type_template_id_bc596104___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _GpsEdit_vue_vue_type_template_id_bc596104___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/admin/gps/components/GpsEdit.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/admin/gps/components/GpsEdit.vue?vue&type=script&lang=js&":
+/*!********************************************************************************!*\
+  !*** ./resources/js/admin/gps/components/GpsEdit.vue?vue&type=script&lang=js& ***!
+  \********************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_GpsEdit_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../node_modules/vue-loader/lib??vue-loader-options!./GpsEdit.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/gps/components/GpsEdit.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_GpsEdit_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/admin/gps/components/GpsEdit.vue?vue&type=template&id=bc596104&":
+/*!**************************************************************************************!*\
+  !*** ./resources/js/admin/gps/components/GpsEdit.vue?vue&type=template&id=bc596104& ***!
+  \**************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_GpsEdit_vue_vue_type_template_id_bc596104___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../node_modules/vue-loader/lib??vue-loader-options!./GpsEdit.vue?vue&type=template&id=bc596104& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/gps/components/GpsEdit.vue?vue&type=template&id=bc596104&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_GpsEdit_vue_vue_type_template_id_bc596104___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_GpsEdit_vue_vue_type_template_id_bc596104___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
+/***/ "./resources/js/admin/gps/components/GpsGroupAdd.vue":
+/*!***********************************************************!*\
+  !*** ./resources/js/admin/gps/components/GpsGroupAdd.vue ***!
+  \***********************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _GpsGroupAdd_vue_vue_type_template_id_19cf0d16___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./GpsGroupAdd.vue?vue&type=template&id=19cf0d16& */ "./resources/js/admin/gps/components/GpsGroupAdd.vue?vue&type=template&id=19cf0d16&");
+/* harmony import */ var _GpsGroupAdd_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./GpsGroupAdd.vue?vue&type=script&lang=js& */ "./resources/js/admin/gps/components/GpsGroupAdd.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _GpsGroupAdd_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _GpsGroupAdd_vue_vue_type_template_id_19cf0d16___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _GpsGroupAdd_vue_vue_type_template_id_19cf0d16___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/admin/gps/components/GpsGroupAdd.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/admin/gps/components/GpsGroupAdd.vue?vue&type=script&lang=js&":
+/*!************************************************************************************!*\
+  !*** ./resources/js/admin/gps/components/GpsGroupAdd.vue?vue&type=script&lang=js& ***!
+  \************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_GpsGroupAdd_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../node_modules/vue-loader/lib??vue-loader-options!./GpsGroupAdd.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/gps/components/GpsGroupAdd.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_GpsGroupAdd_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/admin/gps/components/GpsGroupAdd.vue?vue&type=template&id=19cf0d16&":
+/*!******************************************************************************************!*\
+  !*** ./resources/js/admin/gps/components/GpsGroupAdd.vue?vue&type=template&id=19cf0d16& ***!
+  \******************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_GpsGroupAdd_vue_vue_type_template_id_19cf0d16___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../node_modules/vue-loader/lib??vue-loader-options!./GpsGroupAdd.vue?vue&type=template&id=19cf0d16& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/gps/components/GpsGroupAdd.vue?vue&type=template&id=19cf0d16&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_GpsGroupAdd_vue_vue_type_template_id_19cf0d16___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_GpsGroupAdd_vue_vue_type_template_id_19cf0d16___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
+/***/ "./resources/js/admin/gps/components/GpsGroupEdit.vue":
+/*!************************************************************!*\
+  !*** ./resources/js/admin/gps/components/GpsGroupEdit.vue ***!
+  \************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _GpsGroupEdit_vue_vue_type_template_id_684d8636___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./GpsGroupEdit.vue?vue&type=template&id=684d8636& */ "./resources/js/admin/gps/components/GpsGroupEdit.vue?vue&type=template&id=684d8636&");
+/* harmony import */ var _GpsGroupEdit_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./GpsGroupEdit.vue?vue&type=script&lang=js& */ "./resources/js/admin/gps/components/GpsGroupEdit.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _GpsGroupEdit_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _GpsGroupEdit_vue_vue_type_template_id_684d8636___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _GpsGroupEdit_vue_vue_type_template_id_684d8636___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/admin/gps/components/GpsGroupEdit.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/admin/gps/components/GpsGroupEdit.vue?vue&type=script&lang=js&":
+/*!*************************************************************************************!*\
+  !*** ./resources/js/admin/gps/components/GpsGroupEdit.vue?vue&type=script&lang=js& ***!
+  \*************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_GpsGroupEdit_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../node_modules/vue-loader/lib??vue-loader-options!./GpsGroupEdit.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/gps/components/GpsGroupEdit.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_GpsGroupEdit_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/admin/gps/components/GpsGroupEdit.vue?vue&type=template&id=684d8636&":
+/*!*******************************************************************************************!*\
+  !*** ./resources/js/admin/gps/components/GpsGroupEdit.vue?vue&type=template&id=684d8636& ***!
+  \*******************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_GpsGroupEdit_vue_vue_type_template_id_684d8636___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../node_modules/vue-loader/lib??vue-loader-options!./GpsGroupEdit.vue?vue&type=template&id=684d8636& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/gps/components/GpsGroupEdit.vue?vue&type=template&id=684d8636&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_GpsGroupEdit_vue_vue_type_template_id_684d8636___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_GpsGroupEdit_vue_vue_type_template_id_684d8636___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 
@@ -26615,6 +29654,28 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/api/moths.json":
+/*!*************************************!*\
+  !*** ./resources/js/api/moths.json ***!
+  \*************************************/
+/*! exports provided: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, default */
+/***/ (function(module) {
+
+module.exports = JSON.parse("[{\"name\":\"ENERO\",\"value\":1},{\"name\":\"FEBRERO\",\"value\":2},{\"name\":\"MARZO\",\"value\":3},{\"name\":\"ABRIL\",\"value\":4},{\"name\":\"MAYO\",\"value\":5},{\"name\":\"JUNIO\",\"value\":6},{\"name\":\"JULIO\",\"value\":7},{\"name\":\"AGOSTO\",\"value\":8},{\"name\":\"SEPTIEMBRE\",\"value\":9},{\"name\":\"OCTUBRE\",\"value\":10},{\"name\":\"NOVIEMBRE\",\"value\":11},{\"name\":\"DICIEMBRE\",\"value\":12}]");
+
+/***/ }),
+
+/***/ "./resources/js/api/years.json":
+/*!*************************************!*\
+  !*** ./resources/js/api/years.json ***!
+  \*************************************/
+/*! exports provided: 0, 1, 2, 3, 4, 5, 6, default */
+/***/ (function(module) {
+
+module.exports = JSON.parse("[{\"name\":\"2017\"},{\"name\":\"2018\"},{\"name\":\"2019\"},{\"name\":\"2020\"},{\"name\":\"2021\"},{\"name\":\"2022\"},{\"name\":\"2023\"}]");
+
+/***/ }),
+
 /***/ "./resources/js/bootstrap.js":
 /*!***********************************!*\
   !*** ./resources/js/bootstrap.js ***!
@@ -26623,6 +29684,7 @@ __webpack_require__.r(__webpack_exports__);
 /***/ (function(module, exports, __webpack_require__) {
 
 window.moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
+moment.locale("es");
 window.Dropzone = __webpack_require__(/*! dropzone */ "./node_modules/dropzone/dist/dropzone.js");
 /**
  * We'll load jQuery and the Bootstrap jQuery plugin which provides support
@@ -26643,7 +29705,7 @@ try {
 
 
 window.axios = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
-window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+window.axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
 /**
  * Next we will register the CSRF Token as a common header with Axios so that
  * all outgoing HTTP requests automatically have it attached. This is just
@@ -26654,9 +29716,9 @@ var token = document.head.querySelector('meta[name="csrf-token"]');
 
 if (token) {
   window._token = token.content;
-  window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
+  window.axios.defaults.headers.common["X-CSRF-TOKEN"] = token.content;
 } else {
-  console.error('CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token');
+  console.error("CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token");
 }
 /**
  * Echo exposes an expressive API for subscribing to channels and listening
@@ -26770,8 +29832,10 @@ __webpack_require__.r(__webpack_exports__);
   install: function install(Vue, options) {
     Vue.prototype.$appFormatters = {
       formatDate: function formatDate(dateString, format) {
-        moment.locale('es');
-        return moment(dateString).format(format ? format : 'MMMM DD, YYYY');
+        return moment(dateString).format(format ? format : "MMMM DD, YYYY");
+      },
+      formatTimeFromNow: function formatTimeFromNow(due) {
+        return moment(due).fromNow();
       },
       formatByteToMB: function formatByteToMB(sizeInBytes) {
         return (sizeInBytes / (1024 * 1024)).toFixed(2);

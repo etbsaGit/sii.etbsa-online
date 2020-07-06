@@ -13,5 +13,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(UserSeeder::class);
         $this->call(FileGroupSeeder::class);
+        $this->call(GpsGroupSeeder::class);
+        $this->call(GpsSeeder::class);
     }
 }

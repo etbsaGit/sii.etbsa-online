@@ -17,7 +17,7 @@
     <script type="application/javascript">
       var LSK_APP = {};
       LSK_APP.APP_URL = '{{env('APP_URL')}}';
-      LSK_APP.APP_USER = @json(auth()->user());
+      LSK_APP.AUTH_USER = @json(auth()->user());
     </script>
   </head>
   <body>

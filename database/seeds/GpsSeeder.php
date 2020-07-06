@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Seeder;
 
-class GpsGroupSeeder extends Seeder
+class GpsSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -11,6 +11,6 @@ class GpsGroupSeeder extends Seeder
      */
     public function run()
     {
-        $gps_group = factory(App\Components\Gps\Models\GpsGroup::class, 5)->create();
+        $gps_group = factory(App\Components\Gps\Models\Gps::class, 5)->create();
     }
 }

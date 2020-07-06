@@ -20,10 +20,13 @@ class CreateGpsTable extends Migration
             $table->unsignedInteger('gps_group_id');
             $table->string('sim')->nullable()->unique();
             $table->string('imei')->nullable();
-            $table->double('cost',12,2)->default(0);
-            $table->double('amount',12,2)->default(0);
+            $table->enum('currency', ['MXN', 'USD'])->default('MXN');
+            $table->double('exchange_rate', 12, 2)->default(1);
+            $table->double('cost', 12, 2)->default(0);
+            $table->double('amount', 12, 2)->default(0);
             $table->timestamp('activation_date')->nullable();
             $table->timestamp('due_date')->nullable();
+            $table->text('comment')->nullable();
             $table->timestamps();
         });
     }

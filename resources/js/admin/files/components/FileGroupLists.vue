@@ -2,15 +2,15 @@
     <div class="component-wrap">
 
         <!-- search -->
-        <v-card>
-            <div class="d-flex flex-row">
+        <v-card flat>
+            <div class="d-flex flex-row align-center px-4">
                 <div class="flex-grow-1">
                     <v-text-field prepend-icon="search" label="Filter By Name" v-model="filters.name"></v-text-field>
                 </div>
                 <div class="flex-grow-1 text-right">
                     <v-btn @click="showDialog('file_group_add')" dark class="primary lighten-1">
                         New File Group
-                        <v-icon right>mdi-add</v-icon>
+                        <v-icon right>mdi-plus</v-icon>
                     </v-btn>
                 </div>
             </div>
@@ -31,7 +31,7 @@
                         <v-btn @click="showDialog('file_group_edit',item)" icon small>
                             <v-icon class="blue--text">edit</v-icon>
                         </v-btn>
-                        <v-btn @click="trash(props.item)" icon small>
+                        <v-btn @click="trash(item)" icon small>
                             <v-icon class="red--text">delete</v-icon>
                         </v-btn>
                     </td>

@@ -33,4 +33,6 @@ Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function
     Route::resource('permissions','PermissionController');
     Route::resource('files','FileController');
     Route::resource('file-groups','FileGroupController');
+    Route::resource('gps-groups','GpsGroupController');
+    Route::resource('gps','GpsController');
 });

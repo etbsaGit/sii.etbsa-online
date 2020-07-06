@@ -5,7 +5,7 @@
             <v-tab key="gps" href="#gps" ripple>
                 GPS
             </v-tab>
-            <v-tab key="manage-groups" href="#manage-groups" ripple>
+            <v-tab key="manage-gps-groups" href="#manage-gps-groups" ripple>
                 Administra Grupos GPS
             </v-tab>
             <v-tab key="upload" href="#upload" ripple>
@@ -19,7 +19,7 @@
                     </v-card-text>
                 </v-card>
             </v-tab-item>
-            <v-tab-item value="manage-groups">
+            <v-tab-item value="manage-gps-groups">
                 <v-card flat>
                     <v-card-text>
                         <gps-group-lists></gps-group-lists>
@@ -38,9 +38,9 @@
 </template>
 
 <script>
-    import GpsGroupLists from './components/GpsGroupLists.vue';
-    import GpsUpload from './components/GpsUpload.vue';
-    import GpsLists from './components/GpsLists.vue';
+    import GpsGroupLists from '@admin/gps/components/GpsGroupLists.vue';
+    import GpsUpload from '@admin/gps/components/GpsUpload.vue';
+    import GpsLists from '@admin/gps/components/GpsLists.vue';
     export default {
         components: {
             GpsUpload,
@@ -48,8 +48,6 @@
             GpsLists
         },
         mounted() {
-            console.log('pages.GpsManager.vue');
-
             const self = this;
 
             self.$store.commit('setBreadcrumbs',[
@@ -58,7 +56,7 @@
         },
         data() {
             return {
-                active: 'files'
+                active: 'gps'
             }
         },
         watch: {

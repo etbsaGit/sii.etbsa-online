@@ -1,0 +1,19 @@
+[
+  { "name": "ADMINISTRACION" },
+  { "name": "CENTRO DE SOPORTE A LAS OPERACIONES" },
+  { "name": "CONTABILIDAD" },
+  { "name": "CREDITO Y COBRANZA" },
+  { "name": "DIRECCION" },
+  { "name": "LUBRICANTES" },
+  { "name": "MARKETING" },
+  { "name": "NUEVAS TECNOLOGIAS" },
+  { "name": "POST VENTA" },
+  { "name": "REFACCIONES" },
+  { "name": "RIEGO" },
+  { "name": "RRHH" },
+  { "name": "SERVICIO AGRICOLA" },
+  { "name": "SERVICIO CONSTRUCCION" },
+  { "name": "SISTEMAS" },
+  { "name": "TESORERIA" },
+  { "name": "VENTAS" }
+]
