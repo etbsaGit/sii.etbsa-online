@@ -37,6 +37,8 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
+    protected $appends = ['groups','all_permissions'];
+
     /**
      * the validation rules
      *

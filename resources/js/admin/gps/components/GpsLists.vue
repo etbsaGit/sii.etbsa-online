@@ -2,102 +2,116 @@
   <div class="component-wrap">
     <!-- search -->
     <v-card flat>
-      <div class="d-flex flex-lg-row flex-sm-column flex-wrap align-center">
-        <div class="flex-grow-1 px-2">
-          <v-text-field
-            prepend-icon="mdi-magnify"
-            label="Filtar por Nombre"
-            v-model="filters.name"
-            clearable
-          ></v-text-field>
+      <v-form ref="filterForm">
+        <div class="d-flex flex-lg-row flex-sm-column flex-wrap align-center">
+          <div class="flex-grow-1 px-2">
+            <v-text-field
+              prepend-icon="mdi-magnify"
+              label="Filtar por Nombre"
+              v-model="filters.name"
+              clearable
+            ></v-text-field>
+          </div>
+          <div class="flex-grow-1 px-2">
+            <v-select
+              v-model="filters.month"
+              :items="options.months"
+              label="Mes Vencimiento"
+              :menu-props="{ offsetY: true }"
+              item-text="name"
+              item-value="value"
+              clearable
+            ></v-select>
+          </div>
+          <div class="flex-grow-1 px-2">
+            <v-select
+              v-model="filters.year"
+              :items="options.years"
+              item-text="name"
+              item-value="name"
+              label="Año Vencimiento"
+              clearable
+            ></v-select>
+          </div>
+          <div class="flex-grow-1 px-2">
+            <v-autocomplete
+              v-model="filters.groupId"
+              filled
+              multiple
+              chips
+              deletable-chips
+              clearable
+              prepend-icon="mdi-filter-variant"
+              label="Filtrar por Grupos"
+              :items="filters.groupOptions"
+              item-text="name"
+              item-value="id"
+            ></v-autocomplete>
+          </div>
         </div>
-        <div class="flex-grow-1 px-2">
-          <v-select
-            v-model="filters.month"
-            :items="options.months"
-            item-text="name"
-            item-value="value"
-            label="Mes Vencimiento"
-            clearable
-          ></v-select>
-        </div>
-        <div class="flex-grow-1 px-2">
-          <v-select
-            v-model="filters.year"
-            :items="options.years"
-            item-text="name"
-            item-value="name"
-            label="Año Vencimiento"
-            clearable
-          ></v-select>
-        </div>
-        <div class="flex-grow-1 px-2">
-          <v-autocomplete
-            v-model="filters.groupId"
-            filled
-            multiple
-            chips
-            deletable-chips
-            clearable
-            prepend-icon="mdi-filter-variant"
-            label="Filtrar por Grupos"
-            :items="filters.groupOptions"
-            item-text="name"
-            item-value="id"
-          ></v-autocomplete>
-        </div>
-      </div>
+      </v-form>
+
+      <!-- Buttons -->
       <div class="d-flex flex-md-row flex-sm-column flex-wrap align-center">
-        <div class="flex-grow-1 px-2 text-right">
-          <v-btn color="accent">
-            EXCEL
-            <v-icon right>mdi-file-excel-outline</v-icon>
-          </v-btn>
-          <v-dialog
-            v-model="dialogs.show"
-            fullscreen
-            transition="dialog-bottom-transition"
-            :overlay="false"
-          >
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn color="primary" v-bind="attrs" v-on="on">
-                Nuevo GPS
-                <v-icon right>mdi-plus</v-icon>
-              </v-btn>
-            </template>
-            <v-card>
-              <v-toolbar class="primary">
-                <v-btn
-                  icon
-                  @click.native="(dialogs.show = false), (editedIndex = -1)"
-                >
-                  <v-icon>mdi-close</v-icon>
-                </v-btn>
-                <v-toolbar-title class="white--text">{{
-                  formTitle
-                }}</v-toolbar-title>
-                <v-spacer></v-spacer>
-                <v-toolbar-items>
-                  <v-btn
-                    text
-                    @click.native="(dialogs.show = false), (editedIndex = -1)"
-                    >Done</v-btn
-                  >
-                </v-toolbar-items>
-              </v-toolbar>
-              <v-card-text>
-                <gps-edit
-                  v-if="formEdit"
-                  :propGpsId="dialogs.gps.id"
-                ></gps-edit>
-                <gps-add v-else-if="dialogs.show"></gps-add>
-              </v-card-text>
-            </v-card>
-          </v-dialog>
+        <!-- <div class="flex-grow-1 px-2 text-right"> -->
+        <div class="d-flex flex-grow-1 overline text-uppercase">
+          Ultima Actualizacion de Datos: YYYY/MM/DD
         </div>
+        <v-spacer></v-spacer>
+        <v-btn
+          small
+          color="secondary"
+          @click="$refs.filterForm.reset()"
+          class="ma-1"
+        >
+          Limpiar Filtro
+          <v-icon right>mdi-filter-remove</v-icon>
+        </v-btn>
+        <v-btn small color="accent" class="ma-1">
+          EXCEL
+          <v-icon right>mdi-file-excel-outline</v-icon>
+        </v-btn>
+        <v-dialog
+          v-model="dialogs.show"
+          fullscreen
+          transition="dialog-bottom-transition"
+          :overlay="false"
+        >
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn small color="primary" v-bind="attrs" v-on="on" class="ma-1">
+              Nuevo GPS
+              <v-icon right>mdi-plus</v-icon>
+            </v-btn>
+          </template>
+          <v-card>
+            <v-toolbar class="primary">
+              <v-btn
+                icon
+                @click.native="(dialogs.show = false), (editedIndex = -1)"
+              >
+                <v-icon>mdi-close</v-icon>
+              </v-btn>
+              <v-toolbar-title class="white--text">{{
+                formTitle
+              }}</v-toolbar-title>
+              <v-spacer></v-spacer>
+              <v-toolbar-items>
+                <v-btn
+                  text
+                  @click.native="(dialogs.show = false), (editedIndex = -1)"
+                  >Done</v-btn
+                >
+              </v-toolbar-items>
+            </v-toolbar>
+            <v-card-text>
+              <gps-edit v-if="formEdit" :propGpsId="dialogs.gps.id"></gps-edit>
+              <gps-add v-else-if="dialogs.show"></gps-add>
+            </v-card-text>
+          </v-card>
+        </v-dialog>
+        <!-- </div> -->
       </div>
     </v-card>
-    <!-- /search -->
 
     <!-- data table -->
     <v-data-table
@@ -114,12 +128,41 @@
         {{ item.gps_group.name }}
       </template>
       <template v-slot:item.action="{ item }">
-        <v-btn @click="editItem(item)" icon small>
-          <v-icon small class="blue--text">edit</v-icon>
-        </v-btn>
-        <v-btn @click="trash(item)" icon small>
-          <v-icon small class="red--text">delete</v-icon>
-        </v-btn>
+        <v-menu offset-x>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn icon v-bind="attrs" v-on="on">
+              <v-icon>mdi-dots-vertical</v-icon>
+            </v-btn>
+          </template>
+          <v-list shaped>
+            <v-list-item-group>
+              <v-list-item @click="editItem(item)">
+                <v-list-item-icon>
+                  <v-icon class="blue--text">mdi-information-outline</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-tile-title>Detalle</v-list-tile-title>
+                </v-list-item-content>
+              </v-list-item>
+              <v-list-item>
+                <v-list-item-icon>
+                  <v-icon class="grey--text">mdi-history</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-tile-title>Historico</v-list-tile-title>
+                </v-list-item-content>
+              </v-list-item>
+              <v-list-item @click="trash(item)">
+                <v-list-item-icon>
+                  <v-icon class="red--text">mdi-trash-can</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-tile-title>Eliminar</v-list-tile-title>
+                </v-list-item-content>
+              </v-list-item>
+            </v-list-item-group>
+          </v-list>
+        </v-menu>
       </template>
       <template v-slot:item.gps_group="{ item }">
         <template v-if="item.gps_group">
@@ -136,21 +179,12 @@
             <v-btn outlined small color="primary" pa-0>Asignar a Grupo</v-btn>
             <template v-slot:input>
               <div class="mt-4 title">Asignar a Grupo</div>
-              <!-- <v-autocomplete
-                v-model="item.gps_group_id"
-                :items="filters.groupOptions"
-                :filter="customFilter"
-                label="Grupo GPS"
-                item-text="name"
-                item-value="id"
-                outline
-              ></v-autocomplete> -->
               <v-autocomplete
                 v-model="item.gps_group_id"
                 filled
                 clearable
                 prepend-icon="mdi-filter-variant"
-                label="Filtrar por Grupos"
+                label="Buscar Grupo"
                 :items="filters.groupOptions"
                 item-text="name"
                 item-value="id"
@@ -158,15 +192,6 @@
             </template>
           </v-edit-dialog>
         </template>
-      </template>
-
-      <template v-slot:item.activation_date="{ item }">
-        {{ $appFormatters.formatDate(item.activation_date) }}
-      </template>
-      <template v-slot:item.due_date="{ item }">
-        <span class="overline text-capitalize">{{
-          $appFormatters.formatTimeFromNow(item.due_date)
-        }}</span>
       </template>
 
       <template v-slot:item.cost="{ item }">
@@ -177,18 +202,61 @@
           @save="saveInLine(item)"
           @cancel="cancel"
         >
-          <v-btn outlined small pa-0>${{ item.cost }}</v-btn>
+          <v-btn outlined small pa-0>{{ item.cost | money() }}</v-btn>
           <template v-slot:input>
-            <div class="mt-4 title">Modifica Costo $</div>
+            <div class="mt-4 title">Modificar Costo:</div>
             <v-text-field
-              v-model="item.cost"
+              v-model.lazy="item.cost"
               label="Valor"
+              type="tel"
+              prefix="$"
               single-line
               counter
               autofocus
             ></v-text-field>
           </template>
         </v-edit-dialog>
+      </template>
+      <template v-slot:item.amount="{ item }">
+        <v-edit-dialog
+          :return-value.sync="item.amount"
+          large
+          persistent
+          @save="saveInLine(item)"
+          @cancel="cancel"
+        >
+          <v-btn outlined small pa-0>{{ item.amount | money() }}</v-btn>
+          <template v-slot:input>
+            <div class="mt-4 title">Modificar Costo:</div>
+            <v-text-field
+              v-model.lazy="item.amount"
+              label="Valor"
+              type="tel"
+              prefix="$"
+              single-line
+              counter
+              autofocus
+            ></v-text-field>
+          </template>
+        </v-edit-dialog>
+      </template>
+
+      <template v-slot:item.activation_date="{ item }">
+        <span class="overline text-capitalize">
+          {{ $appFormatters.formatDate(item.activation_date) }}
+        </span>
+      </template>
+      <template v-slot:item.due_date="{ item }">
+        <span class="overline text-capitalize">
+          <v-chip
+            :color="getColor($appFormatters.formatTimeDiffNow(item.due_date))"
+            dark
+            small
+          >
+            {{ $appFormatters.formatTimeDiffNow(item.due_date, "days") }} Dias
+          </v-chip>
+          <!-- |{{ $appFormatters.formatDate(item.due_date) }} -->
+        </span>
       </template>
     </v-data-table>
   </div>
@@ -212,12 +280,21 @@ export default {
           text: "Accion",
           value: "action",
           align: "center",
+          divider: true,
+          width: 10,
+          class: "pa-0",
           sortable: false
         },
         {
           text: "Nombre GPS",
           value: "name",
           align: "left",
+          sortable: true
+        },
+        {
+          text: "SIM",
+          value: "sim",
+          align: "right",
           sortable: true
         },
         {
@@ -233,16 +310,25 @@ export default {
           sortable: false
         },
         {
-          text: "Fecha de Activacion",
-          value: "activation_date",
-          align: "center",
+          text: "Facturado",
+          value: "amount",
+          align: "right",
           sortable: false
         },
         {
-          text: "Fecha Vencimiento",
+          text: "Fecha de Activacion",
+          value: "activation_date",
+          align: "center",
+          width: 135,
+          sortable: false
+        },
+        {
+          text: "Vence en (dias)",
           value: "due_date",
           align: "center",
-          sortable: false
+          width: 125,
+          class: "pa-0",
+          sortable: true
         }
       ],
       items: [],
@@ -298,6 +384,9 @@ export default {
     formEdit() {
       return this.editedIndex !== -1;
     }
+    // filterMonth(){
+    //   return this.options.months.findIndex(v => v == this.filters.month) + 1
+    // }
   },
   methods: {
     editItem(item) {
@@ -416,9 +505,14 @@ export default {
       const self = this;
       self.$store.commit("showSnackbar", {
         message: "Cancel",
-        color: "error",
+        color: "error lighten-1",
         duration: 3000
       });
+    },
+    getColor(date) {
+      if (date < 31) return "red";
+      else if (date < 62) return "orange";
+      else return "green";
     }
   }
 };

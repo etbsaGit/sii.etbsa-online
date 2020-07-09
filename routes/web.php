@@ -35,4 +35,5 @@ Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function
     Route::resource('file-groups','FileGroupController');
     Route::resource('gps-groups','GpsGroupController');
     Route::resource('gps','GpsController');
+    Route::post('gps/import','GpsController@import');
 });

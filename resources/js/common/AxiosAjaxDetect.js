@@ -1,3 +1,4 @@
+import store from "~/common/Store";
 class AxiosAjaxDetect {
   init(startCb, endCb) {
     let count = 0;
@@ -31,11 +32,24 @@ class AxiosAjaxDetect {
         if (error.response.status === 401) {
           window.location.href = "/login";
         }
+        
+        if (error.response) {
+          store.commit("showSnackbar", {
+            message: error.response.data.message,
+            color: "error",
+            duration: 5000,
+          });
+        } else if (error.request) {
+          console.log(error.request);
+        } else {
+          console.log("Error", error.message);
+        }
 
         count--;
         if (count === 0) {
           endCb();
         }
+
 
         return Promise.reject(error);
       }

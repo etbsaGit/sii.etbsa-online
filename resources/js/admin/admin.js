@@ -9,10 +9,9 @@ require("../bootstrap");
 window.Vue = require("vue");
 
 // 3rd party
-import "@mdi/font/css/materialdesignicons.css";
+// import "@mdi/font/css/materialdesignicons.css";
 import Vue from "vue";
 import Vuetify from "vuetify";
-import "vuetify/dist/vuetify.min.css";
 import es from "vuetify/es5/locale/es";
 import VueProgressBar from "vue-progressbar";
 import "~/plugins";
@@ -50,6 +49,15 @@ import AxiosAjaxDetct from "~/common/AxiosAjaxDetect";
 
 Vue.use(formatters);
 Vue.use(eventBus);
+
+Vue.filter("money", (value, type = "MXN") =>
+  new Intl.NumberFormat("es-MX", {
+    style: "currency",
+    currency: type,
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 2,
+  }).format(value)
+);
 
 const admin = new Vue({
   vuetify: new Vuetify({

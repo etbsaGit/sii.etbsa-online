@@ -2,7 +2,6 @@
 
 namespace App\Components\Gps\Models;
 
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class Gps extends Model
@@ -28,14 +27,24 @@ class Gps extends Model
      */
     public function gpsGroup()
     {
-        return $this->belongsTo(GpsGroup::class,'gps_group_id');
+        return $this->belongsTo(GpsGroup::class, 'gps_group_id');
+    }
+
+    /**
+     * Get the chip record associated with the g.
+     */
+    public function chip()
+    {
+        return $this->hasOne(GpsChips::class, 'gps_chip_id');
     }
 
     public function scopeOfName($query, $name)
     {
-        if( $name === null || $name === '' ) return false;
+        if ($name === null || $name === '') {
+            return false;
+        }
 
-        return $query->where('name','LIKE',"%{$name}%");
+        return $query->where('name', 'LIKE', "%{$name}%");
     }
 
     public function scopeOfMonth($query, $v)
@@ -45,7 +54,7 @@ class Gps extends Model
         }
         return $query->whereMonth('due_date', $v);
     }
-    
+
     public function scopeOfYear($query, $v)
     {
         if ($v === null || $v === '') {
@@ -54,13 +63,14 @@ class Gps extends Model
         return $query->whereYear('due_date', $v);
     }
 
-    public function scopeOfGpsGroups($q,$v)
+    public function scopeOfGpsGroups($q, $v)
     {
-        if($v === false || $v === '' || count($v)==0 || $v[0]=='') return $q;
+        if ($v === false || $v === '' || count($v) == 0 || $v[0] == '') {
+            return $q;
+        }
 
-        return $q->whereHas('gpsGroup',function($q) use ($v)
-        {
-            return $q->whereIn('id',$v);
+        return $q->whereHas('gpsGroup', function ($q) use ($v) {
+            return $q->whereIn('id', $v);
         });
     }
 }

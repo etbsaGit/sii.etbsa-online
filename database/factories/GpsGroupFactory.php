@@ -9,6 +9,9 @@ $factory->define(App\Components\Gps\Models\GpsGroup::class, function (Faker $fak
         'CELAYA',
         'SALAMANCA',
         'IRAPUATO',
+        'QUERETARO COLORADO',
+        'QUERETARO COLORADO',
+        'ABASOLO',
     ];
     $departments= [
         "ADMINISTRACION",
@@ -16,11 +19,14 @@ $factory->define(App\Components\Gps\Models\GpsGroup::class, function (Faker $fak
         "DIRECCION",
         "RIEGO",
         "SERVICIO",
+        "LUBRICANTES",
+        "NUEVAS TECNOLOGIAS",
+        "REFACCIONES",
     ];
     return [
         'name' => $faker->unique()->name,
-        'agency' => $agencies[$faker->numberBetween(0, 2)],
-        'department' => $departments[$faker->numberBetween(0, 4)],
+        'agency' => $agencies[$faker->numberBetween(0, 5)],
+        'department' => $departments[$faker->numberBetween(0, 7)],
         'description' => ucwords($faker->words(4, true)),
     ];
 });

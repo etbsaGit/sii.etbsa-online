@@ -1,6 +1,8 @@
 @import "variables";
 @import "dropzone";
-@import 'material-fonts-base64';
+@import "~vuetify/dist/vuetify.min.css";
+@import "~@mdi/font/css/materialdesignicons.css";
+// @import 'material-fonts-base64';
 
 /* general */
 a {

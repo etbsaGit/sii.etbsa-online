@@ -129,25 +129,31 @@ export default {
           sortable: false
         },
         {
-          text: "Nombre Grupo",
+          text: "SIM",
           value: "name",
           align: "left",
           sortable: true
         },
         {
-          text: "Sucursal",
+          text: "Cuenta",
           value: "agency",
           align: "left",
           sortable: true
         },
         {
-          text: "Cargo",
+          text: "IMEI",
           value: "department",
           align: "left",
           sortable: true
         },
         {
-          text: "Total GPS",
+          text: "Fecha Activacion",
+          value: "gps_count",
+          align: "center",
+          sortable: false
+        },
+        {
+          text: "Fecha Vencimiento",
           value: "gps_count",
           align: "center",
           sortable: false

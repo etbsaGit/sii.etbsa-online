@@ -117,24 +117,26 @@
               >Equipos y Tractores del Bajio &copy; {{ date("Y") }}</span
             >
           </v-footer>
+          <!-- snackbar -->
+          <v-snackbar
+            app
+            v-model="showSnackbar"
+            :timeout="snackbarDuration"
+            :color="snackbarColor"
+            top
+            right
+          >
+            <span class="overline">
+              @{{ snackbarMessage }}
+            </span>
+          </v-snackbar>
         </v-app>
-
+        
         <!-- loader -->
         <div v-if="showLoader" class="wask_loader bg_half_transparent">
           <moon-loader color="green"></moon-loader>
         </div>
 
-        <!-- snackbar -->
-        <v-snackbar
-          :timeout="snackbarDuration"
-          :color="snackbarColor"
-          top
-          right
-          v-model="showSnackbar"
-          class="title"
-        >
-          @{{ snackbarMessage }}
-        </v-snackbar>
 
         <!-- dialog confirm -->
         <v-dialog
@@ -146,18 +148,17 @@
           <v-card>
             <v-card-title>
               <div class="headline">
-                <v-icon v-if="dialogIcon">@{{ dialogIcon }}</v-icon> @{{
-                  dialogTitle
-                }}
+                <v-icon v-if="dialogIcon">@{{ dialogIcon }}</v-icon> 
+                @{{ dialogTitle }}
               </div>
             </v-card-title>
-            <v-card-text>@{{ dialogMessage }}</v-card-text>
+            <v-card-text class="body-1">@{{ dialogMessage }}</v-card-text>
             <v-card-actions v-if="dialogType=='confirm'">
               <v-spacer></v-spacer>
-              <v-btn color="orange darken-1" text @click.native="dialogCancel"
+              <v-btn color="error lighten-1" @click.native="dialogCancel"
                 >Cancel</v-btn
               >
-              <v-btn color="green darken-1" text @click.native="dialogOk"
+              <v-btn color="success darken-1" text @click.native="dialogOk"
                 >Ok</v-btn
               >
             </v-card-actions>

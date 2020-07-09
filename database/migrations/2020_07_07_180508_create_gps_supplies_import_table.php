@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateGpsGroupsTable extends Migration
+class CreateGpsSuppliesImportTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,11 @@ class CreateGpsGroupsTable extends Migration
      */
     public function up()
     {
-        Schema::create('gps_groups', function (Blueprint $table) {
+        Schema::create('gps_supplies_import', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
-            $table->string('agency')->nullable();
-            $table->string('department')->nullable();
-            $table->text('description')->nullable();
+            $table->string('sim')->unique();
+            $table->string('imei')->nulable();
+            $table->date('fecha')->nulable();
             $table->timestamps();
         });
     }
@@ -30,6 +29,6 @@ class CreateGpsGroupsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('gps_groups');
+        Schema::dropIfExists('gps_supplies_import');
     }
 }

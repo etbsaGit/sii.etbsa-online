@@ -5,25 +5,47 @@
         <v-container grid-list-md>
           <v-layout row wrap>
             <v-flex xs12>
-              <div class="title">Grupo GPS Detalle</div>
+              <div class="body-2 white--text">Grupo GPS Detalle</div>
             </v-flex>
             <v-flex xs12>
               <v-text-field
-                label="Group Name"
                 v-model="name"
-                :rules="nameRules"
+                label="Nombre Grupo"
+                :rules="rules"
               ></v-text-field>
+            </v-flex>
+            <v-flex xs12 md6>
+              <v-select
+                v-model="agency"
+                :items="options.agencies"
+                label="Sucursal"
+                :menu-props="{ offsetY: true }"
+                item-text="name"
+                item-value="name"
+                clearable
+              ></v-select>
+            </v-flex>
+            <v-flex xs12 md6>
+              <v-select
+                v-model="department"
+                :items="options.departments"
+                label="Departamento"
+                :menu-props="{ offsetY: true }"
+                item-text="name"
+                item-value="name"
+                clearable
+              ></v-select>
             </v-flex>
             <v-flex xs12>
               <v-textarea
-                label="Group Description"
                 v-model="description"
-                :rules="descriptionRules"
+                label="Descripcion"
+                outlined
               ></v-textarea>
             </v-flex>
             <v-flex xs12>
               <v-btn block @click="save()" :disabled="!valid" color="primary"
-                >Guardar</v-btn
+                >Guardar Nuevo</v-btn
               >
             </v-flex>
           </v-layout>
@@ -34,68 +56,68 @@
 </template>
 
 <script>
+import optionAgencies from "~/api/agencies.json";
+import optionDepartments from "~/api/departments.json";
 export default {
   data() {
     return {
       valid: false,
       isLoading: false,
       name: "",
-      nameRules: [v => !!v || "Name is required"],
-      agency: "CELAYA",
-      agencyRules: [v => !!v || "Agencia is required"],
-      department: "SERVICIO",
-      // departmentRules: [v => !!v || "departmento is required"],
+      agency: "",
+      department: "",
       description: "",
-      descriptionRules: [v => !!v || "Description is required"]
+      rules: [v => !!v || "Name is required"],
+      options: {
+        agencies: optionAgencies,
+        departments: optionDepartments
+      }
     };
   },
   mounted() {
     const self = this;
-    self.$refs.gpsGroupFormAdd.reset();
+    // self.loadGpsGroup(() => {});
   },
   methods: {
     save() {
       const self = this;
-      if (self.$refs.gpsGroupFormAdd.validate()) {
-        let payload = {
-          name: self.name,
-          agency: self.agency,
-          department: self.department,
-          description: self.description
-        };
 
-        self.isLoading = true;
+      let payload = {
+        name: self.name,
+        agency: self.agency,
+        department: self.department,
+        description: self.description
+      };
 
-        axios
-          .post("/admin/gps-groups", payload)
-          .then(function(response) {
+      self.isLoading = true;
+
+      axios
+        .post("/admin/gps-groups/", payload)
+        .then(function(response) {
+          self.$store.commit("showSnackbar", {
+            message: response.data.message,
+            color: "success",
+            duration: 3000
+          });
+
+          self.$eventBus.$emit("GPS_GROUP_ADDED");
+        })
+        .catch(function(error) {
+          if (error.response) {
             self.$store.commit("showSnackbar", {
-              message: response.data.message,
-              color: "success",
+              message: error.response.data.message,
+              color: "error",
               duration: 3000
             });
-
-            self.isLoading = false;
-            self.$eventBus.$emit("GPS_GROUP_ADDED");
-
-            // reset
-            self.$refs.gpsGroupFormAdd.reset();
-          })
-          .catch(function(error) {
-            self.isLoading = false;
-            if (error.response) {
-              self.$store.commit("showSnackbar", {
-                message: error.response.data.message,
-                color: "error",
-                duration: 3000
-              });
-            } else if (error.request) {
-              console.log(error.request);
-            } else {
-              console.log("Error", error.message);
-            }
-          });
-      }
+          } else if (error.request) {
+            console.log(error.request);
+          } else {
+            console.log("Error", error.message);
+          }
+        })
+        .finally(function() {
+          self.isLoading = false;
+        });
     }
   }
 };

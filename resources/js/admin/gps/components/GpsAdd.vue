@@ -34,6 +34,7 @@
               <v-text-field
                 label="Costo"
                 v-model="cost"
+                type="tel"
                 :rules="fieldRules"
               ></v-text-field>
             </v-col>
@@ -41,6 +42,7 @@
               <v-text-field
                 label="Importe"
                 v-model="amount"
+                type="tel"
                 :rules="fieldRules"
               ></v-text-field>
             </v-col>

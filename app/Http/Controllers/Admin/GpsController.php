@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Components\Gps\Repositories\GpsRepository;
+use App\Imports\WialonImport;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class GpsController extends AdminController
 {
-        /**
+    /**
      * @var GpsRepository
      */
     private $gpsRepository;
@@ -42,17 +44,18 @@ class GpsController extends AdminController
      */
     public function store(Request $request)
     {
-        $validate = validator($request->all(),[
+        $validate = validator($request->all(), [
             'name' => 'required|string',
         ]);
 
-        if($validate->fails())
-        {
+        if ($validate->fails()) {
             return $this->sendResponseBadRequest($validate->errors()->first());
         }
         $file = $this->gpsRepository->create($request->all());
 
-        if(!$file)  return $this->sendResponseBadRequest("Failed to create.");
+        if (!$file) {
+            return $this->sendResponseBadRequest("Failed to create.");
+        }
 
         return $this->sendResponseCreated($file);
     }
@@ -67,7 +70,9 @@ class GpsController extends AdminController
     {
         $file = $this->gpsRepository->find($id);
 
-        if(!$file) return $this->sendResponseNotFound();
+        if (!$file) {
+            return $this->sendResponseNotFound();
+        }
 
         return $this->sendResponseOk($file);
     }
@@ -81,17 +86,21 @@ class GpsController extends AdminController
      */
     public function update(Request $request, $id)
     {
-        $validate = validator($request->all(),[
+        $validate = validator($request->all(), [
             'name' => 'required|string',
         ]);
 
-        if($validate->fails()) return $this->sendResponseBadRequest($validate->errors()->first());
+        if ($validate->fails()) {
+            return $this->sendResponseBadRequest($validate->errors()->first());
+        }
 
-        $updated = $this->gpsRepository->update($id,$request->all());
+        $updated = $this->gpsRepository->update($id, $request->all());
 
-        if(!$updated) return $this->sendResponseBadRequest("Failed to update");
+        if (!$updated) {
+            return $this->sendResponseBadRequest("Failed to update");
+        }
 
-        return $this->sendResponseOk([],"Updated.");
+        return $this->sendResponseOk([], "Updated.");
     }
 
     /**
@@ -104,6 +113,19 @@ class GpsController extends AdminController
     {
         $this->gpsRepository->delete($id);
 
-        return $this->sendResponseOk([],"Deleted.");
+        return $this->sendResponseOk([], "Deleted.");
+    }
+
+    public function import()
+    {
+        // if (request()->file('file_wialon')) {
+        // }
+        Excel::import(new WialonImport, request()->file('file_wialon'));
+
+        if (request()->file('file_supplier')) {
+            Excel::import(new WialonImport, request()->file('file_wialon'));
+        }
+
+        return $this->sendResponseOk([], 'IMPORTACION COMPLETA');
     }
 }

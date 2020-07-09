@@ -5,20 +5,42 @@
         <v-container grid-list-md>
           <v-layout row wrap>
             <v-flex xs12>
-              <div class="body-2 white--text">Gps Group Details</div>
+              <div class="body-2 white--text">Grupo GPS Detalle</div>
             </v-flex>
             <v-flex xs12>
               <v-text-field
-                label="Group Name"
                 v-model="name"
-                :rules="nameRules"
+                label="Nombre Grupo"
+                :rules="rules"
               ></v-text-field>
+            </v-flex>
+            <v-flex xs12 md6>
+              <v-select
+                v-model="agency"
+                :items="options.agencies"
+                label="Sucursal"
+                :menu-props="{ offsetY: true }"
+                item-text="name"
+                item-value="name"
+                clearable
+              ></v-select>
+            </v-flex>
+            <v-flex xs12 md6>
+              <v-select
+                v-model="department"
+                :items="options.departments"
+                label="Departamento"
+                :menu-props="{ offsetY: true }"
+                item-text="name"
+                item-value="name"
+                clearable
+              ></v-select>
             </v-flex>
             <v-flex xs12>
               <v-textarea
-                label="Group Description"
                 v-model="description"
-                :rules="descriptionRules"
+                label="Descripcion"
+                outlined
               ></v-textarea>
             </v-flex>
             <v-flex xs12>
@@ -34,6 +56,8 @@
 </template>
 
 <script>
+import optionAgencies from "~/api/agencies.json";
+import optionDepartments from "~/api/departments.json";
 export default {
   props: {
     propGpsGroupId: {
@@ -45,9 +69,14 @@ export default {
       valid: false,
       isLoading: false,
       name: "",
-      nameRules: [v => !!v || "Name is required"],
+      agency: "",
+      department: "",
       description: "",
-      descriptionRules: [v => !!v || "Description is required"]
+      rules: [v => !!v || "Name is required"],
+      options: {
+        agencies: optionAgencies,
+        departments: optionDepartments
+      }
     };
   },
   mounted() {
@@ -60,6 +89,8 @@ export default {
 
       let payload = {
         name: self.name,
+        agency: self.agency ? self.agency : " ",
+        department: self.department ? self.department : " ",
         description: self.description
       };
 
@@ -101,6 +132,8 @@ export default {
         .then(function(response) {
           let Group = response.data.data;
           self.name = Group.name;
+          self.agency = Group.agency;
+          self.department = Group.department;
           self.description = Group.description;
           cb();
         });
