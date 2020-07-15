@@ -4,7 +4,7 @@
         <!-- form -->
         <v-card>
             <v-card-title>
-                <v-icon>groups</v-icon> Create Group
+                <v-icon>mdi-account-multiple</v-icon> Create Group
             </v-card-title>
             <v-divider></v-divider>
             <v-form v-model="valid" ref="groupFormAdd" lazy-validation>
@@ -37,20 +37,20 @@
                     <v-flex xs12 sm4>
                         <v-btn @click="addSpecialPermission()" class="primary lighten-1" dark>
                             Add Permission
-                            <v-icon right>add</v-icon>
+                            <v-icon right>mdi-plus</v-icon>
                         </v-btn>
                     </v-flex>
                     <v-flex xs12>
                         <div class="permissions_container">
                             <v-chip v-for="(p,k) in permissions" @input="remove(k)" :key="k" close class="white--text" :class="{'green':(p.value==1),'red':(p.value==-1),'blue':(p.value==0)}">
                                 <v-avatar v-if="p.value==-1" class="red darken-4" title="Deny">
-                                    <v-icon>block</v-icon>
+                                    <v-icon>mdi-cancel</v-icon>
                                 </v-avatar>
                                 <v-avatar v-if="p.value==1" class="green darken-4" title="Allow">
-                                    <v-icon>check_circle</v-icon>
+                                    <v-icon>mdi-check-circle</v-icon>
                                 </v-avatar>
                                 <v-avatar v-if="p.value==0" class="blue darken-4" title="Inherit">
-                                    <v-icon>swap_horiz</v-icon>
+                                    <v-icon>mdi-swap-horizontal</v-icon>
                                 </v-avatar>
                                 {{p.title}}
                             </v-chip>

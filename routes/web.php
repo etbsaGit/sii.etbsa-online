@@ -41,4 +41,5 @@ Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function
     Route::post('gps/import','GpsImportController@importGps')->name('gps-import');
     Route::post('gps-chips/import','GpsImportController@importChips')->name('gps-chips-import');
     Route::post('matching-chips-gps/import','GpsImportController@matchingChipsInGps')->name('matching-chip-gps');
+    Route::get('gps-export', 'ExportController@exportGps')->name('gps-export');
 });

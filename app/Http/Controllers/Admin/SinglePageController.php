@@ -45,8 +45,8 @@ class SinglePageController extends AdminController
                 'visible'=>true,
             ]),
             new MenuItem([
-                'group_requirements' => [],
-                'permission_requirements' => ['superuser'],
+                'group_requirements' => ['GPS'],
+                'permission_requirements' => [],
                 'label'=>'GPS',
                 'nav_type' => MenuItem::$NAV_TYPE_NAV,
                 'icon'=>'mdi-crosshairs-gps',

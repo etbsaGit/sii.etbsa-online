@@ -35,26 +35,28 @@
               clearable
             ></v-select>
           </div>
-          <div class="flex-grow-0 px-2">
+          <div class="flex-grow-1 px-2">
             <v-select
-              v-model="agency"
+              v-model="filters.agency"
               :items="options.agencies"
               label="Sucursal"
               :menu-props="{ offsetY: true }"
               item-text="name"
               item-value="name"
+              prepend-icon="mdi-filter-variant"
               clearable
               filled
             ></v-select>
           </div>
-          <div class="flex-grow-0 px-2">
+          <div class="flex-grow-1 px-2">
             <v-select
-              v-model="department"
+              v-model="filters.department"
               :items="options.departments"
               label="Departamento"
               :menu-props="{ offsetY: true }"
               item-text="name"
               item-value="name"
+              prepend-icon="mdi-filter-variant"
               clearable
               filled
             ></v-select>
@@ -68,7 +70,7 @@
               deletable-chips
               clearable
               prepend-icon="mdi-filter-variant"
-              label="Filtrar por Grupos"
+              label="Filtrar por Clientes"
               :items="options.gpsGroup"
               item-text="name"
               item-value="id"
@@ -91,16 +93,27 @@
       <!-- Top -->
       <template v-slot:top>
         <v-toolbar dense elevation="0">
-          <div class="flex-grow-1 overline text-uppercase">
+          <!-- <div class="flex-grow-1 overline text-uppercase">
             Ultima Actualizacion de Datos: YYYY/MM/DD
-          </div>
+          </div> -->
           <v-spacer></v-spacer>
           <v-btn icon color="secondary" @click="$refs.filterForm.reset()">
             <v-icon>mdi-filter-remove-outline</v-icon>
           </v-btn>
-          <v-btn icon color="green">
-            <v-icon>mdi-file-excel</v-icon>
-          </v-btn>
+          <v-tooltip top>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                icon
+                color="green"
+                @click="exportGps()"
+                v-bind="attrs"
+                v-on="on"
+              >
+                <v-icon>mdi-file-excel</v-icon>
+              </v-btn>
+            </template>
+            <span>Exportar</span>
+          </v-tooltip>
           <v-tooltip top>
             <template v-slot:activator="{ on, attrs }">
               <v-btn
@@ -121,9 +134,6 @@
         </v-toolbar>
       </template>
       <!-- Body  -->
-      <!-- <template v-slot:item.gps_group="{ item }">
-        {{ item.gps_group.name }}
-      </template> -->
       <template v-slot:item.action="{ item }">
         <v-menu offset-x>
           <template v-slot:activator="{ on, attrs }">
@@ -141,14 +151,14 @@
                   <v-list-tile-title>Detalle</v-list-tile-title>
                 </v-list-item-content>
               </v-list-item>
-              <v-list-item>
+              <!-- <v-list-item v-if="false">
                 <v-list-item-icon>
                   <v-icon class="grey--text">mdi-history</v-icon>
                 </v-list-item-icon>
                 <v-list-item-content>
                   <v-list-tile-title>Historico</v-list-tile-title>
                 </v-list-item-content>
-              </v-list-item>
+              </v-list-item> -->
               <v-list-item @click="trash(item)">
                 <v-list-item-icon>
                   <v-icon class="red--text">mdi-trash-can</v-icon>
@@ -170,6 +180,7 @@
           N/A
         </template>
       </template>
+
       <template v-slot:item.gps_group="{ item }">
         <template v-if="item.gps_group">
           {{ item.gps_group.name }}
@@ -202,10 +213,12 @@
 
       <template v-slot:item.cost="{ item }">
         <template v-if="item.chip">
-          {{ item.chip.costo | money() }}
+          <span class="subtitle-1">
+            {{ item.chip.costo | money() }}
+          </span>
         </template>
         <template v-else>
-          no asignado
+          N/A
         </template>
         <!-- <v-edit-dialog 
           :return-value.sync="item.chip.costo"
@@ -229,6 +242,7 @@
           </template>
         </v-edit-dialog> -->
       </template>
+
       <template v-slot:item.amount="{ item }">
         <v-edit-dialog
           :return-value.sync="item.amount"
@@ -237,18 +251,45 @@
           @save="saveInLine(item)"
           @cancel="cancel"
         >
-          <v-btn outlined small pa-0>{{ item.amount | money() }}</v-btn>
+          <v-btn outlined small pa-0>{{
+            item.amount | money(item.currency)
+          }}</v-btn>
           <template v-slot:input>
-            <div class="mt-4 title">Modificar Costo:</div>
+            <div class="mt-4 title">Ingresar Importe Factura:</div>
+            <v-form v-model="validInLine" ref="formInLine" lazy-validation>
+            </v-form>
             <v-text-field
-              v-model.lazy="item.amount"
-              label="Valor"
-              type="tel"
-              prefix="$"
-              single-line
+              v-model.lazy="item.invoice"
+              label="Folio Factura"
+              :rules="[v => !!v || 'Campo requerido']"
               counter
               autofocus
             ></v-text-field>
+            <v-text-field
+              v-model.lazy="item.amount"
+              label="Importe Factura"
+              type="tel"
+              prefix="$"
+              autofocus
+            ></v-text-field>
+            <v-row dense>
+              <v-col cols="6">
+                <v-select
+                  v-model="item.currency"
+                  :items="['MXN', 'USD']"
+                  label="Moneda"
+                ></v-select>
+              </v-col>
+              <v-col cols="6">
+                <v-text-field
+                  v-model.lazy="item.exchange_rate"
+                  label="Tipo Cambio"
+                  type="Numeric"
+                  prefix="$"
+                  autofocus
+                ></v-text-field>
+              </v-col>
+            </v-row>
           </template>
         </v-edit-dialog>
       </template>
@@ -258,6 +299,7 @@
           {{ $appFormatters.formatDate(item.installation_date) }}
         </span>
       </template>
+
       <template v-slot:item.renew_date="{ item }">
         <span class="overline text-capitalize">
           <v-chip
@@ -296,10 +338,12 @@
           </v-toolbar-items>
         </v-toolbar>
         <v-card-text>
-          <gps-edit v-if="formEdit" :propGpsId="dialogs.gps.id"></gps-edit>
+          <gps-edit v-if="formEdit" :propGpsId="dialogs.gps.id"  :propOptionGroups="options.gpsGroup"
+            ></gps-edit>
           <gps-add
             v-else-if="dialogs.show"
             :propOptionGroups="options.gpsGroup"
+            :propOptionChips="options.gpsChips"
           ></gps-add>
         </v-card-text>
       </v-card>
@@ -322,6 +366,7 @@ export default {
   },
   data() {
     return {
+      validInLine: false,
       headers: [
         {
           value: "action",
@@ -391,6 +436,7 @@ export default {
         months: optionMoths,
         years: optionYears,
         gpsGroup: [],
+        gpsChips: [],
         agencies: optionAgencies,
         departments: optionDepartments
       },
@@ -399,8 +445,9 @@ export default {
         month: null,
         year: null,
         groupId: [],
-        agency: "",
-        department: ""
+        chipsId: [],
+        agency: null,
+        department: null
       }
     };
   },
@@ -411,6 +458,7 @@ export default {
       self.loadGps(() => {});
     });
     self.loadGpsGroup(() => {});
+    // self.loadGpsChips(() => {});
   },
   watch: {
     pagination: {
@@ -453,6 +501,8 @@ export default {
         name: self.filters.name,
         month: self.filters.month,
         year: self.filters.year,
+        agency: self.filters.agency,
+        department: self.filters.department,
         group_id: self.filters.groupId.join(","),
         order_sort: self.pagination.sortDesc[0] ? "desc" : "asc",
         order_by: self.pagination.sortBy[0] || "name",
@@ -477,6 +527,20 @@ export default {
         .get("/admin/gps-groups", { params: params })
         .then(function(response) {
           self.options.gpsGroup = response.data.data.data;
+          cb();
+        });
+    },
+    loadGpsChips(cb) {
+      const self = this;
+      let params = {
+        per_page: -1,
+        deallocated: true
+      };
+
+      axios
+        .get("/admin/gps-chips", { params: params })
+        .then(function(response) {
+          self.options.gpsChips = response.data.data.data;
           cb();
         });
     },
@@ -521,31 +585,33 @@ export default {
     },
     saveInLine(item) {
       const self = this;
-      axios
-        .put("/admin/gps/" + item.id, item)
-        .then(function(response) {
-          self.$store.commit("showSnackbar", {
-            message: response.data.message,
-            color: "success",
-            duration: 3000
-          });
-
-          self.$eventBus.$emit("GPS_UPDATED");
-          self.$eventBus.$emit("GPS_GROUP_UPDATED");
-        })
-        .catch(function(error) {
-          if (error.response) {
+      if (self.$refs.formInLine.validate()) {
+        axios
+          .put("/admin/gps/" + item.id, item)
+          .then(function(response) {
             self.$store.commit("showSnackbar", {
-              message: error.response.data.message,
-              color: "error",
+              message: response.data.message,
+              color: "success",
               duration: 3000
             });
-          } else if (error.request) {
-            console.log(error.request);
-          } else {
-            console.log("Error", error.message);
-          }
-        });
+
+            self.$eventBus.$emit("GPS_UPDATED");
+            self.$eventBus.$emit("GPS_GROUP_UPDATED");
+          })
+          .catch(function(error) {
+            if (error.response) {
+              self.$store.commit("showSnackbar", {
+                message: error.response.data.message,
+                color: "error",
+                duration: 3000
+              });
+            } else if (error.request) {
+              console.log(error.request);
+            } else {
+              console.log("Error", error.message);
+            }
+          });
+      }
     },
     cancel() {
       const self = this;
@@ -559,6 +625,49 @@ export default {
       if (date < 31) return "red";
       else if (date < 62) return "orange";
       else return "green";
+    },
+    exportGps() {
+      const self = this;
+
+      let params = {
+        name: self.filters.name,
+        month: self.filters.month,
+        year: self.filters.year,
+        group_id: self.filters.groupId.join(","),
+        order_sort: self.pagination.sortDesc[0] ? "desc" : "asc",
+        order_by: self.pagination.sortBy[0] || "name",
+        paginate: "no"
+      };
+      self.$store.commit("showLoader");
+      axios
+        .get("/admin/gps-export", {
+          params: params,
+          responseType: "blob"
+        })
+        .then(res => {
+          const url = window.URL.createObjectURL(new Blob([res.data]));
+          const link = document.createElement("a");
+          link.href = url;
+          link.setAttribute("download", "gps.xlsx"); //or any other extension
+          document.body.appendChild(link);
+          link.click();
+        })
+        .catch(function(error) {
+          if (error.response) {
+            self.$store.commit("showSnackbar", {
+              message: error.response.data.message,
+              color: "error",
+              duration: 3000
+            });
+          } else if (error.request) {
+            console.log(error.request);
+          } else {
+            console.log("Error", error.message);
+          }
+        })
+        .finally(function() {
+          self.$store.commit("hideLoader");
+        });
     }
   }
 };

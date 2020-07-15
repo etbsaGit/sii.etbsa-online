@@ -77,4 +77,23 @@ class Gps extends Model
             return $q->whereIn('id', $v);
         });
     }
+    public function scopeOfAgency($q, $v)
+    {
+        if ($v === null || $v === '') {
+            return false;
+        }
+        return $q->whereHas('gpsGroup', function ($q) use ($v) {
+            return $q->where('agency', $v);
+        });
+    }
+    public function scopeOfDepartment($q, $v)
+    {
+        if ($v === null || $v === '') {
+            return false;
+        }
+
+        return $q->whereHas('gpsGroup', function ($q) use ($v) {
+            return $q->where('department', $v);
+        });
+    }
 }

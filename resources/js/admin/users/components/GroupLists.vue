@@ -5,12 +5,12 @@
         <v-card>
             <div class="d-flex flex-row">
                 <div class="flex-grow-1 pa-2">
-                    <v-text-field prepend-icon="search" label="Filter By Name" v-model="filters.name"></v-text-field>
+                    <v-text-field prepend-icon="mdi-magnify" label="Filter By Name" v-model="filters.name"></v-text-field>
                 </div>
                 <div class="flex-grow-1 pa-2 text-right">
                     <v-btn @click="$router.push({name:'users.groups.create'})" class="primary lighten-1" dark>
                         New Group
-                        <v-icon right>add</v-icon>
+                        <v-icon right>mdi-plus</v-icon>
                     </v-btn>
                 </div>
             </div>
@@ -50,18 +50,18 @@
         <v-dialog v-model="dialogs.showPermissions.show" absolute max-width="300px">
             <v-card>
                 <v-card-title>
-                    <div class="headline"><v-icon>vpn_key</v-icon> Group Permissions</div>
+                    <div class="headline"><v-icon>mdi-key</v-icon> Group Permissions</div>
                 </v-card-title>
                 <v-card-text>
                     <v-chip v-for="(permission,key) in dialogs.showPermissions.items" :key="key" class="white--text" :class="{'green':(permission.value==1),'red':(permission.value==-1),'blue':(permission.value==0)}">
                         <v-avatar v-if="permission.value==-1" class="red darken-4" title="Deny">
-                            <v-icon>block</v-icon>
+                            <v-icon>mdi-cancel</v-icon>
                         </v-avatar>
                         <v-avatar v-if="permission.value==1" class="green darken-4" title="Allow">
-                            <v-icon>check_circle</v-icon>
+                            <v-icon>mdi-check-circle</v-icon>
                         </v-avatar>
                         <v-avatar v-if="permission.value==0" class="blue darken-4" title="Inherit">
-                            <v-icon>swap_horiz</v-icon>
+                            <v-icon>mdi-swap-horizontal</v-icon>
                         </v-avatar>
                         {{permission.title}}
                     </v-chip>

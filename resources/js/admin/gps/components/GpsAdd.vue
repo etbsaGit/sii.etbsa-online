@@ -1,15 +1,22 @@
 <template>
   <div class="component-wrap">
     <v-card>
-      <v-form v-model="valid" ref="gpsFormEdit" lazy-validation>
+      <v-form v-model="valid" ref="gpsFormAdd" lazy-validation>
         <v-container grid-list-lg>
           <v-row>
-            <v-col cols="12">
+            <v-col cols="12" md="9">
               <v-text-field
                 label="Nombre GPS"
                 v-model="name"
                 :rules="fieldRules"
               ></v-text-field>
+            </v-col>
+            <v-col cols="12" md="3">
+              <v-select
+                v-model="payment_type"
+                :items="options.payment_type"
+                label="Tipo de Pago"
+              ></v-select>
             </v-col>
             <v-col cols="12" md="6">
               <v-autocomplete
@@ -21,22 +28,34 @@
                 item-value="id"
               ></v-autocomplete>
             </v-col>
+
             <v-col cols="6" md="3">
-              <v-text-field
-                label="SIM"
-                v-model="sim"
-                :rules="fieldRules"
-              ></v-text-field>
+              <v-autocomplete
+                v-model="gps_chip"
+                clearable
+                label="Selecciona Chip GPS"
+                :items="propOptionChips"
+                item-text="sim"
+                item-value="id"
+                return-object
+              ></v-autocomplete>
             </v-col>
             <v-col cols="6" md="3">
-              <v-text-field label="Costo Linea" readonly prefix="$" type="Number"></v-text-field>
+              <v-text-field
+                v-if="gps_chip"
+                v-model="gps_chip.costo"
+                label="Costo Linea"
+                readonly
+                prefix="$"
+                type="Number"
+              ></v-text-field>
             </v-col>
           </v-row>
           <v-row>
             <v-col cols="12" md="3">
               <v-text-field
                 label="Folio Factura"
-                :rules="fieldRules"
+                v-model="invoice"
               ></v-text-field>
             </v-col>
             <v-col cols="12" md="3">
@@ -44,23 +63,31 @@
                 label="Importe Factura"
                 v-model="amount"
                 type="Number"
-                :rules="fieldRules"
                 prefix="$"
                 placeholder="0.00"
               ></v-text-field>
             </v-col>
             <v-col cols="6" md="3">
-              <v-select v-model="currency" :items="options.currency" label="Moneda"></v-select>
+              <v-select
+                v-model="currency"
+                :items="options.currency"
+                label="Moneda"
+              ></v-select>
             </v-col>
             <v-col cols="6" md="3">
-              <v-text-field v-model="exchange_rate" label="Tipo Cambio" type="Number" prefix="$"></v-text-field>
+              <v-text-field
+                v-model="exchange_rate"
+                label="Tipo Cambio"
+                type="Number"
+                prefix="$"
+              ></v-text-field>
             </v-col>
           </v-row>
           <v-row>
             <v-col cols="6" md="6">
               <v-text-field
                 label="Fecha Instalacion"
-                v-model="activation_date"
+                v-model="installation_date"
                 type="date"
                 :rules="fieldRules"
               ></v-text-field>
@@ -68,7 +95,7 @@
             <v-col cols="6" md="6">
               <v-text-field
                 label="Fecha Vencimiento"
-                v-model="due_date"
+                v-model="renew_date"
                 type="date"
                 :rules="fieldRules"
                 readonly
@@ -77,7 +104,7 @@
             <v-col cols="12">
               <v-textarea
                 label="Descripcion:"
-                v-model="comment"
+                v-model="description"
                 outlined
               ></v-textarea>
             </v-col>
@@ -98,47 +125,63 @@ export default {
   props: {
     propOptionGroups: {
       required: true
+    },
+    propOptionChips: {
+      required: false
     }
   },
   data() {
     return {
       valid: false,
-      isLoading: false,
       fieldRules: [v => !!v || "Campo requerido"],
       name: "",
-      sim: null,
       gps_group_id: null,
+      gps_chip: null,
       cost: null,
       amount: null,
-      activation_date: null,
-      due_date: null,
-      comment: "",
+      invoice: null,
+      installation_date: null,
+      renew_date: null,
+      description: "",
       currency: "MXN",
       exchange_rate: 1,
+      payment_type: "CONTADO",
       options: {
-        currency: ["MXN", "USD"]
+        currency: ["MXN", "USD"],
+        payment_type: ["CARGO", "CONTADO", "CREDITO"]
       }
     };
   },
+  watch: {
+    installation_date: {
+      handler: function(val) {
+        let date = new Date(val);
+        date.setDate(date.getDate() + 365);
+        this.renew_date = this.$appFormatters.formatDate(date, "yyyy-MM-DD");
+      }
+    }
+  },
   mounted() {
     const self = this;
-    self.$refs.gpsFormEdit.reset();
+    self.loadGpsChips(() => {});
+    // self.$refs.gpsFormAdd.reset();
   },
   methods: {
     save() {
       const self = this;
-      if (self.$refs.gpsFormEdit.validate()) {
+      if (self.$refs.gpsFormAdd.validate()) {
         let payload = {
           name: self.name,
-          sim: self.sim,
-          imei: self.imei,
-          cost: self.cost,
           amount: self.amount,
-          activation_date: self.activation_date,
-          due_date: self.due_date,
+          invoice: self.invoice,
+          installation_date: self.installation_date,
+          renew_date: self.renew_date,
           currency: self.currency,
           exchange_rate: self.exchange_rate,
-          comment: self.comment,
+          description: self.description,
+          gps_group_id: self.gps_group_id,
+          gps_chip_id: self.gps_chip.id,
+          payment_type: self.payment_type,
           uploaded_by: LSK_APP.AUTH_USER.id
         };
         axios
@@ -166,6 +209,20 @@ export default {
             }
           });
       }
+    },
+    loadGpsChips(cb) {
+      const self = this;
+      let params = {
+        per_page: -1,
+        deallocated: true
+      };
+
+      axios
+        .get("/admin/gps-chips", { params: params })
+        .then(function(response) {
+          self.propOptionChips = response.data.data.data;
+          cb();
+        });
     }
   }
 };

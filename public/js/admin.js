@@ -1197,54 +1197,96 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
     propOptionGroups: {
       required: true
+    },
+    propOptionChips: {
+      required: false
     }
   },
   data: function data() {
     return {
       valid: false,
-      isLoading: false,
       fieldRules: [function (v) {
         return !!v || "Campo requerido";
       }],
       name: "",
-      sim: null,
       gps_group_id: null,
+      gps_chip: null,
       cost: null,
       amount: null,
-      activation_date: null,
-      due_date: null,
-      comment: "",
+      invoice: null,
+      installation_date: null,
+      renew_date: null,
+      description: "",
       currency: "MXN",
       exchange_rate: 1,
+      payment_type: "CONTADO",
       options: {
-        currency: ["MXN", "USD"]
+        currency: ["MXN", "USD"],
+        payment_type: ["CARGO", "CONTADO", "CREDITO"]
       }
     };
   },
+  watch: {
+    installation_date: {
+      handler: function handler(val) {
+        var date = new Date(val);
+        date.setDate(date.getDate() + 365);
+        this.renew_date = this.$appFormatters.formatDate(date, "yyyy-MM-DD");
+      }
+    }
+  },
   mounted: function mounted() {
     var self = this;
-    self.$refs.gpsFormEdit.reset();
+    self.loadGpsChips(function () {}); // self.$refs.gpsFormAdd.reset();
   },
   methods: {
     save: function save() {
       var self = this;
 
-      if (self.$refs.gpsFormEdit.validate()) {
+      if (self.$refs.gpsFormAdd.validate()) {
         var payload = {
           name: self.name,
-          sim: self.sim,
-          imei: self.imei,
-          cost: self.cost,
           amount: self.amount,
-          activation_date: self.activation_date,
-          due_date: self.due_date,
+          invoice: self.invoice,
+          installation_date: self.installation_date,
+          renew_date: self.renew_date,
           currency: self.currency,
           exchange_rate: self.exchange_rate,
-          comment: self.comment,
+          description: self.description,
+          gps_group_id: self.gps_group_id,
+          gps_chip_id: self.gps_chip.id,
+          payment_type: self.payment_type,
           uploaded_by: LSK_APP.AUTH_USER.id
         };
         axios.post("/admin/gps", payload).then(function (response) {
@@ -1268,6 +1310,19 @@ __webpack_require__.r(__webpack_exports__);
           }
         });
       }
+    },
+    loadGpsChips: function loadGpsChips(cb) {
+      var self = this;
+      var params = {
+        per_page: -1,
+        deallocated: true
+      };
+      axios.get("/admin/gps-chips", {
+        params: params
+      }).then(function (response) {
+        self.propOptionChips = response.data.data.data;
+        cb();
+      });
     }
   }
 });
@@ -2016,31 +2071,73 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
     propGpsId: {
       required: true
+    },
+    propOptionGroups: {
+      required: true
+    },
+    propOptionChips: {
+      required: false
     }
   },
   data: function data() {
     return {
       valid: false,
-      isLoading: false,
       fieldRules: [function (v) {
         return !!v || "Campo requerido";
       }],
       name: "",
-      sim: null,
-      imei: null,
+      gps_group_id: null,
+      gps_chip: {},
       cost: null,
       amount: null,
-      activation_date: null,
-      due_date: null,
-      comment: ""
+      invoice: null,
+      installation_date: null,
+      renew_date: null,
+      description: "",
+      currency: "MXN",
+      exchange_rate: 1,
+      payment_type: "CONTADO",
+      options: {
+        currency: ["MXN", "USD"],
+        payment_type: ["CARGO", "CONTADO", "CREDITO"]
+      }
     };
   },
   mounted: function mounted() {
     var self = this;
+    self.loadGpsChips(function () {});
     self.loadGps(function () {});
   },
   methods: {
@@ -2050,15 +2147,17 @@ __webpack_require__.r(__webpack_exports__);
       if (self.$refs.gpsFormEdit.validate()) {
         var payload = {
           name: self.name,
-          sim: self.sim,
-          imei: self.imei,
-          cost: self.cost,
           amount: self.amount,
-          activation_date: self.activation_date,
-          due_date: self.due_date,
+          invoice: self.invoice,
+          installation_date: self.installation_date,
+          renew_date: self.renew_date,
           currency: self.currency,
           exchange_rate: self.exchange_rate,
-          comment: self.comment
+          description: self.description,
+          gps_group_id: self.gps_group_id,
+          gps_chip_id: self.gps_chip.id,
+          payment_type: self.payment_type,
+          uploaded_by: LSK_APP.AUTH_USER.id
         };
         axios.put("/admin/gps/" + self.propGpsId, payload).then(function (response) {
           self.$store.commit("showSnackbar", {
@@ -2087,13 +2186,28 @@ __webpack_require__.r(__webpack_exports__);
       axios.get("/admin/gps/" + self.propGpsId).then(function (response) {
         var Gps = response.data.data;
         self.name = Gps.name;
-        self.sim = Gps.sim;
-        self.imei = Gps.imei;
-        self.cost = Gps.cost;
         self.amount = Gps.amount;
-        self.activation_date = self.$appFormatters.formatDate(Gps.activation_date, "yyyy-MM-DD");
-        self.due_date = self.$appFormatters.formatDate(Gps.due_date, "yyyy-MM-DD");
-        self.comment = Gps.comment;
+        self.invoice = Gps.invoice;
+        self.installation_date = self.$appFormatters.formatDate(Gps.installation_date, "yyyy-MM-DD");
+        self.renew_date = self.$appFormatters.formatDate(Gps.renew_date, "yyyy-MM-DD");
+        self.currency = Gps.currency;
+        self.exchange_rate = Gps.exchange_rate;
+        self.description = Gps.description;
+        self.gps_group_id = Gps.gps_group_id;
+        self.gps_chip = Gps.chip;
+        self.payment_type = Gps.payment_type;
+        cb();
+      });
+    },
+    loadGpsChips: function loadGpsChips(cb) {
+      var self = this;
+      var params = {
+        per_page: -1
+      };
+      axios.get("/admin/gps-chips", {
+        params: params
+      }).then(function (response) {
+        self.propOptionChips = response.data.data.data;
         cb();
       });
     }
@@ -3000,6 +3114,50 @@ var _api_departments_json__WEBPACK_IMPORTED_MODULE_5___namespace = /*#__PURE__*/
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -3013,6 +3171,7 @@ var _api_departments_json__WEBPACK_IMPORTED_MODULE_5___namespace = /*#__PURE__*/
   },
   data: function data() {
     return {
+      validInLine: false,
       headers: [{
         value: "action",
         align: "center",
@@ -3073,6 +3232,7 @@ var _api_departments_json__WEBPACK_IMPORTED_MODULE_5___namespace = /*#__PURE__*/
         months: _api_moths_json__WEBPACK_IMPORTED_MODULE_2__,
         years: _api_years_json__WEBPACK_IMPORTED_MODULE_3__,
         gpsGroup: [],
+        gpsChips: [],
         agencies: _api_agencies_json__WEBPACK_IMPORTED_MODULE_4__,
         departments: _api_departments_json__WEBPACK_IMPORTED_MODULE_5__
       },
@@ -3081,8 +3241,9 @@ var _api_departments_json__WEBPACK_IMPORTED_MODULE_5___namespace = /*#__PURE__*/
         month: null,
         year: null,
         groupId: [],
-        agency: "",
-        department: ""
+        chipsId: [],
+        agency: null,
+        department: null
       }
     };
   },
@@ -3091,7 +3252,7 @@ var _api_departments_json__WEBPACK_IMPORTED_MODULE_5___namespace = /*#__PURE__*/
     self.$eventBus.$on(["GPS_ADDED", "GPS_UPDATED", "GPS_DELETED"], function () {
       self.loadGps(function () {});
     });
-    self.loadGpsGroup(function () {});
+    self.loadGpsGroup(function () {}); // self.loadGpsChips(() => {});
   },
   watch: {
     pagination: {
@@ -3133,6 +3294,8 @@ var _api_departments_json__WEBPACK_IMPORTED_MODULE_5___namespace = /*#__PURE__*/
         name: self.filters.name,
         month: self.filters.month,
         year: self.filters.year,
+        agency: self.filters.agency,
+        department: self.filters.department,
         group_id: self.filters.groupId.join(","),
         order_sort: self.pagination.sortDesc[0] ? "desc" : "asc",
         order_by: self.pagination.sortBy[0] || "name",
@@ -3157,6 +3320,19 @@ var _api_departments_json__WEBPACK_IMPORTED_MODULE_5___namespace = /*#__PURE__*/
         params: params
       }).then(function (response) {
         self.options.gpsGroup = response.data.data.data;
+        cb();
+      });
+    },
+    loadGpsChips: function loadGpsChips(cb) {
+      var self = this;
+      var params = {
+        per_page: -1,
+        deallocated: true
+      };
+      axios.get("/admin/gps-chips", {
+        params: params
+      }).then(function (response) {
+        self.options.gpsChips = response.data.data.data;
         cb();
       });
     },
@@ -3196,14 +3372,65 @@ var _api_departments_json__WEBPACK_IMPORTED_MODULE_5___namespace = /*#__PURE__*/
     },
     saveInLine: function saveInLine(item) {
       var self = this;
-      axios.put("/admin/gps/" + item.id, item).then(function (response) {
-        self.$store.commit("showSnackbar", {
-          message: response.data.message,
-          color: "success",
-          duration: 3000
+
+      if (self.$refs.formInLine.validate()) {
+        axios.put("/admin/gps/" + item.id, item).then(function (response) {
+          self.$store.commit("showSnackbar", {
+            message: response.data.message,
+            color: "success",
+            duration: 3000
+          });
+          self.$eventBus.$emit("GPS_UPDATED");
+          self.$eventBus.$emit("GPS_GROUP_UPDATED");
+        })["catch"](function (error) {
+          if (error.response) {
+            self.$store.commit("showSnackbar", {
+              message: error.response.data.message,
+              color: "error",
+              duration: 3000
+            });
+          } else if (error.request) {
+            console.log(error.request);
+          } else {
+            console.log("Error", error.message);
+          }
         });
-        self.$eventBus.$emit("GPS_UPDATED");
-        self.$eventBus.$emit("GPS_GROUP_UPDATED");
+      }
+    },
+    cancel: function cancel() {
+      var self = this;
+      self.$store.commit("showSnackbar", {
+        message: "Cancel",
+        color: "error lighten-1",
+        duration: 3000
+      });
+    },
+    getColor: function getColor(date) {
+      if (date < 31) return "red";else if (date < 62) return "orange";else return "green";
+    },
+    exportGps: function exportGps() {
+      var self = this;
+      var params = {
+        name: self.filters.name,
+        month: self.filters.month,
+        year: self.filters.year,
+        group_id: self.filters.groupId.join(","),
+        order_sort: self.pagination.sortDesc[0] ? "desc" : "asc",
+        order_by: self.pagination.sortBy[0] || "name",
+        paginate: "no"
+      };
+      self.$store.commit("showLoader");
+      axios.get("/admin/gps-export", {
+        params: params,
+        responseType: "blob"
+      }).then(function (res) {
+        var url = window.URL.createObjectURL(new Blob([res.data]));
+        var link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "gps.xlsx"); //or any other extension
+
+        document.body.appendChild(link);
+        link.click();
       })["catch"](function (error) {
         if (error.response) {
           self.$store.commit("showSnackbar", {
@@ -3216,18 +3443,9 @@ var _api_departments_json__WEBPACK_IMPORTED_MODULE_5___namespace = /*#__PURE__*/
         } else {
           console.log("Error", error.message);
         }
+      })["finally"](function () {
+        self.$store.commit("hideLoader");
       });
-    },
-    cancel: function cancel() {
-      var self = this;
-      self.$store.commit("showSnackbar", {
-        message: "Cancel",
-        color: "error lighten-1",
-        duration: 3000
-      });
-    },
-    getColor: function getColor(date) {
-      if (date < 31) return "red";else if (date < 62) return "orange";else return "green";
     }
   }
 });
@@ -23160,7 +23378,7 @@ var render = function() {
           _c(
             "v-form",
             {
-              ref: "gpsFormEdit",
+              ref: "gpsFormAdd",
               attrs: { "lazy-validation": "" },
               model: {
                 value: _vm.valid,
@@ -23180,7 +23398,7 @@ var render = function() {
                     [
                       _c(
                         "v-col",
-                        { attrs: { cols: "12" } },
+                        { attrs: { cols: "12", md: "9" } },
                         [
                           _c("v-text-field", {
                             attrs: {
@@ -23193,6 +23411,27 @@ var render = function() {
                                 _vm.name = $$v
                               },
                               expression: "name"
+                            }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-col",
+                        { attrs: { cols: "12", md: "3" } },
+                        [
+                          _c("v-select", {
+                            attrs: {
+                              items: _vm.options.payment_type,
+                              label: "Tipo de Pago"
+                            },
+                            model: {
+                              value: _vm.payment_type,
+                              callback: function($$v) {
+                                _vm.payment_type = $$v
+                              },
+                              expression: "payment_type"
                             }
                           })
                         ],
@@ -23227,14 +23466,21 @@ var render = function() {
                         "v-col",
                         { attrs: { cols: "6", md: "3" } },
                         [
-                          _c("v-text-field", {
-                            attrs: { label: "SIM", rules: _vm.fieldRules },
+                          _c("v-autocomplete", {
+                            attrs: {
+                              clearable: "",
+                              label: "Selecciona Chip GPS",
+                              items: _vm.propOptionChips,
+                              "item-text": "sim",
+                              "item-value": "id",
+                              "return-object": ""
+                            },
                             model: {
-                              value: _vm.sim,
+                              value: _vm.gps_chip,
                               callback: function($$v) {
-                                _vm.sim = $$v
+                                _vm.gps_chip = $$v
                               },
-                              expression: "sim"
+                              expression: "gps_chip"
                             }
                           })
                         ],
@@ -23245,14 +23491,23 @@ var render = function() {
                         "v-col",
                         { attrs: { cols: "6", md: "3" } },
                         [
-                          _c("v-text-field", {
-                            attrs: {
-                              label: "Costo Linea",
-                              readonly: "",
-                              prefix: "$",
-                              type: "Number"
-                            }
-                          })
+                          _vm.gps_chip
+                            ? _c("v-text-field", {
+                                attrs: {
+                                  label: "Costo Linea",
+                                  readonly: "",
+                                  prefix: "$",
+                                  type: "Number"
+                                },
+                                model: {
+                                  value: _vm.gps_chip.costo,
+                                  callback: function($$v) {
+                                    _vm.$set(_vm.gps_chip, "costo", $$v)
+                                  },
+                                  expression: "gps_chip.costo"
+                                }
+                              })
+                            : _vm._e()
                         ],
                         1
                       )
@@ -23268,9 +23523,13 @@ var render = function() {
                         { attrs: { cols: "12", md: "3" } },
                         [
                           _c("v-text-field", {
-                            attrs: {
-                              label: "Folio Factura",
-                              rules: _vm.fieldRules
+                            attrs: { label: "Folio Factura" },
+                            model: {
+                              value: _vm.invoice,
+                              callback: function($$v) {
+                                _vm.invoice = $$v
+                              },
+                              expression: "invoice"
                             }
                           })
                         ],
@@ -23285,7 +23544,6 @@ var render = function() {
                             attrs: {
                               label: "Importe Factura",
                               type: "Number",
-                              rules: _vm.fieldRules,
                               prefix: "$",
                               placeholder: "0.00"
                             },
@@ -23361,11 +23619,11 @@ var render = function() {
                               rules: _vm.fieldRules
                             },
                             model: {
-                              value: _vm.activation_date,
+                              value: _vm.installation_date,
                               callback: function($$v) {
-                                _vm.activation_date = $$v
+                                _vm.installation_date = $$v
                               },
-                              expression: "activation_date"
+                              expression: "installation_date"
                             }
                           })
                         ],
@@ -23384,11 +23642,11 @@ var render = function() {
                               readonly: ""
                             },
                             model: {
-                              value: _vm.due_date,
+                              value: _vm.renew_date,
                               callback: function($$v) {
-                                _vm.due_date = $$v
+                                _vm.renew_date = $$v
                               },
-                              expression: "due_date"
+                              expression: "renew_date"
                             }
                           })
                         ],
@@ -23402,11 +23660,11 @@ var render = function() {
                           _c("v-textarea", {
                             attrs: { label: "Descripcion:", outlined: "" },
                             model: {
-                              value: _vm.comment,
+                              value: _vm.description,
                               callback: function($$v) {
-                                _vm.comment = $$v
+                                _vm.description = $$v
                               },
-                              expression: "comment"
+                              expression: "description"
                             }
                           })
                         ],
@@ -24447,46 +24705,45 @@ var render = function() {
                 "v-container",
                 { attrs: { "grid-list-lg": "" } },
                 [
-                  _c("v-row", { attrs: { dense: "" } }, [
-                    _c("div", { staticClass: "text-h5" }, [
-                      _vm._v("Detalle GPS")
-                    ])
-                  ]),
-                  _vm._v(" "),
                   _c(
                     "v-row",
-                    { attrs: { dense: "" } },
-                    [
-                      _c("v-text-field", {
-                        attrs: { label: "Nombre GPS", rules: _vm.fieldRules },
-                        model: {
-                          value: _vm.name,
-                          callback: function($$v) {
-                            _vm.name = $$v
-                          },
-                          expression: "name"
-                        }
-                      })
-                    ],
-                    1
-                  ),
-                  _vm._v(" "),
-                  _c(
-                    "v-row",
-                    { attrs: { dense: "" } },
                     [
                       _c(
                         "v-col",
-                        { attrs: { cols: "12", md: "6" } },
+                        { attrs: { cols: "12", md: "9" } },
                         [
                           _c("v-text-field", {
-                            attrs: { label: "SIM", rules: _vm.fieldRules },
+                            attrs: {
+                              label: "Nombre GPS",
+                              rules: _vm.fieldRules
+                            },
                             model: {
-                              value: _vm.sim,
+                              value: _vm.name,
                               callback: function($$v) {
-                                _vm.sim = $$v
+                                _vm.name = $$v
                               },
-                              expression: "sim"
+                              expression: "name"
+                            }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-col",
+                        { attrs: { cols: "12", md: "3" } },
+                        [
+                          _c("v-select", {
+                            attrs: {
+                              items: _vm.options.payment_type,
+                              label: "Tipo de Pago"
+                            },
+                            model: {
+                              value: _vm.payment_type,
+                              callback: function($$v) {
+                                _vm.payment_type = $$v
+                              },
+                              expression: "payment_type"
                             }
                           })
                         ],
@@ -24497,16 +24754,72 @@ var render = function() {
                         "v-col",
                         { attrs: { cols: "12", md: "6" } },
                         [
-                          _c("v-text-field", {
-                            attrs: { label: "IMEI", rules: _vm.fieldRules },
+                          _c("v-autocomplete", {
+                            attrs: {
+                              clearable: "",
+                              label: "Selecciona Cliente GPS",
+                              items: _vm.propOptionGroups,
+                              "item-text": "name",
+                              "item-value": "id"
+                            },
                             model: {
-                              value: _vm.imei,
+                              value: _vm.gps_group_id,
                               callback: function($$v) {
-                                _vm.imei = $$v
+                                _vm.gps_group_id = $$v
                               },
-                              expression: "imei"
+                              expression: "gps_group_id"
                             }
                           })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-col",
+                        { attrs: { cols: "6", md: "3" } },
+                        [
+                          _c("v-autocomplete", {
+                            attrs: {
+                              clearable: "",
+                              label: "Selecciona Chip GPS",
+                              items: _vm.propOptionChips,
+                              "item-text": "sim",
+                              "item-value": "id",
+                              "return-object": ""
+                            },
+                            model: {
+                              value: _vm.gps_chip,
+                              callback: function($$v) {
+                                _vm.gps_chip = $$v
+                              },
+                              expression: "gps_chip"
+                            }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-col",
+                        { attrs: { cols: "6", md: "3" } },
+                        [
+                          _vm.gps_chip
+                            ? _c("v-text-field", {
+                                attrs: {
+                                  label: "Costo Linea",
+                                  readonly: "",
+                                  prefix: "$",
+                                  type: "Number"
+                                },
+                                model: {
+                                  value: _vm.gps_chip.costo,
+                                  callback: function($$v) {
+                                    _vm.$set(_vm.gps_chip, "costo", $$v)
+                                  },
+                                  expression: "gps_chip.costo"
+                                }
+                              })
+                            : _vm._e()
                         ],
                         1
                       )
@@ -24516,24 +24829,19 @@ var render = function() {
                   _vm._v(" "),
                   _c(
                     "v-row",
-                    { attrs: { dense: "" } },
                     [
                       _c(
                         "v-col",
                         { attrs: { cols: "12", md: "3" } },
                         [
                           _c("v-text-field", {
-                            attrs: {
-                              label: "Costo",
-                              type: "tel",
-                              rules: _vm.fieldRules
-                            },
+                            attrs: { label: "Folio Factura" },
                             model: {
-                              value: _vm.cost,
+                              value: _vm.invoice,
                               callback: function($$v) {
-                                _vm.cost = $$v
+                                _vm.invoice = $$v
                               },
-                              expression: "cost"
+                              expression: "invoice"
                             }
                           })
                         ],
@@ -24546,9 +24854,10 @@ var render = function() {
                         [
                           _c("v-text-field", {
                             attrs: {
-                              label: "Importe",
-                              type: "tel",
-                              rules: _vm.fieldRules
+                              label: "Importe Factura",
+                              type: "Number",
+                              prefix: "$",
+                              placeholder: "0.00"
                             },
                             model: {
                               value: _vm.amount,
@@ -24565,7 +24874,21 @@ var render = function() {
                       _c(
                         "v-col",
                         { attrs: { cols: "6", md: "3" } },
-                        [_c("v-text-field", { attrs: { label: "Moneda" } })],
+                        [
+                          _c("v-select", {
+                            attrs: {
+                              items: _vm.options.currency,
+                              label: "Moneda"
+                            },
+                            model: {
+                              value: _vm.currency,
+                              callback: function($$v) {
+                                _vm.currency = $$v
+                              },
+                              expression: "currency"
+                            }
+                          })
+                        ],
                         1
                       ),
                       _vm._v(" "),
@@ -24574,7 +24897,18 @@ var render = function() {
                         { attrs: { cols: "6", md: "3" } },
                         [
                           _c("v-text-field", {
-                            attrs: { label: "Tipo Cambio" }
+                            attrs: {
+                              label: "Tipo Cambio",
+                              type: "Number",
+                              prefix: "$"
+                            },
+                            model: {
+                              value: _vm.exchange_rate,
+                              callback: function($$v) {
+                                _vm.exchange_rate = $$v
+                              },
+                              expression: "exchange_rate"
+                            }
                           })
                         ],
                         1
@@ -24585,24 +24919,23 @@ var render = function() {
                   _vm._v(" "),
                   _c(
                     "v-row",
-                    { attrs: { dense: "" } },
                     [
                       _c(
                         "v-col",
-                        { attrs: { cols: "12", md: "6" } },
+                        { attrs: { cols: "6", md: "6" } },
                         [
                           _c("v-text-field", {
                             attrs: {
-                              label: "Fecha Activacion",
+                              label: "Fecha Instalacion",
                               type: "date",
                               rules: _vm.fieldRules
                             },
                             model: {
-                              value: _vm.activation_date,
+                              value: _vm.installation_date,
                               callback: function($$v) {
-                                _vm.activation_date = $$v
+                                _vm.installation_date = $$v
                               },
-                              expression: "activation_date"
+                              expression: "installation_date"
                             }
                           })
                         ],
@@ -24611,7 +24944,7 @@ var render = function() {
                       _vm._v(" "),
                       _c(
                         "v-col",
-                        { attrs: { cols: "12", md: "6" } },
+                        { attrs: { cols: "6", md: "6" } },
                         [
                           _c("v-text-field", {
                             attrs: {
@@ -24620,34 +24953,34 @@ var render = function() {
                               rules: _vm.fieldRules
                             },
                             model: {
-                              value: _vm.due_date,
+                              value: _vm.renew_date,
                               callback: function($$v) {
-                                _vm.due_date = $$v
+                                _vm.renew_date = $$v
                               },
-                              expression: "due_date"
+                              expression: "renew_date"
+                            }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-col",
+                        { attrs: { cols: "12" } },
+                        [
+                          _c("v-textarea", {
+                            attrs: { label: "Descripcion:", outlined: "" },
+                            model: {
+                              value: _vm.description,
+                              callback: function($$v) {
+                                _vm.description = $$v
+                              },
+                              expression: "description"
                             }
                           })
                         ],
                         1
                       )
-                    ],
-                    1
-                  ),
-                  _vm._v(" "),
-                  _c(
-                    "v-col",
-                    { attrs: { cols: "12" } },
-                    [
-                      _c("v-textarea", {
-                        attrs: { label: "Comentario:", outlined: "" },
-                        model: {
-                          value: _vm.comment,
-                          callback: function($$v) {
-                            _vm.comment = $$v
-                          },
-                          expression: "comment"
-                        }
-                      })
                     ],
                     1
                   ),
@@ -24669,7 +25002,7 @@ var render = function() {
                             }
                           }
                         },
-                        [_vm._v("\n            Modificar\n          ")]
+                        [_vm._v("\n            Registrar Nuevo\n          ")]
                       )
                     ],
                     1
@@ -25573,7 +25906,7 @@ var render = function() {
                 _vm._v(" "),
                 _c(
                   "div",
-                  { staticClass: "flex-grow-0 px-2" },
+                  { staticClass: "flex-grow-1 px-2" },
                   [
                     _c("v-select", {
                       attrs: {
@@ -25582,15 +25915,16 @@ var render = function() {
                         "menu-props": { offsetY: true },
                         "item-text": "name",
                         "item-value": "name",
+                        "prepend-icon": "mdi-filter-variant",
                         clearable: "",
                         filled: ""
                       },
                       model: {
-                        value: _vm.agency,
+                        value: _vm.filters.agency,
                         callback: function($$v) {
-                          _vm.agency = $$v
+                          _vm.$set(_vm.filters, "agency", $$v)
                         },
-                        expression: "agency"
+                        expression: "filters.agency"
                       }
                     })
                   ],
@@ -25599,7 +25933,7 @@ var render = function() {
                 _vm._v(" "),
                 _c(
                   "div",
-                  { staticClass: "flex-grow-0 px-2" },
+                  { staticClass: "flex-grow-1 px-2" },
                   [
                     _c("v-select", {
                       attrs: {
@@ -25608,15 +25942,16 @@ var render = function() {
                         "menu-props": { offsetY: true },
                         "item-text": "name",
                         "item-value": "name",
+                        "prepend-icon": "mdi-filter-variant",
                         clearable: "",
                         filled: ""
                       },
                       model: {
-                        value: _vm.department,
+                        value: _vm.filters.department,
                         callback: function($$v) {
-                          _vm.department = $$v
+                          _vm.$set(_vm.filters, "department", $$v)
                         },
-                        expression: "department"
+                        expression: "filters.department"
                       }
                     })
                   ],
@@ -25635,7 +25970,7 @@ var render = function() {
                         "deletable-chips": "",
                         clearable: "",
                         "prepend-icon": "mdi-filter-variant",
-                        label: "Filtrar por Grupos",
+                        label: "Filtrar por Clientes",
                         items: _vm.options.gpsGroup,
                         "item-text": "name",
                         "item-value": "id"
@@ -25682,16 +26017,6 @@ var render = function() {
                   "v-toolbar",
                   { attrs: { dense: "", elevation: "0" } },
                   [
-                    _c(
-                      "div",
-                      { staticClass: "flex-grow-1 overline text-uppercase" },
-                      [
-                        _vm._v(
-                          "\n          Ultima Actualizacion de Datos: YYYY/MM/DD\n        "
-                        )
-                      ]
-                    ),
-                    _vm._v(" "),
                     _c("v-spacer"),
                     _vm._v(" "),
                     _c(
@@ -25709,10 +26034,43 @@ var render = function() {
                     ),
                     _vm._v(" "),
                     _c(
-                      "v-btn",
-                      { attrs: { icon: "", color: "green" } },
-                      [_c("v-icon", [_vm._v("mdi-file-excel")])],
-                      1
+                      "v-tooltip",
+                      {
+                        attrs: { top: "" },
+                        scopedSlots: _vm._u([
+                          {
+                            key: "activator",
+                            fn: function(ref) {
+                              var on = ref.on
+                              var attrs = ref.attrs
+                              return [
+                                _c(
+                                  "v-btn",
+                                  _vm._g(
+                                    _vm._b(
+                                      {
+                                        attrs: { icon: "", color: "green" },
+                                        on: {
+                                          click: function($event) {
+                                            return _vm.exportGps()
+                                          }
+                                        }
+                                      },
+                                      "v-btn",
+                                      attrs,
+                                      false
+                                    ),
+                                    on
+                                  ),
+                                  [_c("v-icon", [_vm._v("mdi-file-excel")])],
+                                  1
+                                )
+                              ]
+                            }
+                          }
+                        ])
+                      },
+                      [_vm._v(" "), _c("span", [_vm._v("Exportar")])]
                     ),
                     _vm._v(" "),
                     _c(
@@ -25849,34 +26207,6 @@ var render = function() {
                                   "v-list-item-content",
                                   [
                                     _c("v-list-tile-title", [_vm._v("Detalle")])
-                                  ],
-                                  1
-                                )
-                              ],
-                              1
-                            ),
-                            _vm._v(" "),
-                            _c(
-                              "v-list-item",
-                              [
-                                _c(
-                                  "v-list-item-icon",
-                                  [
-                                    _c(
-                                      "v-icon",
-                                      { staticClass: "grey--text" },
-                                      [_vm._v("mdi-history")]
-                                    )
-                                  ],
-                                  1
-                                ),
-                                _vm._v(" "),
-                                _c(
-                                  "v-list-item-content",
-                                  [
-                                    _c("v-list-tile-title", [
-                                      _vm._v("Historico")
-                                    ])
                                   ],
                                   1
                                 )
@@ -26035,13 +26365,15 @@ var render = function() {
               return [
                 item.chip
                   ? [
-                      _vm._v(
-                        "\n        " +
-                          _vm._s(_vm._f("money")(item.chip.costo)) +
-                          "\n      "
-                      )
+                      _c("span", { staticClass: "subtitle-1" }, [
+                        _vm._v(
+                          "\n          " +
+                            _vm._s(_vm._f("money")(item.chip.costo)) +
+                            "\n        "
+                        )
+                      ])
                     ]
-                  : [_vm._v("\n        no asignado\n      ")]
+                  : [_vm._v("\n        N/A\n      ")]
               ]
             }
           },
@@ -26077,16 +26409,46 @@ var render = function() {
                           fn: function() {
                             return [
                               _c("div", { staticClass: "mt-4 title" }, [
-                                _vm._v("Modificar Costo:")
+                                _vm._v("Ingresar Importe Factura:")
                               ]),
+                              _vm._v(" "),
+                              _c("v-form", {
+                                ref: "formInLine",
+                                attrs: { "lazy-validation": "" },
+                                model: {
+                                  value: _vm.validInLine,
+                                  callback: function($$v) {
+                                    _vm.validInLine = $$v
+                                  },
+                                  expression: "validInLine"
+                                }
+                              }),
                               _vm._v(" "),
                               _c("v-text-field", {
                                 attrs: {
-                                  label: "Valor",
+                                  label: "Folio Factura",
+                                  rules: [
+                                    function(v) {
+                                      return !!v || "Campo requerido"
+                                    }
+                                  ],
+                                  counter: "",
+                                  autofocus: ""
+                                },
+                                model: {
+                                  value: item.invoice,
+                                  callback: function($$v) {
+                                    _vm.$set(item, "invoice", $$v)
+                                  },
+                                  expression: "item.invoice"
+                                }
+                              }),
+                              _vm._v(" "),
+                              _c("v-text-field", {
+                                attrs: {
+                                  label: "Importe Factura",
                                   type: "tel",
                                   prefix: "$",
-                                  "single-line": "",
-                                  counter: "",
                                   autofocus: ""
                                 },
                                 model: {
@@ -26096,7 +26458,58 @@ var render = function() {
                                   },
                                   expression: "item.amount"
                                 }
-                              })
+                              }),
+                              _vm._v(" "),
+                              _c(
+                                "v-row",
+                                { attrs: { dense: "" } },
+                                [
+                                  _c(
+                                    "v-col",
+                                    { attrs: { cols: "6" } },
+                                    [
+                                      _c("v-select", {
+                                        attrs: {
+                                          items: ["MXN", "USD"],
+                                          label: "Moneda"
+                                        },
+                                        model: {
+                                          value: item.currency,
+                                          callback: function($$v) {
+                                            _vm.$set(item, "currency", $$v)
+                                          },
+                                          expression: "item.currency"
+                                        }
+                                      })
+                                    ],
+                                    1
+                                  ),
+                                  _vm._v(" "),
+                                  _c(
+                                    "v-col",
+                                    { attrs: { cols: "6" } },
+                                    [
+                                      _c("v-text-field", {
+                                        attrs: {
+                                          label: "Tipo Cambio",
+                                          type: "Numeric",
+                                          prefix: "$",
+                                          autofocus: ""
+                                        },
+                                        model: {
+                                          value: item.exchange_rate,
+                                          callback: function($$v) {
+                                            _vm.$set(item, "exchange_rate", $$v)
+                                          },
+                                          expression: "item.exchange_rate"
+                                        }
+                                      })
+                                    ],
+                                    1
+                                  )
+                                ],
+                                1
+                              )
                             ]
                           },
                           proxy: true
@@ -26110,7 +26523,11 @@ var render = function() {
                     _c(
                       "v-btn",
                       { attrs: { outlined: "", small: "", "pa-0": "" } },
-                      [_vm._v(_vm._s(_vm._f("money")(item.amount)))]
+                      [
+                        _vm._v(
+                          _vm._s(_vm._f("money")(item.amount, item.currency))
+                        )
+                      ]
                     )
                   ],
                   1
@@ -26251,11 +26668,17 @@ var render = function() {
                 [
                   _vm.formEdit
                     ? _c("gps-edit", {
-                        attrs: { propGpsId: _vm.dialogs.gps.id }
+                        attrs: {
+                          propGpsId: _vm.dialogs.gps.id,
+                          propOptionGroups: _vm.options.gpsGroup
+                        }
                       })
                     : _vm.dialogs.show
                     ? _c("gps-add", {
-                        attrs: { propOptionGroups: _vm.options.gpsGroup }
+                        attrs: {
+                          propOptionGroups: _vm.options.gpsGroup,
+                          propOptionChips: _vm.options.gpsChips
+                        }
                       })
                     : _vm._e()
                 ],
@@ -26858,7 +27281,7 @@ var render = function() {
           _c(
             "v-card-title",
             [
-              _c("v-icon", [_vm._v("groups")]),
+              _c("v-icon", [_vm._v("mdi-account-multiple")]),
               _vm._v(" Create Group\n        ")
             ],
             1
@@ -26981,7 +27404,7 @@ var render = function() {
                                 "\n                        Add Permission\n                        "
                               ),
                               _c("v-icon", { attrs: { right: "" } }, [
-                                _vm._v("add")
+                                _vm._v("mdi-plus")
                               ])
                             ],
                             1
@@ -27021,7 +27444,7 @@ var render = function() {
                                           staticClass: "red darken-4",
                                           attrs: { title: "Deny" }
                                         },
-                                        [_c("v-icon", [_vm._v("block")])],
+                                        [_c("v-icon", [_vm._v("mdi-cancel")])],
                                         1
                                       )
                                     : _vm._e(),
@@ -27034,7 +27457,9 @@ var render = function() {
                                           attrs: { title: "Allow" }
                                         },
                                         [
-                                          _c("v-icon", [_vm._v("check_circle")])
+                                          _c("v-icon", [
+                                            _vm._v("mdi-check-circle")
+                                          ])
                                         ],
                                         1
                                       )
@@ -27047,7 +27472,11 @@ var render = function() {
                                           staticClass: "blue darken-4",
                                           attrs: { title: "Inherit" }
                                         },
-                                        [_c("v-icon", [_vm._v("swap_horiz")])],
+                                        [
+                                          _c("v-icon", [
+                                            _vm._v("mdi-swap-horizontal")
+                                          ])
+                                        ],
                                         1
                                       )
                                     : _vm._e(),
@@ -27424,7 +27853,10 @@ var render = function() {
             { staticClass: "flex-grow-1 pa-2" },
             [
               _c("v-text-field", {
-                attrs: { "prepend-icon": "search", label: "Filter By Name" },
+                attrs: {
+                  "prepend-icon": "mdi-magnify",
+                  label: "Filter By Name"
+                },
                 model: {
                   value: _vm.filters.name,
                   callback: function($$v) {
@@ -27456,7 +27888,7 @@ var render = function() {
                   _vm._v(
                     "\n                    New Group\n                    "
                   ),
-                  _c("v-icon", { attrs: { right: "" } }, [_vm._v("add")])
+                  _c("v-icon", { attrs: { right: "" } }, [_vm._v("mdi-plus")])
                 ],
                 1
               )
@@ -27606,7 +28038,7 @@ var render = function() {
                   "div",
                   { staticClass: "headline" },
                   [
-                    _c("v-icon", [_vm._v("vpn_key")]),
+                    _c("v-icon", [_vm._v("mdi-key")]),
                     _vm._v(" Group Permissions")
                   ],
                   1
@@ -27639,7 +28071,7 @@ var render = function() {
                                 staticClass: "red darken-4",
                                 attrs: { title: "Deny" }
                               },
-                              [_c("v-icon", [_vm._v("block")])],
+                              [_c("v-icon", [_vm._v("mdi-cancel")])],
                               1
                             )
                           : _vm._e(),
@@ -27651,7 +28083,7 @@ var render = function() {
                                 staticClass: "green darken-4",
                                 attrs: { title: "Allow" }
                               },
-                              [_c("v-icon", [_vm._v("check_circle")])],
+                              [_c("v-icon", [_vm._v("mdi-check-circle")])],
                               1
                             )
                           : _vm._e(),
@@ -27663,7 +28095,7 @@ var render = function() {
                                 staticClass: "blue darken-4",
                                 attrs: { title: "Inherit" }
                               },
-                              [_c("v-icon", [_vm._v("swap_horiz")])],
+                              [_c("v-icon", [_vm._v("mdi-swap-horizontal")])],
                               1
                             )
                           : _vm._e(),
@@ -28282,7 +28714,7 @@ var render = function() {
         [
           _c(
             "v-card-title",
-            [_c("v-icon", [_vm._v("person")]), _vm._v(" Create User ")],
+            [_c("v-icon", [_vm._v("mdi-account")]), _vm._v(" Create User ")],
             1
           ),
           _vm._v(" "),
@@ -28426,7 +28858,7 @@ var render = function() {
                             "h1",
                             { staticClass: "title" },
                             [
-                              _c("v-icon", [_vm._v("vpn_key")]),
+                              _c("v-icon", [_vm._v("mdi-key")]),
                               _vm._v(" Special Permissions\n            ")
                             ],
                             1
@@ -28437,7 +28869,7 @@ var render = function() {
                             {
                               attrs: {
                                 color: "info",
-                                icon: "info",
+                                icon: "mdi-information-outline",
                                 value: true
                               }
                             },
@@ -28519,7 +28951,7 @@ var render = function() {
                                 "\n              Add Permission\n              "
                               ),
                               _c("v-icon", { attrs: { right: "" } }, [
-                                _vm._v("add")
+                                _vm._v("mdi-plus")
                               ])
                             ],
                             1
@@ -28558,7 +28990,7 @@ var render = function() {
                                           staticClass: "red darken-4",
                                           attrs: { title: "Deny" }
                                         },
-                                        [_c("v-icon", [_vm._v("block")])],
+                                        [_c("v-icon", [_vm._v("mdi-cancel")])],
                                         1
                                       )
                                     : _vm._e(),
@@ -28571,7 +29003,9 @@ var render = function() {
                                           attrs: { title: "Allow" }
                                         },
                                         [
-                                          _c("v-icon", [_vm._v("check_circle")])
+                                          _c("v-icon", [
+                                            _vm._v("mdi-check-circle")
+                                          ])
                                         ],
                                         1
                                       )
@@ -28584,7 +29018,11 @@ var render = function() {
                                           staticClass: "blue darken-4",
                                           attrs: { title: "Inherit" }
                                         },
-                                        [_c("v-icon", [_vm._v("swap_horiz")])],
+                                        [
+                                          _c("v-icon", [
+                                            _vm._v("mdi-swap-horizontal")
+                                          ])
+                                        ],
                                         1
                                       )
                                     : _vm._e(),
@@ -28625,8 +29063,8 @@ var render = function() {
                             "h1",
                             { staticClass: "title" },
                             [
-                              _c("v-icon", [_vm._v("people")]),
-                              _vm._v(" Groups")
+                              _c("v-icon", [_vm._v("mdi-account-multiple")]),
+                              _vm._v(" Grupos")
                             ],
                             1
                           ),
@@ -28669,6 +29107,7 @@ var render = function() {
                             "v-btn",
                             {
                               attrs: {
+                                block: "",
                                 disabled: !_vm.valid,
                                 color: "primary",
                                 dark: ""
@@ -28679,7 +29118,7 @@ var render = function() {
                                 }
                               }
                             },
-                            [_vm._v("Save")]
+                            [_vm._v("Guardar")]
                           )
                         ],
                         1

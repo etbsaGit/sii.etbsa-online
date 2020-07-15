@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-card>
-      <v-card-title> <v-icon>person</v-icon> Create User </v-card-title>
+      <v-card-title> <v-icon>mdi-account</v-icon> Create User </v-card-title>
       <v-divider></v-divider>
       <v-form v-model="valid" ref="userFormAdd" lazy-validation>
         <v-container grid-list-md>
@@ -45,9 +45,9 @@
             <v-flex xs12><v-spacer></v-spacer></v-flex>
             <v-flex xs12>
               <h1 class="title">
-                <v-icon>vpn_key</v-icon> Special Permissions
+                <v-icon>mdi-key</v-icon> Special Permissions
               </h1>
-              <v-alert color="info" icon="info" :value="true">
+              <v-alert color="info" icon="mdi-information-outline" :value="true">
                 Los permisos especiales son permisos exclusivos para este
                 usuario. Permisos definidos aquí. Son más superiores que
                 cualquier permiso que tenga en su grupo. Así que si el usuario
@@ -83,7 +83,7 @@
                 dark
               >
                 Add Permission
-                <v-icon right>add</v-icon>
+                <v-icon right>mdi-plus</v-icon>
               </v-btn>
             </v-flex>
             <v-flex xs12>
@@ -104,21 +104,21 @@
                     class="red darken-4"
                     title="Deny"
                   >
-                    <v-icon>block</v-icon>
+                    <v-icon>mdi-cancel</v-icon>
                   </v-avatar>
                   <v-avatar
                     v-if="p.value == 1"
                     class="green darken-4"
                     title="Allow"
                   >
-                    <v-icon>check_circle</v-icon>
+                    <v-icon>mdi-check-circle</v-icon>
                   </v-avatar>
                   <v-avatar
                     v-if="p.value == 0"
                     class="blue darken-4"
                     title="Inherit"
                   >
-                    <v-icon>swap_horiz</v-icon>
+                    <v-icon>mdi-swap-horizontal</v-icon>
                   </v-avatar>
                   {{ p.title }}
                 </v-chip>
@@ -129,7 +129,7 @@
             </v-flex>
             <v-flex xs12><v-spacer></v-spacer></v-flex>
             <v-flex xs12>
-              <h1 class="title"><v-icon>people</v-icon> Groups</h1>
+              <h1 class="title"><v-icon>mdi-account-multiple</v-icon> Grupos</h1>
               <v-divider></v-divider>
             </v-flex>
             <v-layout wrap mx-2>
@@ -141,8 +141,8 @@
               </v-flex>
             </v-layout>
             <v-flex xs12>
-              <v-btn @click="save()" :disabled="!valid" color="primary" dark
-                >Save</v-btn
+              <v-btn block @click="save()" :disabled="!valid" color="primary" dark
+                >Guardar</v-btn
               >
             </v-flex>
           </v-layout>

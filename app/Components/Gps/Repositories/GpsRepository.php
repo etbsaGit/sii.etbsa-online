@@ -26,6 +26,8 @@ class GpsRepository extends BaseRepository
             $q->ofName($params['name'] ?? '');
             $q->ofMonth($params['month'] ?? '');
             $q->ofYear($params['year'] ?? '');
+            $q->ofAgency($params['agency'] ?? '');
+            $q->ofDepartment($params['department'] ?? '');
 
             return $q;
         });

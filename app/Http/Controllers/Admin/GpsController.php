@@ -67,7 +67,7 @@ class GpsController extends AdminController
      */
     public function show($id)
     {
-        $file = $this->gpsRepository->find($id);
+        $file = $this->gpsRepository->find($id,['chip']);
 
         if (!$file) {
             return $this->sendResponseNotFound();
@@ -115,16 +115,4 @@ class GpsController extends AdminController
         return $this->sendResponseOk([], "Deleted.");
     }
 
-    // public function import()
-    // {
-    //     // if (request()->file('file_wialon')) {
-    //     // }
-    //     Excel::import(new WialonImport, request()->file('file_wialon'));
-
-    //     if (request()->file('file_supplier')) {
-    //         Excel::import(new WialonImport, request()->file('file_wialon'));
-    //     }
-
-    //     return $this->sendResponseOk([], 'IMPORTACION COMPLETA');
-    // }
 }
