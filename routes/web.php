@@ -33,7 +33,12 @@ Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function
     Route::resource('permissions','PermissionController');
     Route::resource('files','FileController');
     Route::resource('file-groups','FileGroupController');
-    Route::resource('gps-groups','GpsGroupController');
     Route::resource('gps','GpsController');
-    Route::post('gps/import','GpsController@import');
+    Route::resource('gps-groups','GpsGroupController');
+    Route::resource('gps-chips','GpsChipController');
+
+    Route::post('clientes-gps/import','GpsImportController@importClientesGps')->name('gps-clientes-import');
+    Route::post('gps/import','GpsImportController@importGps')->name('gps-import');
+    Route::post('gps-chips/import','GpsImportController@importChips')->name('gps-chips-import');
+    Route::post('matching-chips-gps/import','GpsImportController@matchingChipsInGps')->name('matching-chip-gps');
 });

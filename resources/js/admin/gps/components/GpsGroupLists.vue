@@ -2,57 +2,19 @@
   <div class="component-wrap">
     <!-- search -->
     <v-card flat>
-      <div class="d-flex flex-row align-center px-4">
-        <div class="flex-grow-1">
-          <v-text-field
-            prepend-icon="mdi-magnify"
-            label="Filtar por Nombre"
-            v-model="filters.name"
-            clearable
-          ></v-text-field>
+      <v-form ref="filterForm">
+        <div class="d-flex flex-row align-center px-4">
+          <div class="flex-grow-1">
+            <v-text-field
+              prepend-icon="mdi-magnify"
+              label="Filtar por Nombre"
+              v-model="filters.name"
+              clearable
+            ></v-text-field>
+          </div>
+          <div class="flex-grow-1 text-right"></div>
         </div>
-        <div class="flex-grow-1 text-right">
-          <v-dialog
-            v-model="dialogs.show"
-            fullscreen
-            transition="dialog-bottom-transition"
-            :overlay="false"
-          >
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn color="primary" class="mb-2" v-bind="attrs" v-on="on">
-                Nuevo Grupo GPS
-                <v-icon right>mdi-plus</v-icon>
-              </v-btn>
-            </template>
-            <v-card>
-              <v-toolbar class="primary">
-                <v-btn
-                  icon
-                  @click.native="(dialogs.show = false), (editedIndex = -1)"
-                >
-                  <v-icon>mdi-close</v-icon>
-                </v-btn>
-                <v-toolbar-title>{{ formTitle }}</v-toolbar-title>
-                <v-spacer></v-spacer>
-                <v-toolbar-items>
-                  <v-btn
-                    text
-                    @click.native="(dialogs.show = false), (editedIndex = -1)"
-                    >Done</v-btn
-                  >
-                </v-toolbar-items>
-              </v-toolbar>
-              <v-card-text>
-                <gps-group-add v-if="formAdd"></gps-group-add>
-                <gps-group-edit
-                  v-else
-                  :propGpsGroupId="dialogs.gpsGroup.id"
-                ></gps-group-edit>
-              </v-card-text>
-            </v-card>
-          </v-dialog>
-        </div>
-      </div>
+      </v-form>
     </v-card>
     <!-- /search -->
 
@@ -66,6 +28,38 @@
       fixed-header
       class="elevation-1 text-uppercase"
     >
+      <!-- Top -->
+      <template v-slot:top>
+        <v-toolbar dense elevation="0">
+          <div class="flex-grow-1 overline text-uppercase">
+            Ultima Actualizacion de Datos: YYYY/MM/DD
+          </div>
+          <v-spacer></v-spacer>
+          <v-btn icon color="secondary" @click="$refs.filterForm.reset()">
+            <v-icon>mdi-filter-remove-outline</v-icon>
+          </v-btn>
+          <v-btn icon color="green">
+            <v-icon>mdi-file-excel</v-icon>
+          </v-btn>
+          <v-tooltip top>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                icon
+                color="blue"
+                @click="dialogs.show = true"
+                v-bind="attrs"
+                v-on="on"
+              >
+                <v-icon>mdi-plus-thick</v-icon>
+              </v-btn>
+            </template>
+            <span>Agregar Nuevo</span>
+          </v-tooltip>
+          <v-btn icon>
+            <v-icon>mdi-refresh</v-icon>
+          </v-btn>
+        </v-toolbar>
+      </template>
       <!-- Body  -->
       <template v-slot:item.action="{ item }">
         <v-menu offset-x>
@@ -105,6 +99,40 @@
         </v-menu>
       </template>
     </v-data-table>
+    <!-- dialogs -->
+    <v-dialog
+      v-model="dialogs.show"
+      fullscreen
+      transition="dialog-bottom-transition"
+      :overlay="false"
+    >
+      <v-card>
+        <v-toolbar class="primary">
+          <v-btn
+            icon
+            @click.native="(dialogs.show = false), (editedIndex = -1)"
+          >
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+          <v-toolbar-title>{{ formTitle }}</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-toolbar-items>
+            <v-btn
+              text
+              @click.native="(dialogs.show = false), (editedIndex = -1)"
+              >Done</v-btn
+            >
+          </v-toolbar-items>
+        </v-toolbar>
+        <v-card-text>
+          <gps-group-add v-if="formAdd"></gps-group-add>
+          <gps-group-edit
+            v-else
+            :propGpsGroupId="dialogs.gpsGroup.id"
+          ></gps-group-edit>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -120,12 +148,12 @@ export default {
     return {
       headers: [
         {
-          text: "Accion",
+          text: "",
           value: "action",
           align: "center",
           divider: true,
           width: 10,
-          class: "pa-0",
+          class: "pa-auto",
           sortable: false
         },
         {
@@ -206,23 +234,6 @@ export default {
       self.editedIndex = self.items.indexOf(item);
       self.dialogs.gpsGroup = item;
       self.dialogs.show = true;
-    },
-    showDialog(dialog, data) {
-      const self = this;
-
-      switch (dialog) {
-        case "gps_group_edit":
-          self.dialogs.edit.gpsGroup = data;
-          setTimeout(() => {
-            self.dialogs.edit.show = true;
-          }, 500);
-          break;
-        case "gps_group_add":
-          setTimeout(() => {
-            self.dialogs.add.show = true;
-          }, 500);
-          break;
-      }
     },
     loadGpsGroup(cb) {
       const self = this;

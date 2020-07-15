@@ -139,9 +139,9 @@
       <template v-slot:item.active="{ item }">
         <v-avatar outlined>
           <v-icon v-if="item.active != null" class="green--text"
-            >check_circle</v-icon
+            >mdi-check-circle-outline</v-icon
           >
-          <v-icon class="grey--text" v-else>error_outline</v-icon>
+          <v-icon class="grey--text" v-else>mdi-alert-circle-outline</v-icon>
         </v-avatar>
       </template>
     </v-data-table>

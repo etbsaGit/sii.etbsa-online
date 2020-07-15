@@ -12,12 +12,16 @@ class Gps extends Model
         'name',
         'uploaded_by',
         'gps_group_id',
-        'sim',
-        'imei',
-        'cost',
+        'gps_chip_id',
+        'currency',
+        'exchange_rate',
         'amount',
-        'activation_date',
-        'due_date',
+        'invoice',
+        'payment_type',
+        'installation_date',
+        'renew_date',
+        'cancellation_date',
+        'description',
     ];
 
     /**
@@ -35,7 +39,7 @@ class Gps extends Model
      */
     public function chip()
     {
-        return $this->hasOne(GpsChips::class, 'gps_chip_id');
+        return $this->hasOne(GpsChips::class);
     }
 
     public function scopeOfName($query, $name)
@@ -52,7 +56,7 @@ class Gps extends Model
         if ($v === null || $v === '') {
             return false;
         }
-        return $query->whereMonth('due_date', $v);
+        return $query->whereMonth('renew_date', $v);
     }
 
     public function scopeOfYear($query, $v)
@@ -60,7 +64,7 @@ class Gps extends Model
         if ($v === null || $v === '') {
             return false;
         }
-        return $query->whereYear('due_date', $v);
+        return $query->whereYear('renew_date', $v);
     }
 
     public function scopeOfGpsGroups($q, $v)

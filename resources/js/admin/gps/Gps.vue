@@ -5,7 +5,7 @@
         GPS
       </v-tab>
       <v-tab key="manage-groups-gps" href="#manage-groups-gps" ripple>
-        Grupos GPS
+        Clientes
       </v-tab>
       <v-tab key="manage-chips-gps" href="#manage-chips-gps" ripple>
         Chips GPS

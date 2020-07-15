@@ -16,6 +16,7 @@ class CreateGpsGroupsTable extends Migration
         Schema::create('gps_groups', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
+            $table->string('phone')->nullable();
             $table->string('agency')->nullable();
             $table->string('department')->nullable();
             $table->text('description')->nullable();

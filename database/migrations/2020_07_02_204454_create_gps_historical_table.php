@@ -21,7 +21,10 @@ class CreateGpsHistoricalTable extends Migration
             $table->double('cost',12,2)->default(0);
             $table->double('amount',12,2)->default(0);
             $table->timestamp('activation_date')->nullable();
-            $table->timestamp('due_date')->nullable();
+            $table->timestamp('renew_date')->nullable();
+            $table->timestamp('cancellation_date')->nullable();
+
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }

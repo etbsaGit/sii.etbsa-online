@@ -3,7 +3,7 @@
     <!-- search -->
     <v-card flat>
       <v-form ref="filterForm">
-        <div class="d-flex flex-lg-row flex-sm-column flex-wrap align-center">
+        <div class="d-flex flex-md-row flex-xs-column flex-wrap align-center">
           <div class="flex-grow-1 px-2">
             <v-text-field
               prepend-icon="mdi-magnify"
@@ -14,6 +14,7 @@
           </div>
           <div class="flex-grow-1 px-2">
             <v-select
+              prepend-icon="mdi-calendar-month-outline"
               v-model="filters.month"
               :items="options.months"
               label="Mes Vencimiento"
@@ -25,12 +26,37 @@
           </div>
           <div class="flex-grow-1 px-2">
             <v-select
+              prepend-icon="mdi-calendar-month-outline"
               v-model="filters.year"
               :items="options.years"
               item-text="name"
               item-value="name"
               label="Año Vencimiento"
               clearable
+            ></v-select>
+          </div>
+          <div class="flex-grow-0 px-2">
+            <v-select
+              v-model="agency"
+              :items="options.agencies"
+              label="Sucursal"
+              :menu-props="{ offsetY: true }"
+              item-text="name"
+              item-value="name"
+              clearable
+              filled
+            ></v-select>
+          </div>
+          <div class="flex-grow-0 px-2">
+            <v-select
+              v-model="department"
+              :items="options.departments"
+              label="Departamento"
+              :menu-props="{ offsetY: true }"
+              item-text="name"
+              item-value="name"
+              clearable
+              filled
             ></v-select>
           </div>
           <div class="flex-grow-1 px-2">
@@ -43,74 +69,13 @@
               clearable
               prepend-icon="mdi-filter-variant"
               label="Filtrar por Grupos"
-              :items="filters.groupOptions"
+              :items="options.gpsGroup"
               item-text="name"
               item-value="id"
             ></v-autocomplete>
           </div>
         </div>
       </v-form>
-
-      <!-- Buttons -->
-      <div class="d-flex flex-md-row flex-sm-column flex-wrap align-center">
-        <!-- <div class="flex-grow-1 px-2 text-right"> -->
-        <div class="d-flex flex-grow-1 overline text-uppercase">
-          Ultima Actualizacion de Datos: YYYY/MM/DD
-        </div>
-        <v-spacer></v-spacer>
-        <v-btn
-          small
-          color="secondary"
-          @click="$refs.filterForm.reset()"
-          class="ma-1"
-        >
-          Limpiar Filtro
-          <v-icon right>mdi-filter-remove</v-icon>
-        </v-btn>
-        <v-btn small color="accent" class="ma-1">
-          EXCEL
-          <v-icon right>mdi-file-excel-outline</v-icon>
-        </v-btn>
-        <v-dialog
-          v-model="dialogs.show"
-          fullscreen
-          transition="dialog-bottom-transition"
-          :overlay="false"
-        >
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn small color="primary" v-bind="attrs" v-on="on" class="ma-1">
-              Nuevo GPS
-              <v-icon right>mdi-plus</v-icon>
-            </v-btn>
-          </template>
-          <v-card>
-            <v-toolbar class="primary">
-              <v-btn
-                icon
-                @click.native="(dialogs.show = false), (editedIndex = -1)"
-              >
-                <v-icon>mdi-close</v-icon>
-              </v-btn>
-              <v-toolbar-title class="white--text">{{
-                formTitle
-              }}</v-toolbar-title>
-              <v-spacer></v-spacer>
-              <v-toolbar-items>
-                <v-btn
-                  text
-                  @click.native="(dialogs.show = false), (editedIndex = -1)"
-                  >Done</v-btn
-                >
-              </v-toolbar-items>
-            </v-toolbar>
-            <v-card-text>
-              <gps-edit v-if="formEdit" :propGpsId="dialogs.gps.id"></gps-edit>
-              <gps-add v-else-if="dialogs.show"></gps-add>
-            </v-card-text>
-          </v-card>
-        </v-dialog>
-        <!-- </div> -->
-      </div>
     </v-card>
 
     <!-- data table -->
@@ -123,10 +88,42 @@
       fixed-header
       class="elevation-1 text-uppercase"
     >
-      <!-- Body  -->
-      <template v-slot:item.gps_group="{ item }">
-        {{ item.gps_group.name }}
+      <!-- Top -->
+      <template v-slot:top>
+        <v-toolbar dense elevation="0">
+          <div class="flex-grow-1 overline text-uppercase">
+            Ultima Actualizacion de Datos: YYYY/MM/DD
+          </div>
+          <v-spacer></v-spacer>
+          <v-btn icon color="secondary" @click="$refs.filterForm.reset()">
+            <v-icon>mdi-filter-remove-outline</v-icon>
+          </v-btn>
+          <v-btn icon color="green">
+            <v-icon>mdi-file-excel</v-icon>
+          </v-btn>
+          <v-tooltip top>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                icon
+                color="blue"
+                @click="dialogs.show = true"
+                v-bind="attrs"
+                v-on="on"
+              >
+                <v-icon>mdi-plus-thick</v-icon>
+              </v-btn>
+            </template>
+            <span>Agregar Nuevo</span>
+          </v-tooltip>
+          <v-btn icon @click="refresh()">
+            <v-icon>mdi-refresh</v-icon>
+          </v-btn>
+        </v-toolbar>
       </template>
+      <!-- Body  -->
+      <!-- <template v-slot:item.gps_group="{ item }">
+        {{ item.gps_group.name }}
+      </template> -->
       <template v-slot:item.action="{ item }">
         <v-menu offset-x>
           <template v-slot:activator="{ on, attrs }">
@@ -164,6 +161,15 @@
           </v-list>
         </v-menu>
       </template>
+
+      <template v-slot:item.sim="{ item }">
+        <template v-if="item.chip">
+          {{ item.chip.sim }}
+        </template>
+        <template v-else>
+          N/A
+        </template>
+      </template>
       <template v-slot:item.gps_group="{ item }">
         <template v-if="item.gps_group">
           {{ item.gps_group.name }}
@@ -185,7 +191,7 @@
                 clearable
                 prepend-icon="mdi-filter-variant"
                 label="Buscar Grupo"
-                :items="filters.groupOptions"
+                :items="options.gpsGroup"
                 item-text="name"
                 item-value="id"
               ></v-autocomplete>
@@ -195,18 +201,24 @@
       </template>
 
       <template v-slot:item.cost="{ item }">
-        <v-edit-dialog
-          :return-value.sync="item.cost"
+        <template v-if="item.chip">
+          {{ item.chip.costo | money() }}
+        </template>
+        <template v-else>
+          no asignado
+        </template>
+        <!-- <v-edit-dialog 
+          :return-value.sync="item.chip.costo"
           large
           persistent
           @save="saveInLine(item)"
           @cancel="cancel"
         >
-          <v-btn outlined small pa-0>{{ item.cost | money() }}</v-btn>
+          <v-btn outlined small pa-0>{{ item.chip.costo | money() }}</v-btn>
           <template v-slot:input>
             <div class="mt-4 title">Modificar Costo:</div>
             <v-text-field
-              v-model.lazy="item.cost"
+              v-model.lazy="item.chip.costo"
               label="Valor"
               type="tel"
               prefix="$"
@@ -215,7 +227,7 @@
               autofocus
             ></v-text-field>
           </template>
-        </v-edit-dialog>
+        </v-edit-dialog> -->
       </template>
       <template v-slot:item.amount="{ item }">
         <v-edit-dialog
@@ -241,24 +253,57 @@
         </v-edit-dialog>
       </template>
 
-      <template v-slot:item.activation_date="{ item }">
+      <template v-slot:item.installation_date="{ item }">
         <span class="overline text-capitalize">
-          {{ $appFormatters.formatDate(item.activation_date) }}
+          {{ $appFormatters.formatDate(item.installation_date) }}
         </span>
       </template>
-      <template v-slot:item.due_date="{ item }">
+      <template v-slot:item.renew_date="{ item }">
         <span class="overline text-capitalize">
           <v-chip
-            :color="getColor($appFormatters.formatTimeDiffNow(item.due_date))"
+            :color="getColor($appFormatters.formatTimeDiffNow(item.renew_date))"
             dark
             small
           >
-            {{ $appFormatters.formatTimeDiffNow(item.due_date, "days") }} Dias
+            {{ $appFormatters.formatTimeDiffNow(item.renew_date, "days") }} Dias
           </v-chip>
-          <!-- |{{ $appFormatters.formatDate(item.due_date) }} -->
         </span>
       </template>
     </v-data-table>
+    <!-- dialog -->
+    <v-dialog
+      v-model="dialogs.show"
+      fullscreen
+      transition="dialog-bottom-transition"
+      :overlay="false"
+    >
+      <v-card>
+        <v-toolbar class="primary">
+          <v-btn
+            icon
+            @click.native="(dialogs.show = false), (editedIndex = -1)"
+          >
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+          <v-toolbar-title class="white--text">{{ formTitle }}</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-toolbar-items>
+            <v-btn
+              text
+              @click.native="(dialogs.show = false), (editedIndex = -1)"
+              >Done</v-btn
+            >
+          </v-toolbar-items>
+        </v-toolbar>
+        <v-card-text>
+          <gps-edit v-if="formEdit" :propGpsId="dialogs.gps.id"></gps-edit>
+          <gps-add
+            v-else-if="dialogs.show"
+            :propOptionGroups="options.gpsGroup"
+          ></gps-add>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -268,6 +313,8 @@ import GpsEdit from "@admin/gps/components/GpsEdit.vue";
 
 import optionMoths from "~/api/moths.json";
 import optionYears from "~/api/years.json";
+import optionAgencies from "~/api/agencies.json";
+import optionDepartments from "~/api/departments.json";
 export default {
   components: {
     GpsAdd,
@@ -277,12 +324,11 @@ export default {
     return {
       headers: [
         {
-          text: "Accion",
           value: "action",
           align: "center",
           divider: true,
           width: 10,
-          class: "pa-0",
+          class: "pa-auto",
           sortable: false
         },
         {
@@ -316,15 +362,15 @@ export default {
           sortable: false
         },
         {
-          text: "Fecha de Activacion",
-          value: "activation_date",
+          text: "Fecha de Instalacion",
+          value: "installation_date",
           align: "center",
           width: 135,
           sortable: false
         },
         {
           text: "Vence en (dias)",
-          value: "due_date",
+          value: "renew_date",
           align: "center",
           width: 125,
           class: "pa-0",
@@ -344,14 +390,17 @@ export default {
       options: {
         months: optionMoths,
         years: optionYears,
-        gpsGroup: []
+        gpsGroup: [],
+        agencies: optionAgencies,
+        departments: optionDepartments
       },
       filters: {
         name: null,
         month: null,
         year: null,
         groupId: [],
-        groupOptions: []
+        agency: "",
+        department: ""
       }
     };
   },
@@ -384,11 +433,13 @@ export default {
     formEdit() {
       return this.editedIndex !== -1;
     }
-    // filterMonth(){
-    //   return this.options.months.findIndex(v => v == this.filters.month) + 1
-    // }
   },
   methods: {
+    refresh() {
+      const self = this;
+      self.loadGpsGroup(() => {});
+      self.loadGps(() => {});
+    },
     editItem(item) {
       const self = this;
       self.editedIndex = self.items.indexOf(item);
@@ -425,14 +476,9 @@ export default {
       axios
         .get("/admin/gps-groups", { params: params })
         .then(function(response) {
-          self.filters.groupOptions = response.data.data.data;
+          self.options.gpsGroup = response.data.data.data;
           cb();
         });
-    },
-    customFilter(item, queryText, itemText) {
-      const textOne = item.name.toLowerCase();
-      const searchText = queryText.toLowerCase();
-      return textOne.indexOf(searchText) > -1;
     },
     trash(gps) {
       const self = this;

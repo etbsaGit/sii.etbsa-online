@@ -1,6 +1,5 @@
 [
   { "name": "ADMINISTRACION" },
-  { "name": "CENTRO DE SOPORTE A LAS OPERACIONES" },
   { "name": "CONTABILIDAD" },
   { "name": "CREDITO Y COBRANZA" },
   { "name": "DIRECCION" },
@@ -12,8 +11,15 @@
   { "name": "RIEGO" },
   { "name": "RRHH" },
   { "name": "SERVICIO AGRICOLA" },
-  { "name": "SERVICIO CONSTRUCCION" },
+  { "name": "SERVICIO INDRUSTRIAL" },
   { "name": "SISTEMAS" },
-  { "name": "TESORERIA" },
-  { "name": "VENTAS" }
+  { "name": "ASCACAMBARO" },
+  { "name": "EQUIPO DEMO" },
+  { "name": "GERENTE" },
+  { "name": "BRIGADA VERDE" },
+  { "name": "ASC QRO" },
+  { "name": "TRASLADOS" },
+  { "name": "RENTAS" },
+  { "name": "VENTAS MAQ AGRICOLA" },
+  { "name": "VENTAS MAQ INDUSTRIAL" }
 ]

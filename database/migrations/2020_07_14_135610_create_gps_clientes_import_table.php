@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateGpsWialonImportTable extends Migration
+class CreateGpsClientesImportTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,16 +13,14 @@ class CreateGpsWialonImportTable extends Migration
      */
     public function up()
     {
-        Schema::create('gps_wialon_import', function (Blueprint $table) {
+        Schema::create('gps_clientes_import', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre')->unique();
-            $table->string('grupo')->nullable();
+            $table->string('nombre');
+            $table->string('razon_social')->nullable();
+            $table->string('rfc')->nullable();
+            $table->string('gps');
             $table->string('sucursal')->nullable();
             $table->string('departamento')->nullable();
-            $table->string('sim')->nullable();
-            $table->string('uiid')->nullable();
-            $table->timestamps('creacion')->nullable();
-            $table->timestamps();
         });
     }
 
@@ -33,6 +31,6 @@ class CreateGpsWialonImportTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('gps_wialon_import');
+        Schema::dropIfExists('gps_clientes_import');
     }
 }

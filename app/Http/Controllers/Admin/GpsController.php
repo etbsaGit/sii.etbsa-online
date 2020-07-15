@@ -3,9 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Components\Gps\Repositories\GpsRepository;
-use App\Imports\WialonImport;
 use Illuminate\Http\Request;
-use Maatwebsite\Excel\Facades\Excel;
+
 
 class GpsController extends AdminController
 {
@@ -116,16 +115,16 @@ class GpsController extends AdminController
         return $this->sendResponseOk([], "Deleted.");
     }
 
-    public function import()
-    {
-        // if (request()->file('file_wialon')) {
-        // }
-        Excel::import(new WialonImport, request()->file('file_wialon'));
+    // public function import()
+    // {
+    //     // if (request()->file('file_wialon')) {
+    //     // }
+    //     Excel::import(new WialonImport, request()->file('file_wialon'));
 
-        if (request()->file('file_supplier')) {
-            Excel::import(new WialonImport, request()->file('file_wialon'));
-        }
+    //     if (request()->file('file_supplier')) {
+    //         Excel::import(new WialonImport, request()->file('file_wialon'));
+    //     }
 
-        return $this->sendResponseOk([], 'IMPORTACION COMPLETA');
-    }
+    //     return $this->sendResponseOk([], 'IMPORTACION COMPLETA');
+    // }
 }

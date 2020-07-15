@@ -1,5 +1,17 @@
 (window["webpackJsonp"] = window["webpackJsonp"] || []).push([["/js/admin"],{
 
+/***/ "./node_modules/@babel/runtime/regenerator/index.js":
+/*!**********************************************************!*\
+  !*** ./node_modules/@babel/runtime/regenerator/index.js ***!
+  \**********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(/*! regenerator-runtime */ "./node_modules/regenerator-runtime/runtime.js");
+
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/dashboard/Home.vue?vue&type=script&lang=js&":
 /*!********************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/admin/dashboard/Home.vue?vue&type=script&lang=js& ***!
@@ -1183,7 +1195,14 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
+  props: {
+    propOptionGroups: {
+      required: true
+    }
+  },
   data: function data() {
     return {
       valid: false,
@@ -1193,12 +1212,17 @@ __webpack_require__.r(__webpack_exports__);
       }],
       name: "",
       sim: null,
-      imei: null,
+      gps_group_id: null,
       cost: null,
       amount: null,
       activation_date: null,
       due_date: null,
-      comment: ""
+      comment: "",
+      currency: "MXN",
+      exchange_rate: 1,
+      options: {
+        currency: ["MXN", "USD"]
+      }
     };
   },
   mounted: function mounted() {
@@ -1250,6 +1274,241 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/gps/components/GpsChipAdd.vue?vue&type=script&lang=js&":
+/*!*******************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/admin/gps/components/GpsChipAdd.vue?vue&type=script&lang=js& ***!
+  \*******************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      valid: false,
+      isLoading: false,
+      sim: "",
+      imei: "",
+      costo: "",
+      cuenta: "",
+      rules: [function (v) {
+        return !!v || "Campo Requerido";
+      }]
+    };
+  },
+  methods: {
+    save: function save() {
+      var self = this;
+      var payload = {
+        sim: self.sim,
+        imei: self.imei,
+        cuenta: self.cuenta,
+        costo: self.costo
+      };
+      self.isLoading = true;
+      axios.post("/admin/gps-chips/", payload).then(function (response) {
+        self.$store.commit("showSnackbar", {
+          message: response.data.message,
+          color: "success",
+          duration: 3000
+        });
+        self.$eventBus.$emit("GPS_CHIP_ADDED");
+      })["catch"](function (error) {
+        if (error.response) {
+          self.$store.commit("showSnackbar", {
+            message: error.response.data.message,
+            color: "error",
+            duration: 3000
+          });
+        } else if (error.request) {
+          console.log(error.request);
+        } else {
+          console.log("Error", error.message);
+        }
+      })["finally"](function () {
+        self.isLoading = false;
+      });
+    }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/gps/components/GpsChipEdit.vue?vue&type=script&lang=js&":
+/*!********************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/admin/gps/components/GpsChipEdit.vue?vue&type=script&lang=js& ***!
+  \********************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  props: {
+    propGpsChipId: {
+      required: true
+    }
+  },
+  data: function data() {
+    return {
+      valid: false,
+      isLoading: false,
+      sim: "",
+      imei: "",
+      costo: "",
+      cuenta: "",
+      rules: [function (v) {
+        return !!v || "Campo Requerido";
+      }]
+    };
+  },
+  mounted: function mounted() {
+    var self = this;
+    self.loadGpsChip(function () {});
+  },
+  methods: {
+    save: function save() {
+      var self = this;
+      var payload = {
+        sim: self.sim,
+        imei: self.imei,
+        cuenta: self.cuenta,
+        costo: self.costo
+      };
+      self.isLoading = true;
+      axios.put("/admin/gps-chips/" + self.propGpsChipId, payload).then(function (response) {
+        self.$store.commit("showSnackbar", {
+          message: response.data.message,
+          color: "success",
+          duration: 3000
+        });
+        self.$eventBus.$emit("GPS_CHIP_UPDATED");
+      })["catch"](function (error) {
+        if (error.response) {
+          self.$store.commit("showSnackbar", {
+            message: error.response.data.message,
+            color: "error",
+            duration: 3000
+          });
+        } else if (error.request) {
+          console.log(error.request);
+        } else {
+          console.log("Error", error.message);
+        }
+      })["finally"](function () {
+        self.isLoading = false;
+      });
+    },
+    loadGpsChip: function loadGpsChip(cb) {
+      var self = this;
+      axios.get("/admin/gps-chips/" + self.propGpsChipId).then(function (response) {
+        var Chip = response.data.data;
+        self.sim = Chip.sim;
+        self.imei = Chip.imei;
+        self.cuenta = Chip.cuenta;
+        self.costo = Chip.costo;
+        cb();
+      });
+    }
+  }
+});
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/gps/components/GpsChipsLists.vue?vue&type=script&lang=js&":
 /*!**********************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/admin/gps/components/GpsChipsLists.vue?vue&type=script&lang=js& ***!
@@ -1259,8 +1518,12 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _admin_gps_components_GpsGroupAdd_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @admin/gps/components/GpsGroupAdd.vue */ "./resources/js/admin/gps/components/GpsGroupAdd.vue");
-/* harmony import */ var _admin_gps_components_GpsGroupEdit_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @admin/gps/components/GpsGroupEdit.vue */ "./resources/js/admin/gps/components/GpsGroupEdit.vue");
+/* harmony import */ var _admin_gps_components_GpsChipAdd_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @admin/gps/components/GpsChipAdd.vue */ "./resources/js/admin/gps/components/GpsChipAdd.vue");
+/* harmony import */ var _admin_gps_components_GpsChipEdit_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @admin/gps/components/GpsChipEdit.vue */ "./resources/js/admin/gps/components/GpsChipEdit.vue");
+/* harmony import */ var _api_moths_json__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ~/api/moths.json */ "./resources/js/api/moths.json");
+var _api_moths_json__WEBPACK_IMPORTED_MODULE_2___namespace = /*#__PURE__*/__webpack_require__.t(/*! ~/api/moths.json */ "./resources/js/api/moths.json", 1);
+/* harmony import */ var _api_years_json__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ~/api/years.json */ "./resources/js/api/years.json");
+var _api_years_json__WEBPACK_IMPORTED_MODULE_3___namespace = /*#__PURE__*/__webpack_require__.t(/*! ~/api/years.json */ "./resources/js/api/years.json", 1);
 //
 //
 //
@@ -1371,46 +1634,160 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {
-    GpsGroupAdd: _admin_gps_components_GpsGroupAdd_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
-    GpsGroupEdit: _admin_gps_components_GpsGroupEdit_vue__WEBPACK_IMPORTED_MODULE_1__["default"]
+    GpsChipAdd: _admin_gps_components_GpsChipAdd_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
+    GpsChipEdit: _admin_gps_components_GpsChipEdit_vue__WEBPACK_IMPORTED_MODULE_1__["default"]
   },
   data: function data() {
     return {
       headers: [{
-        text: "Accion",
+        text: "",
         value: "action",
         align: "center",
         divider: true,
         width: 10,
-        "class": "pa-0",
+        "class": "pa-auto",
         sortable: false
       }, {
         text: "SIM",
-        value: "name",
-        align: "left",
-        sortable: true
-      }, {
-        text: "Cuenta",
-        value: "agency",
+        value: "sim",
         align: "left",
         sortable: true
       }, {
         text: "IMEI",
-        value: "department",
+        value: "imei",
         align: "left",
         sortable: true
       }, {
-        text: "Fecha Activacion",
-        value: "gps_count",
-        align: "center",
+        text: "Costo",
+        value: "costo",
+        align: "left",
         sortable: false
       }, {
-        text: "Fecha Vencimiento",
-        value: "gps_count",
+        text: "Fecha Activacion",
+        value: "fecha_activacion",
+        align: "center",
+        sortable: true
+      }, {
+        text: "Fecha Renovacion",
+        value: "fecha_renovacion",
+        align: "center",
+        sortable: true
+      }, {
+        text: "Asignado",
+        value: "gps",
         align: "center",
         sortable: false
       }],
@@ -1423,33 +1800,45 @@ __webpack_require__.r(__webpack_exports__);
       dialogs: {
         title: "",
         show: false,
-        gpsGroup: null
+        gpsChip: null
+      },
+      options: {
+        months: _api_moths_json__WEBPACK_IMPORTED_MODULE_2__,
+        years: _api_years_json__WEBPACK_IMPORTED_MODULE_3__
       },
       filters: {
-        name: ""
+        sim: "",
+        imei: "",
+        month: null,
+        year: null,
+        assigned: null,
+        deallocated: null
       }
     };
   },
   mounted: function mounted() {
     var self = this;
-    self.$eventBus.$on(["GPS_GROUP_ADDED", "GPS_GROUP_UPDATED", "GPS_GROUP_DELETED"], function () {
-      self.loadGpsGroup(function () {});
+    self.$eventBus.$on(["GPS_CHIP_ADDED", "GPS_CHIP_UPDATED", "GPS_CHIP_DELETED"], function () {
+      self.loadGpsChips(function () {});
     });
   },
   watch: {
     pagination: {
       handler: _.debounce(function () {
-        this.loadGpsGroup(function () {});
+        this.loadGpsChips(function () {});
       }, 700),
       deep: true
     },
-    "filters.name": _.debounce(function (v) {
-      this.loadGpsGroup(function () {});
-    }, 700)
+    filters: {
+      handler: _.debounce(function (v) {
+        this.loadGpsChips(function () {});
+      }, 700),
+      deep: true
+    }
   },
   computed: {
     formTitle: function formTitle() {
-      return this.editedIndex === -1 ? "Registrar Grupo GPS" : "Editar Grupo GPS";
+      return this.editedIndex === -1 ? "Registrar CHIP de GPS" : "Editar CHIP de GPS";
     },
     formAdd: function formAdd() {
       return this.editedIndex === -1;
@@ -1459,37 +1848,23 @@ __webpack_require__.r(__webpack_exports__);
     editItem: function editItem(item) {
       var self = this;
       self.editedIndex = self.items.indexOf(item);
-      self.dialogs.gpsGroup = item;
+      self.dialogs.gpsChip = item;
       self.dialogs.show = true;
     },
-    showDialog: function showDialog(dialog, data) {
-      var self = this;
-
-      switch (dialog) {
-        case "gps_group_edit":
-          self.dialogs.edit.gpsGroup = data;
-          setTimeout(function () {
-            self.dialogs.edit.show = true;
-          }, 500);
-          break;
-
-        case "gps_group_add":
-          setTimeout(function () {
-            self.dialogs.add.show = true;
-          }, 500);
-          break;
-      }
-    },
-    loadGpsGroup: function loadGpsGroup(cb) {
+    loadGpsChips: function loadGpsChips(cb) {
       var self = this;
       var params = {
-        name: self.filters.name,
+        sim: self.filters.sim,
+        month: self.filters.month,
+        year: self.filters.year,
+        assigned: self.filters.assigned ? self.filters.assigned : null,
+        deallocated: self.filters.deallocated ? self.filters.deallocated : null,
         order_sort: self.pagination.sortDesc[0] ? "desc" : "asc",
-        order_by: self.pagination.sortBy[0] || "name",
+        order_by: self.pagination.sortBy[0] || "sim",
         page: self.pagination.page,
         per_page: self.pagination.itemsPerPage
       };
-      axios.get("/admin/gps-groups", {
+      axios.get("/admin/gps-chips", {
         params: params
       }).then(function (response) {
         self.items = response.data.data.data;
@@ -1498,20 +1873,20 @@ __webpack_require__.r(__webpack_exports__);
         (cb || Function)();
       });
     },
-    trash: function trash(group) {
+    trash: function trash(chip) {
       var self = this;
       self.$store.commit("showDialog", {
         type: "confirm",
         title: "Confirm Deletion",
-        message: "Are you sure you want to delete this gps group?",
+        message: "Are you sure you want to delete this gps chip?",
         okCb: function okCb() {
-          axios["delete"]("/admin/gps-groups/" + group.id).then(function (response) {
+          axios["delete"]("/admin/gps-chips/" + chip.id).then(function (response) {
             self.$store.commit("showSnackbar", {
               message: response.data.message,
               color: "success",
               duration: 3000
             });
-            self.$eventBus.$emit("GPS_GROUP_DELETED");
+            self.$eventBus.$emit("GPS_CHIP_DELETED");
           })["catch"](function (error) {
             if (error.response) {
               self.$store.commit("showSnackbar", {
@@ -1530,6 +1905,9 @@ __webpack_require__.r(__webpack_exports__);
           console.log("CANCEL");
         }
       });
+    },
+    getColor: function getColor(date) {
+      if (date < 31) return "red";else if (date < 62) return "orange";else return "green";
     }
   }
 });
@@ -2124,6 +2502,34 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -2134,12 +2540,12 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       headers: [{
-        text: "Accion",
+        text: "",
         value: "action",
         align: "center",
         divider: true,
         width: 10,
-        "class": "pa-0",
+        "class": "pa-auto",
         sortable: false
       }, {
         text: "Nombre Grupo",
@@ -2209,24 +2615,6 @@ __webpack_require__.r(__webpack_exports__);
       self.editedIndex = self.items.indexOf(item);
       self.dialogs.gpsGroup = item;
       self.dialogs.show = true;
-    },
-    showDialog: function showDialog(dialog, data) {
-      var self = this;
-
-      switch (dialog) {
-        case "gps_group_edit":
-          self.dialogs.edit.gpsGroup = data;
-          setTimeout(function () {
-            self.dialogs.edit.show = true;
-          }, 500);
-          break;
-
-        case "gps_group_add":
-          setTimeout(function () {
-            self.dialogs.add.show = true;
-          }, 500);
-          break;
-      }
     },
     loadGpsGroup: function loadGpsGroup(cb) {
       var self = this;
@@ -2299,6 +2687,10 @@ __webpack_require__.r(__webpack_exports__);
 var _api_moths_json__WEBPACK_IMPORTED_MODULE_2___namespace = /*#__PURE__*/__webpack_require__.t(/*! ~/api/moths.json */ "./resources/js/api/moths.json", 1);
 /* harmony import */ var _api_years_json__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ~/api/years.json */ "./resources/js/api/years.json");
 var _api_years_json__WEBPACK_IMPORTED_MODULE_3___namespace = /*#__PURE__*/__webpack_require__.t(/*! ~/api/years.json */ "./resources/js/api/years.json", 1);
+/* harmony import */ var _api_agencies_json__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ~/api/agencies.json */ "./resources/js/api/agencies.json");
+var _api_agencies_json__WEBPACK_IMPORTED_MODULE_4___namespace = /*#__PURE__*/__webpack_require__.t(/*! ~/api/agencies.json */ "./resources/js/api/agencies.json", 1);
+/* harmony import */ var _api_departments_json__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ~/api/departments.json */ "./resources/js/api/departments.json");
+var _api_departments_json__WEBPACK_IMPORTED_MODULE_5___namespace = /*#__PURE__*/__webpack_require__.t(/*! ~/api/departments.json */ "./resources/js/api/departments.json", 1);
 //
 //
 //
@@ -2563,6 +2955,53 @@ var _api_years_json__WEBPACK_IMPORTED_MODULE_3___namespace = /*#__PURE__*/__webp
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
 
 
 
@@ -2575,12 +3014,11 @@ var _api_years_json__WEBPACK_IMPORTED_MODULE_3___namespace = /*#__PURE__*/__webp
   data: function data() {
     return {
       headers: [{
-        text: "Accion",
         value: "action",
         align: "center",
         divider: true,
         width: 10,
-        "class": "pa-0",
+        "class": "pa-auto",
         sortable: false
       }, {
         text: "Nombre GPS",
@@ -2608,14 +3046,14 @@ var _api_years_json__WEBPACK_IMPORTED_MODULE_3___namespace = /*#__PURE__*/__webp
         align: "right",
         sortable: false
       }, {
-        text: "Fecha de Activacion",
-        value: "activation_date",
+        text: "Fecha de Instalacion",
+        value: "installation_date",
         align: "center",
         width: 135,
         sortable: false
       }, {
         text: "Vence en (dias)",
-        value: "due_date",
+        value: "renew_date",
         align: "center",
         width: 125,
         "class": "pa-0",
@@ -2634,14 +3072,17 @@ var _api_years_json__WEBPACK_IMPORTED_MODULE_3___namespace = /*#__PURE__*/__webp
       options: {
         months: _api_moths_json__WEBPACK_IMPORTED_MODULE_2__,
         years: _api_years_json__WEBPACK_IMPORTED_MODULE_3__,
-        gpsGroup: []
+        gpsGroup: [],
+        agencies: _api_agencies_json__WEBPACK_IMPORTED_MODULE_4__,
+        departments: _api_departments_json__WEBPACK_IMPORTED_MODULE_5__
       },
       filters: {
         name: null,
         month: null,
         year: null,
         groupId: [],
-        groupOptions: []
+        agency: "",
+        department: ""
       }
     };
   },
@@ -2672,12 +3113,14 @@ var _api_years_json__WEBPACK_IMPORTED_MODULE_3___namespace = /*#__PURE__*/__webp
     },
     formEdit: function formEdit() {
       return this.editedIndex !== -1;
-    } // filterMonth(){
-    //   return this.options.months.findIndex(v => v == this.filters.month) + 1
-    // }
-
+    }
   },
   methods: {
+    refresh: function refresh() {
+      var self = this;
+      self.loadGpsGroup(function () {});
+      self.loadGps(function () {});
+    },
     editItem: function editItem(item) {
       var self = this;
       self.editedIndex = self.items.indexOf(item);
@@ -2713,14 +3156,9 @@ var _api_years_json__WEBPACK_IMPORTED_MODULE_3___namespace = /*#__PURE__*/__webp
       axios.get("/admin/gps-groups", {
         params: params
       }).then(function (response) {
-        self.filters.groupOptions = response.data.data.data;
+        self.options.gpsGroup = response.data.data.data;
         cb();
       });
-    },
-    customFilter: function customFilter(item, queryText, itemText) {
-      var textOne = item.name.toLowerCase();
-      var searchText = queryText.toLowerCase();
-      return textOne.indexOf(searchText) > -1;
     },
     trash: function trash(gps) {
       var self = this;
@@ -2805,6 +3243,60 @@ var _api_years_json__WEBPACK_IMPORTED_MODULE_3___namespace = /*#__PURE__*/__webp
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -2920,36 +3412,162 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       e1: 1,
-      steps: 3,
+      steps: 4,
       files: {},
       accept: ".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     };
   },
   methods: {
     nextStep: function nextStep(n) {
-      var self = this;
+      var _this = this;
 
-      if (n === this.steps) {
-        // last Step
-        var formData = new FormData();
-        formData.append("file_wialon", self.files["file_wialon"]);
-        formData.append("file_supplier", self.files["file_supplier"]);
-        self.$store.commit("showLoader");
-        axios.post("admin/gps/import", formData).then(function (response) {
-          self.$store.commit("showSnackbar", {
-            message: response.data.message,
-            color: "success",
-            duration: 3000
-          });
-          self.$eventBus.$emit("UPLOAD_COMPLETE");
-          self.$eventBus.$emit("GPS_UPDATED");
-          self.$eventBus.$emit("GPS_GROUP_UPDATED");
-        })["finally"](function () {
-          self.$store.commit("hideLoader");
+      return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
+        var self, result, _result, _result2, _result3;
+
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                self = _this;
+                self.$store.commit("showLoader");
+
+                if (!(n === self.steps)) {
+                  _context.next = 10;
+                  break;
+                }
+
+                console.log("LastStep excute upload");
+                _context.next = 6;
+                return self.matchingChipsInGps();
+
+              case 6:
+                result = _context.sent;
+                console.log("LastStep finish", result);
+                _context.next = 35;
+                break;
+
+              case 10:
+                if (!(n === 1)) {
+                  _context.next = 19;
+                  break;
+                }
+
+                console.log("Step1 excute upload");
+                _context.next = 14;
+                return self.uploadFileClientes();
+
+              case 14:
+                _result = _context.sent;
+                console.log("Step1 finish", _result);
+                if (_result.data == true) self.e1 = n + 1;
+                _context.next = 35;
+                break;
+
+              case 19:
+                if (!(n === 2)) {
+                  _context.next = 28;
+                  break;
+                }
+
+                console.log("Step2 excute upload");
+                _context.next = 23;
+                return self.uploadFileChips();
+
+              case 23:
+                _result2 = _context.sent;
+                console.log("Step2 finish", _result2);
+                if (_result2.data == true) self.e1 = n + 1;
+                _context.next = 35;
+                break;
+
+              case 28:
+                if (!(n === 3)) {
+                  _context.next = 35;
+                  break;
+                }
+
+                // success = await self.uploadFileChips();
+                console.log("Step3 execute upload");
+                _context.next = 32;
+                return self.uploadFileGps();
+
+              case 32:
+                _result3 = _context.sent;
+                console.log("Step3 finish", _result3);
+                if (_result3.data == true) self.e1 = n + 1;
+
+              case 35:
+                self.$store.commit("hideLoader");
+
+              case 36:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee);
+      }))();
+    },
+    uploadFileClientes: function uploadFileClientes() {
+      var self = this;
+      var formData = new FormData();
+      formData.append("file_clientes_gps", self.files["file_clientes_gps"]);
+      return axios.post("admin/clientes-gps/import", formData).then(function (response) {
+        self.$store.commit("showSnackbar", {
+          message: response.data.message,
+          color: "success",
+          duration: 3000
         });
-      } else {
-        self.e1 = n + 1;
-      }
+        return response.data;
+      })["catch"](function (error) {
+        return error;
+      })["finally"](function () {
+        self.$store.commit("hideLoader");
+      });
+    },
+    uploadFileGps: function uploadFileGps() {
+      var self = this;
+      var formData = new FormData();
+      formData.append("file_gps", self.files["file_gps"]);
+      return axios.post("admin/gps/import", formData).then(function (response) {
+        self.$store.commit("showSnackbar", {
+          message: response.data.message,
+          color: "success",
+          duration: 3000
+        });
+        return response.data;
+      })["catch"](function (error) {
+        return error;
+      })["finally"](function () {
+        self.$store.commit("hideLoader");
+      });
+    },
+    uploadFileChips: function uploadFileChips() {
+      var self = this;
+      var formData = new FormData();
+      formData.append("file_gps_chips", self.files["file_gps_chips"]);
+      return axios.post("admin/gps-chips/import", formData).then(function (response) {
+        self.$store.commit("showSnackbar", {
+          message: response.data.message,
+          color: "success",
+          duration: 3000
+        });
+        return response.data;
+      })["finally"](function () {
+        self.$store.commit("hideLoader");
+      });
+    },
+    matchingChipsInGps: function matchingChipsInGps() {
+      var self = this;
+      return axios.post("admin/matching-chips-gps/import").then(function (response) {
+        self.$store.commit("showSnackbar", {
+          message: response.data.message,
+          color: "success",
+          duration: 3000
+        });
+        return response.data;
+      })["finally"](function () {
+        self.$store.commit("hideLoader");
+      });
     }
   }
 });
@@ -19409,6 +20027,746 @@ process.umask = function() { return 0; };
 
 /***/ }),
 
+/***/ "./node_modules/regenerator-runtime/runtime.js":
+/*!*****************************************************!*\
+  !*** ./node_modules/regenerator-runtime/runtime.js ***!
+  \*****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+/**
+ * Copyright (c) 2014-present, Facebook, Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+var runtime = (function (exports) {
+  "use strict";
+
+  var Op = Object.prototype;
+  var hasOwn = Op.hasOwnProperty;
+  var undefined; // More compressible than void 0.
+  var $Symbol = typeof Symbol === "function" ? Symbol : {};
+  var iteratorSymbol = $Symbol.iterator || "@@iterator";
+  var asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator";
+  var toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag";
+
+  function wrap(innerFn, outerFn, self, tryLocsList) {
+    // If outerFn provided and outerFn.prototype is a Generator, then outerFn.prototype instanceof Generator.
+    var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator;
+    var generator = Object.create(protoGenerator.prototype);
+    var context = new Context(tryLocsList || []);
+
+    // The ._invoke method unifies the implementations of the .next,
+    // .throw, and .return methods.
+    generator._invoke = makeInvokeMethod(innerFn, self, context);
+
+    return generator;
+  }
+  exports.wrap = wrap;
+
+  // Try/catch helper to minimize deoptimizations. Returns a completion
+  // record like context.tryEntries[i].completion. This interface could
+  // have been (and was previously) designed to take a closure to be
+  // invoked without arguments, but in all the cases we care about we
+  // already have an existing method we want to call, so there's no need
+  // to create a new function object. We can even get away with assuming
+  // the method takes exactly one argument, since that happens to be true
+  // in every case, so we don't have to touch the arguments object. The
+  // only additional allocation required is the completion record, which
+  // has a stable shape and so hopefully should be cheap to allocate.
+  function tryCatch(fn, obj, arg) {
+    try {
+      return { type: "normal", arg: fn.call(obj, arg) };
+    } catch (err) {
+      return { type: "throw", arg: err };
+    }
+  }
+
+  var GenStateSuspendedStart = "suspendedStart";
+  var GenStateSuspendedYield = "suspendedYield";
+  var GenStateExecuting = "executing";
+  var GenStateCompleted = "completed";
+
+  // Returning this object from the innerFn has the same effect as
+  // breaking out of the dispatch switch statement.
+  var ContinueSentinel = {};
+
+  // Dummy constructor functions that we use as the .constructor and
+  // .constructor.prototype properties for functions that return Generator
+  // objects. For full spec compliance, you may wish to configure your
+  // minifier not to mangle the names of these two functions.
+  function Generator() {}
+  function GeneratorFunction() {}
+  function GeneratorFunctionPrototype() {}
+
+  // This is a polyfill for %IteratorPrototype% for environments that
+  // don't natively support it.
+  var IteratorPrototype = {};
+  IteratorPrototype[iteratorSymbol] = function () {
+    return this;
+  };
+
+  var getProto = Object.getPrototypeOf;
+  var NativeIteratorPrototype = getProto && getProto(getProto(values([])));
+  if (NativeIteratorPrototype &&
+      NativeIteratorPrototype !== Op &&
+      hasOwn.call(NativeIteratorPrototype, iteratorSymbol)) {
+    // This environment has a native %IteratorPrototype%; use it instead
+    // of the polyfill.
+    IteratorPrototype = NativeIteratorPrototype;
+  }
+
+  var Gp = GeneratorFunctionPrototype.prototype =
+    Generator.prototype = Object.create(IteratorPrototype);
+  GeneratorFunction.prototype = Gp.constructor = GeneratorFunctionPrototype;
+  GeneratorFunctionPrototype.constructor = GeneratorFunction;
+  GeneratorFunctionPrototype[toStringTagSymbol] =
+    GeneratorFunction.displayName = "GeneratorFunction";
+
+  // Helper for defining the .next, .throw, and .return methods of the
+  // Iterator interface in terms of a single ._invoke method.
+  function defineIteratorMethods(prototype) {
+    ["next", "throw", "return"].forEach(function(method) {
+      prototype[method] = function(arg) {
+        return this._invoke(method, arg);
+      };
+    });
+  }
+
+  exports.isGeneratorFunction = function(genFun) {
+    var ctor = typeof genFun === "function" && genFun.constructor;
+    return ctor
+      ? ctor === GeneratorFunction ||
+        // For the native GeneratorFunction constructor, the best we can
+        // do is to check its .name property.
+        (ctor.displayName || ctor.name) === "GeneratorFunction"
+      : false;
+  };
+
+  exports.mark = function(genFun) {
+    if (Object.setPrototypeOf) {
+      Object.setPrototypeOf(genFun, GeneratorFunctionPrototype);
+    } else {
+      genFun.__proto__ = GeneratorFunctionPrototype;
+      if (!(toStringTagSymbol in genFun)) {
+        genFun[toStringTagSymbol] = "GeneratorFunction";
+      }
+    }
+    genFun.prototype = Object.create(Gp);
+    return genFun;
+  };
+
+  // Within the body of any async function, `await x` is transformed to
+  // `yield regeneratorRuntime.awrap(x)`, so that the runtime can test
+  // `hasOwn.call(value, "__await")` to determine if the yielded value is
+  // meant to be awaited.
+  exports.awrap = function(arg) {
+    return { __await: arg };
+  };
+
+  function AsyncIterator(generator, PromiseImpl) {
+    function invoke(method, arg, resolve, reject) {
+      var record = tryCatch(generator[method], generator, arg);
+      if (record.type === "throw") {
+        reject(record.arg);
+      } else {
+        var result = record.arg;
+        var value = result.value;
+        if (value &&
+            typeof value === "object" &&
+            hasOwn.call(value, "__await")) {
+          return PromiseImpl.resolve(value.__await).then(function(value) {
+            invoke("next", value, resolve, reject);
+          }, function(err) {
+            invoke("throw", err, resolve, reject);
+          });
+        }
+
+        return PromiseImpl.resolve(value).then(function(unwrapped) {
+          // When a yielded Promise is resolved, its final value becomes
+          // the .value of the Promise<{value,done}> result for the
+          // current iteration.
+          result.value = unwrapped;
+          resolve(result);
+        }, function(error) {
+          // If a rejected Promise was yielded, throw the rejection back
+          // into the async generator function so it can be handled there.
+          return invoke("throw", error, resolve, reject);
+        });
+      }
+    }
+
+    var previousPromise;
+
+    function enqueue(method, arg) {
+      function callInvokeWithMethodAndArg() {
+        return new PromiseImpl(function(resolve, reject) {
+          invoke(method, arg, resolve, reject);
+        });
+      }
+
+      return previousPromise =
+        // If enqueue has been called before, then we want to wait until
+        // all previous Promises have been resolved before calling invoke,
+        // so that results are always delivered in the correct order. If
+        // enqueue has not been called before, then it is important to
+        // call invoke immediately, without waiting on a callback to fire,
+        // so that the async generator function has the opportunity to do
+        // any necessary setup in a predictable way. This predictability
+        // is why the Promise constructor synchronously invokes its
+        // executor callback, and why async functions synchronously
+        // execute code before the first await. Since we implement simple
+        // async functions in terms of async generators, it is especially
+        // important to get this right, even though it requires care.
+        previousPromise ? previousPromise.then(
+          callInvokeWithMethodAndArg,
+          // Avoid propagating failures to Promises returned by later
+          // invocations of the iterator.
+          callInvokeWithMethodAndArg
+        ) : callInvokeWithMethodAndArg();
+    }
+
+    // Define the unified helper method that is used to implement .next,
+    // .throw, and .return (see defineIteratorMethods).
+    this._invoke = enqueue;
+  }
+
+  defineIteratorMethods(AsyncIterator.prototype);
+  AsyncIterator.prototype[asyncIteratorSymbol] = function () {
+    return this;
+  };
+  exports.AsyncIterator = AsyncIterator;
+
+  // Note that simple async functions are implemented on top of
+  // AsyncIterator objects; they just return a Promise for the value of
+  // the final result produced by the iterator.
+  exports.async = function(innerFn, outerFn, self, tryLocsList, PromiseImpl) {
+    if (PromiseImpl === void 0) PromiseImpl = Promise;
+
+    var iter = new AsyncIterator(
+      wrap(innerFn, outerFn, self, tryLocsList),
+      PromiseImpl
+    );
+
+    return exports.isGeneratorFunction(outerFn)
+      ? iter // If outerFn is a generator, return the full iterator.
+      : iter.next().then(function(result) {
+          return result.done ? result.value : iter.next();
+        });
+  };
+
+  function makeInvokeMethod(innerFn, self, context) {
+    var state = GenStateSuspendedStart;
+
+    return function invoke(method, arg) {
+      if (state === GenStateExecuting) {
+        throw new Error("Generator is already running");
+      }
+
+      if (state === GenStateCompleted) {
+        if (method === "throw") {
+          throw arg;
+        }
+
+        // Be forgiving, per 25.3.3.3.3 of the spec:
+        // https://people.mozilla.org/~jorendorff/es6-draft.html#sec-generatorresume
+        return doneResult();
+      }
+
+      context.method = method;
+      context.arg = arg;
+
+      while (true) {
+        var delegate = context.delegate;
+        if (delegate) {
+          var delegateResult = maybeInvokeDelegate(delegate, context);
+          if (delegateResult) {
+            if (delegateResult === ContinueSentinel) continue;
+            return delegateResult;
+          }
+        }
+
+        if (context.method === "next") {
+          // Setting context._sent for legacy support of Babel's
+          // function.sent implementation.
+          context.sent = context._sent = context.arg;
+
+        } else if (context.method === "throw") {
+          if (state === GenStateSuspendedStart) {
+            state = GenStateCompleted;
+            throw context.arg;
+          }
+
+          context.dispatchException(context.arg);
+
+        } else if (context.method === "return") {
+          context.abrupt("return", context.arg);
+        }
+
+        state = GenStateExecuting;
+
+        var record = tryCatch(innerFn, self, context);
+        if (record.type === "normal") {
+          // If an exception is thrown from innerFn, we leave state ===
+          // GenStateExecuting and loop back for another invocation.
+          state = context.done
+            ? GenStateCompleted
+            : GenStateSuspendedYield;
+
+          if (record.arg === ContinueSentinel) {
+            continue;
+          }
+
+          return {
+            value: record.arg,
+            done: context.done
+          };
+
+        } else if (record.type === "throw") {
+          state = GenStateCompleted;
+          // Dispatch the exception by looping back around to the
+          // context.dispatchException(context.arg) call above.
+          context.method = "throw";
+          context.arg = record.arg;
+        }
+      }
+    };
+  }
+
+  // Call delegate.iterator[context.method](context.arg) and handle the
+  // result, either by returning a { value, done } result from the
+  // delegate iterator, or by modifying context.method and context.arg,
+  // setting context.delegate to null, and returning the ContinueSentinel.
+  function maybeInvokeDelegate(delegate, context) {
+    var method = delegate.iterator[context.method];
+    if (method === undefined) {
+      // A .throw or .return when the delegate iterator has no .throw
+      // method always terminates the yield* loop.
+      context.delegate = null;
+
+      if (context.method === "throw") {
+        // Note: ["return"] must be used for ES3 parsing compatibility.
+        if (delegate.iterator["return"]) {
+          // If the delegate iterator has a return method, give it a
+          // chance to clean up.
+          context.method = "return";
+          context.arg = undefined;
+          maybeInvokeDelegate(delegate, context);
+
+          if (context.method === "throw") {
+            // If maybeInvokeDelegate(context) changed context.method from
+            // "return" to "throw", let that override the TypeError below.
+            return ContinueSentinel;
+          }
+        }
+
+        context.method = "throw";
+        context.arg = new TypeError(
+          "The iterator does not provide a 'throw' method");
+      }
+
+      return ContinueSentinel;
+    }
+
+    var record = tryCatch(method, delegate.iterator, context.arg);
+
+    if (record.type === "throw") {
+      context.method = "throw";
+      context.arg = record.arg;
+      context.delegate = null;
+      return ContinueSentinel;
+    }
+
+    var info = record.arg;
+
+    if (! info) {
+      context.method = "throw";
+      context.arg = new TypeError("iterator result is not an object");
+      context.delegate = null;
+      return ContinueSentinel;
+    }
+
+    if (info.done) {
+      // Assign the result of the finished delegate to the temporary
+      // variable specified by delegate.resultName (see delegateYield).
+      context[delegate.resultName] = info.value;
+
+      // Resume execution at the desired location (see delegateYield).
+      context.next = delegate.nextLoc;
+
+      // If context.method was "throw" but the delegate handled the
+      // exception, let the outer generator proceed normally. If
+      // context.method was "next", forget context.arg since it has been
+      // "consumed" by the delegate iterator. If context.method was
+      // "return", allow the original .return call to continue in the
+      // outer generator.
+      if (context.method !== "return") {
+        context.method = "next";
+        context.arg = undefined;
+      }
+
+    } else {
+      // Re-yield the result returned by the delegate method.
+      return info;
+    }
+
+    // The delegate iterator is finished, so forget it and continue with
+    // the outer generator.
+    context.delegate = null;
+    return ContinueSentinel;
+  }
+
+  // Define Generator.prototype.{next,throw,return} in terms of the
+  // unified ._invoke helper method.
+  defineIteratorMethods(Gp);
+
+  Gp[toStringTagSymbol] = "Generator";
+
+  // A Generator should always return itself as the iterator object when the
+  // @@iterator function is called on it. Some browsers' implementations of the
+  // iterator prototype chain incorrectly implement this, causing the Generator
+  // object to not be returned from this call. This ensures that doesn't happen.
+  // See https://github.com/facebook/regenerator/issues/274 for more details.
+  Gp[iteratorSymbol] = function() {
+    return this;
+  };
+
+  Gp.toString = function() {
+    return "[object Generator]";
+  };
+
+  function pushTryEntry(locs) {
+    var entry = { tryLoc: locs[0] };
+
+    if (1 in locs) {
+      entry.catchLoc = locs[1];
+    }
+
+    if (2 in locs) {
+      entry.finallyLoc = locs[2];
+      entry.afterLoc = locs[3];
+    }
+
+    this.tryEntries.push(entry);
+  }
+
+  function resetTryEntry(entry) {
+    var record = entry.completion || {};
+    record.type = "normal";
+    delete record.arg;
+    entry.completion = record;
+  }
+
+  function Context(tryLocsList) {
+    // The root entry object (effectively a try statement without a catch
+    // or a finally block) gives us a place to store values thrown from
+    // locations where there is no enclosing try statement.
+    this.tryEntries = [{ tryLoc: "root" }];
+    tryLocsList.forEach(pushTryEntry, this);
+    this.reset(true);
+  }
+
+  exports.keys = function(object) {
+    var keys = [];
+    for (var key in object) {
+      keys.push(key);
+    }
+    keys.reverse();
+
+    // Rather than returning an object with a next method, we keep
+    // things simple and return the next function itself.
+    return function next() {
+      while (keys.length) {
+        var key = keys.pop();
+        if (key in object) {
+          next.value = key;
+          next.done = false;
+          return next;
+        }
+      }
+
+      // To avoid creating an additional object, we just hang the .value
+      // and .done properties off the next function object itself. This
+      // also ensures that the minifier will not anonymize the function.
+      next.done = true;
+      return next;
+    };
+  };
+
+  function values(iterable) {
+    if (iterable) {
+      var iteratorMethod = iterable[iteratorSymbol];
+      if (iteratorMethod) {
+        return iteratorMethod.call(iterable);
+      }
+
+      if (typeof iterable.next === "function") {
+        return iterable;
+      }
+
+      if (!isNaN(iterable.length)) {
+        var i = -1, next = function next() {
+          while (++i < iterable.length) {
+            if (hasOwn.call(iterable, i)) {
+              next.value = iterable[i];
+              next.done = false;
+              return next;
+            }
+          }
+
+          next.value = undefined;
+          next.done = true;
+
+          return next;
+        };
+
+        return next.next = next;
+      }
+    }
+
+    // Return an iterator with no values.
+    return { next: doneResult };
+  }
+  exports.values = values;
+
+  function doneResult() {
+    return { value: undefined, done: true };
+  }
+
+  Context.prototype = {
+    constructor: Context,
+
+    reset: function(skipTempReset) {
+      this.prev = 0;
+      this.next = 0;
+      // Resetting context._sent for legacy support of Babel's
+      // function.sent implementation.
+      this.sent = this._sent = undefined;
+      this.done = false;
+      this.delegate = null;
+
+      this.method = "next";
+      this.arg = undefined;
+
+      this.tryEntries.forEach(resetTryEntry);
+
+      if (!skipTempReset) {
+        for (var name in this) {
+          // Not sure about the optimal order of these conditions:
+          if (name.charAt(0) === "t" &&
+              hasOwn.call(this, name) &&
+              !isNaN(+name.slice(1))) {
+            this[name] = undefined;
+          }
+        }
+      }
+    },
+
+    stop: function() {
+      this.done = true;
+
+      var rootEntry = this.tryEntries[0];
+      var rootRecord = rootEntry.completion;
+      if (rootRecord.type === "throw") {
+        throw rootRecord.arg;
+      }
+
+      return this.rval;
+    },
+
+    dispatchException: function(exception) {
+      if (this.done) {
+        throw exception;
+      }
+
+      var context = this;
+      function handle(loc, caught) {
+        record.type = "throw";
+        record.arg = exception;
+        context.next = loc;
+
+        if (caught) {
+          // If the dispatched exception was caught by a catch block,
+          // then let that catch block handle the exception normally.
+          context.method = "next";
+          context.arg = undefined;
+        }
+
+        return !! caught;
+      }
+
+      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+        var entry = this.tryEntries[i];
+        var record = entry.completion;
+
+        if (entry.tryLoc === "root") {
+          // Exception thrown outside of any try block that could handle
+          // it, so set the completion value of the entire function to
+          // throw the exception.
+          return handle("end");
+        }
+
+        if (entry.tryLoc <= this.prev) {
+          var hasCatch = hasOwn.call(entry, "catchLoc");
+          var hasFinally = hasOwn.call(entry, "finallyLoc");
+
+          if (hasCatch && hasFinally) {
+            if (this.prev < entry.catchLoc) {
+              return handle(entry.catchLoc, true);
+            } else if (this.prev < entry.finallyLoc) {
+              return handle(entry.finallyLoc);
+            }
+
+          } else if (hasCatch) {
+            if (this.prev < entry.catchLoc) {
+              return handle(entry.catchLoc, true);
+            }
+
+          } else if (hasFinally) {
+            if (this.prev < entry.finallyLoc) {
+              return handle(entry.finallyLoc);
+            }
+
+          } else {
+            throw new Error("try statement without catch or finally");
+          }
+        }
+      }
+    },
+
+    abrupt: function(type, arg) {
+      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+        var entry = this.tryEntries[i];
+        if (entry.tryLoc <= this.prev &&
+            hasOwn.call(entry, "finallyLoc") &&
+            this.prev < entry.finallyLoc) {
+          var finallyEntry = entry;
+          break;
+        }
+      }
+
+      if (finallyEntry &&
+          (type === "break" ||
+           type === "continue") &&
+          finallyEntry.tryLoc <= arg &&
+          arg <= finallyEntry.finallyLoc) {
+        // Ignore the finally entry if control is not jumping to a
+        // location outside the try/catch block.
+        finallyEntry = null;
+      }
+
+      var record = finallyEntry ? finallyEntry.completion : {};
+      record.type = type;
+      record.arg = arg;
+
+      if (finallyEntry) {
+        this.method = "next";
+        this.next = finallyEntry.finallyLoc;
+        return ContinueSentinel;
+      }
+
+      return this.complete(record);
+    },
+
+    complete: function(record, afterLoc) {
+      if (record.type === "throw") {
+        throw record.arg;
+      }
+
+      if (record.type === "break" ||
+          record.type === "continue") {
+        this.next = record.arg;
+      } else if (record.type === "return") {
+        this.rval = this.arg = record.arg;
+        this.method = "return";
+        this.next = "end";
+      } else if (record.type === "normal" && afterLoc) {
+        this.next = afterLoc;
+      }
+
+      return ContinueSentinel;
+    },
+
+    finish: function(finallyLoc) {
+      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+        var entry = this.tryEntries[i];
+        if (entry.finallyLoc === finallyLoc) {
+          this.complete(entry.completion, entry.afterLoc);
+          resetTryEntry(entry);
+          return ContinueSentinel;
+        }
+      }
+    },
+
+    "catch": function(tryLoc) {
+      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+        var entry = this.tryEntries[i];
+        if (entry.tryLoc === tryLoc) {
+          var record = entry.completion;
+          if (record.type === "throw") {
+            var thrown = record.arg;
+            resetTryEntry(entry);
+          }
+          return thrown;
+        }
+      }
+
+      // The context.catch method must only be called with a location
+      // argument that corresponds to a known catch block.
+      throw new Error("illegal catch attempt");
+    },
+
+    delegateYield: function(iterable, resultName, nextLoc) {
+      this.delegate = {
+        iterator: values(iterable),
+        resultName: resultName,
+        nextLoc: nextLoc
+      };
+
+      if (this.method === "next") {
+        // Deliberately forget the last sent value so that we don't
+        // accidentally pass it on to the delegate.
+        this.arg = undefined;
+      }
+
+      return ContinueSentinel;
+    }
+  };
+
+  // Regardless of whether this script is executing as a CommonJS module
+  // or not, return the runtime object so that we can declare the variable
+  // regeneratorRuntime in the outer scope, which allows this module to be
+  // injected easily by `bin/regenerator --include-runtime script.js`.
+  return exports;
+
+}(
+  // If this script is executing as a CommonJS module, use module.exports
+  // as the regeneratorRuntime namespace. Otherwise create a new empty
+  // object. Either way, the resulting object will be used to initialize
+  // the regeneratorRuntime variable at the top of this file.
+   true ? module.exports : undefined
+));
+
+try {
+  regeneratorRuntime = runtime;
+} catch (accidentalStrictMode) {
+  // This module should not be running in strict mode, so the above
+  // assignment should always work unless something is misconfigured. Just
+  // in case runtime.js accidentally runs in strict mode, we can escape
+  // strict mode using a global Function call. This could conceivably fail
+  // if a Content Security Policy forbids using Function, but in that case
+  // the proper solution is to fix the accidental strict mode problem. If
+  // you've misconfigured your bundler to force strict mode and applied a
+  // CSP to forbid Function, and you're not willing to fix either of those
+  // problems, please detail your unique predicament in a GitHub issue.
+  Function("r", "regeneratorRuntime = r")(runtime);
+}
+
+
+/***/ }),
+
 /***/ "./node_modules/setimmediate/setImmediate.js":
 /*!***************************************************!*\
   !*** ./node_modules/setimmediate/setImmediate.js ***!
@@ -21688,7 +23046,7 @@ var render = function() {
               key: "manage-groups-gps",
               attrs: { href: "#manage-groups-gps", ripple: "" }
             },
-            [_vm._v("\n      Grupos GPS\n    ")]
+            [_vm._v("\n      Clientes\n    ")]
           ),
           _vm._v(" "),
           _c(
@@ -21817,37 +23175,57 @@ var render = function() {
                 "v-container",
                 { attrs: { "grid-list-lg": "" } },
                 [
-                  _c("v-row", { attrs: { dense: "" } }, [
-                    _c("div", { staticClass: "text-h5" }, [
-                      _vm._v("Detalle GPS")
-                    ])
-                  ]),
-                  _vm._v(" "),
                   _c(
                     "v-row",
-                    { attrs: { dense: "" } },
-                    [
-                      _c("v-text-field", {
-                        attrs: { label: "Nombre GPS", rules: _vm.fieldRules },
-                        model: {
-                          value: _vm.name,
-                          callback: function($$v) {
-                            _vm.name = $$v
-                          },
-                          expression: "name"
-                        }
-                      })
-                    ],
-                    1
-                  ),
-                  _vm._v(" "),
-                  _c(
-                    "v-row",
-                    { attrs: { dense: "" } },
                     [
                       _c(
                         "v-col",
+                        { attrs: { cols: "12" } },
+                        [
+                          _c("v-text-field", {
+                            attrs: {
+                              label: "Nombre GPS",
+                              rules: _vm.fieldRules
+                            },
+                            model: {
+                              value: _vm.name,
+                              callback: function($$v) {
+                                _vm.name = $$v
+                              },
+                              expression: "name"
+                            }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-col",
                         { attrs: { cols: "12", md: "6" } },
+                        [
+                          _c("v-autocomplete", {
+                            attrs: {
+                              clearable: "",
+                              label: "Selecciona Cliente GPS",
+                              items: _vm.propOptionGroups,
+                              "item-text": "name",
+                              "item-value": "id"
+                            },
+                            model: {
+                              value: _vm.gps_group_id,
+                              callback: function($$v) {
+                                _vm.gps_group_id = $$v
+                              },
+                              expression: "gps_group_id"
+                            }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-col",
+                        { attrs: { cols: "6", md: "3" } },
                         [
                           _c("v-text-field", {
                             attrs: { label: "SIM", rules: _vm.fieldRules },
@@ -21865,16 +23243,14 @@ var render = function() {
                       _vm._v(" "),
                       _c(
                         "v-col",
-                        { attrs: { cols: "12", md: "6" } },
+                        { attrs: { cols: "6", md: "3" } },
                         [
                           _c("v-text-field", {
-                            attrs: { label: "IMEI", rules: _vm.fieldRules },
-                            model: {
-                              value: _vm.imei,
-                              callback: function($$v) {
-                                _vm.imei = $$v
-                              },
-                              expression: "imei"
+                            attrs: {
+                              label: "Costo Linea",
+                              readonly: "",
+                              prefix: "$",
+                              type: "Number"
                             }
                           })
                         ],
@@ -21886,7 +23262,6 @@ var render = function() {
                   _vm._v(" "),
                   _c(
                     "v-row",
-                    { attrs: { dense: "" } },
                     [
                       _c(
                         "v-col",
@@ -21894,16 +23269,8 @@ var render = function() {
                         [
                           _c("v-text-field", {
                             attrs: {
-                              label: "Costo",
-                              type: "tel",
+                              label: "Folio Factura",
                               rules: _vm.fieldRules
-                            },
-                            model: {
-                              value: _vm.cost,
-                              callback: function($$v) {
-                                _vm.cost = $$v
-                              },
-                              expression: "cost"
                             }
                           })
                         ],
@@ -21916,9 +23283,11 @@ var render = function() {
                         [
                           _c("v-text-field", {
                             attrs: {
-                              label: "Importe",
-                              type: "tel",
-                              rules: _vm.fieldRules
+                              label: "Importe Factura",
+                              type: "Number",
+                              rules: _vm.fieldRules,
+                              prefix: "$",
+                              placeholder: "0.00"
                             },
                             model: {
                               value: _vm.amount,
@@ -21935,7 +23304,21 @@ var render = function() {
                       _c(
                         "v-col",
                         { attrs: { cols: "6", md: "3" } },
-                        [_c("v-text-field", { attrs: { label: "Moneda" } })],
+                        [
+                          _c("v-select", {
+                            attrs: {
+                              items: _vm.options.currency,
+                              label: "Moneda"
+                            },
+                            model: {
+                              value: _vm.currency,
+                              callback: function($$v) {
+                                _vm.currency = $$v
+                              },
+                              expression: "currency"
+                            }
+                          })
+                        ],
                         1
                       ),
                       _vm._v(" "),
@@ -21944,7 +23327,18 @@ var render = function() {
                         { attrs: { cols: "6", md: "3" } },
                         [
                           _c("v-text-field", {
-                            attrs: { label: "Tipo Cambio" }
+                            attrs: {
+                              label: "Tipo Cambio",
+                              type: "Number",
+                              prefix: "$"
+                            },
+                            model: {
+                              value: _vm.exchange_rate,
+                              callback: function($$v) {
+                                _vm.exchange_rate = $$v
+                              },
+                              expression: "exchange_rate"
+                            }
                           })
                         ],
                         1
@@ -21955,15 +23349,14 @@ var render = function() {
                   _vm._v(" "),
                   _c(
                     "v-row",
-                    { attrs: { dense: "" } },
                     [
                       _c(
                         "v-col",
-                        { attrs: { cols: "12", md: "6" } },
+                        { attrs: { cols: "6", md: "6" } },
                         [
                           _c("v-text-field", {
                             attrs: {
-                              label: "Fecha Activacion",
+                              label: "Fecha Instalacion",
                               type: "date",
                               rules: _vm.fieldRules
                             },
@@ -21981,13 +23374,14 @@ var render = function() {
                       _vm._v(" "),
                       _c(
                         "v-col",
-                        { attrs: { cols: "12", md: "6" } },
+                        { attrs: { cols: "6", md: "6" } },
                         [
                           _c("v-text-field", {
                             attrs: {
                               label: "Fecha Vencimiento",
                               type: "date",
-                              rules: _vm.fieldRules
+                              rules: _vm.fieldRules,
+                              readonly: ""
                             },
                             model: {
                               value: _vm.due_date,
@@ -21999,25 +23393,25 @@ var render = function() {
                           })
                         ],
                         1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-col",
+                        { attrs: { cols: "12" } },
+                        [
+                          _c("v-textarea", {
+                            attrs: { label: "Descripcion:", outlined: "" },
+                            model: {
+                              value: _vm.comment,
+                              callback: function($$v) {
+                                _vm.comment = $$v
+                              },
+                              expression: "comment"
+                            }
+                          })
+                        ],
+                        1
                       )
-                    ],
-                    1
-                  ),
-                  _vm._v(" "),
-                  _c(
-                    "v-col",
-                    { attrs: { cols: "12" } },
-                    [
-                      _c("v-textarea", {
-                        attrs: { label: "Comentario:", outlined: "" },
-                        model: {
-                          value: _vm.comment,
-                          callback: function($$v) {
-                            _vm.comment = $$v
-                          },
-                          expression: "comment"
-                        }
-                      })
                     ],
                     1
                   ),
@@ -22064,6 +23458,342 @@ render._withStripped = true
 
 /***/ }),
 
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/gps/components/GpsChipAdd.vue?vue&type=template&id=bac0b11e&":
+/*!***********************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/admin/gps/components/GpsChipAdd.vue?vue&type=template&id=bac0b11e& ***!
+  \***********************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "div",
+    { staticClass: "component-wrap" },
+    [
+      _c(
+        "v-card",
+        [
+          _c(
+            "v-form",
+            {
+              ref: "gpsChipFormAdd",
+              attrs: { "lazy-validation": "" },
+              model: {
+                value: _vm.valid,
+                callback: function($$v) {
+                  _vm.valid = $$v
+                },
+                expression: "valid"
+              }
+            },
+            [
+              _c(
+                "v-container",
+                { attrs: { "grid-list-md": "" } },
+                [
+                  _c(
+                    "v-layout",
+                    { attrs: { row: "", wrap: "" } },
+                    [
+                      _c("v-flex", { attrs: { xs12: "" } }, [
+                        _c("div", { staticClass: "body-2" }, [
+                          _vm._v("CHIP GPS Detalle")
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c(
+                        "v-flex",
+                        { attrs: { xs12: "", md4: "" } },
+                        [
+                          _c("v-text-field", {
+                            attrs: { label: "SIM", rules: _vm.rules },
+                            model: {
+                              value: _vm.sim,
+                              callback: function($$v) {
+                                _vm.sim = $$v
+                              },
+                              expression: "sim"
+                            }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-flex",
+                        { attrs: { xs12: "", md4: "" } },
+                        [
+                          _c("v-text-field", {
+                            attrs: { label: "IMEI", rules: _vm.rules },
+                            model: {
+                              value: _vm.imei,
+                              callback: function($$v) {
+                                _vm.imei = $$v
+                              },
+                              expression: "imei"
+                            }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-flex",
+                        { attrs: { xs12: "", md4: "" } },
+                        [
+                          _c("v-text-field", {
+                            attrs: { label: "Cuenta" },
+                            model: {
+                              value: _vm.cuenta,
+                              callback: function($$v) {
+                                _vm.cuenta = $$v
+                              },
+                              expression: "cuenta"
+                            }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-flex",
+                        { attrs: { xs12: "", md4: "" } },
+                        [
+                          _c("v-text-field", {
+                            attrs: { label: "Costo:", rules: _vm.rules },
+                            model: {
+                              value: _vm.costo,
+                              callback: function($$v) {
+                                _vm.costo = $$v
+                              },
+                              expression: "costo"
+                            }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-flex",
+                        { attrs: { xs12: "" } },
+                        [
+                          _c(
+                            "v-btn",
+                            {
+                              attrs: {
+                                block: "",
+                                disabled: !_vm.valid,
+                                color: "primary"
+                              },
+                              on: {
+                                click: function($event) {
+                                  return _vm.save()
+                                }
+                              }
+                            },
+                            [_vm._v("Guardar Nuevo")]
+                          )
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  )
+                ],
+                1
+              )
+            ],
+            1
+          )
+        ],
+        1
+      )
+    ],
+    1
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/gps/components/GpsChipEdit.vue?vue&type=template&id=5d1bedea&":
+/*!************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/admin/gps/components/GpsChipEdit.vue?vue&type=template&id=5d1bedea& ***!
+  \************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "div",
+    { staticClass: "component-wrap" },
+    [
+      _c(
+        "v-card",
+        [
+          _c(
+            "v-form",
+            {
+              ref: "gpsChipFormEdit",
+              attrs: { "lazy-validation": "" },
+              model: {
+                value: _vm.valid,
+                callback: function($$v) {
+                  _vm.valid = $$v
+                },
+                expression: "valid"
+              }
+            },
+            [
+              _c(
+                "v-container",
+                { attrs: { "grid-list-md": "" } },
+                [
+                  _c(
+                    "v-layout",
+                    { attrs: { row: "", wrap: "" } },
+                    [
+                      _c("v-flex", { attrs: { xs12: "" } }, [
+                        _c("div", { staticClass: "body-2" }, [
+                          _vm._v("CHIP GPS Detalle")
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c(
+                        "v-flex",
+                        { attrs: { xs12: "", md4: "" } },
+                        [
+                          _c("v-text-field", {
+                            attrs: { label: "SIM", rules: _vm.rules },
+                            model: {
+                              value: _vm.sim,
+                              callback: function($$v) {
+                                _vm.sim = $$v
+                              },
+                              expression: "sim"
+                            }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-flex",
+                        { attrs: { xs12: "", md4: "" } },
+                        [
+                          _c("v-text-field", {
+                            attrs: { label: "IMEI", rules: _vm.rules },
+                            model: {
+                              value: _vm.imei,
+                              callback: function($$v) {
+                                _vm.imei = $$v
+                              },
+                              expression: "imei"
+                            }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-flex",
+                        { attrs: { xs12: "", md4: "" } },
+                        [
+                          _c("v-text-field", {
+                            attrs: { label: "Cuenta" },
+                            model: {
+                              value: _vm.cuenta,
+                              callback: function($$v) {
+                                _vm.cuenta = $$v
+                              },
+                              expression: "cuenta"
+                            }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-flex",
+                        { attrs: { xs12: "", md4: "" } },
+                        [
+                          _c("v-text-field", {
+                            attrs: { label: "Costo:", rules: _vm.rules },
+                            model: {
+                              value: _vm.costo,
+                              callback: function($$v) {
+                                _vm.costo = $$v
+                              },
+                              expression: "costo"
+                            }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-flex",
+                        { attrs: { xs12: "" } },
+                        [
+                          _c(
+                            "v-btn",
+                            {
+                              attrs: {
+                                block: "",
+                                disabled: !_vm.valid,
+                                color: "primary"
+                              },
+                              on: {
+                                click: function($event) {
+                                  return _vm.save()
+                                }
+                              }
+                            },
+                            [_vm._v("\n              Modificar\n            ")]
+                          )
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  )
+                ],
+                1
+              )
+            ],
+            1
+          )
+        ],
+        1
+      )
+    ],
+    1
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
 /***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/gps/components/GpsChipsLists.vue?vue&type=template&id=723a6ebc&":
 /*!**************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/admin/gps/components/GpsChipsLists.vue?vue&type=template&id=723a6ebc& ***!
@@ -22083,162 +23813,153 @@ var render = function() {
     "div",
     { staticClass: "component-wrap" },
     [
-      _c("v-card", { attrs: { flat: "" } }, [
-        _c("div", { staticClass: "d-flex flex-row align-center px-4" }, [
-          _c(
-            "div",
-            { staticClass: "flex-grow-1" },
-            [
-              _c("v-text-field", {
-                attrs: {
-                  "prepend-icon": "mdi-magnify",
-                  label: "Filtar por Nombre",
-                  clearable: ""
-                },
-                model: {
-                  value: _vm.filters.name,
-                  callback: function($$v) {
-                    _vm.$set(_vm.filters, "name", $$v)
-                  },
-                  expression: "filters.name"
-                }
-              })
-            ],
-            1
-          ),
-          _vm._v(" "),
-          _c(
-            "div",
-            { staticClass: "flex-grow-1 text-right" },
-            [
-              _c(
-                "v-dialog",
-                {
-                  attrs: {
-                    fullscreen: "",
-                    transition: "dialog-bottom-transition",
-                    overlay: false
-                  },
-                  scopedSlots: _vm._u([
-                    {
-                      key: "activator",
-                      fn: function(ref) {
-                        var on = ref.on
-                        var attrs = ref.attrs
-                        return [
-                          _c(
-                            "v-btn",
-                            _vm._g(
-                              _vm._b(
-                                {
-                                  staticClass: "mb-2",
-                                  attrs: { color: "primary" }
-                                },
-                                "v-btn",
-                                attrs,
-                                false
-                              ),
-                              on
-                            ),
-                            [
-                              _vm._v(
-                                "\n              Nuevo Grupo GPS\n              "
-                              ),
-                              _c("v-icon", { attrs: { right: "" } }, [
-                                _vm._v("mdi-plus")
-                              ])
-                            ],
-                            1
-                          )
-                        ]
+      _c(
+        "v-card",
+        { attrs: { flat: "" } },
+        [
+          _c("v-form", { ref: "filterForm" }, [
+            _c(
+              "div",
+              {
+                staticClass:
+                  "d-flex flex-lg-row flex-xs-column flex-wrap align-center"
+              },
+              [
+                _c(
+                  "div",
+                  { staticClass: "flex-grow-1 px-2" },
+                  [
+                    _c("v-text-field", {
+                      attrs: {
+                        "prepend-icon": "mdi-magnify",
+                        label: "Buscar por SIM",
+                        clearable: ""
+                      },
+                      model: {
+                        value: _vm.filters.sim,
+                        callback: function($$v) {
+                          _vm.$set(_vm.filters, "sim", $$v)
+                        },
+                        expression: "filters.sim"
                       }
-                    }
-                  ]),
-                  model: {
-                    value: _vm.dialogs.show,
-                    callback: function($$v) {
-                      _vm.$set(_vm.dialogs, "show", $$v)
-                    },
-                    expression: "dialogs.show"
-                  }
-                },
-                [
-                  _vm._v(" "),
-                  _c(
-                    "v-card",
-                    [
-                      _c(
-                        "v-toolbar",
-                        { staticClass: "primary" },
-                        [
-                          _c(
-                            "v-btn",
-                            {
-                              attrs: { icon: "" },
-                              nativeOn: {
-                                click: function($event) {
-                                  ;(_vm.dialogs.show = false),
-                                    (_vm.editedIndex = -1)
-                                }
-                              }
-                            },
-                            [_c("v-icon", [_vm._v("mdi-close")])],
-                            1
-                          ),
-                          _vm._v(" "),
-                          _c("v-toolbar-title", [
-                            _vm._v(_vm._s(_vm.formTitle))
-                          ]),
-                          _vm._v(" "),
-                          _c("v-spacer"),
-                          _vm._v(" "),
-                          _c(
-                            "v-toolbar-items",
-                            [
-                              _c(
-                                "v-btn",
-                                {
-                                  attrs: { text: "" },
-                                  nativeOn: {
-                                    click: function($event) {
-                                      ;(_vm.dialogs.show = false),
-                                        (_vm.editedIndex = -1)
-                                    }
-                                  }
-                                },
-                                [_vm._v("Done")]
-                              )
-                            ],
-                            1
-                          )
-                        ],
-                        1
-                      ),
-                      _vm._v(" "),
-                      _c(
-                        "v-card-text",
-                        [
-                          _vm.formAdd
-                            ? _c("gps-group-add")
-                            : _c("gps-group-edit", {
-                                attrs: {
-                                  propGpsGroupId: _vm.dialogs.gpsGroup.id
-                                }
-                              })
-                        ],
-                        1
-                      )
-                    ],
-                    1
-                  )
-                ],
-                1
-              )
-            ],
-            1
-          )
-        ])
-      ]),
+                    })
+                  ],
+                  1
+                ),
+                _vm._v(" "),
+                _c(
+                  "div",
+                  { staticClass: "flex-grow-0 px-2" },
+                  [
+                    _c("v-select", {
+                      attrs: {
+                        "prepend-icon": "mdi-calendar-month-outline",
+                        items: _vm.options.months,
+                        label: "Mes Renovacion",
+                        "menu-props": { offsetY: true },
+                        "item-text": "name",
+                        "item-value": "value",
+                        clearable: ""
+                      },
+                      model: {
+                        value: _vm.filters.month,
+                        callback: function($$v) {
+                          _vm.$set(_vm.filters, "month", $$v)
+                        },
+                        expression: "filters.month"
+                      }
+                    })
+                  ],
+                  1
+                ),
+                _vm._v(" "),
+                _c(
+                  "div",
+                  { staticClass: "flex-grow-0 px-2" },
+                  [
+                    _c("v-select", {
+                      attrs: {
+                        "prepend-icon": "mdi-calendar-month-outline",
+                        items: _vm.options.years,
+                        "item-text": "name",
+                        "item-value": "name",
+                        label: "Año Renovacion",
+                        clearable: ""
+                      },
+                      model: {
+                        value: _vm.filters.year,
+                        callback: function($$v) {
+                          _vm.$set(_vm.filters, "year", $$v)
+                        },
+                        expression: "filters.year"
+                      }
+                    })
+                  ],
+                  1
+                ),
+                _vm._v(" "),
+                _c(
+                  "div",
+                  { staticClass: "flex-grow-0 px-2" },
+                  [
+                    _c("v-text-field", {
+                      attrs: {
+                        "prepend-icon": "mdi-magnify",
+                        label: "Buscar por IMEI",
+                        clearable: ""
+                      },
+                      model: {
+                        value: _vm.filters.imei,
+                        callback: function($$v) {
+                          _vm.$set(_vm.filters, "imei", $$v)
+                        },
+                        expression: "filters.imei"
+                      }
+                    })
+                  ],
+                  1
+                ),
+                _vm._v(" "),
+                _c(
+                  "v-row",
+                  {
+                    staticClass: "flex-grow-0 px-2",
+                    attrs: { justify: "space-around" }
+                  },
+                  [
+                    _c("v-checkbox", {
+                      staticClass: "mx-2",
+                      attrs: { label: "Asignados" },
+                      model: {
+                        value: _vm.filters.assigned,
+                        callback: function($$v) {
+                          _vm.$set(_vm.filters, "assigned", $$v)
+                        },
+                        expression: "filters.assigned"
+                      }
+                    }),
+                    _vm._v(" "),
+                    _c("v-checkbox", {
+                      staticClass: "mx-2",
+                      attrs: { label: "Desasignados" },
+                      model: {
+                        value: _vm.filters.deallocated,
+                        callback: function($$v) {
+                          _vm.$set(_vm.filters, "deallocated", $$v)
+                        },
+                        expression: "filters.deallocated"
+                      }
+                    })
+                  ],
+                  1
+                )
+              ],
+              1
+            )
+          ])
+        ],
+        1
+      ),
       _vm._v(" "),
       _c("v-data-table", {
         staticClass: "elevation-1 text-uppercase",
@@ -22256,6 +23977,100 @@ var render = function() {
           }
         },
         scopedSlots: _vm._u([
+          {
+            key: "top",
+            fn: function() {
+              return [
+                _c(
+                  "v-toolbar",
+                  { attrs: { dense: "", elevation: "0" } },
+                  [
+                    _c(
+                      "div",
+                      { staticClass: "flex-grow-1 overline text-uppercase" },
+                      [
+                        _vm._v(
+                          "\n          Ultima Actualizacion de Datos: YYYY/MM/DD\n        "
+                        )
+                      ]
+                    ),
+                    _vm._v(" "),
+                    _c("v-spacer"),
+                    _vm._v(" "),
+                    _c(
+                      "v-btn",
+                      {
+                        attrs: { icon: "", color: "secondary" },
+                        on: {
+                          click: function($event) {
+                            return _vm.$refs.filterForm.reset()
+                          }
+                        }
+                      },
+                      [_c("v-icon", [_vm._v("mdi-filter-remove-outline")])],
+                      1
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "v-btn",
+                      { attrs: { icon: "", color: "green" } },
+                      [_c("v-icon", [_vm._v("mdi-file-excel")])],
+                      1
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "v-tooltip",
+                      {
+                        attrs: { top: "" },
+                        scopedSlots: _vm._u([
+                          {
+                            key: "activator",
+                            fn: function(ref) {
+                              var on = ref.on
+                              var attrs = ref.attrs
+                              return [
+                                _c(
+                                  "v-btn",
+                                  _vm._g(
+                                    _vm._b(
+                                      {
+                                        attrs: { icon: "", color: "blue" },
+                                        on: {
+                                          click: function($event) {
+                                            _vm.dialogs.show = true
+                                          }
+                                        }
+                                      },
+                                      "v-btn",
+                                      attrs,
+                                      false
+                                    ),
+                                    on
+                                  ),
+                                  [_c("v-icon", [_vm._v("mdi-plus-thick")])],
+                                  1
+                                )
+                              ]
+                            }
+                          }
+                        ])
+                      },
+                      [_vm._v(" "), _c("span", [_vm._v("Agregar Nuevo")])]
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "v-btn",
+                      { attrs: { icon: "" } },
+                      [_c("v-icon", [_vm._v("mdi-refresh")])],
+                      1
+                    )
+                  ],
+                  1
+                )
+              ]
+            },
+            proxy: true
+          },
           {
             key: "item.action",
             fn: function(ref) {
@@ -22302,7 +24117,7 @@ var render = function() {
                       { attrs: { shaped: "" } },
                       [
                         _c(
-                          "v-list-item-group",
+                          "v-list-item-chip",
                           [
                             _c(
                               "v-list-item",
@@ -22404,9 +24219,183 @@ var render = function() {
                 )
               ]
             }
+          },
+          {
+            key: "item.costo",
+            fn: function(ref) {
+              var item = ref.item
+              return [
+                _vm._v(
+                  "\n      " + _vm._s(_vm._f("money")(item.costo)) + "\n    "
+                )
+              ]
+            }
+          },
+          {
+            key: "item.fecha_activacion",
+            fn: function(ref) {
+              var item = ref.item
+              return [
+                _c("span", { staticClass: "overline text-capitalize" }, [
+                  _vm._v(
+                    "\n        " +
+                      _vm._s(
+                        _vm.$appFormatters.formatDate(item.fecha_activacion)
+                      ) +
+                      "\n      "
+                  )
+                ])
+              ]
+            }
+          },
+          {
+            key: "item.fecha_renovacion",
+            fn: function(ref) {
+              var item = ref.item
+              return [
+                _c(
+                  "span",
+                  { staticClass: "overline text-capitalize" },
+                  [
+                    _c(
+                      "v-chip",
+                      {
+                        attrs: {
+                          color: _vm.getColor(
+                            _vm.$appFormatters.formatTimeDiffNow(
+                              item.fecha_renovacion
+                            )
+                          ),
+                          dark: "",
+                          small: ""
+                        }
+                      },
+                      [
+                        _vm._v(
+                          "\n          " +
+                            _vm._s(
+                              _vm.$appFormatters.formatTimeDiffNow(
+                                item.fecha_renovacion,
+                                "days"
+                              )
+                            ) +
+                            "\n          Dias\n        "
+                        )
+                      ]
+                    )
+                  ],
+                  1
+                )
+              ]
+            }
+          },
+          {
+            key: "item.gps",
+            fn: function(ref) {
+              var item = ref.item
+              return [
+                _c(
+                  "v-avatar",
+                  { attrs: { outlined: "" } },
+                  [
+                    item.gps != null
+                      ? _c("v-icon", { staticClass: "green--text" }, [
+                          _vm._v("mdi-check-circle-outline")
+                        ])
+                      : _c("v-icon", { staticClass: "grey--text" }, [
+                          _vm._v("mdi-alert-rhombus-outline")
+                        ])
+                  ],
+                  1
+                )
+              ]
+            }
           }
         ])
-      })
+      }),
+      _vm._v(" "),
+      _c(
+        "v-dialog",
+        {
+          attrs: {
+            fullscreen: "",
+            transition: "dialog-bottom-transition",
+            overlay: false
+          },
+          model: {
+            value: _vm.dialogs.show,
+            callback: function($$v) {
+              _vm.$set(_vm.dialogs, "show", $$v)
+            },
+            expression: "dialogs.show"
+          }
+        },
+        [
+          _c(
+            "v-card",
+            [
+              _c(
+                "v-toolbar",
+                { staticClass: "primary" },
+                [
+                  _c(
+                    "v-btn",
+                    {
+                      attrs: { icon: "" },
+                      nativeOn: {
+                        click: function($event) {
+                          ;(_vm.dialogs.show = false), (_vm.editedIndex = -1)
+                        }
+                      }
+                    },
+                    [_c("v-icon", [_vm._v("mdi-close")])],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c("v-toolbar-title", [_vm._v(_vm._s(_vm.formTitle))]),
+                  _vm._v(" "),
+                  _c("v-spacer"),
+                  _vm._v(" "),
+                  _c(
+                    "v-toolbar-items",
+                    [
+                      _c(
+                        "v-btn",
+                        {
+                          attrs: { text: "" },
+                          nativeOn: {
+                            click: function($event) {
+                              ;(_vm.dialogs.show = false),
+                                (_vm.editedIndex = -1)
+                            }
+                          }
+                        },
+                        [_vm._v("Done")]
+                      )
+                    ],
+                    1
+                  )
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "v-card-text",
+                [
+                  _vm.formAdd
+                    ? _c("gps-chip-add")
+                    : _c("gps-chip-edit", {
+                        attrs: { propGpsChipId: _vm.dialogs.gpsChip.id }
+                      })
+                ],
+                1
+              )
+            ],
+            1
+          )
+        ],
+        1
+      )
     ],
     1
   )
@@ -23088,162 +25077,40 @@ var render = function() {
     "div",
     { staticClass: "component-wrap" },
     [
-      _c("v-card", { attrs: { flat: "" } }, [
-        _c("div", { staticClass: "d-flex flex-row align-center px-4" }, [
-          _c(
-            "div",
-            { staticClass: "flex-grow-1" },
-            [
-              _c("v-text-field", {
-                attrs: {
-                  "prepend-icon": "mdi-magnify",
-                  label: "Filtar por Nombre",
-                  clearable: ""
-                },
-                model: {
-                  value: _vm.filters.name,
-                  callback: function($$v) {
-                    _vm.$set(_vm.filters, "name", $$v)
-                  },
-                  expression: "filters.name"
-                }
-              })
-            ],
-            1
-          ),
-          _vm._v(" "),
-          _c(
-            "div",
-            { staticClass: "flex-grow-1 text-right" },
-            [
+      _c(
+        "v-card",
+        { attrs: { flat: "" } },
+        [
+          _c("v-form", { ref: "filterForm" }, [
+            _c("div", { staticClass: "d-flex flex-row align-center px-4" }, [
               _c(
-                "v-dialog",
-                {
-                  attrs: {
-                    fullscreen: "",
-                    transition: "dialog-bottom-transition",
-                    overlay: false
-                  },
-                  scopedSlots: _vm._u([
-                    {
-                      key: "activator",
-                      fn: function(ref) {
-                        var on = ref.on
-                        var attrs = ref.attrs
-                        return [
-                          _c(
-                            "v-btn",
-                            _vm._g(
-                              _vm._b(
-                                {
-                                  staticClass: "mb-2",
-                                  attrs: { color: "primary" }
-                                },
-                                "v-btn",
-                                attrs,
-                                false
-                              ),
-                              on
-                            ),
-                            [
-                              _vm._v(
-                                "\n              Nuevo Grupo GPS\n              "
-                              ),
-                              _c("v-icon", { attrs: { right: "" } }, [
-                                _vm._v("mdi-plus")
-                              ])
-                            ],
-                            1
-                          )
-                        ]
-                      }
-                    }
-                  ]),
-                  model: {
-                    value: _vm.dialogs.show,
-                    callback: function($$v) {
-                      _vm.$set(_vm.dialogs, "show", $$v)
-                    },
-                    expression: "dialogs.show"
-                  }
-                },
+                "div",
+                { staticClass: "flex-grow-1" },
                 [
-                  _vm._v(" "),
-                  _c(
-                    "v-card",
-                    [
-                      _c(
-                        "v-toolbar",
-                        { staticClass: "primary" },
-                        [
-                          _c(
-                            "v-btn",
-                            {
-                              attrs: { icon: "" },
-                              nativeOn: {
-                                click: function($event) {
-                                  ;(_vm.dialogs.show = false),
-                                    (_vm.editedIndex = -1)
-                                }
-                              }
-                            },
-                            [_c("v-icon", [_vm._v("mdi-close")])],
-                            1
-                          ),
-                          _vm._v(" "),
-                          _c("v-toolbar-title", [
-                            _vm._v(_vm._s(_vm.formTitle))
-                          ]),
-                          _vm._v(" "),
-                          _c("v-spacer"),
-                          _vm._v(" "),
-                          _c(
-                            "v-toolbar-items",
-                            [
-                              _c(
-                                "v-btn",
-                                {
-                                  attrs: { text: "" },
-                                  nativeOn: {
-                                    click: function($event) {
-                                      ;(_vm.dialogs.show = false),
-                                        (_vm.editedIndex = -1)
-                                    }
-                                  }
-                                },
-                                [_vm._v("Done")]
-                              )
-                            ],
-                            1
-                          )
-                        ],
-                        1
-                      ),
-                      _vm._v(" "),
-                      _c(
-                        "v-card-text",
-                        [
-                          _vm.formAdd
-                            ? _c("gps-group-add")
-                            : _c("gps-group-edit", {
-                                attrs: {
-                                  propGpsGroupId: _vm.dialogs.gpsGroup.id
-                                }
-                              })
-                        ],
-                        1
-                      )
-                    ],
-                    1
-                  )
+                  _c("v-text-field", {
+                    attrs: {
+                      "prepend-icon": "mdi-magnify",
+                      label: "Filtar por Nombre",
+                      clearable: ""
+                    },
+                    model: {
+                      value: _vm.filters.name,
+                      callback: function($$v) {
+                        _vm.$set(_vm.filters, "name", $$v)
+                      },
+                      expression: "filters.name"
+                    }
+                  })
                 ],
                 1
-              )
-            ],
-            1
-          )
-        ])
-      ]),
+              ),
+              _vm._v(" "),
+              _c("div", { staticClass: "flex-grow-1 text-right" })
+            ])
+          ])
+        ],
+        1
+      ),
       _vm._v(" "),
       _c("v-data-table", {
         staticClass: "elevation-1 text-uppercase",
@@ -23261,6 +25128,100 @@ var render = function() {
           }
         },
         scopedSlots: _vm._u([
+          {
+            key: "top",
+            fn: function() {
+              return [
+                _c(
+                  "v-toolbar",
+                  { attrs: { dense: "", elevation: "0" } },
+                  [
+                    _c(
+                      "div",
+                      { staticClass: "flex-grow-1 overline text-uppercase" },
+                      [
+                        _vm._v(
+                          "\n          Ultima Actualizacion de Datos: YYYY/MM/DD\n        "
+                        )
+                      ]
+                    ),
+                    _vm._v(" "),
+                    _c("v-spacer"),
+                    _vm._v(" "),
+                    _c(
+                      "v-btn",
+                      {
+                        attrs: { icon: "", color: "secondary" },
+                        on: {
+                          click: function($event) {
+                            return _vm.$refs.filterForm.reset()
+                          }
+                        }
+                      },
+                      [_c("v-icon", [_vm._v("mdi-filter-remove-outline")])],
+                      1
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "v-btn",
+                      { attrs: { icon: "", color: "green" } },
+                      [_c("v-icon", [_vm._v("mdi-file-excel")])],
+                      1
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "v-tooltip",
+                      {
+                        attrs: { top: "" },
+                        scopedSlots: _vm._u([
+                          {
+                            key: "activator",
+                            fn: function(ref) {
+                              var on = ref.on
+                              var attrs = ref.attrs
+                              return [
+                                _c(
+                                  "v-btn",
+                                  _vm._g(
+                                    _vm._b(
+                                      {
+                                        attrs: { icon: "", color: "blue" },
+                                        on: {
+                                          click: function($event) {
+                                            _vm.dialogs.show = true
+                                          }
+                                        }
+                                      },
+                                      "v-btn",
+                                      attrs,
+                                      false
+                                    ),
+                                    on
+                                  ),
+                                  [_c("v-icon", [_vm._v("mdi-plus-thick")])],
+                                  1
+                                )
+                              ]
+                            }
+                          }
+                        ])
+                      },
+                      [_vm._v(" "), _c("span", [_vm._v("Agregar Nuevo")])]
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "v-btn",
+                      { attrs: { icon: "" } },
+                      [_c("v-icon", [_vm._v("mdi-refresh")])],
+                      1
+                    )
+                  ],
+                  1
+                )
+              ]
+            },
+            proxy: true
+          },
           {
             key: "item.action",
             fn: function(ref) {
@@ -23411,7 +25372,90 @@ var render = function() {
             }
           }
         ])
-      })
+      }),
+      _vm._v(" "),
+      _c(
+        "v-dialog",
+        {
+          attrs: {
+            fullscreen: "",
+            transition: "dialog-bottom-transition",
+            overlay: false
+          },
+          model: {
+            value: _vm.dialogs.show,
+            callback: function($$v) {
+              _vm.$set(_vm.dialogs, "show", $$v)
+            },
+            expression: "dialogs.show"
+          }
+        },
+        [
+          _c(
+            "v-card",
+            [
+              _c(
+                "v-toolbar",
+                { staticClass: "primary" },
+                [
+                  _c(
+                    "v-btn",
+                    {
+                      attrs: { icon: "" },
+                      nativeOn: {
+                        click: function($event) {
+                          ;(_vm.dialogs.show = false), (_vm.editedIndex = -1)
+                        }
+                      }
+                    },
+                    [_c("v-icon", [_vm._v("mdi-close")])],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c("v-toolbar-title", [_vm._v(_vm._s(_vm.formTitle))]),
+                  _vm._v(" "),
+                  _c("v-spacer"),
+                  _vm._v(" "),
+                  _c(
+                    "v-toolbar-items",
+                    [
+                      _c(
+                        "v-btn",
+                        {
+                          attrs: { text: "" },
+                          nativeOn: {
+                            click: function($event) {
+                              ;(_vm.dialogs.show = false),
+                                (_vm.editedIndex = -1)
+                            }
+                          }
+                        },
+                        [_vm._v("Done")]
+                      )
+                    ],
+                    1
+                  )
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "v-card-text",
+                [
+                  _vm.formAdd
+                    ? _c("gps-group-add")
+                    : _c("gps-group-edit", {
+                        attrs: { propGpsGroupId: _vm.dialogs.gpsGroup.id }
+                      })
+                ],
+                1
+              )
+            ],
+            1
+          )
+        ],
+        1
+      )
     ],
     1
   )
@@ -23451,7 +25495,7 @@ var render = function() {
               "div",
               {
                 staticClass:
-                  "d-flex flex-lg-row flex-sm-column flex-wrap align-center"
+                  "d-flex flex-md-row flex-xs-column flex-wrap align-center"
               },
               [
                 _c(
@@ -23482,6 +25526,7 @@ var render = function() {
                   [
                     _c("v-select", {
                       attrs: {
+                        "prepend-icon": "mdi-calendar-month-outline",
                         items: _vm.options.months,
                         label: "Mes Vencimiento",
                         "menu-props": { offsetY: true },
@@ -23507,6 +25552,7 @@ var render = function() {
                   [
                     _c("v-select", {
                       attrs: {
+                        "prepend-icon": "mdi-calendar-month-outline",
                         items: _vm.options.years,
                         "item-text": "name",
                         "item-value": "name",
@@ -23527,6 +25573,58 @@ var render = function() {
                 _vm._v(" "),
                 _c(
                   "div",
+                  { staticClass: "flex-grow-0 px-2" },
+                  [
+                    _c("v-select", {
+                      attrs: {
+                        items: _vm.options.agencies,
+                        label: "Sucursal",
+                        "menu-props": { offsetY: true },
+                        "item-text": "name",
+                        "item-value": "name",
+                        clearable: "",
+                        filled: ""
+                      },
+                      model: {
+                        value: _vm.agency,
+                        callback: function($$v) {
+                          _vm.agency = $$v
+                        },
+                        expression: "agency"
+                      }
+                    })
+                  ],
+                  1
+                ),
+                _vm._v(" "),
+                _c(
+                  "div",
+                  { staticClass: "flex-grow-0 px-2" },
+                  [
+                    _c("v-select", {
+                      attrs: {
+                        items: _vm.options.departments,
+                        label: "Departamento",
+                        "menu-props": { offsetY: true },
+                        "item-text": "name",
+                        "item-value": "name",
+                        clearable: "",
+                        filled: ""
+                      },
+                      model: {
+                        value: _vm.department,
+                        callback: function($$v) {
+                          _vm.department = $$v
+                        },
+                        expression: "department"
+                      }
+                    })
+                  ],
+                  1
+                ),
+                _vm._v(" "),
+                _c(
+                  "div",
                   { staticClass: "flex-grow-1 px-2" },
                   [
                     _c("v-autocomplete", {
@@ -23538,7 +25636,7 @@ var render = function() {
                         clearable: "",
                         "prepend-icon": "mdi-filter-variant",
                         label: "Filtrar por Grupos",
-                        items: _vm.filters.groupOptions,
+                        items: _vm.options.gpsGroup,
                         "item-text": "name",
                         "item-value": "id"
                       },
@@ -23555,185 +25653,7 @@ var render = function() {
                 )
               ]
             )
-          ]),
-          _vm._v(" "),
-          _c(
-            "div",
-            {
-              staticClass:
-                "d-flex flex-md-row flex-sm-column flex-wrap align-center"
-            },
-            [
-              _c(
-                "div",
-                { staticClass: "d-flex flex-grow-1 overline text-uppercase" },
-                [
-                  _vm._v(
-                    "\n        Ultima Actualizacion de Datos: YYYY/MM/DD\n      "
-                  )
-                ]
-              ),
-              _vm._v(" "),
-              _c("v-spacer"),
-              _vm._v(" "),
-              _c(
-                "v-btn",
-                {
-                  staticClass: "ma-1",
-                  attrs: { small: "", color: "secondary" },
-                  on: {
-                    click: function($event) {
-                      return _vm.$refs.filterForm.reset()
-                    }
-                  }
-                },
-                [
-                  _vm._v("\n        Limpiar Filtro\n        "),
-                  _c("v-icon", { attrs: { right: "" } }, [
-                    _vm._v("mdi-filter-remove")
-                  ])
-                ],
-                1
-              ),
-              _vm._v(" "),
-              _c(
-                "v-btn",
-                { staticClass: "ma-1", attrs: { small: "", color: "accent" } },
-                [
-                  _vm._v("\n        EXCEL\n        "),
-                  _c("v-icon", { attrs: { right: "" } }, [
-                    _vm._v("mdi-file-excel-outline")
-                  ])
-                ],
-                1
-              ),
-              _vm._v(" "),
-              _c(
-                "v-dialog",
-                {
-                  attrs: {
-                    fullscreen: "",
-                    transition: "dialog-bottom-transition",
-                    overlay: false
-                  },
-                  scopedSlots: _vm._u([
-                    {
-                      key: "activator",
-                      fn: function(ref) {
-                        var on = ref.on
-                        var attrs = ref.attrs
-                        return [
-                          _c(
-                            "v-btn",
-                            _vm._g(
-                              _vm._b(
-                                {
-                                  staticClass: "ma-1",
-                                  attrs: { small: "", color: "primary" }
-                                },
-                                "v-btn",
-                                attrs,
-                                false
-                              ),
-                              on
-                            ),
-                            [
-                              _vm._v("\n            Nuevo GPS\n            "),
-                              _c("v-icon", { attrs: { right: "" } }, [
-                                _vm._v("mdi-plus")
-                              ])
-                            ],
-                            1
-                          )
-                        ]
-                      }
-                    }
-                  ]),
-                  model: {
-                    value: _vm.dialogs.show,
-                    callback: function($$v) {
-                      _vm.$set(_vm.dialogs, "show", $$v)
-                    },
-                    expression: "dialogs.show"
-                  }
-                },
-                [
-                  _vm._v(" "),
-                  _c(
-                    "v-card",
-                    [
-                      _c(
-                        "v-toolbar",
-                        { staticClass: "primary" },
-                        [
-                          _c(
-                            "v-btn",
-                            {
-                              attrs: { icon: "" },
-                              nativeOn: {
-                                click: function($event) {
-                                  ;(_vm.dialogs.show = false),
-                                    (_vm.editedIndex = -1)
-                                }
-                              }
-                            },
-                            [_c("v-icon", [_vm._v("mdi-close")])],
-                            1
-                          ),
-                          _vm._v(" "),
-                          _c(
-                            "v-toolbar-title",
-                            { staticClass: "white--text" },
-                            [_vm._v(_vm._s(_vm.formTitle))]
-                          ),
-                          _vm._v(" "),
-                          _c("v-spacer"),
-                          _vm._v(" "),
-                          _c(
-                            "v-toolbar-items",
-                            [
-                              _c(
-                                "v-btn",
-                                {
-                                  attrs: { text: "" },
-                                  nativeOn: {
-                                    click: function($event) {
-                                      ;(_vm.dialogs.show = false),
-                                        (_vm.editedIndex = -1)
-                                    }
-                                  }
-                                },
-                                [_vm._v("Done")]
-                              )
-                            ],
-                            1
-                          )
-                        ],
-                        1
-                      ),
-                      _vm._v(" "),
-                      _c(
-                        "v-card-text",
-                        [
-                          _vm.formEdit
-                            ? _c("gps-edit", {
-                                attrs: { propGpsId: _vm.dialogs.gps.id }
-                              })
-                            : _vm.dialogs.show
-                            ? _c("gps-add")
-                            : _vm._e()
-                        ],
-                        1
-                      )
-                    ],
-                    1
-                  )
-                ],
-                1
-              )
-            ],
-            1
-          )
+          ])
         ],
         1
       ),
@@ -23755,93 +25675,105 @@ var render = function() {
         },
         scopedSlots: _vm._u([
           {
-            key: "item.gps_group",
-            fn: function(ref) {
-              var item = ref.item
+            key: "top",
+            fn: function() {
               return [
-                item.gps_group
-                  ? [
-                      _vm._v(
-                        "\n        " + _vm._s(item.gps_group.name) + "\n      "
-                      )
-                    ]
-                  : [
-                      _c(
-                        "v-edit-dialog",
-                        {
-                          attrs: {
-                            "return-value": item.gps_group_id,
-                            large: "",
-                            persistent: ""
-                          },
-                          on: {
-                            "update:returnValue": function($event) {
-                              return _vm.$set(item, "gps_group_id", $event)
-                            },
-                            "update:return-value": function($event) {
-                              return _vm.$set(item, "gps_group_id", $event)
-                            },
-                            save: function($event) {
-                              return _vm.saveInLine(item)
-                            },
-                            cancel: _vm.cancel
-                          },
-                          scopedSlots: _vm._u(
-                            [
-                              {
-                                key: "input",
-                                fn: function() {
-                                  return [
-                                    _c("div", { staticClass: "mt-4 title" }, [
-                                      _vm._v("Asignar a Grupo")
-                                    ]),
-                                    _vm._v(" "),
-                                    _c("v-autocomplete", {
-                                      attrs: {
-                                        filled: "",
-                                        clearable: "",
-                                        "prepend-icon": "mdi-filter-variant",
-                                        label: "Buscar Grupo",
-                                        items: _vm.filters.groupOptions,
-                                        "item-text": "name",
-                                        "item-value": "id"
+                _c(
+                  "v-toolbar",
+                  { attrs: { dense: "", elevation: "0" } },
+                  [
+                    _c(
+                      "div",
+                      { staticClass: "flex-grow-1 overline text-uppercase" },
+                      [
+                        _vm._v(
+                          "\n          Ultima Actualizacion de Datos: YYYY/MM/DD\n        "
+                        )
+                      ]
+                    ),
+                    _vm._v(" "),
+                    _c("v-spacer"),
+                    _vm._v(" "),
+                    _c(
+                      "v-btn",
+                      {
+                        attrs: { icon: "", color: "secondary" },
+                        on: {
+                          click: function($event) {
+                            return _vm.$refs.filterForm.reset()
+                          }
+                        }
+                      },
+                      [_c("v-icon", [_vm._v("mdi-filter-remove-outline")])],
+                      1
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "v-btn",
+                      { attrs: { icon: "", color: "green" } },
+                      [_c("v-icon", [_vm._v("mdi-file-excel")])],
+                      1
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "v-tooltip",
+                      {
+                        attrs: { top: "" },
+                        scopedSlots: _vm._u([
+                          {
+                            key: "activator",
+                            fn: function(ref) {
+                              var on = ref.on
+                              var attrs = ref.attrs
+                              return [
+                                _c(
+                                  "v-btn",
+                                  _vm._g(
+                                    _vm._b(
+                                      {
+                                        attrs: { icon: "", color: "blue" },
+                                        on: {
+                                          click: function($event) {
+                                            _vm.dialogs.show = true
+                                          }
+                                        }
                                       },
-                                      model: {
-                                        value: item.gps_group_id,
-                                        callback: function($$v) {
-                                          _vm.$set(item, "gps_group_id", $$v)
-                                        },
-                                        expression: "item.gps_group_id"
-                                      }
-                                    })
-                                  ]
-                                },
-                                proxy: true
-                              }
-                            ],
-                            null,
-                            true
-                          )
-                        },
-                        [
-                          _c(
-                            "v-btn",
-                            {
-                              attrs: {
-                                outlined: "",
-                                small: "",
-                                color: "primary",
-                                "pa-0": ""
-                              }
-                            },
-                            [_vm._v("Asignar a Grupo")]
-                          )
-                        ],
-                        1
-                      )
-                    ]
+                                      "v-btn",
+                                      attrs,
+                                      false
+                                    ),
+                                    on
+                                  ),
+                                  [_c("v-icon", [_vm._v("mdi-plus-thick")])],
+                                  1
+                                )
+                              ]
+                            }
+                          }
+                        ])
+                      },
+                      [_vm._v(" "), _c("span", [_vm._v("Agregar Nuevo")])]
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "v-btn",
+                      {
+                        attrs: { icon: "" },
+                        on: {
+                          click: function($event) {
+                            return _vm.refresh()
+                          }
+                        }
+                      },
+                      [_c("v-icon", [_vm._v("mdi-refresh")])],
+                      1
+                    )
+                  ],
+                  1
+                )
               ]
-            }
+            },
+            proxy: true
           },
           {
             key: "item.action",
@@ -23997,75 +25929,119 @@ var render = function() {
             }
           },
           {
+            key: "item.sim",
+            fn: function(ref) {
+              var item = ref.item
+              return [
+                item.chip
+                  ? [_vm._v("\n        " + _vm._s(item.chip.sim) + "\n      ")]
+                  : [_vm._v("\n        N/A\n      ")]
+              ]
+            }
+          },
+          {
+            key: "item.gps_group",
+            fn: function(ref) {
+              var item = ref.item
+              return [
+                item.gps_group
+                  ? [
+                      _vm._v(
+                        "\n        " + _vm._s(item.gps_group.name) + "\n      "
+                      )
+                    ]
+                  : [
+                      _c(
+                        "v-edit-dialog",
+                        {
+                          attrs: {
+                            "return-value": item.gps_group_id,
+                            large: "",
+                            persistent: ""
+                          },
+                          on: {
+                            "update:returnValue": function($event) {
+                              return _vm.$set(item, "gps_group_id", $event)
+                            },
+                            "update:return-value": function($event) {
+                              return _vm.$set(item, "gps_group_id", $event)
+                            },
+                            save: function($event) {
+                              return _vm.saveInLine(item)
+                            },
+                            cancel: _vm.cancel
+                          },
+                          scopedSlots: _vm._u(
+                            [
+                              {
+                                key: "input",
+                                fn: function() {
+                                  return [
+                                    _c("div", { staticClass: "mt-4 title" }, [
+                                      _vm._v("Asignar a Grupo")
+                                    ]),
+                                    _vm._v(" "),
+                                    _c("v-autocomplete", {
+                                      attrs: {
+                                        filled: "",
+                                        clearable: "",
+                                        "prepend-icon": "mdi-filter-variant",
+                                        label: "Buscar Grupo",
+                                        items: _vm.options.gpsGroup,
+                                        "item-text": "name",
+                                        "item-value": "id"
+                                      },
+                                      model: {
+                                        value: item.gps_group_id,
+                                        callback: function($$v) {
+                                          _vm.$set(item, "gps_group_id", $$v)
+                                        },
+                                        expression: "item.gps_group_id"
+                                      }
+                                    })
+                                  ]
+                                },
+                                proxy: true
+                              }
+                            ],
+                            null,
+                            true
+                          )
+                        },
+                        [
+                          _c(
+                            "v-btn",
+                            {
+                              attrs: {
+                                outlined: "",
+                                small: "",
+                                color: "primary",
+                                "pa-0": ""
+                              }
+                            },
+                            [_vm._v("Asignar a Grupo")]
+                          )
+                        ],
+                        1
+                      )
+                    ]
+              ]
+            }
+          },
+          {
             key: "item.cost",
             fn: function(ref) {
               var item = ref.item
               return [
-                _c(
-                  "v-edit-dialog",
-                  {
-                    attrs: {
-                      "return-value": item.cost,
-                      large: "",
-                      persistent: ""
-                    },
-                    on: {
-                      "update:returnValue": function($event) {
-                        return _vm.$set(item, "cost", $event)
-                      },
-                      "update:return-value": function($event) {
-                        return _vm.$set(item, "cost", $event)
-                      },
-                      save: function($event) {
-                        return _vm.saveInLine(item)
-                      },
-                      cancel: _vm.cancel
-                    },
-                    scopedSlots: _vm._u(
-                      [
-                        {
-                          key: "input",
-                          fn: function() {
-                            return [
-                              _c("div", { staticClass: "mt-4 title" }, [
-                                _vm._v("Modificar Costo:")
-                              ]),
-                              _vm._v(" "),
-                              _c("v-text-field", {
-                                attrs: {
-                                  label: "Valor",
-                                  type: "tel",
-                                  prefix: "$",
-                                  "single-line": "",
-                                  counter: "",
-                                  autofocus: ""
-                                },
-                                model: {
-                                  value: item.cost,
-                                  callback: function($$v) {
-                                    _vm.$set(item, "cost", $$v)
-                                  },
-                                  expression: "item.cost"
-                                }
-                              })
-                            ]
-                          },
-                          proxy: true
-                        }
-                      ],
-                      null,
-                      true
-                    )
-                  },
-                  [
-                    _c(
-                      "v-btn",
-                      { attrs: { outlined: "", small: "", "pa-0": "" } },
-                      [_vm._v(_vm._s(_vm._f("money")(item.cost)))]
-                    )
-                  ],
-                  1
-                )
+                item.chip
+                  ? [
+                      _vm._v(
+                        "\n        " +
+                          _vm._s(_vm._f("money")(item.chip.costo)) +
+                          "\n      "
+                      )
+                    ]
+                  : [_vm._v("\n        no asignado\n      ")]
               ]
             }
           },
@@ -24143,7 +26119,7 @@ var render = function() {
             }
           },
           {
-            key: "item.activation_date",
+            key: "item.installation_date",
             fn: function(ref) {
               var item = ref.item
               return [
@@ -24151,7 +26127,7 @@ var render = function() {
                   _vm._v(
                     "\n        " +
                       _vm._s(
-                        _vm.$appFormatters.formatDate(item.activation_date)
+                        _vm.$appFormatters.formatDate(item.installation_date)
                       ) +
                       "\n      "
                   )
@@ -24160,7 +26136,7 @@ var render = function() {
             }
           },
           {
-            key: "item.due_date",
+            key: "item.renew_date",
             fn: function(ref) {
               var item = ref.item
               return [
@@ -24173,7 +26149,9 @@ var render = function() {
                       {
                         attrs: {
                           color: _vm.getColor(
-                            _vm.$appFormatters.formatTimeDiffNow(item.due_date)
+                            _vm.$appFormatters.formatTimeDiffNow(
+                              item.renew_date
+                            )
                           ),
                           dark: "",
                           small: ""
@@ -24184,7 +26162,7 @@ var render = function() {
                           "\n          " +
                             _vm._s(
                               _vm.$appFormatters.formatTimeDiffNow(
-                                item.due_date,
+                                item.renew_date,
                                 "days"
                               )
                             ) +
@@ -24199,7 +26177,96 @@ var render = function() {
             }
           }
         ])
-      })
+      }),
+      _vm._v(" "),
+      _c(
+        "v-dialog",
+        {
+          attrs: {
+            fullscreen: "",
+            transition: "dialog-bottom-transition",
+            overlay: false
+          },
+          model: {
+            value: _vm.dialogs.show,
+            callback: function($$v) {
+              _vm.$set(_vm.dialogs, "show", $$v)
+            },
+            expression: "dialogs.show"
+          }
+        },
+        [
+          _c(
+            "v-card",
+            [
+              _c(
+                "v-toolbar",
+                { staticClass: "primary" },
+                [
+                  _c(
+                    "v-btn",
+                    {
+                      attrs: { icon: "" },
+                      nativeOn: {
+                        click: function($event) {
+                          ;(_vm.dialogs.show = false), (_vm.editedIndex = -1)
+                        }
+                      }
+                    },
+                    [_c("v-icon", [_vm._v("mdi-close")])],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c("v-toolbar-title", { staticClass: "white--text" }, [
+                    _vm._v(_vm._s(_vm.formTitle))
+                  ]),
+                  _vm._v(" "),
+                  _c("v-spacer"),
+                  _vm._v(" "),
+                  _c(
+                    "v-toolbar-items",
+                    [
+                      _c(
+                        "v-btn",
+                        {
+                          attrs: { text: "" },
+                          nativeOn: {
+                            click: function($event) {
+                              ;(_vm.dialogs.show = false),
+                                (_vm.editedIndex = -1)
+                            }
+                          }
+                        },
+                        [_vm._v("Done")]
+                      )
+                    ],
+                    1
+                  )
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "v-card-text",
+                [
+                  _vm.formEdit
+                    ? _c("gps-edit", {
+                        attrs: { propGpsId: _vm.dialogs.gps.id }
+                      })
+                    : _vm.dialogs.show
+                    ? _c("gps-add", {
+                        attrs: { propOptionGroups: _vm.options.gpsGroup }
+                      })
+                    : _vm._e()
+                ],
+                1
+              )
+            ],
+            1
+          )
+        ],
+        1
+      )
     ],
     1
   )
@@ -24251,10 +26318,10 @@ var render = function() {
                   attrs: {
                     step: 1,
                     editable: "",
-                    complete: !!_vm.files["file_wialon"]
+                    complete: !!_vm.files["file_clientes_gps"]
                   }
                 },
-                [_vm._v("\n        Archivo Wialon\n      ")]
+                [_vm._v("\n        Archivo Clientes\n      ")]
               ),
               _vm._v(" "),
               _c("v-divider"),
@@ -24265,7 +26332,7 @@ var render = function() {
                   attrs: {
                     step: 2,
                     editable: "",
-                    complete: !!_vm.files["file_supplier"]
+                    complete: !!_vm.files["file_gps_chips"]
                   }
                 },
                 [_vm._v("\n        Archivo Proveedor\n      ")]
@@ -24273,7 +26340,21 @@ var render = function() {
               _vm._v(" "),
               _c("v-divider"),
               _vm._v(" "),
-              _c("v-stepper-step", { attrs: { step: 3 } }, [
+              _c(
+                "v-stepper-step",
+                {
+                  attrs: {
+                    step: 3,
+                    editable: "",
+                    complete: !!_vm.files["file_gps"]
+                  }
+                },
+                [_vm._v("\n        Archivo Wialon\n      ")]
+              ),
+              _vm._v(" "),
+              _c("v-divider"),
+              _vm._v(" "),
+              _c("v-stepper-step", { attrs: { step: 4 } }, [
                 _vm._v("Cargar a BD")
               ])
             ],
@@ -24299,11 +26380,11 @@ var render = function() {
                       accept: _vm.accept
                     },
                     model: {
-                      value: _vm.files["file_wialon"],
+                      value: _vm.files["file_clientes_gps"],
                       callback: function($$v) {
-                        _vm.$set(_vm.files, "file_wialon", $$v)
+                        _vm.$set(_vm.files, "file_clientes_gps", $$v)
                       },
-                      expression: "files['file_wialon']"
+                      expression: "files['file_clientes_gps']"
                     }
                   }),
                   _vm._v(" "),
@@ -24324,11 +26405,19 @@ var render = function() {
                             _c("thead", [
                               _c("tr", [
                                 _c("th", { staticClass: "text-center" }, [
-                                  _vm._v("Nombre")
+                                  _vm._v("Cliente")
                                 ]),
                                 _vm._v(" "),
                                 _c("th", { staticClass: "text-center" }, [
-                                  _vm._v("Grupo")
+                                  _vm._v("Razon Social")
+                                ]),
+                                _vm._v(" "),
+                                _c("th", { staticClass: "text-center" }, [
+                                  _vm._v("RFC")
+                                ]),
+                                _vm._v(" "),
+                                _c("th", { staticClass: "text-center" }, [
+                                  _vm._v("Nombre Gps")
                                 ]),
                                 _vm._v(" "),
                                 _c("th", { staticClass: "text-center" }, [
@@ -24337,10 +26426,6 @@ var render = function() {
                                 _vm._v(" "),
                                 _c("th", { staticClass: "text-center" }, [
                                   _vm._v("Departamento")
-                                ]),
-                                _vm._v(" "),
-                                _c("th", { staticClass: "text-center" }, [
-                                  _vm._v("Creado")
                                 ])
                               ])
                             ])
@@ -24387,11 +26472,11 @@ var render = function() {
                       accept: _vm.accept
                     },
                     model: {
-                      value: _vm.files["file_supplier"],
+                      value: _vm.files["file_gps_chips"],
                       callback: function($$v) {
-                        _vm.$set(_vm.files, "file_supplier", $$v)
+                        _vm.$set(_vm.files, "file_gps_chips", $$v)
                       },
-                      expression: "files['file_supplier']"
+                      expression: "files['file_gps_chips']"
                     }
                   }),
                   _vm._v(" "),
@@ -24416,11 +26501,15 @@ var render = function() {
                                 ]),
                                 _vm._v(" "),
                                 _c("th", { staticClass: "text-center" }, [
+                                  _vm._v("Cuenta")
+                                ]),
+                                _vm._v(" "),
+                                _c("th", { staticClass: "text-center" }, [
                                   _vm._v("IMEI")
                                 ]),
                                 _vm._v(" "),
                                 _c("th", { staticClass: "text-center" }, [
-                                  _vm._v("Fecha")
+                                  _vm._v("Fecha Activacion")
                                 ])
                               ])
                             ])
@@ -24454,6 +26543,86 @@ var render = function() {
               _c(
                 "v-stepper-content",
                 { attrs: { step: 3 } },
+                [
+                  _c("v-file-input", {
+                    staticClass: "pa-2",
+                    attrs: {
+                      label: "Archivo Wialon",
+                      placeholder: "Selecciona tu Archivo",
+                      outlined: "",
+                      "show-size": "",
+                      chips: "",
+                      counter: "",
+                      accept: _vm.accept
+                    },
+                    model: {
+                      value: _vm.files["file_gps"],
+                      callback: function($$v) {
+                        _vm.$set(_vm.files, "file_gps", $$v)
+                      },
+                      expression: "files['file_gps']"
+                    }
+                  }),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "overline" }, [
+                    _vm._v(
+                      "\n          Muestra de Encabezados en el Excel iniciando en (A1)\n        "
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _c("v-simple-table", {
+                    staticClass: "mb-2",
+                    attrs: { dense: "", "fixed-header": "", dark: "" },
+                    scopedSlots: _vm._u([
+                      {
+                        key: "default",
+                        fn: function() {
+                          return [
+                            _c("thead", [
+                              _c("tr", [
+                                _c("th", { staticClass: "text-center" }, [
+                                  _vm._v("Nombre GPS")
+                                ]),
+                                _vm._v(" "),
+                                _c("th", { staticClass: "text-center" }, [
+                                  _vm._v("Telefono")
+                                ]),
+                                _vm._v(" "),
+                                _c("th", { staticClass: "text-center" }, [
+                                  _vm._v("Fecha Instalacion")
+                                ])
+                              ])
+                            ])
+                          ]
+                        },
+                        proxy: true
+                      }
+                    ])
+                  }),
+                  _vm._v(" "),
+                  _c(
+                    "v-btn",
+                    {
+                      attrs: { color: "primary" },
+                      on: {
+                        click: function($event) {
+                          return _vm.nextStep(3)
+                        }
+                      }
+                    },
+                    [
+                      _vm._v("\n          Continuar "),
+                      _c("v-icon", [_vm._v("mdi-chevron-right")])
+                    ],
+                    1
+                  )
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "v-stepper-content",
+                { attrs: { step: 4 } },
                 [
                   _c("div", { staticClass: "text-h5" }, [
                     _vm._v("Confirmacion para carga de archivos")
@@ -24521,7 +26690,7 @@ var render = function() {
                       attrs: { color: "primary" },
                       on: {
                         click: function($event) {
-                          return _vm.nextStep(3)
+                          return _vm.nextStep(4)
                         }
                       }
                     },
@@ -27348,10 +29517,10 @@ var render = function() {
                   [
                     item.active != null
                       ? _c("v-icon", { staticClass: "green--text" }, [
-                          _vm._v("check_circle")
+                          _vm._v("mdi-check-circle-outline")
                         ])
                       : _c("v-icon", { staticClass: "grey--text" }, [
-                          _vm._v("error_outline")
+                          _vm._v("mdi-alert-circle-outline")
                         ])
                   ],
                   1
@@ -29912,6 +32081,144 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/admin/gps/components/GpsChipAdd.vue":
+/*!**********************************************************!*\
+  !*** ./resources/js/admin/gps/components/GpsChipAdd.vue ***!
+  \**********************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _GpsChipAdd_vue_vue_type_template_id_bac0b11e___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./GpsChipAdd.vue?vue&type=template&id=bac0b11e& */ "./resources/js/admin/gps/components/GpsChipAdd.vue?vue&type=template&id=bac0b11e&");
+/* harmony import */ var _GpsChipAdd_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./GpsChipAdd.vue?vue&type=script&lang=js& */ "./resources/js/admin/gps/components/GpsChipAdd.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _GpsChipAdd_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _GpsChipAdd_vue_vue_type_template_id_bac0b11e___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _GpsChipAdd_vue_vue_type_template_id_bac0b11e___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/admin/gps/components/GpsChipAdd.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/admin/gps/components/GpsChipAdd.vue?vue&type=script&lang=js&":
+/*!***********************************************************************************!*\
+  !*** ./resources/js/admin/gps/components/GpsChipAdd.vue?vue&type=script&lang=js& ***!
+  \***********************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_GpsChipAdd_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../node_modules/vue-loader/lib??vue-loader-options!./GpsChipAdd.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/gps/components/GpsChipAdd.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_GpsChipAdd_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/admin/gps/components/GpsChipAdd.vue?vue&type=template&id=bac0b11e&":
+/*!*****************************************************************************************!*\
+  !*** ./resources/js/admin/gps/components/GpsChipAdd.vue?vue&type=template&id=bac0b11e& ***!
+  \*****************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_GpsChipAdd_vue_vue_type_template_id_bac0b11e___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../node_modules/vue-loader/lib??vue-loader-options!./GpsChipAdd.vue?vue&type=template&id=bac0b11e& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/gps/components/GpsChipAdd.vue?vue&type=template&id=bac0b11e&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_GpsChipAdd_vue_vue_type_template_id_bac0b11e___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_GpsChipAdd_vue_vue_type_template_id_bac0b11e___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
+/***/ "./resources/js/admin/gps/components/GpsChipEdit.vue":
+/*!***********************************************************!*\
+  !*** ./resources/js/admin/gps/components/GpsChipEdit.vue ***!
+  \***********************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _GpsChipEdit_vue_vue_type_template_id_5d1bedea___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./GpsChipEdit.vue?vue&type=template&id=5d1bedea& */ "./resources/js/admin/gps/components/GpsChipEdit.vue?vue&type=template&id=5d1bedea&");
+/* harmony import */ var _GpsChipEdit_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./GpsChipEdit.vue?vue&type=script&lang=js& */ "./resources/js/admin/gps/components/GpsChipEdit.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _GpsChipEdit_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _GpsChipEdit_vue_vue_type_template_id_5d1bedea___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _GpsChipEdit_vue_vue_type_template_id_5d1bedea___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/admin/gps/components/GpsChipEdit.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/admin/gps/components/GpsChipEdit.vue?vue&type=script&lang=js&":
+/*!************************************************************************************!*\
+  !*** ./resources/js/admin/gps/components/GpsChipEdit.vue?vue&type=script&lang=js& ***!
+  \************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_GpsChipEdit_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../node_modules/vue-loader/lib??vue-loader-options!./GpsChipEdit.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/gps/components/GpsChipEdit.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_GpsChipEdit_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/admin/gps/components/GpsChipEdit.vue?vue&type=template&id=5d1bedea&":
+/*!******************************************************************************************!*\
+  !*** ./resources/js/admin/gps/components/GpsChipEdit.vue?vue&type=template&id=5d1bedea& ***!
+  \******************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_GpsChipEdit_vue_vue_type_template_id_5d1bedea___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../node_modules/vue-loader/lib??vue-loader-options!./GpsChipEdit.vue?vue&type=template&id=5d1bedea& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/gps/components/GpsChipEdit.vue?vue&type=template&id=5d1bedea&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_GpsChipEdit_vue_vue_type_template_id_5d1bedea___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_GpsChipEdit_vue_vue_type_template_id_5d1bedea___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
 /***/ "./resources/js/admin/gps/components/GpsChipsLists.vue":
 /*!*************************************************************!*\
   !*** ./resources/js/admin/gps/components/GpsChipsLists.vue ***!
@@ -31338,10 +33645,10 @@ __webpack_require__.r(__webpack_exports__);
 /*!****************************************!*\
   !*** ./resources/js/api/agencies.json ***!
   \****************************************/
-/*! exports provided: 0, 1, 2, 3, 4, 5, 6, default */
+/*! exports provided: 0, 1, 2, 3, 4, 5, default */
 /***/ (function(module) {
 
-module.exports = JSON.parse("[{\"name\":\"CELAYA\"},{\"name\":\"SALAMANCA\"},{\"name\":\"IRAPUATO\"},{\"name\":\"QUERETARO 5 FREBRERO\"},{\"name\":\"QUERETARO COLORADO\"},{\"name\":\"ABASOLO\"},{\"name\":\"MATRIZ\"}]");
+module.exports = JSON.parse("[{\"name\":\"CELAYA\"},{\"name\":\"SALAMANCA\"},{\"name\":\"IRAPUATO\"},{\"name\":\"QRO\"},{\"name\":\"ABASOLO\"},{\"name\":\"MATRIZ\"}]");
 
 /***/ }),
 
@@ -31349,10 +33656,10 @@ module.exports = JSON.parse("[{\"name\":\"CELAYA\"},{\"name\":\"SALAMANCA\"},{\"
 /*!*******************************************!*\
   !*** ./resources/js/api/departments.json ***!
   \*******************************************/
-/*! exports provided: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, default */
+/*! exports provided: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, default */
 /***/ (function(module) {
 
-module.exports = JSON.parse("[{\"name\":\"ADMINISTRACION\"},{\"name\":\"CENTRO DE SOPORTE A LAS OPERACIONES\"},{\"name\":\"CONTABILIDAD\"},{\"name\":\"CREDITO Y COBRANZA\"},{\"name\":\"DIRECCION\"},{\"name\":\"LUBRICANTES\"},{\"name\":\"MARKETING\"},{\"name\":\"NUEVAS TECNOLOGIAS\"},{\"name\":\"POST VENTA\"},{\"name\":\"REFACCIONES\"},{\"name\":\"RIEGO\"},{\"name\":\"RRHH\"},{\"name\":\"SERVICIO AGRICOLA\"},{\"name\":\"SERVICIO CONSTRUCCION\"},{\"name\":\"SISTEMAS\"},{\"name\":\"TESORERIA\"},{\"name\":\"VENTAS\"}]");
+module.exports = JSON.parse("[{\"name\":\"ADMINISTRACION\"},{\"name\":\"CONTABILIDAD\"},{\"name\":\"CREDITO Y COBRANZA\"},{\"name\":\"DIRECCION\"},{\"name\":\"LUBRICANTES\"},{\"name\":\"MARKETING\"},{\"name\":\"NUEVAS TECNOLOGIAS\"},{\"name\":\"POST VENTA\"},{\"name\":\"REFACCIONES\"},{\"name\":\"RIEGO\"},{\"name\":\"RRHH\"},{\"name\":\"SERVICIO AGRICOLA\"},{\"name\":\"SERVICIO INDRUSTRIAL\"},{\"name\":\"SISTEMAS\"},{\"name\":\"ASCACAMBARO\"},{\"name\":\"EQUIPO DEMO\"},{\"name\":\"GERENTE\"},{\"name\":\"BRIGADA VERDE\"},{\"name\":\"ASC QRO\"},{\"name\":\"TRASLADOS\"},{\"name\":\"RENTAS\"},{\"name\":\"VENTAS MAQ AGRICOLA\"},{\"name\":\"VENTAS MAQ INDUSTRIAL\"}]");
 
 /***/ }),
 

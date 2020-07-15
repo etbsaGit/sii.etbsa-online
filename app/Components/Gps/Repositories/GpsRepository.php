@@ -21,7 +21,7 @@ class GpsRepository extends BaseRepository
      */
     public function index($params)
     {
-        return $this->get($params, ['gpsGroup'], function ($q) use ($params) {
+        return $this->get($params, ['gpsGroup','chip'], function ($q) use ($params) {
             $q->ofGpsGroups(Helpers::commasToArray($params['group_id'] ?? ''));
             $q->ofName($params['name'] ?? '');
             $q->ofMonth($params['month'] ?? '');
