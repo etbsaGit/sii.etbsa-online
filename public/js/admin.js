@@ -1386,52 +1386,85 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
       valid: false,
-      isLoading: false,
       sim: "",
       imei: "",
       costo: "",
       cuenta: "",
+      fecha_activacion: null,
+      fecha_renovacion: null,
+      descripcion: "",
       rules: [function (v) {
         return !!v || "Campo Requerido";
       }]
     };
   },
+  watch: {
+    fecha_activacion: {
+      handler: function handler(val) {
+        var date = new Date(val);
+        date.setDate(date.getDate() + 365);
+        this.fecha_renovacion = this.$appFormatters.formatDate(date, "yyyy-MM-DD");
+      }
+    }
+  },
   methods: {
     save: function save() {
       var self = this;
-      var payload = {
-        sim: self.sim,
-        imei: self.imei,
-        cuenta: self.cuenta,
-        costo: self.costo
-      };
-      self.isLoading = true;
-      axios.post("/admin/gps-chips/", payload).then(function (response) {
-        self.$store.commit("showSnackbar", {
-          message: response.data.message,
-          color: "success",
-          duration: 3000
-        });
-        self.$eventBus.$emit("GPS_CHIP_ADDED");
-      })["catch"](function (error) {
-        if (error.response) {
+
+      if (self.$refs.gpsChipFormAdd.validate()) {
+        var payload = {
+          sim: self.sim,
+          imei: self.imei,
+          cuenta: self.cuenta,
+          costo: self.costo,
+          fecha_activacion: self.fecha_activacion,
+          fecha_renovacion: self.fecha_renovacion,
+          descripcion: self.descripcion
+        };
+        axios.post("/admin/gps-chips/", payload).then(function (response) {
           self.$store.commit("showSnackbar", {
-            message: error.response.data.message,
-            color: "error",
+            message: response.data.message,
+            color: "success",
             duration: 3000
           });
-        } else if (error.request) {
-          console.log(error.request);
-        } else {
-          console.log("Error", error.message);
-        }
-      })["finally"](function () {
-        self.isLoading = false;
-      });
+          self.$eventBus.$emit("GPS_CHIP_ADDED");
+        })["catch"](function (error) {
+          if (error.response) {
+            self.$store.commit("showSnackbar", {
+              message: error.response.data.message,
+              color: "error",
+              duration: 3000
+            });
+          } else if (error.request) {
+            console.log(error.request);
+          } else {
+            console.log("Error", error.message);
+          }
+        });
+      }
     }
   }
 });
@@ -1492,6 +1525,31 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
     propGpsChipId: {
@@ -1501,11 +1559,13 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       valid: false,
-      isLoading: false,
       sim: "",
       imei: "",
       costo: "",
       cuenta: "",
+      fecha_activacion: null,
+      fecha_renovacion: null,
+      descripcion: "",
       rules: [function (v) {
         return !!v || "Campo Requerido";
       }]
@@ -1518,35 +1578,41 @@ __webpack_require__.r(__webpack_exports__);
   methods: {
     save: function save() {
       var self = this;
-      var payload = {
-        sim: self.sim,
-        imei: self.imei,
-        cuenta: self.cuenta,
-        costo: self.costo
-      };
-      self.isLoading = true;
-      axios.put("/admin/gps-chips/" + self.propGpsChipId, payload).then(function (response) {
-        self.$store.commit("showSnackbar", {
-          message: response.data.message,
-          color: "success",
-          duration: 3000
-        });
-        self.$eventBus.$emit("GPS_CHIP_UPDATED");
-      })["catch"](function (error) {
-        if (error.response) {
+
+      if (self.$refs.gpsChipFormEdit.validate()) {
+        var payload = {
+          sim: self.sim,
+          imei: self.imei,
+          cuenta: self.cuenta,
+          costo: self.costo,
+          fecha_activacion: self.fecha_activacion,
+          fecha_renovacion: self.fecha_renovacion,
+          descripcion: self.descripcion
+        };
+        self.isLoading = true;
+        axios.put("/admin/gps-chips/" + self.propGpsChipId, payload).then(function (response) {
           self.$store.commit("showSnackbar", {
-            message: error.response.data.message,
-            color: "error",
+            message: response.data.message,
+            color: "success",
             duration: 3000
           });
-        } else if (error.request) {
-          console.log(error.request);
-        } else {
-          console.log("Error", error.message);
-        }
-      })["finally"](function () {
-        self.isLoading = false;
-      });
+          self.$eventBus.$emit("GPS_CHIP_UPDATED");
+        })["catch"](function (error) {
+          if (error.response) {
+            self.$store.commit("showSnackbar", {
+              message: error.response.data.message,
+              color: "error",
+              duration: 3000
+            });
+          } else if (error.request) {
+            console.log(error.request);
+          } else {
+            console.log("Error", error.message);
+          }
+        })["finally"](function () {
+          self.isLoading = false;
+        });
+      }
     },
     loadGpsChip: function loadGpsChip(cb) {
       var self = this;
@@ -1556,6 +1622,10 @@ __webpack_require__.r(__webpack_exports__);
         self.imei = Chip.imei;
         self.cuenta = Chip.cuenta;
         self.costo = Chip.costo;
+        self.fecha_activacion = self.$appFormatters.formatDate(Chip.fecha_activacion, "yyyy-MM-DD");
+        self.fecha_renovacion = self.$appFormatters.formatDate(Chip.fecha_renovacion, "yyyy-MM-DD");
+        C;
+        self.descripcion = Chip.descripcion;
         cb();
       });
     }
@@ -23757,18 +23827,11 @@ var render = function() {
                 { attrs: { "grid-list-md": "" } },
                 [
                   _c(
-                    "v-layout",
-                    { attrs: { row: "", wrap: "" } },
+                    "v-row",
                     [
-                      _c("v-flex", { attrs: { xs12: "" } }, [
-                        _c("div", { staticClass: "body-2" }, [
-                          _vm._v("CHIP GPS Detalle")
-                        ])
-                      ]),
-                      _vm._v(" "),
                       _c(
-                        "v-flex",
-                        { attrs: { xs12: "", md4: "" } },
+                        "v-col",
+                        { attrs: { cols: "12", md: "4" } },
                         [
                           _c("v-text-field", {
                             attrs: { label: "SIM", rules: _vm.rules },
@@ -23785,11 +23848,11 @@ var render = function() {
                       ),
                       _vm._v(" "),
                       _c(
-                        "v-flex",
-                        { attrs: { xs12: "", md4: "" } },
+                        "v-col",
+                        { attrs: { cols: "12", md: "4" } },
                         [
                           _c("v-text-field", {
-                            attrs: { label: "IMEI", rules: _vm.rules },
+                            attrs: { label: "IMEI", counter: "" },
                             model: {
                               value: _vm.imei,
                               callback: function($$v) {
@@ -23803,11 +23866,11 @@ var render = function() {
                       ),
                       _vm._v(" "),
                       _c(
-                        "v-flex",
-                        { attrs: { xs12: "", md4: "" } },
+                        "v-col",
+                        { attrs: { cols: "12", md: "4" } },
                         [
                           _c("v-text-field", {
-                            attrs: { label: "Cuenta" },
+                            attrs: { label: "Cuenta", counter: "" },
                             model: {
                               value: _vm.cuenta,
                               callback: function($$v) {
@@ -23821,11 +23884,17 @@ var render = function() {
                       ),
                       _vm._v(" "),
                       _c(
-                        "v-flex",
-                        { attrs: { xs12: "", md4: "" } },
+                        "v-col",
+                        { attrs: { cols: "12", md: "4" } },
                         [
                           _c("v-text-field", {
-                            attrs: { label: "Costo:", rules: _vm.rules },
+                            attrs: {
+                              label: "Costo:",
+                              rules: _vm.rules,
+                              type: "Numeric",
+                              prefix: "$",
+                              suffix: "MXN"
+                            },
                             model: {
                               value: _vm.costo,
                               callback: function($$v) {
@@ -23839,8 +23908,71 @@ var render = function() {
                       ),
                       _vm._v(" "),
                       _c(
-                        "v-flex",
-                        { attrs: { xs12: "" } },
+                        "v-col",
+                        { attrs: { cols: "6", md: "4" } },
+                        [
+                          _c("v-text-field", {
+                            attrs: {
+                              label: "Fecha Activacion",
+                              type: "date",
+                              rules: _vm.rules
+                            },
+                            model: {
+                              value: _vm.fecha_activacion,
+                              callback: function($$v) {
+                                _vm.fecha_activacion = $$v
+                              },
+                              expression: "fecha_activacion"
+                            }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-col",
+                        { attrs: { cols: "6", md: "4" } },
+                        [
+                          _c("v-text-field", {
+                            attrs: {
+                              label: "Fecha Renovacion",
+                              type: "date",
+                              rules: _vm.rules,
+                              readonly: ""
+                            },
+                            model: {
+                              value: _vm.fecha_renovacion,
+                              callback: function($$v) {
+                                _vm.fecha_renovacion = $$v
+                              },
+                              expression: "fecha_renovacion"
+                            }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-col",
+                        { attrs: { cols: "12" } },
+                        [
+                          _c("v-textarea", {
+                            attrs: { label: "Descripcion:", outlined: "" },
+                            model: {
+                              value: _vm.description,
+                              callback: function($$v) {
+                                _vm.description = $$v
+                              },
+                              expression: "description"
+                            }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-col",
+                        { attrs: { cols: "12" } },
                         [
                           _c(
                             "v-btn",
@@ -23925,18 +24057,11 @@ var render = function() {
                 { attrs: { "grid-list-md": "" } },
                 [
                   _c(
-                    "v-layout",
-                    { attrs: { row: "", wrap: "" } },
+                    "v-row",
                     [
-                      _c("v-flex", { attrs: { xs12: "" } }, [
-                        _c("div", { staticClass: "body-2" }, [
-                          _vm._v("CHIP GPS Detalle")
-                        ])
-                      ]),
-                      _vm._v(" "),
                       _c(
-                        "v-flex",
-                        { attrs: { xs12: "", md4: "" } },
+                        "v-col",
+                        { attrs: { cols: "12", md: "4" } },
                         [
                           _c("v-text-field", {
                             attrs: { label: "SIM", rules: _vm.rules },
@@ -23953,11 +24078,11 @@ var render = function() {
                       ),
                       _vm._v(" "),
                       _c(
-                        "v-flex",
-                        { attrs: { xs12: "", md4: "" } },
+                        "v-col",
+                        { attrs: { cols: "12", md: "4" } },
                         [
                           _c("v-text-field", {
-                            attrs: { label: "IMEI", rules: _vm.rules },
+                            attrs: { label: "IMEI", counter: "" },
                             model: {
                               value: _vm.imei,
                               callback: function($$v) {
@@ -23971,11 +24096,11 @@ var render = function() {
                       ),
                       _vm._v(" "),
                       _c(
-                        "v-flex",
-                        { attrs: { xs12: "", md4: "" } },
+                        "v-col",
+                        { attrs: { cols: "12", md: "4" } },
                         [
                           _c("v-text-field", {
-                            attrs: { label: "Cuenta" },
+                            attrs: { label: "Cuenta", counter: "" },
                             model: {
                               value: _vm.cuenta,
                               callback: function($$v) {
@@ -23989,11 +24114,17 @@ var render = function() {
                       ),
                       _vm._v(" "),
                       _c(
-                        "v-flex",
-                        { attrs: { xs12: "", md4: "" } },
+                        "v-col",
+                        { attrs: { cols: "12", md: "4" } },
                         [
                           _c("v-text-field", {
-                            attrs: { label: "Costo:", rules: _vm.rules },
+                            attrs: {
+                              label: "Costo:",
+                              rules: _vm.rules,
+                              type: "Numeric",
+                              prefix: "$",
+                              suffix: "MXN"
+                            },
                             model: {
                               value: _vm.costo,
                               callback: function($$v) {
@@ -24007,8 +24138,70 @@ var render = function() {
                       ),
                       _vm._v(" "),
                       _c(
-                        "v-flex",
-                        { attrs: { xs12: "" } },
+                        "v-col",
+                        { attrs: { cols: "6", md: "4" } },
+                        [
+                          _c("v-text-field", {
+                            attrs: {
+                              label: "Fecha Activacion",
+                              type: "date",
+                              rules: _vm.rules
+                            },
+                            model: {
+                              value: _vm.fecha_activacion,
+                              callback: function($$v) {
+                                _vm.fecha_activacion = $$v
+                              },
+                              expression: "fecha_activacion"
+                            }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-col",
+                        { attrs: { cols: "6", md: "4" } },
+                        [
+                          _c("v-text-field", {
+                            attrs: {
+                              label: "Fecha Renovacion",
+                              type: "date",
+                              rules: _vm.rules
+                            },
+                            model: {
+                              value: _vm.fecha_renovacion,
+                              callback: function($$v) {
+                                _vm.fecha_renovacion = $$v
+                              },
+                              expression: "fecha_renovacion"
+                            }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-col",
+                        { attrs: { cols: "12" } },
+                        [
+                          _c("v-textarea", {
+                            attrs: { label: "Descripcion:", outlined: "" },
+                            model: {
+                              value: _vm.description,
+                              callback: function($$v) {
+                                _vm.description = $$v
+                              },
+                              expression: "description"
+                            }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-col",
+                        { attrs: { cols: "12" } },
                         [
                           _c(
                             "v-btn",
@@ -24024,7 +24217,7 @@ var render = function() {
                                 }
                               }
                             },
-                            [_vm._v("\n              Modificar\n            ")]
+                            [_vm._v("Guardar Nuevo")]
                           )
                         ],
                         1
@@ -24404,30 +24597,6 @@ var render = function() {
                                   [
                                     _c("v-list-tile-title", [_vm._v("Detalle")])
                                   ],
-                                  1
-                                )
-                              ],
-                              1
-                            ),
-                            _vm._v(" "),
-                            _c(
-                              "v-list-item",
-                              [
-                                _c(
-                                  "v-list-item-icon",
-                                  [
-                                    _c(
-                                      "v-icon",
-                                      { staticClass: "grey--text" },
-                                      [_vm._v("mdi-crosshairs-question")]
-                                    )
-                                  ],
-                                  1
-                                ),
-                                _vm._v(" "),
-                                _c(
-                                  "v-list-item-content",
-                                  [_c("v-list-tile-title", [_vm._v("GPS")])],
                                   1
                                 )
                               ],
