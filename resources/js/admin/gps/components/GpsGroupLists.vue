@@ -78,14 +78,14 @@
                   <v-list-tile-title>Detalle</v-list-tile-title>
                 </v-list-item-content>
               </v-list-item>
-              <v-list-item>
+              <!-- <v-list-item>
                 <v-list-item-icon>
                   <v-icon class="grey--text">mdi-crosshairs-question</v-icon>
                 </v-list-item-icon>
                 <v-list-item-content>
                   <v-list-tile-title>GPS</v-list-tile-title>
                 </v-list-item-content>
-              </v-list-item>
+              </v-list-item> -->
               <v-list-item @click="trash(item)">
                 <v-list-item-icon>
                   <v-icon class="red--text">mdi-trash-can</v-icon>
