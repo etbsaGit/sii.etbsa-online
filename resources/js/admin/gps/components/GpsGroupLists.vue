@@ -3,14 +3,40 @@
     <!-- search -->
     <v-card flat>
       <v-form ref="filterForm">
-        <div class="d-flex flex-row align-center px-4">
-          <div class="flex-grow-1">
+        <div class="d-flex flex-row align-center">
+          <div class="flex-grow-1 px-2">
             <v-text-field
               prepend-icon="mdi-magnify"
               label="Filtar por Nombre"
               v-model="filters.name"
               clearable
             ></v-text-field>
+          </div>
+          <div class="flex-grow-1 px-2">
+            <v-select
+              v-model="filters.agency"
+              :items="options.agencies"
+              label="Sucursal"
+              :menu-props="{ offsetY: true }"
+              item-text="name"
+              item-value="name"
+              prepend-icon="mdi-filter-variant"
+              clearable
+              filled
+            ></v-select>
+          </div>
+          <div class="flex-grow-1 px-2">
+            <v-select
+              v-model="filters.department"
+              :items="options.departments"
+              label="Departamento"
+              :menu-props="{ offsetY: true }"
+              item-text="name"
+              item-value="name"
+              prepend-icon="mdi-filter-variant"
+              clearable
+              filled
+            ></v-select>
           </div>
           <div class="flex-grow-1 text-right"></div>
         </div>
@@ -32,7 +58,7 @@
       <template v-slot:top>
         <v-toolbar dense elevation="0">
           <div class="flex-grow-1 overline text-uppercase">
-            Ultima Actualizacion de Datos: YYYY/MM/DD
+           
           </div>
           <v-spacer></v-spacer>
           <v-btn icon color="secondary" @click="$refs.filterForm.reset()">
@@ -55,7 +81,7 @@
             </template>
             <span>Agregar Nuevo</span>
           </v-tooltip>
-          <v-btn icon>
+          <v-btn icon @click="refresh()">
             <v-icon>mdi-refresh</v-icon>
           </v-btn>
         </v-toolbar>
@@ -139,6 +165,9 @@
 <script>
 import GpsGroupAdd from "@admin/gps/components/GpsGroupAdd.vue";
 import GpsGroupEdit from "@admin/gps/components/GpsGroupEdit.vue";
+
+import optionAgencies from "~/api/agencies.json";
+import optionDepartments from "~/api/departments.json";
 export default {
   components: {
     GpsGroupAdd,
@@ -157,7 +186,7 @@ export default {
           sortable: false
         },
         {
-          text: "Nombre Grupo",
+          text: "Nombre Cliente",
           value: "name",
           align: "left",
           sortable: true
@@ -192,8 +221,14 @@ export default {
         show: false,
         gpsGroup: null
       },
+      options: {
+        agencies: optionAgencies,
+        departments: optionDepartments
+      },
       filters: {
-        name: ""
+        name: "",
+        agency: null,
+        department: null
       }
     };
   },
@@ -214,9 +249,12 @@ export default {
       }, 700),
       deep: true
     },
-    "filters.name": _.debounce(function(v) {
-      this.loadGpsGroup(() => {});
-    }, 700)
+    filters: {
+      handler: _.debounce(function(v) {
+        this.loadGpsGroup(() => {});
+      }, 700),
+      deep: true
+    }
   },
   computed: {
     formTitle() {
@@ -229,6 +267,10 @@ export default {
     }
   },
   methods: {
+    refresh() {
+      const self = this;
+      self.loadGpsGroup(() => {});
+    },
     editItem(item) {
       const self = this;
       self.editedIndex = self.items.indexOf(item);
@@ -240,6 +282,8 @@ export default {
 
       let params = {
         name: self.filters.name,
+        agency: self.filters.agency,
+        department: self.filters.department,
         order_sort: self.pagination.sortDesc[0] ? "desc" : "asc",
         order_by: self.pagination.sortBy[0] || "name",
         page: self.pagination.page,

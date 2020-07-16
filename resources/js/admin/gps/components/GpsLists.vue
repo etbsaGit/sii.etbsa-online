@@ -76,6 +76,18 @@
               item-value="id"
             ></v-autocomplete>
           </div>
+          <div class="d-flex flex-row align-center">
+            <v-checkbox
+              v-model="filters.assigned"
+              class="mx-2"
+              label="Asignados"
+            ></v-checkbox>
+            <v-checkbox
+              v-model="filters.deallocated"
+              class="mx-2"
+              label="Desasignados"
+            ></v-checkbox>
+          </div>
         </div>
       </v-form>
     </v-card>
@@ -177,7 +189,28 @@
           {{ item.chip.sim }}
         </template>
         <template v-else>
-          N/A
+          <v-edit-dialog
+            :return-value.sync="item.gps_chip_id"
+            large
+            persistent
+            @save="saveInLine(item)"
+            @cancel="cancel"
+          >
+            <v-btn outlined small color="primary" pa-0>Asignar CHIP</v-btn>
+            <template v-slot:input>
+              <div class="mt-4 title">Asignar CHIP</div>
+              <v-autocomplete
+                v-model="item.gps_chip_id"
+                filled
+                clearable
+                prepend-icon="mdi-filter-variant"
+                label="Buscar CHIP"
+                :items="options.gpsChips"
+                item-text="sim"
+                item-value="id"
+              ></v-autocomplete>
+            </template>
+          </v-edit-dialog>
         </template>
       </template>
 
@@ -447,7 +480,9 @@ export default {
         groupId: [],
         chipsId: [],
         agency: null,
-        department: null
+        department: null,
+        assigned: null,
+        deallocated: null
       }
     };
   },
@@ -458,7 +493,7 @@ export default {
       self.loadGps(() => {});
     });
     self.loadGpsGroup(() => {});
-    // self.loadGpsChips(() => {});
+    self.loadGpsChips(() => {});
   },
   watch: {
     pagination: {
@@ -504,6 +539,8 @@ export default {
         agency: self.filters.agency,
         department: self.filters.department,
         group_id: self.filters.groupId.join(","),
+         assigned: self.filters.assigned ? self.filters.assigned : null,
+        deallocated: self.filters.deallocated ? self.filters.deallocated : null,
         order_sort: self.pagination.sortDesc[0] ? "desc" : "asc",
         order_by: self.pagination.sortBy[0] || "name",
         page: self.pagination.page,

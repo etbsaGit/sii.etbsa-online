@@ -22,11 +22,10 @@ class GpsGroupRepository extends BaseRepository
     public function index($params)
     {
         return $this->get($params, ['gps'], function ($q) use ($params) {
-            $name = Arr::get($params, 'name', null);
-
-            if ($name) {
-                $q = $q->where('name', 'like', "%{$name}%");
-            }
+            
+            $q->ofName($params['name'] ?? '');
+            $q->ofAgency($params['agency'] ?? '');
+            $q->ofDepartment($params['department'] ?? '');
 
             return $q;
         });

@@ -45,7 +45,7 @@ class SinglePageController extends AdminController
                 'visible'=>true,
             ]),
             new MenuItem([
-                'group_requirements' => ['GPS'],
+                'group_requirements' => ['Super User','GPS'],
                 'permission_requirements' => [],
                 'label'=>'GPS',
                 'nav_type' => MenuItem::$NAV_TYPE_NAV,

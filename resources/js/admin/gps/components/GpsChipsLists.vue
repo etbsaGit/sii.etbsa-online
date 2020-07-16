@@ -12,8 +12,16 @@
               clearable
             ></v-text-field>
           </div>
+          <div class="flex-grow-1 px-2">
+            <v-text-field
+              prepend-icon="mdi-magnify"
+              label="Buscar por IMEI"
+              v-model="filters.imei"
+              clearable
+            ></v-text-field>
+          </div>
 
-          <div class="flex-grow-0 px-2">
+          <div class="flex-grow-1 px-2">
             <v-select
               prepend-icon="mdi-calendar-month-outline"
               v-model="filters.month"
@@ -25,7 +33,7 @@
               clearable
             ></v-select>
           </div>
-          <div class="flex-grow-0 px-2">
+          <div class="flex-grow-1 px-2">
             <v-select
               prepend-icon="mdi-calendar-month-outline"
               v-model="filters.year"
@@ -36,14 +44,7 @@
               clearable
             ></v-select>
           </div>
-          <div class="flex-grow-0 px-2">
-            <v-text-field
-              prepend-icon="mdi-magnify"
-              label="Buscar por IMEI"
-              v-model="filters.imei"
-              clearable
-            ></v-text-field>
-          </div>
+
           <v-row class="flex-grow-0 px-2" justify="space-around">
             <v-checkbox
               v-model="filters.assigned"
@@ -74,9 +75,7 @@
       <!-- Top -->
       <template v-slot:top>
         <v-toolbar dense elevation="0">
-          <div class="flex-grow-1 overline text-uppercase">
-            Ultima Actualizacion de Datos: YYYY/MM/DD
-          </div>
+          <div class="flex-grow-1 overline text-uppercase"></div>
           <v-spacer></v-spacer>
           <v-btn icon color="secondary" @click="$refs.filterForm.reset()">
             <v-icon>mdi-filter-remove-outline</v-icon>
@@ -167,7 +166,6 @@
         </span>
       </template>
 
-      
       <template v-slot:item.gps="{ item }">
         <v-avatar outlined>
           <v-icon v-if="item.gps != null" class="green--text"
@@ -335,6 +333,10 @@ export default {
     }
   },
   methods: {
+    refresh() {
+      const self = this;
+      self.loadGpsChips(() => {});
+    },
     editItem(item) {
       const self = this;
       self.editedIndex = self.items.indexOf(item);
@@ -348,6 +350,7 @@ export default {
         sim: self.filters.sim,
         month: self.filters.month,
         year: self.filters.year,
+        imei: self.filters.imei,
         assigned: self.filters.assigned ? self.filters.assigned : null,
         deallocated: self.filters.deallocated ? self.filters.deallocated : null,
         order_sort: self.pagination.sortDesc[0] ? "desc" : "asc",

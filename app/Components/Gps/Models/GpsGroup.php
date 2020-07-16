@@ -35,4 +35,30 @@ class GpsGroup extends Model
     {
         return $this->hasMany(Gps::class, 'gps_group_id');
     }
+
+    public function scopeOfName($query, $name)
+    {
+        if ($name === null || $name === '') {
+            return false;
+        }
+
+        return $query->where('name', 'LIKE', "%{$name}%");
+    }
+
+    public function scopeOfAgency($q, $v)
+    {
+        if ($v === null || $v === '') {
+            return false;
+        }
+        return $q->where('agency', $v);
+
+    }
+    public function scopeOfDepartment($q, $v)
+    {
+        if ($v === null || $v === '') {
+            return false;
+        }
+        return $q->where('department', $v);
+
+    }
 }

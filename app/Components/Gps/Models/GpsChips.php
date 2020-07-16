@@ -34,6 +34,14 @@ class GpsChips extends Model
 
         return $query->where('sim', 'like', "%{$sim}%");
     }
+    public function scopeOfImei($query, $sim)
+    {
+        if ($sim === null || $sim === '') {
+            return false;
+        }
+
+        return $query->where('imei', 'like', "%{$sim}%");
+    }
 
     public function scopeOfMonth($query, $v)
     {

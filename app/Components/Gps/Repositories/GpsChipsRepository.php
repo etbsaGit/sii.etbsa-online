@@ -31,6 +31,7 @@ class GpsChipsRepository extends BaseRepository
             // }
 
             $q->ofSim($params['sim'] ?? '');
+            $q->ofImei($params['imei'] ?? '');
             $q->ofMonth($params['month'] ?? '');
             $q->ofYear($params['year'] ?? '');
 

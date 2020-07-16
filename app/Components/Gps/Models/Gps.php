@@ -96,4 +96,22 @@ class Gps extends Model
             return $q->where('department', $v);
         });
     }
+
+    public function scopeOfAssigned($q, $v)
+    {
+        if ($v === null || $v == false) {
+            return false;
+        }
+        
+        return $q->whereNotNull('gps_chip_id');
+    }
+
+    public function scopeOfDeallocated($q, $v)
+    {
+        if ($v === null || $v == false) {
+            return false;
+        }
+
+        return $q->whereNull('gps_chip_id');
+    }
 }

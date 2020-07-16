@@ -22,12 +22,21 @@ class GpsRepository extends BaseRepository
     public function index($params)
     {
         return $this->get($params, ['gpsGroup','chip'], function ($q) use ($params) {
+
+            $assigned = ($params['assigned'] ?? null);
+            $deallocated = ($params['deallocated'] ?? null);
+            
             $q->ofGpsGroups(Helpers::commasToArray($params['group_id'] ?? ''));
             $q->ofName($params['name'] ?? '');
             $q->ofMonth($params['month'] ?? '');
             $q->ofYear($params['year'] ?? '');
             $q->ofAgency($params['agency'] ?? '');
             $q->ofDepartment($params['department'] ?? '');
+
+            if (!($assigned && $deallocated)) {
+                $q->ofAssigned($assigned);
+                $q->ofDeallocated($deallocated);
+            }
 
             return $q;
         });
