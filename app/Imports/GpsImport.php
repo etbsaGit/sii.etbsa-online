@@ -19,8 +19,10 @@ class GpsImport implements ToModel, WithHeadingRow
     public function model(array $row)
     {
 
-        $gps_import = DB::table('gps_import')->where('nombre', 'like', "%{$row['nombre']}%")->first();
-        
+        $gps_import = DB::table('gps_import')
+            ->where('nombre', "{$row['nombre']}")
+            ->first();
+
         $date = new Carbon($row['creado']);
         $date_due = $date->setYear(Carbon::now()->year);
 

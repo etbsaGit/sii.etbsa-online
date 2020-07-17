@@ -17,6 +17,8 @@ class CreateGpsGroupsTable extends Migration
             $table->id();
             $table->string('name')->unique();
             $table->string('phone')->nullable();
+            $table->string('rfc')->nullable();
+            $table->string('razon_social')->nullable();
             $table->string('agency')->nullable();
             $table->string('department')->nullable();
             $table->text('description')->nullable();

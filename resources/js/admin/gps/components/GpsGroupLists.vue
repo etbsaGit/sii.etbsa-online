@@ -3,7 +3,7 @@
     <!-- search -->
     <v-card flat>
       <v-form ref="filterForm">
-        <div class="d-flex flex-row align-center">
+        <div class="d-flex flex-md-row flex-xs-column flex-wrap align-center">
           <div class="flex-grow-1 px-2">
             <v-text-field
               prepend-icon="mdi-magnify"
@@ -57,11 +57,13 @@
       <!-- Top -->
       <template v-slot:top>
         <v-toolbar dense elevation="0">
-          <div class="flex-grow-1 overline text-uppercase">
-           
-          </div>
+          <div class="flex-grow-1 overline text-uppercase"></div>
           <v-spacer></v-spacer>
-          <v-btn icon color="secondary" @click="$refs.filterForm.reset()">
+          <v-btn
+            icon
+            color="secondary"
+            @click="$refs.filterForm.reset(), (pagination.itemsPerPage = 10)"
+          >
             <v-icon>mdi-filter-remove-outline</v-icon>
           </v-btn>
           <v-btn icon color="green">

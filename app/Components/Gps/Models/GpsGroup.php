@@ -12,6 +12,8 @@ class GpsGroup extends Model
         'name',
         'agency',
         'department',
+        'razon_social',
+        'rfc',
         'description',
     ];
 

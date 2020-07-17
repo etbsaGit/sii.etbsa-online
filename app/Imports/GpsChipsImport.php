@@ -20,7 +20,8 @@ class GpsChipsImport implements ToModel, WithHeadingRow
      */
     public function model(array $row)
     {
-        $gps_chip = DB::table('gps_chips_import')->where('sim', 'like', "%{$row['linea']}%")->first();
+        $gps_chip = DB::table('gps_chips_import')
+        ->where('sim',"{$row['linea']}")->first();
 
         $date = new Carbon($row['fecha_activacion']);
         $date_due = $date->setYear(Carbon::now()->year);

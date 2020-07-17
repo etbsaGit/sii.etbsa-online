@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Components\Gps\Models\GpsChips;
 use App\Components\Gps\Repositories\GpsRepository;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
-
 
 class GpsController extends AdminController
 {
@@ -67,7 +68,7 @@ class GpsController extends AdminController
      */
     public function show($id)
     {
-        $file = $this->gpsRepository->find($id,['chip']);
+        $file = $this->gpsRepository->find($id, ['chip']);
 
         if (!$file) {
             return $this->sendResponseNotFound();
@@ -92,11 +93,37 @@ class GpsController extends AdminController
         if ($validate->fails()) {
             return $this->sendResponseBadRequest($validate->errors()->first());
         }
+        $gps = $this->gpsRepository->find($id);
+
+        if (!$request->has('gps_group_id')) {
+            $request['gps_group_id'] = null;
+            $gps->gpsGroup()->dissociate();
+        }
+        if ($request->gps_chip_id == null) {
+            $chip = GpsChips::find($gps->gps_chip_id);
+            $chip->gps()->dissociate();
+            $chip->save();
+        }
+
+        if ($request->has('renew')) {
+            $renew = new Carbon($request->renew_date);
+            $renew->setYear(Carbon::now()->year);
+            $request['renew_date'] = $renew->addYear();
+            if (!$renew) {
+                return $this->sendResponseBadRequest("Fallo en Renovacion");
+            }
+        }
 
         $updated = $this->gpsRepository->update($id, $request->all());
 
         if (!$updated) {
             return $this->sendResponseBadRequest("Failed to update");
+        }
+       
+        if ($request->gps_chip_id != null) {
+            $chip = GpsChips::find($request['gps_chip_id']);
+            $chip->gps()->associate($gps);
+            $chip->save();
         }
 
         return $this->sendResponseOk([], "Updated.");

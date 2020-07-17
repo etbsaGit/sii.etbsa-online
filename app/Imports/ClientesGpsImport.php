@@ -19,25 +19,28 @@ class ClientesGpsImport implements ToModel, WithHeadingRow
     public function model(array $row)
     {
         $cliente_import = DB::table('gps_clientes_import')
-            ->where('gps', 'like', "%{$row['nombre_gps']}%")
+            ->where('sim', "%{$row['sim']}%")
             ->first();
-        $cliente_nombre = DB::table('gps_clientes_import')
-            ->where('nombre', 'like', "%{$row['cliente']}%")
-            ->first();
+
+        $cliente = GpsGroup::where('name', "{$row['cliente']}")->first();
+
         if (!$cliente_import) {
             DB::table('gps_clientes_import')->insert([
                 'nombre' => $row['cliente'],
                 'razon_social' => $row['razon_social'],
                 'rfc' => $row['rfc'],
                 'gps' => $row['nombre_gps'],
-                'sucursal' => $row['sucursal'],
-                'departamento' => $row['departamento'],
+                'sim' => $row['sim'] ?? null,
+                'sucursal' => $row['sucursal'] ?? null,
+                'departamento' => $row['departamento'] ?? null,
             ]
             );
         }
-        if (!$cliente_nombre) {
+        if (!$cliente) {
             return new GpsGroup([
                 'name' => $row['cliente'],
+                'razon_social' => $row['razon_social'],
+                'rfc' => $row['rfc'],
                 'agency' => $row['sucursal'] ?? null,
                 'department' => $row['departamento'] ?? null,
             ]);

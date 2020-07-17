@@ -65,7 +65,7 @@
             <span class="text-h5">
               {{auth()->user()->name}}
             </span>
-            <v-menu offset-y>
+            <v-menu offset-y v-if="false">
                 <template v-slot:activator="{ on, attrs }">
                     <v-btn icon v-bind="attrs"
                     v-on="on">

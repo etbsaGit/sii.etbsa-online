@@ -45,16 +45,21 @@
             ></v-select>
           </div>
 
-          <v-row class="flex-grow-0 px-2" justify="space-around">
+          <v-row class="flex-grow-1 px-2" justify="space-around">
             <v-checkbox
               v-model="filters.assigned"
-              class="mx-2"
+              class="mx-1"
               label="Asignados"
             ></v-checkbox>
             <v-checkbox
               v-model="filters.deallocated"
-              class="mx-2"
-              label="Desasignados"
+              class="mx-1"
+              label="SIN Asignar"
+            ></v-checkbox>
+            <v-checkbox
+              v-model="filters.expired"
+              class="mx-1"
+              label="Vencidos"
             ></v-checkbox>
           </v-row>
         </div>
@@ -77,7 +82,11 @@
         <v-toolbar dense elevation="0">
           <div class="flex-grow-1 overline text-uppercase"></div>
           <v-spacer></v-spacer>
-          <v-btn icon color="secondary" @click="$refs.filterForm.reset()">
+          <v-btn
+            icon
+            color="secondary"
+            @click="$refs.filterForm.reset(), (pagination.itemsPerPage = 10)"
+          >
             <v-icon>mdi-filter-remove-outline</v-icon>
           </v-btn>
           <v-btn icon color="green">
@@ -168,9 +177,14 @@
 
       <template v-slot:item.gps="{ item }">
         <v-avatar outlined>
-          <v-icon v-if="item.gps != null" class="green--text"
-            >mdi-check-circle-outline</v-icon
-          >
+          <v-tooltip top v-if="item.gps != null">
+            <template v-slot:activator="{ on, attrs }">
+              <v-icon class="green--text" v-bind="attrs" v-on="on"
+                >mdi-check-circle-outline</v-icon
+              >
+            </template>
+            <span>{{ item.gps.name }}</span>
+          </v-tooltip>
           <v-icon class="grey--text" v-else>mdi-alert-rhombus-outline</v-icon>
         </v-avatar>
         <!-- {{ item.gps ? item.gps.name : "SIN ASIGNAR" }} -->
@@ -294,7 +308,8 @@ export default {
         month: null,
         year: null,
         assigned: null,
-        deallocated: null
+        deallocated: null,
+        expired: null
       }
     };
   },
@@ -353,6 +368,7 @@ export default {
         imei: self.filters.imei,
         assigned: self.filters.assigned ? self.filters.assigned : null,
         deallocated: self.filters.deallocated ? self.filters.deallocated : null,
+        expired: self.filters.expired ? self.filters.expired : null,
         order_sort: self.pagination.sortDesc[0] ? "desc" : "asc",
         order_by: self.pagination.sortBy[0] || "sim",
         page: self.pagination.page,

@@ -2,6 +2,7 @@
 
 namespace App\Components\Gps\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class GpsChips extends Model
@@ -75,5 +76,14 @@ class GpsChips extends Model
         }
 
         return $q->whereNull('gps_id');
+    }
+
+    public function scopeOfExpired($q, $v)
+    {
+        if ($v === null || $v == false) {
+            return false;
+        }
+
+        return $q->whereDate('fecha_renovacion', '<=', Carbon::now());
     }
 }

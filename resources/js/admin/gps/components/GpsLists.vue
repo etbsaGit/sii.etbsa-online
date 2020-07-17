@@ -76,7 +76,7 @@
               item-value="id"
             ></v-autocomplete>
           </div>
-          <div class="d-flex flex-row align-center">
+          <div class="d-flex flex-xs-column flex-md-row align-center">
             <v-checkbox
               v-model="filters.assigned"
               class="mx-2"
@@ -85,7 +85,19 @@
             <v-checkbox
               v-model="filters.deallocated"
               class="mx-2"
-              label="Desasignados"
+              label="SIN Asignar"
+            ></v-checkbox>
+          </div>
+          <div class="d-flex flex-xs-column flex-md-row align-center">
+            <v-checkbox
+              v-model="filters.renewed"
+              class="mx-2"
+              label="Renovados"
+            ></v-checkbox>
+            <v-checkbox
+              v-model="filters.expired"
+              class="mx-2"
+              label="Vencidos"
             ></v-checkbox>
           </div>
         </div>
@@ -109,7 +121,11 @@
             Ultima Actualizacion de Datos: YYYY/MM/DD
           </div> -->
           <v-spacer></v-spacer>
-          <v-btn icon color="secondary" @click="$refs.filterForm.reset()">
+          <v-btn
+            icon
+            color="secondary"
+            @click="$refs.filterForm.reset(), (pagination.itemsPerPage = 10)"
+          >
             <v-icon>mdi-filter-remove-outline</v-icon>
           </v-btn>
           <v-tooltip top>
@@ -198,17 +214,19 @@
           >
             <v-btn outlined small color="primary" pa-0>Asignar CHIP</v-btn>
             <template v-slot:input>
-              <div class="mt-4 title">Asignar CHIP</div>
-              <v-autocomplete
-                v-model="item.gps_chip_id"
-                filled
-                clearable
-                prepend-icon="mdi-filter-variant"
-                label="Buscar CHIP"
-                :items="options.gpsChips"
-                item-text="sim"
-                item-value="id"
-              ></v-autocomplete>
+              <v-form v-model="validInLine" ref="formInLine" lazy-validation>
+                <div class="mt-4 title">Asignar CHIP</div>
+                <v-autocomplete
+                  v-model="item.gps_chip_id"
+                  filled
+                  clearable
+                  prepend-icon="mdi-filter-variant"
+                  label="Buscar CHIP"
+                  :items="options.gpsChips"
+                  item-text="sim"
+                  item-value="id"
+                ></v-autocomplete>
+              </v-form>
             </template>
           </v-edit-dialog>
         </template>
@@ -228,17 +246,19 @@
           >
             <v-btn outlined small color="primary" pa-0>Asignar a Grupo</v-btn>
             <template v-slot:input>
-              <div class="mt-4 title">Asignar a Grupo</div>
-              <v-autocomplete
-                v-model="item.gps_group_id"
-                filled
-                clearable
-                prepend-icon="mdi-filter-variant"
-                label="Buscar Grupo"
-                :items="options.gpsGroup"
-                item-text="name"
-                item-value="id"
-              ></v-autocomplete>
+              <v-form v-model="validInLine" ref="formInLine" lazy-validation>
+                <div class="mt-4 title">Asignar a Grupo</div>
+                <v-autocomplete
+                  v-model="item.gps_group_id"
+                  filled
+                  clearable
+                  prepend-icon="mdi-filter-variant"
+                  label="Buscar Grupo"
+                  :items="options.gpsGroup"
+                  item-text="name"
+                  item-value="id"
+                ></v-autocomplete>
+              </v-form>
             </template>
           </v-edit-dialog>
         </template>
@@ -281,55 +301,61 @@
           :return-value.sync="item.amount"
           large
           persistent
-          @save="saveInLine(item)"
+          save-text="RENOVAR"
+          @save="saveInLine(item, true)"
           @cancel="cancel"
         >
           <v-btn outlined small pa-0>{{
             item.amount | money(item.currency)
           }}</v-btn>
           <template v-slot:input>
-            <div class="mt-4 title">Ingresar Importe Factura:</div>
-            <v-form v-model="validInLine" ref="formInLine" lazy-validation>
-            </v-form>
-            <v-text-field
-              v-model.lazy="item.invoice"
-              label="Folio Factura"
-              :rules="[v => !!v || 'Campo requerido']"
-              counter
-              autofocus
-            ></v-text-field>
-            <v-text-field
-              v-model.lazy="item.amount"
-              label="Importe Factura"
-              type="tel"
-              prefix="$"
-              autofocus
-            ></v-text-field>
-            <v-row dense>
-              <v-col cols="6">
-                <v-select
-                  v-model="item.currency"
-                  :items="['MXN', 'USD']"
-                  label="Moneda"
-                ></v-select>
-              </v-col>
-              <v-col cols="6">
+            <v-container>
+              <div class="title">Renovacion</div>
+              <div class="overline">{{ item.name }}</div>
+              <div class="mt-2 caption text-uppercase">Ingresar Factura:</div>
+              <v-form v-model="validInLine" ref="formInLine" lazy-validation>
                 <v-text-field
-                  v-model.lazy="item.exchange_rate"
-                  label="Tipo Cambio"
-                  type="Numeric"
+                  v-model.lazy="item.invoice"
+                  label="Folio Factura"
+                  :rules="[v => !!v || 'Campo requerido']"
+                  counter
+                  autofocus
+                ></v-text-field>
+                <v-text-field
+                  v-model.lazy="item.amount"
+                  label="Importe Factura"
+                  type="tel"
                   prefix="$"
                   autofocus
                 ></v-text-field>
-              </v-col>
-            </v-row>
+                <v-row dense>
+                  <v-col cols="6">
+                    <v-select
+                      v-model="item.currency"
+                      :items="['MXN', 'USD']"
+                      label="Moneda"
+                    ></v-select>
+                  </v-col>
+                  <v-col cols="6">
+                    <v-text-field
+                      v-model.lazy="item.exchange_rate"
+                      label="Tipo Cambio"
+                      type="Numeric"
+                      prefix="$"
+                      autofocus
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
+              </v-form>
+            </v-container>
           </template>
         </v-edit-dialog>
       </template>
 
       <template v-slot:item.installation_date="{ item }">
         <span class="overline text-capitalize">
-          {{ $appFormatters.formatDate(item.installation_date) }}
+          <!-- {{ $appFormatters.formatDate(item.installation_date) }} -->
+          {{ $appFormatters.formatDate(item.renew_date) }}
         </span>
       </template>
 
@@ -371,8 +397,11 @@
           </v-toolbar-items>
         </v-toolbar>
         <v-card-text>
-          <gps-edit v-if="formEdit" :propGpsId="dialogs.gps.id"  :propOptionGroups="options.gpsGroup"
-            ></gps-edit>
+          <gps-edit
+            v-if="formEdit"
+            :propGpsId="dialogs.gps.id"
+            :propOptionGroups="options.gpsGroup"
+          ></gps-edit>
           <gps-add
             v-else-if="dialogs.show"
             :propOptionGroups="options.gpsGroup"
@@ -440,7 +469,7 @@ export default {
           sortable: false
         },
         {
-          text: "Fecha de Instalacion",
+          text: "Fecha de Renovacion",
           value: "installation_date",
           align: "center",
           width: 135,
@@ -482,7 +511,9 @@ export default {
         agency: null,
         department: null,
         assigned: null,
-        deallocated: null
+        deallocated: null,
+        expired: null,
+        renewed: null
       }
     };
   },
@@ -539,8 +570,10 @@ export default {
         agency: self.filters.agency,
         department: self.filters.department,
         group_id: self.filters.groupId.join(","),
-         assigned: self.filters.assigned ? self.filters.assigned : null,
+        assigned: self.filters.assigned ? self.filters.assigned : null,
         deallocated: self.filters.deallocated ? self.filters.deallocated : null,
+        expired: self.filters.expired ? self.filters.expired : null,
+        renewed: self.filters.renewed ? self.filters.renewed : null,
         order_sort: self.pagination.sortDesc[0] ? "desc" : "asc",
         order_by: self.pagination.sortBy[0] || "name",
         page: self.pagination.page,
@@ -620,9 +653,10 @@ export default {
         }
       });
     },
-    saveInLine(item) {
+    saveInLine(item, renew = null) {
       const self = this;
       if (self.$refs.formInLine.validate()) {
+        item.renew = renew;
         axios
           .put("/admin/gps/" + item.id, item)
           .then(function(response) {
@@ -648,6 +682,8 @@ export default {
               console.log("Error", error.message);
             }
           });
+      } else {
+        self.cancel();
       }
     },
     cancel() {

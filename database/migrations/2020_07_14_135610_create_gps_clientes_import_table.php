@@ -15,6 +15,7 @@ class CreateGpsClientesImportTable extends Migration
     {
         Schema::create('gps_clientes_import', function (Blueprint $table) {
             $table->id();
+            $table->string('sim')->nullable();
             $table->string('nombre');
             $table->string('razon_social')->nullable();
             $table->string('rfc')->nullable();

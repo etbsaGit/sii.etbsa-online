@@ -25,6 +25,7 @@ class GpsChipsRepository extends BaseRepository
             // $sim = Arr::get($params, 'sim', null);
             $assigned = ($params['assigned'] ?? null);
             $deallocated = ($params['deallocated'] ?? null);
+            $expired = ($params['expired'] ?? null);
 
             // if ($sim) {
             //     $q = $q->where('sim', 'like', "%{$sim}%");
@@ -38,6 +39,7 @@ class GpsChipsRepository extends BaseRepository
             if (!($assigned && $deallocated)) {
                 $q->ofAssigned($assigned);
                 $q->ofDeallocated($deallocated);
+                $q->ofExpired($expired);
             }
 
             return $q;

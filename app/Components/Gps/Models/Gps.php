@@ -2,6 +2,7 @@
 
 namespace App\Components\Gps\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class Gps extends Model
@@ -102,7 +103,7 @@ class Gps extends Model
         if ($v === null || $v == false) {
             return false;
         }
-        
+
         return $q->whereNotNull('gps_chip_id');
     }
 
@@ -113,5 +114,22 @@ class Gps extends Model
         }
 
         return $q->whereNull('gps_chip_id');
+    }
+
+    public function scopeOfExpired($q, $v)
+    {
+        if ($v === null || $v == false) {
+            return false;
+        }
+
+        return $q->whereDate('renew_date', '<=', Carbon::now());
+    }
+    public function scopeOfRenewed($q, $v)
+    {
+        if ($v === null || $v == false) {
+            return false;
+        }
+
+        return $q->whereYear('renew_date', '>=', Carbon::now()->addYear()->year);
     }
 }

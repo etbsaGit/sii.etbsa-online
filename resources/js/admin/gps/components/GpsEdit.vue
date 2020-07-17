@@ -98,6 +98,7 @@
                 v-model="renew_date"
                 type="date"
                 :rules="fieldRules"
+                readonly
               ></v-text-field>
             </v-col>
             <v-col cols="12">
@@ -110,7 +111,7 @@
           </v-row>
           <v-row>
             <v-btn block @click="save()" :disabled="!valid" color="primary">
-              Registrar Nuevo
+              Actualizar GPS
             </v-btn>
           </v-row>
         </v-container>
@@ -172,8 +173,8 @@ export default {
           currency: self.currency,
           exchange_rate: self.exchange_rate,
           description: self.description,
-          gps_group_id: self.gps_group_id,
-          gps_chip_id: self.gps_chip.id,
+          gps_group_id: self.gps_group_id ? self.gps_group_id : null,
+          gps_chip_id: self.gps_chip ? self.gps_chip.id : null,
           payment_type: self.payment_type,
           uploaded_by: LSK_APP.AUTH_USER.id
         };

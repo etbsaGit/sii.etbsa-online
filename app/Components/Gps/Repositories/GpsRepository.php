@@ -25,6 +25,8 @@ class GpsRepository extends BaseRepository
 
             $assigned = ($params['assigned'] ?? null);
             $deallocated = ($params['deallocated'] ?? null);
+            $expired = ($params['expired'] ?? null);
+            $renewed = ($params['renewed'] ?? null);
             
             $q->ofGpsGroups(Helpers::commasToArray($params['group_id'] ?? ''));
             $q->ofName($params['name'] ?? '');
@@ -36,9 +38,16 @@ class GpsRepository extends BaseRepository
             if (!($assigned && $deallocated)) {
                 $q->ofAssigned($assigned);
                 $q->ofDeallocated($deallocated);
+                $q->ofExpired($expired);
+                $q->ofRenewed($renewed);
             }
 
             return $q;
         });
+    }
+
+    public function renewGps($request)
+    {
+        # code...
     }
 }
