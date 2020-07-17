@@ -62,6 +62,17 @@
             ></v-select>
           </div>
           <div class="flex-grow-1 px-2">
+            <v-select
+              v-model="filters.payment_type"
+              :items="options.payment_type"
+              label="Tipo de Pago"
+              :menu-props="{ offsetY: true }"
+              prepend-icon="mdi-filter-variant"
+              clearable
+              filled
+            ></v-select>
+          </div>
+          <div class="flex-grow-1 px-2">
             <v-autocomplete
               v-model="filters.groupId"
               filled
@@ -500,7 +511,8 @@ export default {
         gpsGroup: [],
         gpsChips: [],
         agencies: optionAgencies,
-        departments: optionDepartments
+        departments: optionDepartments,
+        payment_type: ["CARGO", "CONTADO", "CREDITO"]
       },
       filters: {
         name: null,
@@ -513,7 +525,8 @@ export default {
         assigned: null,
         deallocated: null,
         expired: null,
-        renewed: null
+        renewed: null,
+        payment_type: null
       }
     };
   },
@@ -569,6 +582,7 @@ export default {
         year: self.filters.year,
         agency: self.filters.agency,
         department: self.filters.department,
+        payment_type: self.filters.payment_type,
         group_id: self.filters.groupId.join(","),
         assigned: self.filters.assigned ? self.filters.assigned : null,
         deallocated: self.filters.deallocated ? self.filters.deallocated : null,

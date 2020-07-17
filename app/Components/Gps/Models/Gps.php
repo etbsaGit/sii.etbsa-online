@@ -52,6 +52,15 @@ class Gps extends Model
         return $query->where('name', 'LIKE', "%{$name}%");
     }
 
+    public function scopeOfPayment($query, $v)
+    {
+        if ($v === null || $v === '') {
+            return false;
+        }
+
+        return $query->where('payment_type', 'LIKE', "%{$v}%");
+    }
+
     public function scopeOfMonth($query, $v)
     {
         if ($v === null || $v === '') {

@@ -34,6 +34,7 @@ class GpsRepository extends BaseRepository
             $q->ofYear($params['year'] ?? '');
             $q->ofAgency($params['agency'] ?? '');
             $q->ofDepartment($params['department'] ?? '');
+            $q->ofPayment($params['payment_type'] ?? '');
 
             if (!($assigned && $deallocated)) {
                 $q->ofAssigned($assigned);
