@@ -213,14 +213,14 @@ export default {
     loadGpsChips(cb) {
       const self = this;
       let params = {
-        per_page: -1,
+        paginate: 'no',
         deallocated: true
       };
 
       axios
         .get("/admin/gps-chips", { params: params })
         .then(function(response) {
-          self.propOptionChips = response.data.data.data;
+          self.propOptionChips = response.data.data;
           cb();
         });
     }

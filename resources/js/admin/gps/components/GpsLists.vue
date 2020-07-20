@@ -328,7 +328,7 @@
                 <v-text-field
                   v-model.lazy="item.invoice"
                   label="Folio Factura"
-                  :rules="[v => !!v || 'Campo requerido']"
+                  :rules="[(v) => !!v || 'Campo requerido']"
                   counter
                   autofocus
                 ></v-text-field>
@@ -382,6 +382,21 @@
         </span>
       </template>
     </v-data-table>
+    <v-divider class="my-3"></v-divider>
+    <div
+      v-if="countAmountCost >= 0 && countAmountInvoice >= 0"
+      class="d-flex flex-md-row flex-xs-column flex-wrap justify-space-around "
+    >
+      <gps-card
+        propTitle="Total Costo:"
+        :propAmount="countAmountCost"
+      ></gps-card>
+
+      <gps-card
+        propTitle="Total Facturado:"
+        :propAmount="countAmountInvoice"
+      ></gps-card>
+    </div>
     <!-- dialog -->
     <v-dialog
       v-model="dialogs.show"
@@ -427,6 +442,7 @@
 <script>
 import GpsAdd from "@admin/gps/components/GpsAdd.vue";
 import GpsEdit from "@admin/gps/components/GpsEdit.vue";
+import GpsCard from "@admin/gps/components/GpsAmountsCard.vue";
 
 import optionMoths from "~/api/moths.json";
 import optionYears from "~/api/years.json";
@@ -435,7 +451,8 @@ import optionDepartments from "~/api/departments.json";
 export default {
   components: {
     GpsAdd,
-    GpsEdit
+    GpsEdit,
+    GpsCard,
   },
   data() {
     return {
@@ -447,44 +464,44 @@ export default {
           divider: true,
           width: 10,
           class: "pa-auto",
-          sortable: false
+          sortable: false,
         },
         {
           text: "Nombre GPS",
           value: "name",
           align: "left",
-          sortable: true
+          sortable: true,
         },
         {
           text: "SIM",
           value: "sim",
           align: "right",
-          sortable: true
+          sortable: true,
         },
         {
           text: "Grupo",
           value: "gps_group",
           align: "left",
-          sortable: false
+          sortable: false,
         },
         {
           text: "Costo",
           value: "cost",
           align: "right",
-          sortable: false
+          sortable: false,
         },
         {
           text: "Facturado",
           value: "amount",
           align: "right",
-          sortable: false
+          sortable: false,
         },
         {
           text: "Fecha de Renovacion",
           value: "installation_date",
           align: "center",
           width: 135,
-          sortable: false
+          sortable: false,
         },
         {
           text: "Vence en (dias)",
@@ -492,18 +509,19 @@ export default {
           align: "center",
           width: 125,
           class: "pa-0",
-          sortable: true
-        }
+          sortable: true,
+        },
       ],
       items: [],
+      items_np: [],
       totalItems: 0,
       pagination: {
-        itemsPerPage: 10
+        itemsPerPage: 10,
       },
       editedIndex: -1,
       dialogs: {
         show: false,
-        gps: null
+        gps: null,
       },
       options: {
         months: optionMoths,
@@ -512,7 +530,7 @@ export default {
         gpsChips: [],
         agencies: optionAgencies,
         departments: optionDepartments,
-        payment_type: ["CARGO", "CONTADO", "CREDITO"]
+        payment_type: ["CARGO", "CONTADO", "CREDITO"],
       },
       filters: {
         name: null,
@@ -526,8 +544,8 @@ export default {
         deallocated: null,
         expired: null,
         renewed: null,
-        payment_type: null
-      }
+        payment_type: null,
+      },
     };
   },
   mounted() {
@@ -544,14 +562,14 @@ export default {
       handler: _.debounce(function() {
         this.loadGps(() => {});
       }, 700),
-      deep: true
+      deep: true,
     },
     filters: {
       handler: _.debounce(function(v) {
         this.loadGps(() => {});
       }, 700),
-      deep: true
-    }
+      deep: true,
+    },
   },
   computed: {
     formTitle() {
@@ -559,7 +577,37 @@ export default {
     },
     formEdit() {
       return this.editedIndex !== -1;
-    }
+    },
+    countAmountCost() {
+      const self = this;
+      if (self.items_np.length > 0) {
+        return self.items_np
+          .map((item) => {
+            return !!item.chip ? item.chip.costo : 0;
+          })
+          .reduce((acc, curr) => {
+            return parseFloat(acc) + parseFloat(curr);
+          });
+      } else {
+        return 0;
+      }
+    },
+    countAmountInvoice() {
+      const self = this;
+      if (self.items_np.length > 0) {
+        return self.items_np
+          .map((item) => {
+            return !!item.amount
+              ? parseFloat(item.amount) * parseFloat(item.exchange_rate)
+              : 0;
+          })
+          .reduce((acc, curr) => {
+            return parseFloat(acc) + parseFloat(curr);
+          });
+      } else {
+        return 0;
+      }
+    },
   },
   methods: {
     refresh() {
@@ -591,7 +639,7 @@ export default {
         order_sort: self.pagination.sortDesc[0] ? "desc" : "asc",
         order_by: self.pagination.sortBy[0] || "name",
         page: self.pagination.page,
-        per_page: self.pagination.itemsPerPage
+        per_page: self.pagination.itemsPerPage,
       };
 
       axios.get("/admin/gps", { params: params }).then(function(response) {
@@ -600,31 +648,37 @@ export default {
         self.pagination.totalItems = response.data.data.total;
         (cb || Function)();
       });
+
+      const cloneParams = { ...params, paginate: "no" };
+      axios.get("/admin/gps", { params: cloneParams }).then(function(response) {
+        self.items_np = response.data.data;
+        (cb || Function)();
+      });
     },
     loadGpsGroup(cb) {
       const self = this;
       let params = {
-        per_page: -1
+        paginate: "no",
       };
 
       axios
         .get("/admin/gps-groups", { params: params })
         .then(function(response) {
-          self.options.gpsGroup = response.data.data.data;
+          self.options.gpsGroup = response.data.data;
           cb();
         });
     },
     loadGpsChips(cb) {
       const self = this;
       let params = {
-        per_page: -1,
-        deallocated: true
+        paginate: "no",
+        deallocated: true,
       };
 
       axios
         .get("/admin/gps-chips", { params: params })
         .then(function(response) {
-          self.options.gpsChips = response.data.data.data;
+          self.options.gpsChips = response.data.data;
           cb();
         });
     },
@@ -642,7 +696,7 @@ export default {
               self.$store.commit("showSnackbar", {
                 message: response.data.message,
                 color: "success",
-                duration: 3000
+                duration: 3000,
               });
 
               self.$eventBus.$emit("GPS_DELETED");
@@ -653,7 +707,7 @@ export default {
                 self.$store.commit("showSnackbar", {
                   message: error.response.data.message,
                   color: "error",
-                  duration: 3000
+                  duration: 3000,
                 });
               } else if (error.request) {
                 console.log(error.request);
@@ -664,48 +718,62 @@ export default {
         },
         cancelCb: () => {
           console.log("CANCEL");
-        }
+        },
       });
     },
     saveInLine(item, renew = null) {
       const self = this;
       if (self.$refs.formInLine.validate()) {
         item.renew = renew;
-        axios
-          .put("/admin/gps/" + item.id, item)
-          .then(function(response) {
-            self.$store.commit("showSnackbar", {
-              message: response.data.message,
-              color: "success",
-              duration: 3000
-            });
+        self.$store.commit("showDialog", {
+          type: "confirm",
+          title: "Confirmar Renovacion",
+          message: "¿Seguro en Renovar el GPS para el Siguiente año?",
+          okCb: () => {
+            axios
+              .put("/admin/gps/" + item.id, item)
+              .then(function(response) {
+                self.$store.commit("showSnackbar", {
+                  message: response.data.message,
+                  color: "success",
+                  duration: 3000,
+                });
 
-            self.$eventBus.$emit("GPS_UPDATED");
-            self.$eventBus.$emit("GPS_GROUP_UPDATED");
-          })
-          .catch(function(error) {
-            if (error.response) {
-              self.$store.commit("showSnackbar", {
-                message: error.response.data.message,
-                color: "error",
-                duration: 3000
+                self.$eventBus.$emit("GPS_UPDATED");
+                self.$eventBus.$emit("GPS_GROUP_UPDATED");
+              })
+              .catch(function(error) {
+                item.amount = 0;
+                if (error.response) {
+                  self.$store.commit("showSnackbar", {
+                    message: error.response.data.message,
+                    color: "error",
+                    duration: 3000,
+                  });
+                } else if (error.request) {
+                  console.log(error.request);
+                } else {
+                  console.log("Error", error.message);
+                }
               });
-            } else if (error.request) {
-              console.log(error.request);
-            } else {
-              console.log("Error", error.message);
-            }
-          });
-      } else {
+          },
+          cancelCb: () => {        
+            self.cancel();
+            item.amount = 0;
+          },
+        });
+      } else {    
         self.cancel();
+        item.amount = 0;
       }
     },
     cancel() {
       const self = this;
+      self.$refs.formInLine.reset();
       self.$store.commit("showSnackbar", {
         message: "Cancel",
         color: "error lighten-1",
-        duration: 3000
+        duration: 3000,
       });
     },
     getColor(date) {
@@ -723,15 +791,15 @@ export default {
         group_id: self.filters.groupId.join(","),
         order_sort: self.pagination.sortDesc[0] ? "desc" : "asc",
         order_by: self.pagination.sortBy[0] || "name",
-        paginate: "no"
+        paginate: "no",
       };
       self.$store.commit("showLoader");
       axios
         .get("/admin/gps-export", {
           params: params,
-          responseType: "blob"
+          responseType: "blob",
         })
-        .then(res => {
+        .then((res) => {
           const url = window.URL.createObjectURL(new Blob([res.data]));
           const link = document.createElement("a");
           link.href = url;
@@ -744,7 +812,7 @@ export default {
             self.$store.commit("showSnackbar", {
               message: error.response.data.message,
               color: "error",
-              duration: 3000
+              duration: 3000,
             });
           } else if (error.request) {
             console.log(error.request);
@@ -755,7 +823,7 @@ export default {
         .finally(function() {
           self.$store.commit("hideLoader");
         });
-    }
-  }
+    },
+  },
 };
 </script>
