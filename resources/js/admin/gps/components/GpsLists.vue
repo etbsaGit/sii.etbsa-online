@@ -308,11 +308,15 @@
       </template>
 
       <template v-slot:item.amount="{ item }">
+        <!-- <v-btn v-if="item.amount > 0" outlined small pa-0 disabled>{{
+          item.amount | money(item.currency)
+        }}</v-btn> -->
         <v-edit-dialog
           :return-value.sync="item.amount"
           large
           persistent
           save-text="RENOVAR"
+          @open="openInLine(item)"
           @save="saveInLine(item, true)"
           @cancel="cancel"
         >
@@ -383,6 +387,7 @@
       </template>
     </v-data-table>
     <v-divider class="my-3"></v-divider>
+    <!-- cards importes totales -->
     <div
       v-if="countAmountCost >= 0 && countAmountInvoice >= 0"
       class="d-flex flex-md-row flex-xs-column flex-wrap justify-space-around "
@@ -514,6 +519,7 @@ export default {
       ],
       items: [],
       items_np: [],
+      itemEditInLine: {},
       totalItems: 0,
       pagination: {
         itemsPerPage: 10,
@@ -743,7 +749,8 @@ export default {
                 self.$eventBus.$emit("GPS_GROUP_UPDATED");
               })
               .catch(function(error) {
-                item.amount = 0;
+                self.$refs.formInLine.reset();
+                item = self.itemEditInLine;
                 if (error.response) {
                   self.$store.commit("showSnackbar", {
                     message: error.response.data.message,
@@ -757,19 +764,22 @@ export default {
                 }
               });
           },
-          cancelCb: () => {        
+          cancelCb: () => {
             self.cancel();
-            item.amount = 0;
+            item = self.itemEditInLine;
           },
         });
-      } else {    
+      } else {
         self.cancel();
         item.amount = 0;
       }
     },
+    openInLine(item) {
+      const self = this;
+      self.itemEditInLine = item;
+    },
     cancel() {
       const self = this;
-      self.$refs.formInLine.reset();
       self.$store.commit("showSnackbar", {
         message: "Cancel",
         color: "error lighten-1",

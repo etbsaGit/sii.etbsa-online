@@ -9,6 +9,7 @@
                 label="Nombre GPS"
                 v-model="name"
                 :rules="fieldRules"
+                :readonly="$gate.deny('updateGps', 'gps')"
               ></v-text-field>
             </v-col>
             <v-col cols="12" md="3">
@@ -56,6 +57,7 @@
               <v-text-field
                 label="Folio Factura"
                 v-model="invoice"
+                :readonly="$gate.deny('updateGps', 'gps')"
               ></v-text-field>
             </v-col>
             <v-col cols="12" md="3">
@@ -65,6 +67,7 @@
                 type="Number"
                 prefix="$"
                 placeholder="0.00"
+                :readonly="$gate.deny('updateGps', 'gps')"
               ></v-text-field>
             </v-col>
             <v-col cols="6" md="3">
@@ -72,6 +75,7 @@
                 v-model="currency"
                 :items="options.currency"
                 label="Moneda"
+                :readonly="$gate.deny('updateGps', 'gps')"
               ></v-select>
             </v-col>
             <v-col cols="6" md="3">
@@ -80,6 +84,7 @@
                 label="Tipo Cambio"
                 type="Number"
                 prefix="$"
+                :readonly="$gate.deny('updateGps', 'gps')"
               ></v-text-field>
             </v-col>
           </v-row>
@@ -98,7 +103,7 @@
                 v-model="renew_date"
                 type="date"
                 :rules="fieldRules"
-                readonly
+                :readonly="$gate.deny('updateGps', 'gps')"
               ></v-text-field>
             </v-col>
             <v-col cols="12">

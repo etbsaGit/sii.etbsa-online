@@ -14,12 +14,16 @@ import Vue from "vue";
 import Vuetify from "vuetify";
 import es from "vuetify/es5/locale/es";
 import VueProgressBar from "vue-progressbar";
+import  Gate  from "~/common/Gate";
 import "~/plugins";
 
 // this is the vuetify theming options
 // you can change colors here based on your needs
 // and please dont forget to recompile scripts
 Vue.use(Vuetify);
+
+// Gate
+Vue.prototype.$gate = new Gate(window.LSK_APP.AUTH_USER.all_permissions);
 
 // this is the progress bar settings, you
 // can change colors here to fit on your needs or match
