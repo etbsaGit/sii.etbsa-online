@@ -65,7 +65,7 @@ class GpsChipsRepository extends BaseRepository
                 return false;
             };
 
-            $GpsChips->gps()->detach();
+            $GpsChips->gps()->dissociate();
             $GpsChips->delete();
         }
 

@@ -51,6 +51,16 @@ class Gps extends Model
 
         return $query->where('name', 'LIKE', "%{$name}%");
     }
+    public function scopeOfSim($query, $v)
+    {
+        if ($v === null || $v === '') {
+            return false;
+        }
+
+        return $query->whereHas('chip', function ($q) use ($v) {
+            return $q->where('sim','like', "%{$v}%");
+        });
+    }
 
     public function scopeOfPayment($query, $v)
     {
@@ -75,6 +85,21 @@ class Gps extends Model
             return false;
         }
         return $query->whereYear('renew_date', $v);
+    }
+    public function scopeOfMonthInstallation($query, $v)
+    {
+        if ($v === null || $v === '') {
+            return false;
+        }
+        return $query->whereMonth('installation_date', $v);
+    }
+
+    public function scopeOfYearInstallation($query, $v)
+    {
+        if ($v === null || $v === '') {
+            return false;
+        }
+        return $query->whereYear('installation_date', $v);
     }
 
     public function scopeOfGpsGroups($q, $v)

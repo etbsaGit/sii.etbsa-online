@@ -106,7 +106,7 @@
             </template>
             <span>Agregar Nuevo</span>
           </v-tooltip>
-          <v-btn icon>
+          <v-btn icon  @click="refresh()">
             <v-icon>mdi-refresh</v-icon>
           </v-btn>
         </v-toolbar>

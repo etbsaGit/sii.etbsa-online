@@ -88,12 +88,13 @@ class GpsController extends AdminController
     {
         $validate = validator($request->all(), [
             'name' => 'required|string',
+            'amount' => 'numeric',
         ]);
 
         if ($validate->fails()) {
             return $this->sendResponseBadRequest($validate->errors()->first());
         }
-        $gps = $this->gpsRepository->find($id);
+        $gps = $this->gpsRepository->find($id,['chip']);
 
         if (!$request->has('gps_group_id')) {
             $request['gps_group_id'] = null;
@@ -119,7 +120,7 @@ class GpsController extends AdminController
         if (!$updated) {
             return $this->sendResponseBadRequest("Failed to update");
         }
-       
+
         if ($request->gps_chip_id != null) {
             $chip = GpsChips::find($request['gps_chip_id']);
             $chip->gps()->associate($gps);

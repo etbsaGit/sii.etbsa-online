@@ -1,11 +1,11 @@
 <template>
   <v-card class="mx-auto" max-width="350">
     <v-card-text>
-      <p class="display-1 text--primary">
+      <p class="text-h5 text--primary">
         {{ propTitle }}
       </p>
-      <div class="text--primary text-h4">
-        {{ propAmount | money() }} MXN
+      <div class="text--primary text-h5">
+        {{ propAmount | money() }}
       </div>
     </v-card-text>
   </v-card>
@@ -21,6 +21,9 @@ export default {
       type: Number,
       default: 0,
       required: true
+    },
+    propCurrency: {
+      default: 'MXN',
     }
   }
 }

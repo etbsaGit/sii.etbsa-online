@@ -37,6 +37,29 @@
           </div>
           <div class="flex-grow-1 px-2">
             <v-select
+              prepend-icon="mdi-calendar-month-outline"
+              v-model="filters.month_installation"
+              :items="options.months"
+              label="Mes Instalacion"
+              :menu-props="{ offsetY: true }"
+              item-text="name"
+              item-value="value"
+              clearable
+            ></v-select>
+          </div>
+          <div class="flex-grow-1 px-2">
+            <v-select
+              prepend-icon="mdi-calendar-month-outline"
+              v-model="filters.year_installation"
+              :items="options.years"
+              item-text="name"
+              item-value="name"
+              label="Año Intalacion"
+              clearable
+            ></v-select>
+          </div>
+          <div class="flex-grow-1 px-2">
+            <v-select
               v-model="filters.agency"
               :items="options.agencies"
               label="Sucursal"
@@ -123,14 +146,135 @@
       :server-items-length="totalItems"
       dense
       fixed-header
-      class="elevation-1 text-uppercase"
+      class="elevation-1 text-uppercase caption"
     >
       <!-- Top -->
       <template v-slot:top>
-        <v-toolbar dense elevation="0">
-          <!-- <div class="flex-grow-1 overline text-uppercase">
-            Ultima Actualizacion de Datos: YYYY/MM/DD
-          </div> -->
+        <v-toolbar elevation="0">
+          <div class="flex-grow-1 overline text-uppercase">
+            <!-- Mes Anterior({{ lastMonth.mes }}): {{ lastMonth.total }} -->
+            Mes Anterior({{ lastMonth.mes }}):<br />
+            <v-tooltip top>
+              <template v-slot:activator="{ on, attrs }">
+                <v-chip color="grey" dark small v-bind="attrs" v-on="on">
+                  {{ lastMonth.total }}
+                </v-chip>
+              </template>
+              <span>GPS Totales</span>
+            </v-tooltip>
+            <v-tooltip top>
+              <template v-slot:activator="{ on, attrs }">
+                <v-chip color="primary" dark small v-bind="attrs" v-on="on">
+                  {{ lastMonth.renovados }}
+                </v-chip>
+              </template>
+              <span>GPS Renovados</span>
+            </v-tooltip>
+            <v-tooltip top>
+              <template v-slot:activator="{ on, attrs }">
+                <v-chip color="blue" dark small v-bind="attrs" v-on="on">
+                  {{ lastMonth.nuevos }}
+                </v-chip>
+              </template>
+              <span>GPS Nuevos</span>
+            </v-tooltip>
+            <v-tooltip top>
+              <template v-slot:activator="{ on, attrs }">
+                <v-chip
+                  :color="getColor(lastMonth.porcentaje * 100)"
+                  dark
+                  small
+                  v-bind="attrs"
+                  v-on="on"
+                >
+                  {{ lastMonth.porcentaje | percent() }}
+                </v-chip>
+              </template>
+              <span>Porcentaje Renovacion</span>
+            </v-tooltip>
+          </div>
+          <div class="flex-grow-1 overline text-uppercase">
+            Mes Actual({{ currentMonth.mes }}):<br />
+            <v-tooltip top>
+              <template v-slot:activator="{ on, attrs }">
+                <v-chip color="grey" dark small v-bind="attrs" v-on="on">
+                  {{ currentMonth.total }}
+                </v-chip>
+              </template>
+              <span>GPS Totales</span>
+            </v-tooltip>
+            <v-tooltip top>
+              <template v-slot:activator="{ on, attrs }">
+                <v-chip color="primary" dark small v-bind="attrs" v-on="on">
+                  {{ currentMonth.renovados }}
+                </v-chip>
+              </template>
+              <span>GPS Renovados</span>
+            </v-tooltip>
+            <v-tooltip top>
+              <template v-slot:activator="{ on, attrs }">
+                <v-chip color="blue" dark small v-bind="attrs" v-on="on">
+                  {{ currentMonth.nuevos }}
+                </v-chip>
+              </template>
+              <span>GPS Nuevos</span>
+            </v-tooltip>
+            <v-tooltip top>
+              <template v-slot:activator="{ on, attrs }">
+                <v-chip
+                  :color="getColor(currentMonth.porcentaje * 100)"
+                  dark
+                  small
+                  v-bind="attrs"
+                  v-on="on"
+                >
+                  {{ currentMonth.porcentaje | percent() }}
+                </v-chip>
+              </template>
+              <span>Porcentaje Renovacion</span>
+            </v-tooltip>
+          </div>
+          <div class="flex-grow-1 overline text-uppercase">
+            Mes Siguiente({{ nextMonth.mes }}):<br />
+            <v-tooltip top>
+              <template v-slot:activator="{ on, attrs }">
+                <v-chip color="grey" dark small v-bind="attrs" v-on="on">
+                  {{ nextMonth.total }}
+                </v-chip>
+              </template>
+              <span>GPS Totales</span>
+            </v-tooltip>
+            <v-tooltip top>
+              <template v-slot:activator="{ on, attrs }">
+                <v-chip color="primary" dark small v-bind="attrs" v-on="on">
+                  {{ nextMonth.renovados }}
+                </v-chip>
+              </template>
+              <span>GPS Renovados</span>
+            </v-tooltip>
+            <v-tooltip top>
+              <template v-slot:activator="{ on, attrs }">
+                <v-chip color="blue" dark small v-bind="attrs" v-on="on">
+                  {{ nextMonth.nuevos }}
+                </v-chip>
+              </template>
+              <span>GPS Nuevos</span>
+            </v-tooltip>
+            <v-tooltip top>
+              <template v-slot:activator="{ on, attrs }">
+                <v-chip
+                  :color="getColor(nextMonth.porcentaje * 100)"
+                  dark
+                  small
+                  v-bind="attrs"
+                  v-on="on"
+                >
+                  {{ nextMonth.porcentaje | percent() }}
+                </v-chip>
+              </template>
+              <span>Porcentaje Renovacion</span>
+            </v-tooltip>
+          </div>
           <v-spacer></v-spacer>
           <v-btn
             icon
@@ -284,39 +428,29 @@
         <template v-else>
           N/A
         </template>
-        <!-- <v-edit-dialog 
-          :return-value.sync="item.chip.costo"
-          large
-          persistent
-          @save="saveInLine(item)"
-          @cancel="cancel"
-        >
-          <v-btn outlined small pa-0>{{ item.chip.costo | money() }}</v-btn>
-          <template v-slot:input>
-            <div class="mt-4 title">Modificar Costo:</div>
-            <v-text-field
-              v-model.lazy="item.chip.costo"
-              label="Valor"
-              type="tel"
-              prefix="$"
-              single-line
-              counter
-              autofocus
-            ></v-text-field>
-          </template>
-        </v-edit-dialog> -->
       </template>
 
       <template v-slot:item.amount="{ item }">
-        <!-- <v-btn v-if="item.amount > 0" outlined small pa-0 disabled>{{
-          item.amount | money(item.currency)
-        }}</v-btn> -->
+        <template
+          v-if="
+            canEditAmount(item.renew_date) || $gate.deny('updateGps', 'gps')
+          "
+        >
+          <v-tooltip top>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn text pa-0 v-bind="attrs" v-on="on">{{
+                item.amount | money(item.currency)
+              }}</v-btn>
+            </template>
+            <span>{{ item.invoice }}</span>
+          </v-tooltip>
+        </template>
         <v-edit-dialog
+          v-else
           :return-value.sync="item.amount"
           large
           persistent
           save-text="RENOVAR"
-          @open="openInLine(item)"
           @save="saveInLine(item, true)"
           @cancel="cancel"
         >
@@ -341,6 +475,7 @@
                   label="Importe Factura"
                   type="tel"
                   prefix="$"
+                  :rules="[(v) => !!v || 'Campo requerido']"
                   autofocus
                 ></v-text-field>
                 <v-row dense>
@@ -349,6 +484,7 @@
                       v-model="item.currency"
                       :items="['MXN', 'USD']"
                       label="Moneda"
+                      :rules="[(v) => !!v || 'Campo requerido']"
                     ></v-select>
                   </v-col>
                   <v-col cols="6">
@@ -357,6 +493,7 @@
                       label="Tipo Cambio"
                       type="Numeric"
                       prefix="$"
+                      :rules="[(v) => !!v || 'Campo requerido']"
                       autofocus
                     ></v-text-field>
                   </v-col>
@@ -393,13 +530,19 @@
       class="d-flex flex-md-row flex-xs-column flex-wrap justify-space-around "
     >
       <gps-card
-        propTitle="Total Costo:"
+        propTitle="Total Costo MXN:"
         :propAmount="countAmountCost"
       ></gps-card>
 
       <gps-card
-        propTitle="Total Facturado:"
+        propTitle="Total Facturado MXN:"
         :propAmount="countAmountInvoice"
+      ></gps-card>
+
+      <gps-card
+        propTitle="Total Facturado USD:"
+        :propAmount="countAmountInvoiceUSD"
+        propCurrency="USD"
       ></gps-card>
     </div>
     <!-- dialog -->
@@ -542,6 +685,8 @@ export default {
         name: null,
         month: null,
         year: null,
+        month_installation: null,
+        year_installation: null,
         groupId: [],
         chipsId: [],
         agency: null,
@@ -614,6 +759,60 @@ export default {
         return 0;
       }
     },
+    countAmountInvoiceUSD() {
+      const self = this;
+      if (self.items_np.length > 0) {
+        return self.items_np
+          .map((item) => {
+            return item.currency == "USD" ? parseFloat(item.amount) : 0;
+          })
+          .reduce((acc, curr) => {
+            return parseFloat(acc) + parseFloat(curr);
+          });
+      } else {
+        return 0;
+      }
+    },
+    currentMonth() {
+      const self = this;
+      let month = moment().month();
+      if (self.items_np.length > 0) {
+        let gps = self.items_np.filter(
+          (item) => moment(item.renew_date).month() == month
+        );
+        return self.renewGpsStats(gps, month);
+      } else {
+        return {};
+      }
+    },
+    lastMonth() {
+      const self = this;
+      let month = moment()
+        .subtract(1, "M")
+        .month();
+      if (self.items_np.length > 0) {
+        let gps = self.items_np.filter(
+          (item) => moment(item.renew_date).month() == month
+        );
+        return self.renewGpsStats(gps, month);
+      } else {
+        return {};
+      }
+    },
+    nextMonth() {
+      const self = this;
+      let month = moment()
+        .add(1, "M")
+        .month();
+      if (self.items_np.length > 0) {
+        let gps = self.items_np.filter(
+          (item) => moment(item.renew_date).month() == month
+        );
+        return self.renewGpsStats(gps, month);
+      } else {
+        return {};
+      }
+    },
   },
   methods: {
     refresh() {
@@ -634,6 +833,8 @@ export default {
         name: self.filters.name,
         month: self.filters.month,
         year: self.filters.year,
+        month_installation: self.filters.month_installation,
+        year_installation: self.filters.year_installation,
         agency: self.filters.agency,
         department: self.filters.department,
         payment_type: self.filters.payment_type,
@@ -648,16 +849,16 @@ export default {
         per_page: self.pagination.itemsPerPage,
       };
 
+      // no paginate
+      const no_paginate = { ...params, paginate: "no" };
+      axios.get("/admin/gps", { params: no_paginate }).then(function(response) {
+        self.items_np = response.data.data;
+      });
+
       axios.get("/admin/gps", { params: params }).then(function(response) {
         self.items = response.data.data.data;
         self.totalItems = response.data.data.total;
         self.pagination.totalItems = response.data.data.total;
-        (cb || Function)();
-      });
-
-      const cloneParams = { ...params, paginate: "no" };
-      axios.get("/admin/gps", { params: cloneParams }).then(function(response) {
-        self.items_np = response.data.data;
         (cb || Function)();
       });
     },
@@ -749,8 +950,10 @@ export default {
                 self.$eventBus.$emit("GPS_GROUP_UPDATED");
               })
               .catch(function(error) {
-                self.$refs.formInLine.reset();
-                item = self.itemEditInLine;
+                item.amount = 0;
+                item.invoice = "";
+                item.currency = "MXN";
+                item.exchange_rate = 1;
                 if (error.response) {
                   self.$store.commit("showSnackbar", {
                     message: error.response.data.message,
@@ -766,17 +969,19 @@ export default {
           },
           cancelCb: () => {
             self.cancel();
-            item = self.itemEditInLine;
+            item.amount = 0;
+            item.invoice = "";
+            item.currency = "MXN";
+            item.exchange_rate = 1;
           },
         });
       } else {
         self.cancel();
         item.amount = 0;
+        item.invoice = "";
+        item.currency = "MXN";
+        item.exchange_rate = 1;
       }
-    },
-    openInLine(item) {
-      const self = this;
-      self.itemEditInLine = item;
     },
     cancel() {
       const self = this;
@@ -786,9 +991,9 @@ export default {
         duration: 3000,
       });
     },
-    getColor(date) {
-      if (date < 31) return "red";
-      else if (date < 62) return "orange";
+    getColor(value) {
+      if (value < 31) return "red";
+      else if (value < 62) return "orange";
       else return "green";
     },
     exportGps() {
@@ -833,6 +1038,42 @@ export default {
         .finally(function() {
           self.$store.commit("hideLoader");
         });
+    },
+    renewGpsStats(GpsMonth = [], month) {
+      let toRenewGps = GpsMonth.filter(
+        (item) => moment(item.installation_date).year() < moment().year()
+      );
+      let newGps = GpsMonth.filter(
+        (item) => moment(item.installation_date).year() == moment().year()
+      );
+      let renewedGps = toRenewGps.filter(
+        (item) =>
+          moment(item.renew_date).year() ==
+          moment()
+            .add(1, "y")
+            .year()
+        // && moment(item.installation_date).year() < moment().year()
+      );
+      let totalGps = GpsMonth.length;
+      let totalNewGps = newGps.length;
+      let totalRenewedGps = renewedGps.length;
+      let percent = totalRenewedGps / totalGps;
+      // let percent = (totalRenewedGps * 100) / totalGps;
+      return {
+        total: totalGps,
+        nuevos: totalNewGps,
+        renovados: totalRenewedGps,
+        porcentaje: percent,
+        mes: moment.months(month),
+      };
+    },
+    canEditAmount(date) {
+      return (
+        moment(date).year() ==
+        moment()
+          .add(1, "y")
+          .year()
+      );
     },
   },
 };

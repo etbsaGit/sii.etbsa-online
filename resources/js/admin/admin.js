@@ -34,8 +34,7 @@ Vue.use(VueProgressBar, {
   thickness: "5px",
   transition: {
     speed: "0.2s",
-    opacity: "0.6s",
-    termination: 300,
+    opacity: "0.6s"
   },
   autoRevert: true,
   inverse: false,
@@ -61,6 +60,12 @@ Vue.filter("money", (value, type = "MXN") =>
     maximumFractionDigits: 2,
     minimumFractionDigits: 2,
   }).format(value)
+);
+
+Vue.filter("percent", value =>
+    new Intl.NumberFormat("es-MX", {
+        style: "percent"
+    }).format(value)
 );
 
 const admin = new Vue({

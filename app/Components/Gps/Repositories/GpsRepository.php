@@ -32,6 +32,8 @@ class GpsRepository extends BaseRepository
             $q->ofName($params['name'] ?? '');
             $q->ofMonth($params['month'] ?? '');
             $q->ofYear($params['year'] ?? '');
+            $q->ofMonthInstallation($params['month_installation'] ?? '');
+            $q->ofYearInstallation($params['year_installation'] ?? '');
             $q->ofAgency($params['agency'] ?? '');
             $q->ofDepartment($params['department'] ?? '');
             $q->ofPayment($params['payment_type'] ?? '');
@@ -50,5 +52,26 @@ class GpsRepository extends BaseRepository
     public function renewGps($request)
     {
         # code...
+    }
+
+    public function delete(int $id)
+    {
+        $ids = explode(',',$id);
+
+        foreach ($ids as $id)
+        {
+            /** @var Gps $Gps */
+            $Gps = $this->model->find($id);
+
+            if(!$Gps)
+            {
+                return false;
+            };
+
+            $Gps->gpsGroup()->dissociate();
+            $Gps->delete();
+        }
+
+        return true;
     }
 }

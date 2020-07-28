@@ -16,11 +16,19 @@ class CreateGpsHistoricalTable extends Migration
         Schema::create('gps_historical', function (Blueprint $table) {
             $table->id();
             $table->unsignedInteger('gps_id');
-            $table->string('sim')->nullable()->unique();
-            $table->string('imei')->nullable();
-            $table->double('cost',12,2)->default(0);
-            $table->double('amount',12,2)->default(0);
-            $table->timestamp('activation_date')->nullable();
+            $table->string('name');
+            $table->unsignedInteger('uploaded_by');
+
+            $table->unsignedInteger('gps_group_id')->nullable();
+            $table->unsignedInteger('gps_chip_id')->nullable();
+
+            $table->enum('currency', ['MXN', 'USD'])->default('MXN');
+            $table->double('exchange_rate', 12, 2)->default(1);
+            $table->double('amount', 12, 2)->default(0);
+            $table->string('invoice')->nullable();
+            $table->string('payment_type')->nullable();
+
+            $table->timestamp('installation_date')->nullable();
             $table->timestamp('renew_date')->nullable();
             $table->timestamp('cancellation_date')->nullable();
 

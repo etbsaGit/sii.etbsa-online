@@ -4,6 +4,8 @@
             <th>Nombre GPS</th>
             <th>SIM</th>
             <th>Cliente</th>
+            <th>Sucursal</th>
+            <th>Departamento</th>
             <th>Costo</th>
             <th>Factura</th>
             <th>Importe</th>
@@ -19,6 +21,8 @@
             <td>{{ $item->name }}</td>
             <td>{{ $item->chip->sim ?? 'S/A' }}</td>
             <td>{{ $item->gpsGroup->name ?? 'S/A'}}</td>
+            <td>{{ $item->gpsGroup->agency ?? 'S/A'}}</td>
+            <td>{{ $item->gpsGroup->department ?? 'S/A'}}</td>
             <td>{{ $item->chip->costo ?? 'S/A'}}</td>
             <td>{{ $item->invoice ?? 'S/A'}}</td>
             <td>{{ $item->amount ?? 0}}</td>

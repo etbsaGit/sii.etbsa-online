@@ -4,14 +4,17 @@ export default {
       formatDate: function(dateString, format) {
         return moment(dateString).format(format ? format : "MMMDD, YYYY");
       },
-      formatTimeFromNow: (due) => {
-        return moment(due).fromNow(true);
+      formatTimeFromNow: (dateString) => {
+        return moment(dateString).fromNow(true);
       },
-      formatTimeDiffNow: (due, format) => {
-        return moment(due).diff(Date.now(), format ? format : "days");
+      formatTimeDiffNow: (dateString, format) => {
+        return moment(dateString).diff(Date.now(), format ? format : "days");
       },
-      formatTimeDiffDays: (start, end) => {
-        return moment(start).diff(end, "days");
+      formatTimeDiffDays: (dateString, end) => {
+        return moment(dateString).diff(end, "days");
+      },
+      formatLetterMonth: (numberMonth) => {
+        return moment.months(numberMonth);
       },
       formatByteToMB(sizeInBytes) {
         return (sizeInBytes / (1024 * 1024)).toFixed(2);
