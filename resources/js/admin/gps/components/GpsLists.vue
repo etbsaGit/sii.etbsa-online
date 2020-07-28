@@ -54,7 +54,7 @@
               :items="options.years"
               item-text="name"
               item-value="name"
-              label="Año Intalacion"
+              label="Año Instalacion"
               clearable
             ></v-select>
           </div>
@@ -433,7 +433,7 @@
       <template v-slot:item.amount="{ item }">
         <template
           v-if="
-            canEditAmount(item.renew_date) || $gate.deny('updateGps', 'gps')
+            canEditAmount(item.renew_date)
           "
         >
           <v-tooltip top>
