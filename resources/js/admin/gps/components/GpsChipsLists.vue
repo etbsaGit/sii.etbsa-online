@@ -106,7 +106,7 @@
             </template>
             <span>Agregar Nuevo</span>
           </v-tooltip>
-          <v-btn icon  @click="refresh()">
+          <v-btn icon @click="refresh()">
             <v-icon>mdi-refresh</v-icon>
           </v-btn>
         </v-toolbar>
@@ -219,7 +219,7 @@
           <gps-chip-add v-if="formAdd"></gps-chip-add>
           <gps-chip-edit
             v-else
-            :propGpsChipId="dialogs.gpsChip.id"
+            :propGpsChipId="dialogs.gpsChip.sim"
           ></gps-chip-edit>
         </v-card-text>
       </v-card>
@@ -231,12 +231,12 @@
 import GpsChipAdd from "@admin/gps/components/GpsChipAdd.vue";
 import GpsChipEdit from "@admin/gps/components/GpsChipEdit.vue";
 
-import optionMoths from "~/api/moths.json";
+import optionMonths from "~/api/months.json";
 import optionYears from "~/api/years.json";
 export default {
   components: {
     GpsChipAdd,
-    GpsChipEdit
+    GpsChipEdit,
   },
   data() {
     return {
@@ -248,59 +248,59 @@ export default {
           divider: true,
           width: 10,
           class: "pa-auto",
-          sortable: false
+          sortable: false,
         },
         {
           text: "SIM",
           value: "sim",
           align: "left",
-          sortable: true
+          sortable: true,
         },
         {
           text: "IMEI",
           value: "imei",
           align: "left",
-          sortable: true
+          sortable: true,
         },
         {
           text: "Costo",
           value: "costo",
           align: "left",
-          sortable: false
+          sortable: false,
         },
         {
           text: "Fecha Activacion",
           value: "fecha_activacion",
           align: "center",
-          sortable: true
+          sortable: true,
         },
         {
           text: "Fecha Renovacion",
           value: "fecha_renovacion",
           align: "center",
-          sortable: true
+          sortable: true,
         },
         {
           text: "Asignado",
           value: "gps",
           align: "center",
-          sortable: false
-        }
+          sortable: false,
+        },
       ],
       items: [],
       totalItems: 0,
       pagination: {
-        itemsPerPage: 10
+        itemsPerPage: 10,
       },
       editedIndex: -1,
       dialogs: {
         title: "",
         show: false,
-        gpsChip: null
+        gpsChip: null,
       },
       options: {
-        months: optionMoths,
-        years: optionYears
+        months: optionMonths,
+        years: optionYears,
       },
       filters: {
         sim: "",
@@ -309,8 +309,8 @@ export default {
         year: null,
         assigned: null,
         deallocated: null,
-        expired: null
-      }
+        expired: null,
+      },
     };
   },
   mounted() {
@@ -328,14 +328,14 @@ export default {
       handler: _.debounce(function() {
         this.loadGpsChips(() => {});
       }, 700),
-      deep: true
+      deep: true,
     },
     filters: {
       handler: _.debounce(function(v) {
         this.loadGpsChips(() => {});
       }, 700),
-      deep: true
-    }
+      deep: true,
+    },
   },
   computed: {
     formTitle() {
@@ -345,7 +345,7 @@ export default {
     },
     formAdd() {
       return this.editedIndex === -1;
-    }
+    },
   },
   methods: {
     refresh() {
@@ -372,7 +372,7 @@ export default {
         order_sort: self.pagination.sortDesc[0] ? "desc" : "asc",
         order_by: self.pagination.sortBy[0] || "sim",
         page: self.pagination.page,
-        per_page: self.pagination.itemsPerPage
+        per_page: self.pagination.itemsPerPage,
       };
 
       axios
@@ -398,7 +398,7 @@ export default {
               self.$store.commit("showSnackbar", {
                 message: response.data.message,
                 color: "success",
-                duration: 3000
+                duration: 3000,
               });
 
               self.$eventBus.$emit("GPS_CHIP_DELETED");
@@ -408,7 +408,7 @@ export default {
                 self.$store.commit("showSnackbar", {
                   message: error.response.data.message,
                   color: "error",
-                  duration: 3000
+                  duration: 3000,
                 });
               } else if (error.request) {
                 console.log(error.request);
@@ -419,14 +419,14 @@ export default {
         },
         cancelCb: () => {
           console.log("CANCEL");
-        }
+        },
       });
     },
     getColor(date) {
       if (date < 31) return "red";
       else if (date < 62) return "orange";
       else return "green";
-    }
-  }
+    },
+  },
 };
 </script>

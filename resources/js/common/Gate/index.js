@@ -9,10 +9,14 @@ export default class Gate {
             user: UserPolicy,
             gps: GpsPolicy,
         };
+
+        // this.groups = {
+        //     group: GroupPolicy
+        // }
     }
 
     before() {
-        return this.user["superuser"] === 1;
+        return this.user.all_permissions["superuser"] === 1;
     }
 
     allow(action, type, model = null) {
@@ -20,7 +24,7 @@ export default class Gate {
             return true;
         }
 
-        return this.policies[type][action](this.user, model);
+        return this.policies[type][action](this.user.all_permissions, model);
     }
 
     deny(action, type, model = null) {

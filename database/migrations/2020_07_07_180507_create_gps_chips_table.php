@@ -14,8 +14,8 @@ class CreateGpsChipsTable extends Migration
     public function up()
     {
         Schema::create('gps_chips', function (Blueprint $table) {
-            $table->id();
-            $table->string('sim')->unique();
+            // $table->id();
+            $table->string('sim');
             $table->string('cuenta')->nullable();
             $table->string('imei')->nullable();
             $table->double('costo', 12, 2)->default(2600);
@@ -25,6 +25,9 @@ class CreateGpsChipsTable extends Migration
 
             $table->text('descripcion')->nullable();
             $table->unsignedInteger('gps_id')->unique()->nullable();
+
+            $table->primary('sim');
+
             $table->timestamps();
         });
     }

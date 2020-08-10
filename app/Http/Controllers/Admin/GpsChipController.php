@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 class GpsChipController extends AdminController
 {
-        /**
+    /**
      * @var GpsChipsRepository
      */
     private $gpsChipsRepository;
@@ -29,6 +29,10 @@ class GpsChipController extends AdminController
      */
     public function index(Request $request)
     {
+        if (!$request->has('order_by')) {
+            $request['order_by'] = 'sim';
+        }
+
         $data = $this->gpsChipsRepository->index($request->all());
 
         return $this->sendResponseOk($data);
@@ -42,18 +46,19 @@ class GpsChipController extends AdminController
      */
     public function store(Request $request)
     {
-        $validate = validator($request->all(),[
+        $validate = validator($request->all(), [
             'sim' => 'required|string',
         ]);
 
-        if($validate->fails())
-        {
+        if ($validate->fails()) {
             return $this->sendResponseBadRequest($validate->errors()->first());
         }
 
         $chip = $this->gpsChipsRepository->create($request->all());
 
-        if(!$chip)  return $this->sendResponseBadRequest("Failed to create.");
+        if (!$chip) {
+            return $this->sendResponseBadRequest("Failed to create.");
+        }
 
         return $this->sendResponseCreated($chip);
     }
@@ -68,7 +73,9 @@ class GpsChipController extends AdminController
     {
         $chip = $this->gpsChipsRepository->find($id);
 
-        if(!$chip) return $this->sendResponseNotFound();
+        if (!$chip) {
+            return $this->sendResponseNotFound();
+        }
 
         return $this->sendResponseOk($chip);
     }
@@ -82,17 +89,21 @@ class GpsChipController extends AdminController
      */
     public function update(Request $request, $id)
     {
-        $validate = validator($request->all(),[
+        $validate = validator($request->all(), [
             'sim' => 'required|string',
         ]);
 
-        if($validate->fails()) return $this->sendResponseBadRequest($validate->errors()->first());
+        if ($validate->fails()) {
+            return $this->sendResponseBadRequest($validate->errors()->first());
+        }
 
-        $updated = $this->gpsChipsRepository->update($id,$request->all());
+        $updated = $this->gpsChipsRepository->update($id, $request->all());
 
-        if(!$updated) return $this->sendResponseBadRequest("Failed to update");
+        if (!$updated) {
+            return $this->sendResponseBadRequest("Failed to update");
+        }
 
-        return $this->sendResponseOk([],"Updated.");
+        return $this->sendResponseOk([], "Updated.");
     }
 
     /**
@@ -105,6 +116,6 @@ class GpsChipController extends AdminController
     {
         $this->gpsChipsRepository->delete($id);
 
-        return $this->sendResponseOk([],"Deleted.");
+        return $this->sendResponseOk([], "Deleted.");
     }
 }

@@ -592,7 +592,7 @@ import GpsAdd from "@admin/gps/components/GpsAdd.vue";
 import GpsEdit from "@admin/gps/components/GpsEdit.vue";
 import GpsCard from "@admin/gps/components/GpsAmountsCard.vue";
 
-import optionMoths from "~/api/moths.json";
+import optionMonths from "~/api/months.json";
 import optionYears from "~/api/years.json";
 import optionAgencies from "~/api/agencies.json";
 import optionDepartments from "~/api/departments.json";
@@ -673,7 +673,7 @@ export default {
         gps: null,
       },
       options: {
-        months: optionMoths,
+        months: optionMonths,
         years: optionYears,
         gpsGroup: [],
         gpsChips: [],

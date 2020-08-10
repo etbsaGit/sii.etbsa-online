@@ -25,6 +25,7 @@ class Gps extends Model
         'description',
     ];
 
+
     /**
      * the group the gps belongs
      *
@@ -40,7 +41,7 @@ class Gps extends Model
      */
     public function chip()
     {
-        return $this->hasOne(GpsChips::class);
+        return $this->hasOne(GpsChips::class,'sim','gps_chip_id');
     }
 
     public function scopeOfName($query, $name)

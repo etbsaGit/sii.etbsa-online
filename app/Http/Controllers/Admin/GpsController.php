@@ -46,6 +46,8 @@ class GpsController extends AdminController
     {
         $validate = validator($request->all(), [
             'name' => 'required|string',
+        ], [
+            'name.required' => 'El campo nombre es obligatorio',
         ]);
 
         if ($validate->fails()) {
@@ -89,12 +91,14 @@ class GpsController extends AdminController
         $validate = validator($request->all(), [
             'name' => 'required|string',
             'amount' => 'numeric',
+        ], [
+            'name.required' => 'El campo nombre es obligatorio',
         ]);
 
         if ($validate->fails()) {
             return $this->sendResponseBadRequest($validate->errors()->first());
         }
-        $gps = $this->gpsRepository->find($id,['chip']);
+        $gps = $this->gpsRepository->find($id, ['chip']);
 
         if (!$request->has('gps_group_id')) {
             $request['gps_group_id'] = null;

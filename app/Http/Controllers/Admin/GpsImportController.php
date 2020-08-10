@@ -64,7 +64,7 @@ class GpsImportController extends AdminController
                 $new_gps = new Gps([
                     'name' => $gps->nombre,
                     'gps_group_id' => $group->id,
-                    'gps_chip_id' => $chip->id,
+                    'gps_chip_id' => $chip->sim,
                     'installation_date' => $gps->creacion,
                     'payment_type' => $group->department ? 'CARGO' : 'CONTADO',
                     'renew_date' => $renew_date,
@@ -77,7 +77,7 @@ class GpsImportController extends AdminController
                 $record = new Gps([
                     'name' => $gps->nombre,
                     'gps_group_id' => $group->id ?? null,
-                    'gps_chip_id' => $chip->id ?? null,
+                    'gps_chip_id' => $chip->sim ?? null,
                     'installation_date' => $gps->creacion,
                     'renew_date' => $renew_date,
                     'uploaded_by' => \Auth::user()->id,

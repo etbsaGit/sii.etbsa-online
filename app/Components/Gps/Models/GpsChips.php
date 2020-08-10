@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class GpsChips extends Model
 {
     protected $table = 'gps_chips';
+    protected $primaryKey = 'sim';
 
     protected $fillable = [
         'sim',

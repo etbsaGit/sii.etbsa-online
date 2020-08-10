@@ -19,7 +19,7 @@ class CreateGpsTable extends Migration
             $table->unsignedInteger('uploaded_by');
 
             $table->unsignedInteger('gps_group_id')->nullable();
-            $table->unsignedInteger('gps_chip_id')->nullable();
+            $table->string('gps_chip_id')->nullable();
 
             $table->enum('currency', ['MXN', 'USD'])->default('MXN');
             $table->double('exchange_rate', 12, 2)->default(1);

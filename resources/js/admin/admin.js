@@ -23,7 +23,7 @@ import "~/plugins";
 Vue.use(Vuetify);
 
 // Gate
-Vue.prototype.$gate = new Gate(window.LSK_APP.AUTH_USER.all_permissions);
+Vue.prototype.$gate = new Gate(window.LSK_APP.AUTH_USER);
 
 // this is the progress bar settings, you
 // can change colors here to fit on your needs or match
