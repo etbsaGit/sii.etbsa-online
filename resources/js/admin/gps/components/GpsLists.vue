@@ -364,7 +364,7 @@
             :return-value.sync="item.gps_chip_id"
             large
             persistent
-            @save="saveInLine(item)"
+            @save="saveInLine(item, undefined)"
             @cancel="cancel"
           >
             <v-btn outlined small color="primary" pa-0>Asignar CHIP</v-btn>
@@ -379,7 +379,7 @@
                   label="Buscar CHIP"
                   :items="options.gpsChips"
                   item-text="sim"
-                  item-value="id"
+                  item-value="sim"
                 ></v-autocomplete>
               </v-form>
             </template>
@@ -396,7 +396,7 @@
             :return-value.sync="item.gps_group_id"
             large
             persistent
-            @save="saveInLine(item)"
+            @save="saveInLine(item, undefined)"
             @cancel="cancel"
           >
             <v-btn outlined small color="primary" pa-0>Asignar a Grupo</v-btn>
@@ -431,11 +431,7 @@
       </template>
 
       <template v-slot:item.amount="{ item }">
-        <template
-          v-if="
-            canEditAmount(item.renew_date)
-          "
-        >
+        <template v-if="canEditAmount(item.renew_date)">
           <v-tooltip top>
             <template v-slot:activator="{ on, attrs }">
               <v-btn text pa-0 v-bind="attrs" v-on="on">{{
@@ -931,11 +927,11 @@ export default {
     saveInLine(item, renew = null) {
       const self = this;
       if (self.$refs.formInLine.validate()) {
-        item.renew = renew;
+        if (renew) item.renew = renew;
         self.$store.commit("showDialog", {
           type: "confirm",
-          title: "Confirmar Renovacion",
-          message: "¿Seguro en Renovar el GPS para el Siguiente año?",
+          title: "Confirmar Cambio",
+          message: "¿Seguro Realizar Cambios al GPS?",
           okCb: () => {
             axios
               .put("/admin/gps/" + item.id, item)

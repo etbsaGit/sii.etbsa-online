@@ -37,7 +37,7 @@
                 label="Selecciona Chip GPS"
                 :items="propOptionChips"
                 item-text="sim"
-                item-value="id"
+                item-value="sim"
                 return-object
               ></v-autocomplete>
             </v-col>
@@ -179,7 +179,7 @@ export default {
           exchange_rate: self.exchange_rate,
           description: self.description,
           gps_group_id: self.gps_group_id ? self.gps_group_id : null,
-          gps_chip_id: self.gps_chip ? self.gps_chip.id : null,
+          gps_chip_id: self.gps_chip ? self.gps_chip.sim : null,
           payment_type: self.payment_type,
           uploaded_by: LSK_APP.AUTH_USER.id
         };

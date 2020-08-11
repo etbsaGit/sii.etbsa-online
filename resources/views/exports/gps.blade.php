@@ -6,6 +6,7 @@
             <th>Cliente</th>
             <th>Sucursal</th>
             <th>Departamento</th>
+            <th>Tipo de Pago</th>
             <th>Costo</th>
             <th>Factura</th>
             <th>Importe</th>
@@ -23,6 +24,7 @@
             <td>{{ $item->gpsGroup->name ?? 'S/A'}}</td>
             <td>{{ $item->gpsGroup->agency ?? 'S/A'}}</td>
             <td>{{ $item->gpsGroup->department ?? 'S/A'}}</td>
+            <td>{{ $item->payment_type ?? 'S/A'}}</td>
             <td>{{ $item->chip->costo ?? 'S/A'}}</td>
             <td>{{ $item->invoice ?? 'S/A'}}</td>
             <td>{{ $item->amount ?? 0}}</td>

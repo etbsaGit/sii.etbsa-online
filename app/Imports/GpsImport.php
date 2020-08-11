@@ -23,13 +23,19 @@ class GpsImport implements ToModel, WithHeadingRow
             ->where('nombre', "{$row['nombre']}")
             ->first();
 
+        // $date = new Carbon($row['creado']);
         $date = new Carbon($row['creado']);
         $date_due = $date->setYear(Carbon::now()->year);
 
         if (!$gps_import) {
             DB::table('gps_import')->insert([
                 'nombre' => $row['nombre'],
-                'sim' => $row['telefono'],
+                'sim' => $row['sim'],
+                'currency' => $row['moneda'] ?? 'MXN',
+                'exchange_rate' => $row['tipo_cambio'] ?? 1,
+                'amount' => $row['importe'] ?? 0,
+                'invoice' => $row['factura'] ?? null,
+                'payment_type' => $row['tipo_pago'] ?? null,
                 'creacion' => new Carbon($row['creado']),
                 'fecha_carga' => Carbon::now(),
             ]

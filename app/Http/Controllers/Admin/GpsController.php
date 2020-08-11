@@ -106,8 +106,10 @@ class GpsController extends AdminController
         }
         if ($request->gps_chip_id == null) {
             $chip = GpsChips::find($gps->gps_chip_id);
-            $chip->gps()->dissociate();
-            $chip->save();
+            if($chip){
+                $chip->gps()->dissociate();
+                $chip->save();
+            }
         }
 
         if ($request->has('renew')) {

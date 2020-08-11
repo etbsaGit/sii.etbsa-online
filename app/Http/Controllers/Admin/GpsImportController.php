@@ -44,45 +44,39 @@ class GpsImportController extends AdminController
             $date = new Carbon($gps->creacion);
             $renew_date = $date->setYear(Carbon::now()->year);
 
-            // $exist_gps = Gps::where('name',"{$gps->nombre}")->first();
             $exist_gps = Gps::whereHas('chip', function ($q) use ($gps) {
                 return $q->where('sim', $gps->sim);
             })->first();
 
-            // $cliente = DB::table('gps_clientes_import')->where('gps', "{$gps->nombre}")->first();
             $cliente = DB::table('gps_clientes_import')
-                ->where('sim', "{$gps->sim}")
-                ->where('gps', "{$gps->nombre}")
+                ->orWhere('gps', "{$gps->nombre}")
+                ->orWhere('sim', "{$gps->sim}")
                 ->first();
 
             if ($cliente) {
                 $group = GpsGroup::where('name', "{$cliente->nombre}")->first();
                 $chip = GpsChips::where('sim', "{$cliente->sim}")->first();
             }
-
-            if ($chip && $group && !$exist_gps) {
+            if (!$exist_gps) {
                 $new_gps = new Gps([
-                    'name' => $gps->nombre,
-                    'gps_group_id' => $group->id,
-                    'gps_chip_id' => $chip->sim,
-                    'installation_date' => $gps->creacion,
-                    'payment_type' => $group->department ? 'CARGO' : 'CONTADO',
-                    'renew_date' => $renew_date,
-                    'uploaded_by' => \Auth::user()->id,
-                ]);
-                $new_gps->save();
-                $chip->gps()->associate($new_gps->id);
-                $chip->save();
-            } else if (!$cliente) {
-                $record = new Gps([
                     'name' => $gps->nombre,
                     'gps_group_id' => $group->id ?? null,
                     'gps_chip_id' => $chip->sim ?? null,
                     'installation_date' => $gps->creacion,
+                    'payment_type' => $gps->payment_type,
                     'renew_date' => $renew_date,
+                    'invoice' => $gps->invoice,
+                    'amount' => $gps->amount ?? 0,
+                    'currency' => $gps->currency ?? 'MXN',
+                    'exchange_rate' => $gps->exchange_rate ?? 1,
+                    'renew_date' => $gps->invoice ? $renew_date->addYear() : $renew_date,
                     'uploaded_by' => \Auth::user()->id,
                 ]);
-                $record->save();
+                $new_gps->save();
+                if ($chip) {
+                    $chip->gps()->associate($new_gps->id);
+                    $chip->save();
+                }
             }
         }
 
