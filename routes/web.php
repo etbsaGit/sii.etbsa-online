@@ -9,11 +9,11 @@
 | routes are loaded by the RouteServiceProvider within a group which
 | contains the "web" middleware group. Now create something great!
 |
-*/
+ */
 
-Route::get('/','Front\\HomeController@index')->name('front.home');
-Route::get('files/{id}/preview','Front\\FileController@filePreview')->name('front.file.preview');
-Route::get('files/{id}/download','Front\\FileController@fileDownload')->name('front.file.download');
+Route::get('/', 'Front\\HomeController@index')->name('front.home');
+Route::get('files/{id}/preview', 'Front\\FileController@filePreview')->name('front.file.preview');
+Route::get('files/{id}/download', 'Front\\FileController@fileDownload')->name('front.file.download');
 
 Auth::routes();
 
@@ -22,24 +22,60 @@ Auth::routes();
 // for demo purpose to prevent viewers to modify data on a live demo site
 
 // admin
-Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function()
-{
+Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function () {
     // single page
     Route::get('/', 'SinglePageController@displaySPA')->name('admin.spa');
 
     // resource routes
-    Route::resource('users','UserController');
-    Route::resource('groups','GroupController');
-    Route::resource('permissions','PermissionController');
-    Route::resource('files','FileController');
-    Route::resource('file-groups','FileGroupController');
-    Route::resource('gps','GpsController');
-    Route::resource('gps-groups','GpsGroupController');
-    Route::resource('gps-chips','GpsChipController');
+    Route::resource('users', 'UserController');
+    Route::resource('groups', 'GroupController');
+    Route::resource('permissions', 'PermissionController');
+    Route::resource('files', 'FileController');
+    Route::resource('file-groups', 'FileGroupController');
+    Route::resource('gps', 'GpsController');
+    Route::resource('gpsCustomers', 'GpsGroupController');
+    Route::resource('chips', 'GpsChipController');
 
-    Route::post('clientes-gps/import','GpsImportController@importClientesGps')->name('gps-clientes-import');
-    Route::post('gps/import','GpsImportController@importGps')->name('gps-import');
-    Route::post('gps-chips/import','GpsImportController@importChips')->name('gps-chips-import');
-    Route::post('matching-chips-gps/import','GpsImportController@matchingChipsInGps')->name('matching-chip-gps');
+    Route::post('clientes-gps/import', 'GpsImportController@importClientesGps')->name('gps-clientes-import');
+    Route::post('gps/import', 'GpsImportController@importGps')->name('gps-import');
+    Route::post('chips/import', 'GpsImportController@importChips')->name('chips-import');
+    Route::post('matching-chips-gps/import', 'GpsImportController@matchingChipsInGps')->name('matching-chip-gps');
     Route::get('gps-export', 'ExportController@exportGps')->name('gps-export');
+});
+
+
+//Clear Cache facade value:
+Route::get('/clear-cache', function() {
+    $exitCode = Artisan::call('cache:clear');
+    return '<h1>Cache facade value cleared</h1>';
+});
+
+//Reoptimized class loader:
+Route::get('/optimize', function() {
+    $exitCode = Artisan::call('optimize');
+    return '<h1>Reoptimized class loader</h1>';
+});
+
+//Route cache:
+Route::get('/route-cache', function() {
+    $exitCode = Artisan::call('route:cache');
+    return '<h1>Routes cached</h1>';
+});
+
+//Clear Route cache:
+Route::get('/route-clear', function() {
+    $exitCode = Artisan::call('route:clear');
+    return '<h1>Route cache cleared</h1>';
+});
+
+//Clear View cache:
+Route::get('/view-clear', function() {
+    $exitCode = Artisan::call('view:clear');
+    return '<h1>View cache cleared</h1>';
+});
+
+//Clear Config cache:
+Route::get('/config-cache', function() {
+    $exitCode = Artisan::call('config:cache');
+    return '<h1>Clear Config cleared</h1>';
 });

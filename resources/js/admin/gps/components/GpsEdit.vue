@@ -241,7 +241,7 @@ export default {
       };
 
       axios
-        .get("/admin/gps-chips", { params: params })
+        .get("/admin/chips", { params: params })
         .then(function(response) {
           self.propOptionChips = response.data.data.data;
           cb();

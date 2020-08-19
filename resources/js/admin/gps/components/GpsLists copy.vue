@@ -336,7 +336,7 @@
                   <v-list-tile-title>Detalle GPS</v-list-tile-title>
                 </v-list-item-content>
               </v-list-item>
-              <v-list-item v-if="false">
+              <v-list-item>
                 <v-list-item-icon>
                   <v-icon class="red--text" dark>mdi-cancel</v-icon>
                 </v-list-item-icon>

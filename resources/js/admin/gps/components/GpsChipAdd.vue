@@ -107,7 +107,7 @@ export default {
         };
 
         axios
-          .post("/admin/gps-chips/", payload)
+          .post("admin/chips/", payload)
           .then(function(response) {
             self.$store.commit("showSnackbar", {
               message: response.data.message,

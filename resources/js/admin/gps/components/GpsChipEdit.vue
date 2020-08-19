@@ -109,7 +109,7 @@ export default {
         self.isLoading = true;
 
         axios
-          .put("/admin/gps-chips/" + self.propGpsChipId, payload)
+          .put("/admin/chips/" + self.propGpsChipId, payload)
           .then(function(response) {
             self.$store.commit("showSnackbar", {
               message: response.data.message,
@@ -141,7 +141,7 @@ export default {
       const self = this;
 
       axios
-        .get("/admin/gps-chips/" + self.propGpsChipId)
+        .get("/admin/chips/" + self.propGpsChipId)
         .then(function(response) {
           let Chip = response.data.data;
 

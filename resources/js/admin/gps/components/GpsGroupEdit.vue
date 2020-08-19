@@ -97,7 +97,7 @@ export default {
       self.isLoading = true;
 
       axios
-        .put("/admin/gps-groups/" + self.propGpsGroupId, payload)
+        .put("/admin/gpsCustomers/" + self.propGpsGroupId, payload)
         .then(function(response) {
           self.$store.commit("showSnackbar", {
             message: response.data.message,
@@ -128,7 +128,7 @@ export default {
       const self = this;
 
       axios
-        .get("/admin/gps-groups/" + self.propGpsGroupId)
+        .get("/admin/gpsCustomers/" + self.propGpsGroupId)
         .then(function(response) {
           let Group = response.data.data;
           self.name = Group.name;

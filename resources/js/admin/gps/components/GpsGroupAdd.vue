@@ -92,7 +92,7 @@ export default {
       self.isLoading = true;
 
       axios
-        .post("/admin/gps-groups/", payload)
+        .post("/admin/gpsCustomers/", payload)
         .then(function(response) {
           self.$store.commit("showSnackbar", {
             message: response.data.message,

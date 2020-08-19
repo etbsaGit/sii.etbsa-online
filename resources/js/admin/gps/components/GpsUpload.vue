@@ -242,7 +242,7 @@ export default {
       let formData = new FormData();
       formData.append("file_gps_chips", self.files["file_gps_chips"]);
       return axios
-        .post("admin/gps-chips/import", formData)
+        .post("admin/chips/import", formData)
         .then(response => {
           self.$store.commit("showSnackbar", {
             message: response.data.message,

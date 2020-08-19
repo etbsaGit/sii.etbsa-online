@@ -47,7 +47,7 @@ class GpsChipController extends AdminController
     public function store(Request $request)
     {
         $validate = validator($request->all(), [
-            'sim' => 'required|string',
+            'sim' => 'required',
         ]);
 
         if ($validate->fails()) {
@@ -90,7 +90,7 @@ class GpsChipController extends AdminController
     public function update(Request $request, $id)
     {
         $validate = validator($request->all(), [
-            'sim' => 'required|string',
+            'sim' => 'required',
         ]);
 
         if ($validate->fails()) {

@@ -31,7 +31,7 @@
       <v-tab-item value="manage-chips-gps">
         <v-card flat>
           <v-card-text>
-            <gps-chips-lists></gps-chips-lists>
+            <chips-lists></chips-lists>
           </v-card-text>
         </v-card>
       </v-tab-item>
@@ -49,13 +49,13 @@
 <script>
 import GpsLists from "@admin/gps/components/GpsLists.vue";
 import GpsGroupLists from "@admin/gps/components/GpsGroupLists.vue";
-import GpsChipsLists from "@admin/gps/components/GpsChipsLists.vue";
+import ChipsLists from "@admin/gps/components/GpsChipsLists.vue";
 import GpsUpload from "@admin/gps/components/GpsUpload.vue";
 export default {
   components: {
     GpsUpload,
     GpsGroupLists,
-    GpsChipsLists,
+    ChipsLists,
     GpsLists
   },
   mounted() {

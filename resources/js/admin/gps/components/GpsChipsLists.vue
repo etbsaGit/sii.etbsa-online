@@ -376,7 +376,7 @@ export default {
       };
 
       axios
-        .get("/admin/gps-chips", { params: params })
+        .get("/admin/chips", { params: params })
         .then(function(response) {
           self.items = response.data.data.data;
           self.totalItems = response.data.data.total;
@@ -393,7 +393,7 @@ export default {
         message: "Are you sure you want to delete this gps chip?",
         okCb: () => {
           axios
-            .delete("/admin/gps-chips/" + chip.id)
+            .delete("/admin/chips/" + chip.id)
             .then(function(response) {
               self.$store.commit("showSnackbar", {
                 message: response.data.message,

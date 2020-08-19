@@ -293,7 +293,7 @@ export default {
       };
 
       axios
-        .get("/admin/gps-groups", { params: params })
+        .get("/admin/gpsCustomers", { params: params })
         .then(function(response) {
           self.items = response.data.data.data;
           self.totalItems = response.data.data.total;
@@ -310,7 +310,7 @@ export default {
         message: "Are you sure you want to delete this gps group?",
         okCb: () => {
           axios
-            .delete("/admin/gps-groups/" + group.id)
+            .delete("/admin/gpsCustomers/" + group.id)
             .then(function(response) {
               self.$store.commit("showSnackbar", {
                 message: response.data.message,
