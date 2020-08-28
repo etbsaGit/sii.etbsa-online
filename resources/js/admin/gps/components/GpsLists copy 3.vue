@@ -2,6 +2,7 @@
   <div class="component-wrap">
     <v-row>
       <v-col sm="12" lg="3" class="mb-4 controls">
+        <!-- <v-navigation-drawer v-model="drawer"> -->
         <v-form ref="filterForm">
           <v-text-field
             prepend-icon="mdi-magnify"
@@ -10,33 +11,60 @@
             clearable
             class="mt-2"
           ></v-text-field>
-          <v-row class="justify-space-between mx-auto">
-            <v-checkbox
-              v-model="filters.assigned"
-              label="Asignados"
-              hide-details
-            ></v-checkbox>
-            <v-checkbox
-              v-model="filters.deallocated"
-              label="Sin Asignar"
-              hide-details
-            ></v-checkbox>
-            <!-- <v-checkbox
-              v-model="filters.renewed"
-              label="Renovados"
-              hide-details
-            ></v-checkbox> -->
-            <v-checkbox
-              v-model="filters.expired"
-              label="Vencidos"
-              hide-details
-            ></v-checkbox>
-            <v-checkbox
-              v-model="filters.canceled"
-              label="Cancelados"
-              hide-details
-            ></v-checkbox>
-          </v-row>
+          <!-- <v-select
+            hide-details
+            outlined
+            dense
+            prepend-icon="mdi-calendar-month-outline"
+            v-model="filters.month"
+            :items="options.months"
+            label="Mes Vencimiento"
+            :menu-props="{ offsetY: true }"
+            item-text="name"
+            item-value="value"
+            clearable
+            class="mt-2"
+          ></v-select>
+          <v-select
+            hide-details
+            outlined
+            dense
+            prepend-icon="mdi-calendar-month-outline"
+            v-model="filters.year"
+            :items="options.years"
+            item-text="name"
+            item-value="name"
+            label="Año Vencimiento"
+            clearable
+            class="mt-2"
+          ></v-select>
+          <v-select
+            hide-details
+            outlined
+            dense
+            prepend-icon="mdi-calendar-month-outline"
+            v-model="filters.month_installation"
+            :items="options.months"
+            label="Mes Instalacion"
+            :menu-props="{ offsetY: true }"
+            item-text="name"
+            item-value="value"
+            clearable
+            class="mt-2"
+          ></v-select>
+          <v-select
+            hide-details
+            outlined
+            dense
+            prepend-icon="mdi-calendar-month-outline"
+            v-model="filters.year_installation"
+            :items="options.years"
+            item-text="name"
+            item-value="name"
+            label="Año Instalacion"
+            clearable
+            class="mt-2"
+          ></v-select> -->
           <v-select
             hide-details
             outlined
@@ -114,7 +142,7 @@
             item-value="sim"
             class="mt-2"
           ></v-autocomplete>
-          <!-- <v-select
+          <v-select
             hide-details
             outlined
             dense
@@ -128,10 +156,39 @@
             clearable
             filled
             class="mt-2"
-          ></v-select> -->
+          ></v-select>
+          <v-row class="justify-space-between mx-auto">
+            <v-checkbox
+              v-model="filters.assigned"
+              label="Asignados"
+              hide-details
+            ></v-checkbox>
+            <v-checkbox
+              v-model="filters.deallocated"
+              label="Sin Asignar"
+              hide-details
+            ></v-checkbox>
+            <v-checkbox
+              v-model="filters.renewed"
+              label="Renovados"
+              hide-details
+            ></v-checkbox>
+            <v-checkbox
+              v-model="filters.expired"
+              label="Vencidos"
+              hide-details
+            ></v-checkbox>
+            <v-checkbox
+              v-model="filters.canceled"
+              label="Cancelados"
+              hide-details
+            ></v-checkbox>
+          </v-row>
         </v-form>
+        <!-- </v-navigation-drawer> -->
       </v-col>
       <v-col sm="12" lg="9" class="pl-2">
+        <!-- <v-sheet height="600"> -->
         <gps-widget-stats></gps-widget-stats>
         <v-data-table
           v-bind:headers="headers"
@@ -146,16 +203,167 @@
           <!-- Top -->
           <template v-slot:top>
             <v-toolbar elevation="0">
-              <v-toolbar-title>
-                Filtrado:
-                <span v-if="filters.month">
-                  {{ nameMonth }} - {{ filters.type_query }}
-                </span>
-                <span v-else> Año Completo </span>
-              </v-toolbar-title>
+              <!-- <v-row>
+                <div
+                  class="col-4 flex-grow-1 caption text-uppercase text-truncate"
+                >
+                  Mes Anterior({{ lastMonth.mes }}):<br />
+                  <v-tooltip top>
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-chip color="grey" dark small v-bind="attrs" v-on="on">
+                        {{ lastMonth.total }}
+                      </v-chip>
+                    </template>
+                    <span>GPS Totales</span>
+                  </v-tooltip>
+                  <v-tooltip top>
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-chip
+                        color="primary"
+                        dark
+                        small
+                        v-bind="attrs"
+                        v-on="on"
+                      >
+                        {{ lastMonth.renovados }}
+                      </v-chip>
+                    </template>
+                    <span>GPS Renovados</span>
+                  </v-tooltip>
+                  <v-tooltip top>
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-chip color="blue" dark small v-bind="attrs" v-on="on">
+                        {{ lastMonth.nuevos }}
+                      </v-chip>
+                    </template>
+                    <span>GPS Nuevos</span>
+                  </v-tooltip>
+                  <v-tooltip top>
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-chip
+                        :color="getColor(lastMonth.porcentaje * 100)"
+                        dark
+                        small
+                        v-bind="attrs"
+                        v-on="on"
+                      >
+                        {{ lastMonth.porcentaje | percent() }}
+                      </v-chip>
+                    </template>
+                    <span>Porcentaje Renovacion</span>
+                  </v-tooltip>
+                </div>
+                <div
+                  class="col-4 flex-grow-1 caption text-uppercase text-truncate"
+                >
+                  Mes Actual({{ currentMonth.mes }}):<br />
+                  <v-tooltip top>
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-chip color="grey" dark small v-bind="attrs" v-on="on">
+                        {{ currentMonth.total }}
+                      </v-chip>
+                    </template>
+                    <span>GPS Totales</span>
+                  </v-tooltip>
+                  <v-tooltip top>
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-chip
+                        color="primary"
+                        dark
+                        small
+                        v-bind="attrs"
+                        v-on="on"
+                      >
+                        {{ currentMonth.renovados }}
+                      </v-chip>
+                    </template>
+                    <span>GPS Renovados</span>
+                  </v-tooltip>
+                  <v-tooltip top>
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-chip color="blue" dark small v-bind="attrs" v-on="on">
+                        {{ currentMonth.nuevos }}
+                      </v-chip>
+                    </template>
+                    <span>GPS Nuevos</span>
+                  </v-tooltip>
+                  <v-tooltip top>
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-chip
+                        :color="getColor(currentMonth.porcentaje * 100)"
+                        dark
+                        small
+                        v-bind="attrs"
+                        v-on="on"
+                      >
+                        {{ currentMonth.porcentaje | percent() }}
+                      </v-chip>
+                    </template>
+                    <span>Porcentaje Renovacion</span>
+                  </v-tooltip>
+                </div>
+                <div
+                  class="col-4 flex-grow-1 caption text-uppercase text-truncate"
+                >
+                  Mes Siguiente({{ nextMonth.mes }}):<br />
+                  <v-tooltip top>
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-chip color="grey" dark small v-bind="attrs" v-on="on">
+                        {{ nextMonth.total }}
+                      </v-chip>
+                    </template>
+                    <span>GPS Totales</span>
+                  </v-tooltip>
+                  <v-tooltip top>
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-chip
+                        color="primary"
+                        dark
+                        small
+                        v-bind="attrs"
+                        v-on="on"
+                      >
+                        {{ nextMonth.renovados }}
+                      </v-chip>
+                    </template>
+                    <span>GPS Renovados</span>
+                  </v-tooltip>
+                  <v-tooltip top>
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-chip color="blue" dark small v-bind="attrs" v-on="on">
+                        {{ nextMonth.nuevos }}
+                      </v-chip>
+                    </template>
+                    <span>GPS Nuevos</span>
+                  </v-tooltip>
+                  <v-tooltip top>
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-chip
+                        :color="getColor(nextMonth.porcentaje * 100)"
+                        dark
+                        small
+                        v-bind="attrs"
+                        v-on="on"
+                      >
+                        {{ nextMonth.porcentaje | percent() }}
+                      </v-chip>
+                    </template>
+                    <span>Porcentaje Renovacion</span>
+                  </v-tooltip>
+                </div>
+              </v-row> -->
               <v-row>
                 <div class="cols-3 d-flex flex-grow-1 justify-end">
-                  <v-btn icon color="secondary" @click="cleanFilter()">
+                  <!-- <v-btn icon color="accent" @click="drawer = !drawer">
+                    <v-icon>mdi-magnify</v-icon>
+                  </v-btn> -->
+                  <v-btn
+                    icon
+                    color="secondary"
+                    @click="
+                      $refs.filterForm.reset(), (pagination.itemsPerPage = 10)
+                    "
+                  >
                     <v-icon>mdi-filter-remove-outline</v-icon>
                   </v-btn>
                   <v-tooltip top>
@@ -210,7 +418,7 @@
                       >
                     </v-list-item-icon>
                     <v-list-item-content>
-                      <v-list-item-title>Detalle GPS</v-list-item-title>
+                      <v-list-tile-title>Detalle GPS</v-list-tile-title>
                     </v-list-item-content>
                   </v-list-item>
                   <v-list-item @click="openDialogReasign(item)">
@@ -218,7 +426,7 @@
                       <v-icon class="blue--text">mdi-swap-horizontal</v-icon>
                     </v-list-item-icon>
                     <v-list-item-content>
-                      <v-list-item-title>Reasignar GPS</v-list-item-title>
+                      <v-list-tile-title>Reasignar GPS</v-list-tile-title>
                     </v-list-item-content>
                   </v-list-item>
                   <v-list-item @click="openDialogCancel(item)">
@@ -226,7 +434,7 @@
                       <v-icon class="red--text" dark>mdi-cancel</v-icon>
                     </v-list-item-icon>
                     <v-list-item-content>
-                      <v-list-item-title>Cancelar GPS</v-list-item-title>
+                      <v-list-tile-title>Cancelar GPS</v-list-tile-title>
                     </v-list-item-content>
                   </v-list-item>
                   <v-list-item v-if="false" @click="trash(item)">
@@ -234,7 +442,7 @@
                       <v-icon class="red--text">mdi-trash-can</v-icon>
                     </v-list-item-icon>
                     <v-list-item-content>
-                      <v-list-item-title>Eliminar</v-list-item-title>
+                      <v-list-tile-title>Eliminar</v-list-tile-title>
                     </v-list-item-content>
                   </v-list-item>
                 </v-list-item-group>
@@ -249,12 +457,76 @@
             <template v-if="item.chip">
               {{ item.chip.sim }}
             </template>
+            <!-- <template v-else>
+              <v-edit-dialog
+                :return-value.sync="item.gps_chip_id"
+                large
+                persistent
+                @save="saveInLine(item, undefined)"
+                @cancel="cancel"
+              >
+                <v-btn outlined x-small color="primary" pa-0
+                  >Asignar CHIP</v-btn
+                >
+                <template v-slot:input>
+                  <v-form
+                    v-model="validInLine"
+                    ref="formInLine"
+                    lazy-validation
+                  >
+                    <div class="mt-4 title">Asignar CHIP</div>
+                    <v-autocomplete
+                      v-model="item.gps_chip_id"
+                      filled
+                      clearable
+                      prepend-icon="mdi-filter-variant"
+                      label="Buscar CHIP"
+                      :items="options.gpsChips"
+                      item-text="sim"
+                      item-value="sim"
+                    ></v-autocomplete>
+                  </v-form>
+                </template>
+              </v-edit-dialog>
+            </template> -->
           </template>
 
           <template v-slot:[`item.gps_group`]="{ item }">
             <template v-if="item.gps_group">
               <span class="caption">{{ item.gps_group.name }}</span>
             </template>
+            <!-- <template v-else>
+              <v-edit-dialog
+                :return-value.sync="item.gps_group_id"
+                large
+                persistent
+                @save="saveInLine(item, undefined)"
+                @cancel="cancel"
+              >
+                <v-btn outlined x-small color="primary" pa-0
+                  >Asignar a Grupo</v-btn
+                >
+                <template v-slot:input>
+                  <v-form
+                    v-model="validInLine"
+                    ref="formInLine"
+                    lazy-validation
+                  >
+                    <div class="mt-4 title">Asignar a Grupo</div>
+                    <v-autocomplete
+                      v-model="item.gps_group_id"
+                      filled
+                      clearable
+                      prepend-icon="mdi-filter-variant"
+                      label="Buscar Grupo"
+                      :items="options.gpsGroup"
+                      item-text="name"
+                      item-value="id"
+                    ></v-autocomplete>
+                  </v-form>
+                </template>
+              </v-edit-dialog>
+            </template> -->
           </template>
 
           <template v-slot:[`item.cost`]="{ item }">
@@ -348,7 +620,8 @@
 
           <template v-slot:[`item.renew_date`]="{ item }">
             <span class="overline text-capitalize">
-              {{ $appFormatters.formatDate(item.renew_date, "MMMM YYYY") }}
+              <!-- {{ $appFormatters.formatDate(item.installation_date) }} -->
+              {{ $appFormatters.formatDate(item.renew_date, "MMM YYYY") }}
             </span>
           </template>
 
@@ -359,27 +632,26 @@
                   getColor($appFormatters.formatTimeDiffNow(item.renew_date))
                 "
                 dark
-                x-small
+                small
               >
                 {{ $appFormatters.formatTimeDiffNow(item.renew_date, "days") }}
                 Dias
               </v-chip>
             </span>
           </template>
-          <template v-slot:[`item.installation_date`]="{ item }">
+          <template v-slot:[`item.estatus`]="{ item }">
             <span class="overline text-capitalize">
-              {{
-                $appFormatters.formatDate(item.installation_date, "MMMM YYYY")
-              }}
+              {{ item.estatus || "NA" }}
             </span>
           </template>
         </v-data-table>
+        <!-- </v-sheet> -->
       </v-col>
     </v-row>
     <!-- cards importes totales -->
     <v-row
       v-show="countAmountCost >= 0 && countAmountInvoice >= 0"
-      class="justify-center"
+      class="justify-space-between"
     >
       <v-col cols="12" md="4">
         <gps-card
@@ -580,10 +852,10 @@ export default {
           sortable: false,
         },
         {
-          text: "Mes Renovacion",
+          text: "Fecha de Renovacion",
           value: "renew_date",
           align: "center",
-          width: 100,
+          width: 135,
           sortable: false,
         },
         {
@@ -595,8 +867,8 @@ export default {
           sortable: true,
         },
         {
-          text: "Mes Instalacion",
-          value: "installation_date",
+          text: "Estatus",
+          value: "estatus",
           align: "center",
           class: "pa-0",
           sortable: true,
@@ -635,9 +907,7 @@ export default {
         payment_type: ["CARGO", "CONTADO", "CREDITO"],
       },
       filters: {
-        indexMonth: null,
         name: null,
-        type_query: null,
         month: null,
         year: null,
         month_installation: null,
@@ -664,15 +934,6 @@ export default {
       self.loadGpsGroup(() => {});
       self.loadGpsChips(() => {});
     });
-
-    self.$eventBus.$on(["STAT_QUERY"], (data) => {
-      self.$store.commit("showLoader");
-      self.filters.indexMonth = data.month;
-      self.filters.month = data.month + 1;
-      self.filters.type_query = data.type_query;
-      self.$store.commit("hideLoader");
-    });
-
     self.loadGpsGroup(() => {});
     self.loadGpsChips(() => {});
   },
@@ -704,9 +965,6 @@ export default {
     },
   },
   computed: {
-    nameMonth() {
-      return moment.months(this.filters.indexMonth);
-    },
     formTitle() {
       return this.editedIndex === -1 ? "Registrar Nuevo GPS" : "Detalle GPS";
     },
@@ -757,18 +1015,54 @@ export default {
         return 0;
       }
     },
+    currentMonth() {
+      const self = this;
+      let month = moment().month();
+      if (self.items_np.length > 0) {
+        let gps = self.items_np.filter(
+          (item) => moment(item.renew_date).month() == month
+        );
+        return self.renewGpsStats(gps, month);
+      } else {
+        return {};
+      }
+    },
+    lastMonth() {
+      const self = this;
+      let month = moment()
+        .subtract(1, "M")
+        .month();
+      if (self.items_np.length > 0) {
+        let gps = self.items_np.filter(
+          (item) => moment(item.renew_date).month() == month
+        );
+        return self.renewGpsStats(gps, month);
+      } else {
+        return {};
+      }
+    },
+    nextMonth() {
+      const self = this;
+      let month = moment()
+        .add(1, "M")
+        .month();
+      if (self.items_np.length > 0) {
+        let gps = self.items_np.filter(
+          (item) => moment(item.renew_date).month() == month
+        );
+        return self.renewGpsStats(gps, month);
+      } else {
+        return {};
+      }
+    },
   },
   methods: {
-    cleanFilter() {
-      this.$refs.filterForm.reset();
-      this.filters.month = null;
-      this.filters.type_query = null;
-      this.pagination.itemsPerPage = 10;
-    },
     refresh() {
       const self = this;
       self.pagination.page = 1;
-      self.$eventBus.$emit("GPS_ADDED");
+      self.loadGpsGroup(() => {});
+      self.loadGpsChips(() => {});
+      self.loadGps(() => {});
     },
     openDialogCancel(item) {
       this.item = {};
@@ -795,24 +1089,21 @@ export default {
 
       let params = {
         name: self.filters.name,
-        typeQuery: self.filters.type_query,
         month: self.filters.month,
-        // year: self.filters.year,
-        // month_installation: self.filters.month_installation,
-        // year_installation: self.filters.year_installation,
+        year: self.filters.year,
+        month_installation: self.filters.month_installation,
+        year_installation: self.filters.year_installation,
         agency: self.filters.agency,
         department: self.filters.department,
         payment_type: self.filters.payment_type,
         estatus: self.filters.estatus,
         group_id: self.filters.groupId.join(","),
         chips_id: self.filters.chipsId.join(","),
-
         assigned: self.filters.assigned ? self.filters.assigned : null,
         deallocated: self.filters.deallocated ? self.filters.deallocated : null,
         expired: self.filters.expired ? self.filters.expired : null,
-        // renewed: self.filters.renewed ? self.filters.renewed : null,
+        renewed: self.filters.renewed ? self.filters.renewed : null,
         canceled: self.filters.canceled ? self.filters.canceled : null,
-
         order_sort: self.pagination.sortDesc[0] ? "desc" : "asc",
         order_by: self.pagination.sortBy[0] || "name",
         page: self.pagination.page,
@@ -1121,11 +1412,10 @@ export default {
 
       let params = {
         name: self.filters.name,
-        typeQuery: self.filters.type_query,
         month: self.filters.month,
-        // year: self.filters.year,
-        // month_installation: self.filters.month_installation,
-        // year_installation: self.filters.year_installation,
+        year: self.filters.year,
+        month_installation: self.filters.month_installation,
+        year_installation: self.filters.year_installation,
         agency: self.filters.agency,
         department: self.filters.department,
         payment_type: self.filters.payment_type,
@@ -1134,7 +1424,7 @@ export default {
         assigned: self.filters.assigned ? self.filters.assigned : null,
         deallocated: self.filters.deallocated ? self.filters.deallocated : null,
         expired: self.filters.expired ? self.filters.expired : null,
-        // renewed: self.filters.renewed ? self.filters.renewed : null,
+        renewed: self.filters.renewed ? self.filters.renewed : null,
         canceled: self.filters.canceled ? self.filters.canceled : null,
         order_sort: self.pagination.sortDesc[0] ? "desc" : "asc",
         order_by: self.pagination.sortBy[0] || "name",

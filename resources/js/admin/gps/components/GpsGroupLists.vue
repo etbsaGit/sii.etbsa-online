@@ -66,9 +66,9 @@
           >
             <v-icon>mdi-filter-remove-outline</v-icon>
           </v-btn>
-          <v-btn icon color="green">
+          <!-- <v-btn icon color="green">
             <v-icon>mdi-file-excel</v-icon>
-          </v-btn>
+          </v-btn> -->
           <v-tooltip top>
             <template v-slot:activator="{ on, attrs }">
               <v-btn
@@ -89,7 +89,7 @@
         </v-toolbar>
       </template>
       <!-- Body  -->
-      <template v-slot:item.action="{ item }">
+      <template v-slot:[`item.action`]="{ item }">
         <v-menu offset-x>
           <template v-slot:activator="{ on, attrs }">
             <v-btn icon v-bind="attrs" v-on="on">
@@ -103,7 +103,7 @@
                   <v-icon class="blue--text">mdi-information-outline</v-icon>
                 </v-list-item-icon>
                 <v-list-item-content>
-                  <v-list-tile-title>Detalle</v-list-tile-title>
+                  <v-list-item-title>Detalle</v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
               <!-- <v-list-item>
@@ -119,7 +119,7 @@
                   <v-icon class="red--text">mdi-trash-can</v-icon>
                 </v-list-item-icon>
                 <v-list-item-content>
-                  <v-list-tile-title>Eliminar</v-list-tile-title>
+                  <v-list-item-title>Eliminar</v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
             </v-list-item-group>
@@ -204,6 +204,12 @@ export default {
           value: "department",
           align: "left",
           sortable: true
+        },
+        {
+          text: "Telefono",
+          value: "phone",
+          align: "left",
+          sortable: false
         },
         {
           text: "Total GPS",

@@ -89,9 +89,9 @@
           >
             <v-icon>mdi-filter-remove-outline</v-icon>
           </v-btn>
-          <v-btn icon color="green">
+          <!-- <v-btn icon color="green">
             <v-icon>mdi-file-excel</v-icon>
-          </v-btn>
+          </v-btn> -->
           <v-tooltip top>
             <template v-slot:activator="{ on, attrs }">
               <v-btn
@@ -112,7 +112,7 @@
         </v-toolbar>
       </template>
       <!-- Body  -->
-      <template v-slot:item.action="{ item }">
+      <template v-slot:[`item.action`]="{ item }">
         <v-menu offset-x>
           <template v-slot:activator="{ on, attrs }">
             <v-btn icon v-bind="attrs" v-on="on">
@@ -149,16 +149,16 @@
           </v-list>
         </v-menu>
       </template>
-      <template v-slot:item.costo="{ item }">
+      <template v-slot:[`item.costo`]="{ item }">
         {{ item.costo | money() }}
       </template>
 
-      <template v-slot:item.fecha_activacion="{ item }">
+      <template v-slot:[`item.fecha_activacion`]="{ item }">
         <span class="overline text-capitalize">
           {{ $appFormatters.formatDate(item.fecha_activacion) }}
         </span>
       </template>
-      <template v-slot:item.fecha_renovacion="{ item }">
+      <!-- <template v-slot:[`item.fecha_renovacion`]="{ item }">
         <span class="overline text-capitalize">
           <v-chip
             :color="
@@ -173,9 +173,9 @@
             Dias
           </v-chip>
         </span>
-      </template>
+      </template> -->
 
-      <template v-slot:item.gps="{ item }">
+      <template v-slot:[`item.gps_id`]="{ item }">
         <v-avatar outlined>
           <v-tooltip top v-if="item.gps != null">
             <template v-slot:activator="{ on, attrs }">
@@ -187,7 +187,6 @@
           </v-tooltip>
           <v-icon class="grey--text" v-else>mdi-alert-rhombus-outline</v-icon>
         </v-avatar>
-        <!-- {{ item.gps ? item.gps.name : "SIN ASIGNAR" }} -->
       </template>
     </v-data-table>
     <!-- dialog -->
@@ -274,17 +273,17 @@ export default {
           align: "center",
           sortable: true,
         },
-        {
-          text: "Fecha Renovacion",
-          value: "fecha_renovacion",
-          align: "center",
-          sortable: true,
-        },
+        // {
+        //   text: "Fecha Renovacion",
+        //   value: "fecha_renovacion",
+        //   align: "center",
+        //   sortable: true,
+        // },
         {
           text: "Asignado",
-          value: "gps",
+          value: "gps_id",
           align: "center",
-          sortable: false,
+          sortable: true,
         },
       ],
       items: [],

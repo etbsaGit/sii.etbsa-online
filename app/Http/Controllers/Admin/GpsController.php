@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Components\Gps\Models\GpsChips;
 use App\Components\Gps\Repositories\GpsRepository;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class GpsController extends AdminController
 {
@@ -45,21 +45,24 @@ class GpsController extends AdminController
     public function store(Request $request)
     {
         $validate = validator($request->all(), [
-            'name' => 'required|string',
+            'name' => 'required|unique:gps,name',
+            'gps_chip_id' => 'required|unique:gps,gps_chip_id',
         ], [
             'name.required' => 'El campo nombre es obligatorio',
+            'name.unique' => 'Nombre GPS Duplicado',
+            'gps_chip_id.unique' => 'Error Chip Duplicado, Ya se encuentra Asignado',
         ]);
 
         if ($validate->fails()) {
             return $this->sendResponseBadRequest($validate->errors()->first());
         }
-        $file = $this->gpsRepository->create($request->all());
+        $gps = $this->gpsRepository->create($request->all());
 
-        if (!$file) {
+        if (!$gps) {
             return $this->sendResponseBadRequest("Failed to create.");
         }
 
-        return $this->sendResponseCreated($file);
+        return $this->sendResponseCreated($gps);
     }
 
     /**
@@ -70,13 +73,13 @@ class GpsController extends AdminController
      */
     public function show($id)
     {
-        $file = $this->gpsRepository->find($id, ['chip']);
+        $gps = $this->gpsRepository->find($id, ['chip', 'gpsGroup', 'historical', 'user']);
 
-        if (!$file) {
+        if (!$gps) {
             return $this->sendResponseNotFound();
         }
 
-        return $this->sendResponseOk($file);
+        return $this->sendResponseOk($gps);
     }
 
     /**
@@ -98,42 +101,118 @@ class GpsController extends AdminController
         if ($validate->fails()) {
             return $this->sendResponseBadRequest($validate->errors()->first());
         }
-        $gps = $this->gpsRepository->find($id, ['chip']);
-
-        if (!$request->has('gps_group_id')) {
-            $request['gps_group_id'] = null;
-            $gps->gpsGroup()->dissociate();
-        }
-        if ($request->gps_chip_id == null) {
-            $chip = GpsChips::find($gps->gps_chip_id);
-            if($chip){
-                $chip->gps()->dissociate();
-                $chip->save();
-            }
-        }
-
-        if ($request->has('renew')) {
-            $renew = new Carbon($request->renew_date);
-            $renew->setYear(Carbon::now()->year);
-            $request['renew_date'] = $renew->addYear();
-            if (!$renew) {
-                return $this->sendResponseBadRequest("Fallo en Renovacion");
-            }
-        }
-
         $updated = $this->gpsRepository->update($id, $request->all());
 
         if (!$updated) {
             return $this->sendResponseBadRequest("Failed to update");
         }
 
-        if ($request->gps_chip_id != null) {
-            $chip = GpsChips::find($request['gps_chip_id']);
-            $chip->gps()->associate($gps);
-            $chip->save();
+        return $this->sendResponseOk([], "Updated.");
+    }
+
+    public function renewInvoice(Request $request, $id)
+    {
+        $validate = validator($request->all(), [
+            'invoice' => 'required',
+            'amount' => 'required|numeric',
+            'currency' => 'required',
+            'exchange_rate' => 'required|numeric',
+        ], [
+            'invoice.required' => 'La Factura es Requerida',
+        ]);
+
+        if ($validate->fails()) {
+            return $this->sendResponseBadRequest($validate->errors()->first());
+        }
+        $updated = false;
+        DB::transaction(function () use ($id, $request, $updated) {
+            $this->gpsRepository->keepHistorical($id);
+            $renew = new Carbon($request->renew_date);
+            $renew->setYear(Carbon::now()->year);
+
+            $request['renew_date'] = $renew->addYear();
+            $request['estatus'] = 'RENOVADO';
+            $request['uploaded_by'] = auth()->user()->id;
+            $updated = $this->gpsRepository->update($id, $request->all());
+        });
+
+        // if (!$updated) {
+        //     return $this->sendResponseBadRequest("Error en la Renovacion ");
+        // }
+
+        return $this->sendResponseOk([], "GPS RENOVADO.");
+
+    }
+
+    public function cancelled(Request $request, $id)
+    {
+        $validate = validator($request->all(), [
+            'cancellation_date' => 'required',
+            'description' => 'required',
+        ], [
+            'cancellation_date.required' => 'Ingrese Fecha de Cancelacion',
+            'description.required' => 'Ingrese Motivo de la Cancelacion',
+        ]);
+
+        if ($validate->fails()) {
+            return $this->sendResponseBadRequest($validate->errors()->first());
         }
 
-        return $this->sendResponseOk([], "Updated.");
+        $updated = false;
+        DB::transaction(function () use ($id, $request, $updated) {
+            $this->gpsRepository->keepHistorical($id);
+            $this->gpsRepository->cancelGps($id);
+            $request['estatus'] = 'CANCELADO';
+            $request['invoice'] = null;
+            $request['amount'] = 0;
+            $request['currency'] = 'MXN';
+            $request['exchange_rate'] = 1;
+            $request['renew_date'] = null;
+            // $request['installation_date'] = null;
+            $request['uploaded_by'] = auth()->user()->id;
+            $updated = $this->gpsRepository->update($id, $request->all());
+        });
+        // if (!$updated) {
+        //     return $this->sendResponseBadRequest("Error en la Cancelacion");
+        // }
+
+        return $this->sendResponseOk([], "GPS Cancelado.");
+    }
+
+    public function reasign(Request $request, $id)
+    {
+        $validate = validator($request->all(), [
+            'name' => 'required',
+            'gps_chip_id' => 'required',
+            'gps_group_id' => 'required',
+            'installation_date' => 'required',
+            // 'gps_chip_id' => 'required|unique:gps,gps_chip_id',
+        ], [
+            'name.required' => 'Nombre GPS es Requrido',
+            // 'gps_chip_id.unique' => 'Error Chip Duplicado, Ya se encuentra Asignado',
+        ]);
+
+        if ($validate->fails()) {
+            return $this->sendResponseBadRequest($validate->errors()->first());
+        }
+        $updated = false;
+        DB::transaction(function () use ($id, $request, $updated) {
+            $this->gpsRepository->keepHistorical($id);
+            $renew = new Carbon($request->installation_date);
+            $renew->setYear(Carbon::now()->year);
+
+            // $request['renew_date'] = $renew;
+            $request['estatus'] = 'REASIGNADO';
+            $request['cancellation_date'] = null;
+            $request['uploaded_by'] = auth()->user()->id;
+            $updated = $this->gpsRepository->update($id, $request->all());
+        });
+
+        // if (!$updated) {
+        //     return $this->sendResponseBadRequest("Error en Reasignar");
+        // }
+
+        return $this->sendResponseOk([], "GPS Reasignado.");
     }
 
     /**
@@ -147,6 +226,27 @@ class GpsController extends AdminController
         $this->gpsRepository->delete($id);
 
         return $this->sendResponseOk([], "Deleted.");
+    }
+
+    public function stats(Request $request)
+    {
+        $year = Carbon::now()->year;
+        $stats = [];
+        $list;
+
+        for ($month = 1; $month <= 12; $month++) {
+            $params = [
+                'month' => $month,
+                'year' => $year,
+                // 'month_installation' => $month,
+                // 'year_installation' => $month,
+                'paginate' => 'no',
+            ];
+             $stats[] = $this->gpsRepository->stats($params);
+        }
+
+        return $this->sendResponseOk($stats, "Get Estadisticas GPS.");
+
     }
 
 }

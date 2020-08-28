@@ -7,11 +7,18 @@
             <v-flex xs12>
               <div class="body-2 white--text">Grupo GPS Detalle</div>
             </v-flex>
-            <v-flex xs12>
+            <v-flex xs9>
               <v-text-field
                 v-model="name"
                 label="Nombre Grupo"
                 :rules="rules"
+              ></v-text-field>
+            </v-flex>
+            <v-flex xs3>
+              <v-text-field
+                v-model="phone"
+                label="Telefono Contacto"
+                counter="10"
               ></v-text-field>
             </v-flex>
             <v-flex xs12 md6>
@@ -64,14 +71,15 @@ export default {
       valid: false,
       isLoading: false,
       name: "",
+      phone: null,
       agency: "",
       department: "",
       description: "",
-      rules: [v => !!v || "Name is required"],
+      rules: [(v) => !!v || "Name is required"],
       options: {
         agencies: optionAgencies,
-        departments: optionDepartments
-      }
+        departments: optionDepartments,
+      },
     };
   },
   mounted() {
@@ -84,9 +92,10 @@ export default {
 
       let payload = {
         name: self.name,
+        phone: self.phone,
         agency: self.agency,
         department: self.department,
-        description: self.description
+        description: self.description,
       };
 
       self.isLoading = true;
@@ -97,7 +106,7 @@ export default {
           self.$store.commit("showSnackbar", {
             message: response.data.message,
             color: "success",
-            duration: 3000
+            duration: 3000,
           });
 
           self.$eventBus.$emit("GPS_GROUP_ADDED");
@@ -107,7 +116,7 @@ export default {
             self.$store.commit("showSnackbar", {
               message: error.response.data.message,
               color: "error",
-              duration: 3000
+              duration: 3000,
             });
           } else if (error.request) {
             console.log(error.request);
@@ -118,7 +127,7 @@ export default {
         .finally(function() {
           self.isLoading = false;
         });
-    }
-  }
+    },
+  },
 };
 </script>

@@ -3,10 +3,12 @@
 namespace App\Components\Gps\Models;
 
 use Carbon\Carbon;
+use App\Components\User\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
 class Gps extends Model
 {
+    use GpsTrait;
     protected $table = 'gps';
 
     protected $fillable = [
@@ -19,12 +21,17 @@ class Gps extends Model
         'amount',
         'invoice',
         'payment_type',
+        'estatus',
         'installation_date',
         'renew_date',
         'cancellation_date',
         'description',
     ];
 
+    public function user()
+    {
+        return $this->belongsTo(User::class,'uploaded_by');
+    }
 
     /**
      * the group the gps belongs
@@ -41,7 +48,13 @@ class Gps extends Model
      */
     public function chip()
     {
-        return $this->hasOne(GpsChips::class,'sim','gps_chip_id');
+        // return $this->hasOne(GpsChips::class,'sim','gps_chip_id');
+        return $this->belongsTo(GpsChips::class,'gps_chip_id');
+    }
+
+    public function historical()
+    {
+        return $this->hasMAny(GpsHistorical::class,'gps_id','id');
     }
 
     public function scopeOfName($query, $name)
@@ -50,17 +63,7 @@ class Gps extends Model
             return false;
         }
 
-        return $query->where('name', 'LIKE', "%{$name}%");
-    }
-    public function scopeOfSim($query, $v)
-    {
-        if ($v === null || $v === '') {
-            return false;
-        }
-
-        return $query->whereHas('chip', function ($q) use ($v) {
-            return $q->where('sim','like', "%{$v}%");
-        });
+        return $query->where('name', 'like', "%{$name}%");
     }
 
     public function scopeOfPayment($query, $v)
@@ -70,6 +73,14 @@ class Gps extends Model
         }
 
         return $query->where('payment_type', 'LIKE', "%{$v}%");
+    }
+    public function scopeOfEstatus($query, $v)
+    {
+        if ($v === null || $v === '') {
+            return false;
+        }
+
+        return $query->where('estatus', 'LIKE', "%{$v}%");
     }
 
     public function scopeOfMonth($query, $v)
@@ -102,6 +113,21 @@ class Gps extends Model
         }
         return $query->whereYear('installation_date', $v);
     }
+    public function scopeOfMonthCancelled($query, $v)
+    {
+        if ($v === null || $v === '') {
+            return false;
+        }
+        return $query->whereMonth('cancellation_date', $v);
+    }
+
+    public function scopeOfYearCancelled($query, $v)
+    {
+        if ($v === null || $v === '') {
+            return false;
+        }
+        return $query->whereYear('cancellation_date', $v);
+    }
 
     public function scopeOfGpsGroups($q, $v)
     {
@@ -113,6 +139,18 @@ class Gps extends Model
             return $q->whereIn('id', $v);
         });
     }
+    public function scopeOfGpsChips($q, $v)
+    {
+        if ($v === false || $v === '' || count($v) == 0 || $v[0] == '') {
+            return $q;
+        }
+
+        return $q->whereHas('chip', function ($q) use ($v) {
+            return $q->whereIn('sim', $v);
+        });
+    }
+
+
     public function scopeOfAgency($q, $v)
     {
         if ($v === null || $v === '') {
@@ -166,5 +204,13 @@ class Gps extends Model
         }
 
         return $q->whereYear('renew_date', '>=', Carbon::now()->addYear()->year);
+    }
+
+    public function scopeOfCancelled($q,$v){
+        if ($v === null || $v == false) {
+            return false;
+        }
+
+        return $q->whereNotNull('cancellation_date');
     }
 }

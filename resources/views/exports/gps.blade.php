@@ -12,8 +12,10 @@
             <th>Importe</th>
             <th>Moneda</th>
             <th>Tipo Cambio</th>
+            {{-- <th>Estatus</th> --}}
             <th>Fecha Instalacion</th>
             <th>Fecha Vencimiento</th>
+            <th>Fecha Cancelacion</th>
         </tr>
     </thead>
     <tbody>
@@ -30,8 +32,10 @@
             <td>{{ $item->amount ?? 0}}</td>
             <td>{{ $item->currency ?? 'MXN'}}</td>
             <td>{{ $item->exchange_rate ?? 1 }}</td>
+            {{-- <td>{{ $item->estatus ?? '' }}</td> --}}
             <td>{{ $item->installation_date }}</td>
             <td>{{ $item->renew_date }}</td>
+            <td>{{ $item->cancellation_date }}</td>
         </tr>
         @endforeach
     </tbody>

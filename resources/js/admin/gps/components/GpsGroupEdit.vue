@@ -7,11 +7,18 @@
             <v-flex xs12>
               <div class="body-2 white--text">Grupo GPS Detalle</div>
             </v-flex>
-            <v-flex xs12>
+            <v-flex xs9>
               <v-text-field
                 v-model="name"
                 label="Nombre Grupo"
                 :rules="rules"
+              ></v-text-field>
+            </v-flex>
+             <v-flex xs3>
+              <v-text-field
+                v-model="phone"
+                label="Telefono Contacto"
+                counter="10"
               ></v-text-field>
             </v-flex>
             <v-flex xs12 md6>
@@ -69,6 +76,7 @@ export default {
       valid: false,
       isLoading: false,
       name: "",
+      phone: "",
       agency: "",
       department: "",
       description: "",
@@ -89,6 +97,7 @@ export default {
 
       let payload = {
         name: self.name,
+        phone: self.phone,
         agency: self.agency ? self.agency : " ",
         department: self.department ? self.department : " ",
         description: self.description
@@ -132,6 +141,7 @@ export default {
         .then(function(response) {
           let Group = response.data.data;
           self.name = Group.name;
+          self.phone = Group.phone;
           self.agency = Group.agency;
           self.department = Group.department;
           self.description = Group.description;

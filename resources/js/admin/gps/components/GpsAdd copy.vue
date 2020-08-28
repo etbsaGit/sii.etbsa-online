@@ -54,6 +54,38 @@
               ></v-text-field>
             </v-col>
           </v-row>
+          <!-- <v-row>
+            <v-col cols="12" md="3">
+              <v-text-field
+                label="Folio Factura"
+                v-model="invoice"
+              ></v-text-field>
+            </v-col>
+            <v-col cols="12" md="3">
+              <v-text-field
+                label="Importe Factura"
+                v-model="amount"
+                type="Number"
+                prefix="$"
+                placeholder="0.00"
+              ></v-text-field>
+            </v-col>
+            <v-col cols="6" md="3">
+              <v-select
+                v-model="currency"
+                :items="options.currency"
+                label="Moneda"
+              ></v-select>
+            </v-col>
+            <v-col cols="6" md="3">
+              <v-text-field
+                v-model="exchange_rate"
+                label="Tipo Cambio"
+                type="Number"
+                prefix="$"
+              ></v-text-field>
+            </v-col>
+          </v-row> -->
           <v-row>
             <v-col cols="6" md="6">
               <v-text-field

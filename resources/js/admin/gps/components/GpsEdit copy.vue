@@ -1,7 +1,7 @@
 <template>
   <div class="component-wrap">
     <v-card>
-      <v-form v-model="valid" ref="gpsFormAdd" lazy-validation>
+      <v-form v-model="valid" ref="gpsFormEdit" lazy-validation>
         <v-container grid-list-lg>
           <v-row>
             <v-col cols="12" md="9">
@@ -9,16 +9,14 @@
                 label="Nombre GPS"
                 v-model="name"
                 :rules="fieldRules"
-                filled
+                :readonly="$gate.deny('updateGps', 'gps')"
               ></v-text-field>
             </v-col>
             <v-col cols="12" md="3">
               <v-select
                 v-model="payment_type"
                 :items="options.payment_type"
-                :rules="fieldRules"
                 label="Tipo de Pago"
-                filled
               ></v-select>
             </v-col>
             <v-col cols="12" md="6">
@@ -37,7 +35,7 @@
                 v-model="gps_chip"
                 clearable
                 label="Selecciona Chip GPS"
-                :items="options.chips"
+                :items="propOptionChips"
                 item-text="sim"
                 item-value="sim"
                 return-object
@@ -55,13 +53,48 @@
             </v-col>
           </v-row>
           <v-row>
+            <v-col cols="12" md="3">
+              <v-text-field
+                label="Folio Factura"
+                v-model="invoice"
+                :readonly="$gate.deny('updateGps', 'gps')"
+              ></v-text-field>
+            </v-col>
+            <v-col cols="12" md="3">
+              <v-text-field
+                label="Importe Factura"
+                v-model="amount"
+                type="Number"
+                prefix="$"
+                placeholder="0.00"
+                :readonly="$gate.deny('updateGps', 'gps')"
+              ></v-text-field>
+            </v-col>
+            <v-col cols="6" md="3">
+              <v-select
+                v-model="currency"
+                :items="options.currency"
+                label="Moneda"
+                :readonly="$gate.deny('updateGps', 'gps')"
+              ></v-select>
+            </v-col>
+            <v-col cols="6" md="3">
+              <v-text-field
+                v-model="exchange_rate"
+                label="Tipo Cambio"
+                type="Number"
+                prefix="$"
+                :readonly="$gate.deny('updateGps', 'gps')"
+              ></v-text-field>
+            </v-col>
+          </v-row>
+          <v-row>
             <v-col cols="6" md="6">
               <v-text-field
                 label="Fecha Instalacion"
                 v-model="installation_date"
                 type="date"
                 :rules="fieldRules"
-                filled
               ></v-text-field>
             </v-col>
             <v-col cols="6" md="6">
@@ -70,8 +103,7 @@
                 v-model="renew_date"
                 type="date"
                 :rules="fieldRules"
-                readonly
-                filled
+                :readonly="$gate.deny('updateGps', 'gps')"
               ></v-text-field>
             </v-col>
             <v-col cols="12">
@@ -84,7 +116,7 @@
           </v-row>
           <v-row>
             <v-btn block @click="save()" :disabled="!valid" color="primary">
-              Registrar Nuevo
+              Actualizar GPS
             </v-btn>
           </v-row>
         </v-container>
@@ -96,19 +128,25 @@
 <script>
 export default {
   props: {
+    propGpsId: {
+      required: true
+    },
     propOptionGroups: {
-      required: true,
+      required: true
+    },
+    propOptionChips: {
+      required: false
     }
   },
   data() {
     return {
       valid: false,
-      fieldRules: [(v) => !!v || "Campo requerido"],
+      fieldRules: [v => !!v || "Campo requerido"],
       name: "",
       gps_group_id: null,
-      gps_chip: null,
+      gps_chip: {},
       cost: null,
-      amount: 0,
+      amount: null,
       invoice: null,
       installation_date: null,
       renew_date: null,
@@ -118,62 +156,50 @@ export default {
       payment_type: "CONTADO",
       options: {
         currency: ["MXN", "USD"],
-        payment_type: ["CARGO", "CONTADO", "CREDITO"],
-        chips: [],
-      },
+        payment_type: ["CARGO", "CONTADO", "CREDITO"]
+      }
     };
   },
-  watch: {
-    installation_date: {
-      handler: function(val) {
-        let hoy = new Date();
-        let año = hoy.getFullYear()
-        let date = new Date(val);
-        // this.amount > 0 ? date.setDate(date.getDate()) : true;
-        this.renew_date = this.$appFormatters.formatDate(date.setFullYear(año), "yyyy-MM-DD");
-      },
-    },
-  },
-  created() {
+  mounted() {
     const self = this;
     self.loadGpsChips(() => {});
-    // self.$refs.gpsFormAdd.reset();
+    self.loadGps(() => {});
   },
   methods: {
     save() {
       const self = this;
-      if (self.$refs.gpsFormAdd.validate()) {
+      if (self.$refs.gpsFormEdit.validate()) {
         let payload = {
           name: self.name,
-          // amount: self.amount,
-          // invoice: self.invoice,
+          amount: self.amount,
+          invoice: self.invoice,
           installation_date: self.installation_date,
           renew_date: self.renew_date,
-          // currency: self.currency,
-          // exchange_rate: self.exchange_rate,
+          currency: self.currency,
+          exchange_rate: self.exchange_rate,
           description: self.description,
-          gps_group_id: self.gps_group_id,
-          gps_chip_id: self.gps_chip.sim,
+          gps_group_id: self.gps_group_id ? self.gps_group_id : null,
+          gps_chip_id: self.gps_chip ? self.gps_chip.sim : null,
           payment_type: self.payment_type,
-          uploaded_by: LSK_APP.AUTH_USER.id,
+          uploaded_by: LSK_APP.AUTH_USER.id
         };
         axios
-          .post("/admin/gps", payload)
+          .put("/admin/gps/" + self.propGpsId, payload)
           .then(function(response) {
             self.$store.commit("showSnackbar", {
               message: response.data.message,
               color: "success",
-              duration: 3000,
+              duration: 3000
             });
 
-            self.$eventBus.$emit("GPS_ADDED");
+            self.$eventBus.$emit("GPS_UPDATED");
           })
           .catch(function(error) {
             if (error.response) {
               self.$store.commit("showSnackbar", {
                 message: error.response.data.message,
                 color: "error",
-                duration: 3000,
+                duration: 3000
               });
             } else if (error.request) {
               console.log(error.request);
@@ -183,18 +209,44 @@ export default {
           });
       }
     },
-    loadGpsChips(cb) {
+    loadGps(cb) {
       const self = this;
-      let params = {
-        paginate: "no",
-        deallocated: true,
-      };
 
-      axios.get("/admin/chips", { params: params }).then(function(response) {
-        self.options.chips = response.data.data;
+      axios.get("/admin/gps/" + self.propGpsId).then(function(response) {
+        let Gps = response.data.data;
+        self.name = Gps.name;
+        self.amount = Gps.amount;
+        self.invoice = Gps.invoice;
+        self.installation_date = self.$appFormatters.formatDate(
+          Gps.installation_date,
+          "yyyy-MM-DD"
+        );
+        self.renew_date = self.$appFormatters.formatDate(
+          Gps.renew_date,
+          "yyyy-MM-DD"
+        );
+        self.currency = Gps.currency;
+        self.exchange_rate = Gps.exchange_rate;
+        self.description = Gps.description;
+        self.gps_group_id = Gps.gps_group_id;
+        self.gps_chip = Gps.chip;
+        self.payment_type = Gps.payment_type;
         cb();
       });
     },
-  },
+    loadGpsChips(cb) {
+      const self = this;
+      let params = {
+        per_page: -1
+      };
+
+      axios
+        .get("/admin/chips", { params: params })
+        .then(function(response) {
+          self.propOptionChips = response.data.data.data;
+          cb();
+        });
+    }
+  }
 };
 </script>

@@ -41,6 +41,12 @@ Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function
     Route::post('chips/import', 'GpsImportController@importChips')->name('chips-import');
     Route::post('matching-chips-gps/import', 'GpsImportController@matchingChipsInGps')->name('matching-chip-gps');
     Route::get('gps-export', 'ExportController@exportGps')->name('gps-export');
+
+    //GPS
+    Route::post('gps/renewInvoice/{id}','GpsController@renewInvoice')->name('renewInvoice-gps');
+    Route::post('gps/cancelled/{id}','GpsController@cancelled')->name('cancelled-gps');
+    Route::post('gps/reasign/{id}','GpsController@reasign')->name('reasign-gps');
+    Route::post('gps/statsMonths','GpsController@stats')->name('stats-gps');
 });
 
 

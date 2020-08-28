@@ -3,8 +3,8 @@
 namespace App\Components\Gps\Repositories;
 
 use App\Components\Core\BaseRepository;
-use App\Components\Gps\Models\Gps;
 use App\Components\Core\Utilities\Helpers;
+use App\Components\Gps\Models\Gps;
 
 class GpsRepository extends BaseRepository
 {
@@ -21,50 +21,165 @@ class GpsRepository extends BaseRepository
      */
     public function index($params)
     {
-        return $this->get($params, ['gpsGroup','chip'], function ($q) use ($params) {
+        return $this->get($params, ['gpsGroup', 'chip', 'historical'], function ($q) use ($params) {
+
+            $typeQuery = ($params['typeQuery'] ?? false);
+            $month = ($params['month'] ?? false);
 
             $assigned = ($params['assigned'] ?? null);
             $deallocated = ($params['deallocated'] ?? null);
             $expired = ($params['expired'] ?? null);
-            $renewed = ($params['renewed'] ?? null);
-            
-            $q->ofGpsGroups(Helpers::commasToArray($params['group_id'] ?? ''));
+            // $renewed = ($params['renewed'] ?? null);
+            $canceled = ($params['canceled'] ?? null);
+
+            if ($typeQuery != 'cancelados' && $month) {
+                $q->ofTotalGps($month);
+                if ($typeQuery == 'nuevos') {
+                    $q->OfNewGps();
+                }
+
+                if ($typeQuery == 'renovados') {
+                    $q->OfReNewGps();
+                }
+
+                if ($typeQuery == 'por_renovar') {
+                    $q->OfToReNewGps();
+                }
+            } else if ($typeQuery == 'cancelados' && $month) {
+                $q->ofCanceledGps($month);
+            }
+
             $q->ofName($params['name'] ?? '');
-            $q->ofMonth($params['month'] ?? '');
-            $q->ofYear($params['year'] ?? '');
-            $q->ofMonthInstallation($params['month_installation'] ?? '');
-            $q->ofYearInstallation($params['year_installation'] ?? '');
+            $q->ofGpsGroups(Helpers::commasToArray($params['group_id'] ?? ''));
+            $q->ofGpsChips(Helpers::commasToArray($params['chips_id'] ?? ''));
             $q->ofAgency($params['agency'] ?? '');
             $q->ofDepartment($params['department'] ?? '');
             $q->ofPayment($params['payment_type'] ?? '');
+            $q->ofEstatus($params['estatus'] ?? '');
+            // $q->ofMonth($params['month'] ?? '');
+            // $q->ofYear($params['year'] ?? '');
+            // $q->ofMonthInstallation($params['month_installation'] ?? '');
+            // $q->ofYearInstallation($params['year_installation'] ?? '');
 
             if (!($assigned && $deallocated)) {
                 $q->ofAssigned($assigned);
                 $q->ofDeallocated($deallocated);
                 $q->ofExpired($expired);
-                $q->ofRenewed($renewed);
+                // $q->ofRenewed($renewed);
             }
+
+            // if ($canceled) {
+            //     $q->ofCancelled($canceled);
+            // }
+
+            $canceled ? $q->ofCancelled($canceled) : $q->whereNull('cancellation_date');
 
             return $q;
         });
     }
 
-    public function renewGps($request)
+    public function stats($params)
+    {
+        $Total = $this->get($params, [], function ($q) use ($params) {
+            $q->ofTotalGps($params['month']);
+            return $q;
+        })->count();
+
+        $Nuevos = $this->get($params, [], function ($q) use ($params) {
+            $q->ofTotalGps($params['month']);
+            $q->OfNewGps();
+            return $q;
+        })->count();
+
+        $Renovados = $this->get($params, [], function ($q) use ($params) {
+            $q->ofTotalGps($params['month']);
+            $q->OfReNewGps();
+            return $q;
+        })->count();
+
+        $PorRenovar = $this->get($params, [], function ($q) use ($params) {
+            $q->ofTotalGps($params['month']);
+            $q->OfToReNewGps();
+            return $q;
+        })->count();
+
+        $Cancelados = $this->get($params, [], function ($q) use ($params) {
+            $q->ofCanceledGps($params['month']);
+            return $q;
+        })->count();
+
+        $Porcentaje = $Renovados / ($Total - $Nuevos);
+
+        $stats = [
+            'Total' => $Total,
+            'Nuevos' => $Nuevos,
+            'Renovados' => $Renovados,
+            'PorRenovar' => $PorRenovar,
+            'Cancelados' => $Cancelados,
+            'Porcentaje' => $Porcentaje,
+        ];
+
+        return $stats;
+    }
+
+    public function assignChip(Type $var = null)
     {
         # code...
     }
 
+    public function assignGroup(Type $var = null)
+    {
+        # code...
+    }
+
+    public function keepHistorical(int $id)
+    {
+        $ids = explode(',', $id);
+
+        foreach ($ids as $id) {
+            /** @var Gps $Gps */
+            $gps = $this->model->find($id);
+
+            if (!$gps) {
+                return false;
+            };
+
+            $historical = $gps->replicate()->fill([
+                'uploaded_by' => auth()->user()->id,
+            ]);
+
+            $gps->historical()->create($historical->toArray());
+
+        }
+    }
+
+    public function cancelGps(int $id)
+    {
+        $ids = explode(',', $id);
+
+        foreach ($ids as $id) {
+            /** @var Gps $Gps */
+            $gps = $this->model->find($id);
+
+            if (!$gps) {
+                return false;
+            }
+
+            $gps->gpsGroup()->dissociate();
+            $gps->chip()->dissociate();
+            $gps->save();
+        }
+    }
+
     public function delete(int $id)
     {
-        $ids = explode(',',$id);
+        $ids = explode(',', $id);
 
-        foreach ($ids as $id)
-        {
+        foreach ($ids as $id) {
             /** @var Gps $Gps */
             $Gps = $this->model->find($id);
 
-            if(!$Gps)
-            {
+            if (!$Gps) {
                 return false;
             };
 

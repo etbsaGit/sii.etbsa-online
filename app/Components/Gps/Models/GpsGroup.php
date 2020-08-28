@@ -14,6 +14,7 @@ class GpsGroup extends Model
         'department',
         'razon_social',
         'rfc',
+        'phone',
         'description',
     ];
 

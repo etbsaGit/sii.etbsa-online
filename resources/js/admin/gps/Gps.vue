@@ -10,7 +10,7 @@
       <v-tab key="manage-chips-gps" href="#manage-chips-gps" ripple>
         Chips GPS
       </v-tab>
-      <v-tab key="upload" href="#upload" ripple>
+      <v-tab key="upload" href="#upload" ripple v-if="false">
         Upload
       </v-tab>
 
@@ -35,7 +35,7 @@
           </v-card-text>
         </v-card>
       </v-tab-item>
-      <v-tab-item value="upload">
+      <v-tab-item value="upload" v-if="false">
         <v-card flat v-if="active === 'upload'">
           <v-card-text>
             <gps-upload></gps-upload>

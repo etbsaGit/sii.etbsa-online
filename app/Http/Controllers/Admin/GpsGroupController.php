@@ -44,7 +44,7 @@ class GpsGroupController extends AdminController
     {
         $validate = validator($request->all(),[
             'name' => 'required|string',
-            'description' => 'required|string',
+            // 'description' => 'required|string',
         ]);
 
         if($validate->fails())
