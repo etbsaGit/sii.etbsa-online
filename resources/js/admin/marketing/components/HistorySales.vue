@@ -169,7 +169,9 @@
             <span class="d-flex overline align-center pl-4">
               historico de ventas
             </span>
-            <div class="cols-4 d-flex flex-grow-1 justify-end align-center mx-2">
+            <div
+              class="cols-4 d-flex flex-grow-1 justify-end align-center mx-2"
+            >
               <span class="overline pr-2">
                 total Registros: {{ totalItems }}
               </span>
@@ -376,6 +378,9 @@ export default {
       const height = this.$vuetify.breakpoint.mdAndUp ? "66vh" : "60vh";
       return `calc(${height} - ${this.$vuetify.application.top}px)`;
     },
+    canExport() {
+      return this.totalItems > 17000;
+    },
   },
   watch: {
     page: {
@@ -446,14 +451,24 @@ export default {
     },
     excelGenerate() {
       const self = this;
+      if (self.canExport)
+        return self.$store.commit("showSnackbar", {
+          message: "Agregar un Filtro para Exportar",
+          color: "warning",
+          duration: 3000,
+        });
       self.$store.commit("showLoader");
       let params = {
         product_name: self.filters.product_name,
+        customer_name: self.filters.customer_name,
         years: self.filters.years.join(","),
         months: self.filters.months.join(","),
         agencies: self.filters.agencies.join(","),
+        brands: self.filters.brands.join(","),
         type_of_sale: self.filters.type_of_sale.join(","),
         seller: self.filters.seller.join(","),
+        isMXN: self.filters.isMXN ? true : null,
+        isUSD: self.filters.isUSD ? true : null,
         paginate: "no",
       };
 

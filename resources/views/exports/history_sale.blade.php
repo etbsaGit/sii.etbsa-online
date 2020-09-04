@@ -19,6 +19,7 @@
       <th>DESCRIPCION_PRODUCTO</th>
       <th>NIP</th>
       <th>CLAVE_CLIENTE</th>
+      <th>NOMBRE_CLIENTE</th>
       
       <th>VENDEDOR</th>
       <th>EMAIL</th>
@@ -66,7 +67,7 @@
       <td>{{ $item->DESCRIPCION_PRODUCTO}}</td>
       <td>{{ $item->NIP}}</td>
       <td>{{ $item->CLAVE_CLIENTE }}</td>
-    
+      <td>{{ $item->NOMBRE_CLIENTE }}</td>
       <td>{{ $item->VENDEDOR}}</td>
       <td>{{ $item->EMAIL}}</td>
       <td>{{ $item->CALLE}}</td>
