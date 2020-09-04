@@ -47,6 +47,11 @@ Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function
     Route::post('gps/cancelled/{id}','GpsController@cancelled')->name('cancelled-gps');
     Route::post('gps/reasign/{id}','GpsController@reasign')->name('reasign-gps');
     Route::post('gps/statsMonths','GpsController@stats')->name('stats-gps');
+
+    //Marketing
+    Route::get('marketing/sales_history','MarketingController@salesHistory')->name('salesHistory');
+    Route::get('marketing/sales_history/resources','MarketingController@resources')->name('salesHistoryResources');
+    Route::get('marketing/export', 'ExportController@exportMarketing')->name('marketingExport');
 });
 
 

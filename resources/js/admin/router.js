@@ -85,6 +85,11 @@ const router = new Router({
             component: require('@admin/files/Files').default,
         },
         {
+            name: 'marketing',
+            path: '/marketing',
+            component: require('@admin/marketing/Marketing').default,
+        },
+        {
             name: 'settings',
             path: '/settings',
             component: require('@admin/settings/Settings').default,
