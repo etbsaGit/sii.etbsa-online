@@ -24,24 +24,24 @@
           <v-col cols="12" xs="12" md="3" class="py-0">
             <v-select
               v-model="filters.years"
-              hide-details
-              outlined
+              :items="options.years"
+              label="Filtro por Años"
+              item-text="ANIO"
+              item-value="ANIO"
               dense
               filled
               multiple
-              small-chips
-              deletable-chips
+              outlined
               clearable
-              prepend-icon="mdi-filter-variant"
-              label="Filtro por Años"
-              :items="options.years"
-              item-text="ANIO"
-              item-value="ANIO"
+              small-chips
+              hide-details
+              deletable-chips
+              prepend-icon="mdi-calendar"
               class="mt-2"
             ></v-select>
           </v-col>
           <v-col cols="12" xs="12" md="3" class="py-0">
-            <v-select
+            <v-autocomplete
               v-model="filters.months"
               hide-details
               outlined
@@ -51,16 +51,16 @@
               small-chips
               deletable-chips
               clearable
-              prepend-icon="mdi-filter-variant"
+              prepend-icon="mdi-calendar-month"
               label="Filtro por Mes"
               :items="options.months"
               item-text="MES"
               item-value="MES"
               class="mt-2"
-            ></v-select>
+            ></v-autocomplete>
           </v-col>
           <v-col cols="12" xs="12" md="3" class="py-0">
-            <v-select
+            <v-autocomplete
               v-model="filters.agencies"
               hide-details
               outlined
@@ -76,10 +76,10 @@
               item-text="SUCURSAL"
               item-value="SUCURSAL"
               class="mt-2"
-            ></v-select>
+            ></v-autocomplete>
           </v-col>
           <v-col cols="12" xs="12" md="3" class="py-0">
-            <v-select
+            <v-autocomplete
               v-model="filters.type_of_sale"
               hide-details
               outlined
@@ -95,7 +95,7 @@
               item-text="TIPO_DE_VENTA"
               item-value="TIPO_DE_VENTA"
               class="mt-2"
-            ></v-select>
+            ></v-autocomplete>
           </v-col>
           <v-col cols="12" xs="12" md="3" class="py-0">
             <v-autocomplete
@@ -375,11 +375,11 @@ export default {
       ];
     },
     minHeight() {
-      const height = this.$vuetify.breakpoint.mdAndUp ? "66vh" : "60vh";
+      const height = this.$vuetify.breakpoint.mdAndUp ? "70vh" : "60vh";
       return `calc(${height} - ${this.$vuetify.application.top}px)`;
     },
     canExport() {
-      return this.totalItems > 17000;
+      return this.totalItems > 1500;
     },
   },
   watch: {
@@ -451,9 +451,9 @@ export default {
     },
     excelGenerate() {
       const self = this;
-      if (self.canExport)
+      if (self.filters.years.length <= 0)
         return self.$store.commit("showSnackbar", {
-          message: "Agregar un Filtro para Exportar",
+          message: "Agregar Filtro por Año",
           color: "warning",
           duration: 3000,
         });

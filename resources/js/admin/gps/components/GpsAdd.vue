@@ -126,11 +126,12 @@ export default {
   watch: {
     installation_date: {
       handler: function(val) {
-        let hoy = new Date();
-        let año = hoy.getFullYear()
-        let date = new Date(val);
-        // this.amount > 0 ? date.setDate(date.getDate()) : true;
-        this.renew_date = this.$appFormatters.formatDate(date.setFullYear(año), "yyyy-MM-DD");
+        // let hoy = new Date();
+        // let año = hoy.getFullYear()
+        // let date = new Date(val);
+        // // this.amount > 0 ? date.setDate(date.getDate()) : true;
+        // this.renew_date = this.$appFormatters.formatDate(date.setFullYear(año), "yyyy-MM-DD");
+        this.renew_date = val;
       },
     },
   },
