@@ -16,12 +16,13 @@ class AlterUsersTable extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->text('permissions')->nullable();
-            $table->string('agency')->nullable();
-            $table->string('departments')->nullable();
             $table->string('job_title')->nullable();
             $table->timestamp('last_login')->nullable();
             $table->timestamp('active')->nullable();
             $table->string('activation_key', 255)->nullable();
+            $table->string('seller_key')->nullable()->unique();
+            $table->foreignId('agency_id')->nullable();
+            $table->foreignId('departments_id')->nullable();
         });
     }
 

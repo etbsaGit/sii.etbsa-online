@@ -7,7 +7,7 @@
       tile
       v-if="GPS"
     >
-      <v-card class="mx-auto my-auto" max-width="300"> 
+      <v-card class="mx-auto my-auto" max-width="300">
         <v-card-text>
           <div>Nombre GPS</div>
           <p class="text-h6 text--primary">
@@ -85,6 +85,14 @@
           <p class="text--primary">
             {{ $appFormatters.formatDate(GPS.updated_at, "LLL") }}
           </p>
+          <div>Ultimo Comentario:</div>
+          <div
+            class="text--primary text-lowercase"
+            style="max-width: 300px;"
+            v-if="GPS.description != ''"
+          >
+            <blockquote class="blockquote">{{ GPS.description }}</blockquote>
+          </div>
         </v-card-text>
       </v-card>
     </v-card>

@@ -26,6 +26,13 @@
         >
           Administra Permisos <v-icon right dark>mdi-key</v-icon>
         </v-btn>
+        <v-btn
+          @click="$router.push({ name: 'sellers.list' })"
+          class="orange lighten-1 float-right mr-2 flex-grow-1 ma-1"
+          dark
+        >
+          Administrar Vendedores <v-icon right dark>mdi-account</v-icon>
+        </v-btn>
       </div>
       <div class="d-flex flex-lg-row flex-sm-column flex-wrap align-center">
         <div class="flex-grow-1 pa-2">
@@ -75,24 +82,24 @@
       class="elevation-1 text-uppercase"
     >
       <!-- Headers -->
-      <template v-slot:header.name="{ header }" class="align-center">
+      <template v-slot:[`header.name`]="{ header }" class="align-center">
         <v-icon small>mdi-account</v-icon>{{ header.text }}
       </template>
-      <template v-slot:header.email="{ header }" class="align-center">
+      <template v-slot:[`header.email`]="{ header }" class="align-center">
         <v-icon small>mdi-email</v-icon>{{ header.text }}
       </template>
-      <template v-slot:header.permissions="{ header }" class="align-center">
+      <template v-slot:[`header.permissions`]="{ header }" class="align-center">
         <v-icon small>mdi-key</v-icon>{{ header.text }}
       </template>
-      <template v-slot:header.groups="{ header }" class="align-center">
+      <template v-slot:[`header.groups`]="{ header }" class="align-center">
         <v-icon small>mdi-account-multiple</v-icon>{{ header.text }}
       </template>
-      <template v-slot:header.last_login="{ header }" class="align-center">
+      <template v-slot:[`header.last_login`]="{ header }" class="align-center">
         <v-icon small>mdi-av-timer</v-icon>{{ header.text }}
       </template>
 
       <!-- Body  -->
-      <template v-slot:item.action="{ item }">
+      <template v-slot:[`item.action`]="{ item }">
         <v-btn
           @click="
             $router.push({
@@ -111,7 +118,7 @@
           <v-icon small>mdi-delete</v-icon>
         </v-btn>
       </template>
-      <template v-slot:item.permissions="{ item }">
+      <template v-slot:[`item.permissions`]="{ item }">
         <v-btn
           small
           @click="showDialog('user_permissions', item.permissions)"
@@ -122,7 +129,7 @@
           >Mostrar</v-btn
         >
       </template>
-      <template v-slot:item.groups="{ item }">
+      <template v-slot:[`item.groups`]="{ item }">
         <v-chip
           v-for="group in item.groups"
           :key="group.id"
@@ -133,10 +140,10 @@
           {{ group.name }}
         </v-chip>
       </template>
-      <template v-slot:item.last_login="{ item }">
+      <template v-slot:[`item.last_login`]="{ item }">
         {{ $appFormatters.formatDate(item.last_login) }}
       </template>
-      <template v-slot:item.active="{ item }">
+      <template v-slot:[`item.active`]="{ item }">
         <v-avatar outlined>
           <v-icon v-if="item.active != null" class="green--text"
             >mdi-check-circle-outline</v-icon

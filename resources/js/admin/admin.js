@@ -44,7 +44,7 @@ Vue.use(VueProgressBar, {
 Vue.component("moon-loader", require("vue-spinner/src/MoonLoader.vue").default);
 
 // app
-import router from "@admin/router";
+import router from "@admin/router/";
 import store from "~/common/Store";
 import eventBus from "~/common/Event";
 import formatters from "~/common/Formatters";

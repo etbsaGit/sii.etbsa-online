@@ -10,7 +10,6 @@ $factory->define(App\Components\Gps\Models\GpsGroup::class, function (Faker $fak
         'SALAMANCA',
         'IRAPUATO',
         'QUERETARO COLORADO',
-        'QUERETARO COLORADO',
         'ABASOLO',
     ];
     $departments= [

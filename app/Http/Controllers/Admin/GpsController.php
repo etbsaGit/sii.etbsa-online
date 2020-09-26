@@ -127,7 +127,7 @@ class GpsController extends AdminController
         $updated = false;
         DB::transaction(function () use ($id, $request, $updated) {
             $this->gpsRepository->keepHistorical($id);
-            $renew = new Carbon($request->renew_date);
+            $renew = new Carbon($request->installation_date);
             $renew->setYear(Carbon::now()->year);
 
             $request['renew_date'] = $renew->addYear();
@@ -201,7 +201,7 @@ class GpsController extends AdminController
             $renew = new Carbon($request->installation_date);
             $renew->setYear(Carbon::now()->year);
 
-            // $request['renew_date'] = $renew;
+            $request['renew_date'] = $renew;
             $request['estatus'] = 'REASIGNADO';
             $request['cancellation_date'] = null;
             $request['uploaded_by'] = auth()->user()->id;
@@ -242,11 +242,26 @@ class GpsController extends AdminController
                 // 'year_installation' => $month,
                 'paginate' => 'no',
             ];
-             $stats[] = $this->gpsRepository->stats($params);
+            $stats[] = $this->gpsRepository->stats($params);
         }
 
         return $this->sendResponseOk($stats, "Get Estadisticas GPS.");
 
     }
+
+    // public function update_dates()
+    // {
+    //     $g = 'App\Components\Gps\Models\Gps'::all();
+
+    //     foreach ($g as $gps) {
+    //         $gps->installation_date = $gps->chip->fecha_activacion ?? null;
+    //         $renew = new Carbon($gps->installation_date);
+    //         $renew->setYear(Carbon::now()->year);
+    //         $gps->renew_date = $renew;
+    //         $gps->save();
+    //     }
+
+    //     return $this->sendResponseOk([], "updated-date.");
+    // }
 
 }

@@ -8,6 +8,7 @@
 
 namespace App\Components\User\Models;
 
+use App\Components\Common\Models\SellerType;
 use Hash;
 use Illuminate\Support\Arr;
 
@@ -53,7 +54,7 @@ trait UserTrait
 
     /**
      * append attribute with group names
-     * 
+     *
      * * @return mixed
      */
     public function getGroupsAttribute()
@@ -62,7 +63,7 @@ trait UserTrait
     }
     /**
      * append attribute with combined permissions
-     * 
+     *
      * * @return mixed
      */
     public function getAllPermissionsAttribute()
@@ -78,6 +79,25 @@ trait UserTrait
     public function groups()
     {
         return $this->belongsToMany(Group::class, 'user_group_pivot_table', 'user_id');
+    }
+
+    /**
+     * returns the groups of the user
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function seller_type()
+    {
+        return $this->belongsToMany(SellerType::class, 'sellers_type_pivot', 'user_id');
+    }
+
+    public function agency()
+    {
+        return $this->belongsTo('App\Components\Common\Models\Agency', 'agency_id');
+    }
+    public function department()
+    {
+        return $this->belongsTo('App\Components\Common\Models\Department', 'departments_id');
     }
 
     /**
@@ -493,6 +513,17 @@ trait UserTrait
 
         return $q->whereHas('groups', function ($q) use ($v) {
             return $q->whereIn('groups.id', $v);
+        });
+    }
+
+    public function scopeOfSellerType($q, $v)
+    {
+        if ($v === false || $v === '' || count($v) == 0 || $v[0] == '') {
+            return $q;
+        }
+
+        return $q->whereHas('seller_type', function ($q) use ($v) {
+            return $q->whereIn('departments.id', $v);
         });
     }
 }

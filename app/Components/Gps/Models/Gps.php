@@ -177,7 +177,7 @@ class Gps extends Model
             return false;
         }
 
-        return $q->whereNotNull('gps_chip_id');
+        return $q->has('chip');
     }
 
     public function scopeOfDeallocated($q, $v)
@@ -186,7 +186,7 @@ class Gps extends Model
             return false;
         }
 
-        return $q->whereNull('gps_chip_id');
+        return $q->doesntHave('chip');
     }
 
     public function scopeOfExpired($q, $v)

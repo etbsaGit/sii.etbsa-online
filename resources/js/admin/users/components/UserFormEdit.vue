@@ -1,7 +1,9 @@
 <template>
   <div>
     <v-card>
-      <v-card-title> <v-icon>mdi-badge-account</v-icon> Perfil Usuario </v-card-title>
+      <v-card-title>
+        <v-icon>mdi-badge-account</v-icon> Perfil Usuario
+      </v-card-title>
       <v-divider class="mb-2"></v-divider>
       <v-form v-model="valid" ref="userFormEdit" lazy-validation>
         <v-container grid-list-md>
@@ -20,6 +22,29 @@
                 :rules="emailRules"
               ></v-text-field>
             </v-flex>
+            <v-flex xs12 sm4>
+              <v-autocomplete
+                v-model="agency"
+                :items="options.agencies"
+                item-text="title"
+                item-value="id"
+                label="Agencia"
+                placeholder="Agencia a cual correponde."
+              ></v-autocomplete>
+            </v-flex>
+            <v-flex xs12 sm4>
+              <v-autocomplete
+                v-model="department"
+                :items="options.departments"
+                item-text="title"
+                item-value="id"
+                label="Departamento:"
+                placeholder="Departamento a cual correponde."
+              ></v-autocomplete>
+            </v-flex>
+            <v-flex xs12 sm4>
+              <v-text-field v-model="jobTitle" label="Puesto"></v-text-field>
+            </v-flex>
             <v-flex xs12>
               <v-text-field
                 label="Contraseña (dejar en blanco si no se cambia)"
@@ -29,10 +54,7 @@
               ></v-text-field>
             </v-flex>
             <v-flex xs12 sm6>
-              <v-switch
-                label="Cuenta Preactivada"
-                v-model="active"
-              ></v-switch>
+              <v-switch label="Cuenta Preactivada" v-model="active"></v-switch>
             </v-flex>
             <v-flex xs12><v-spacer></v-spacer></v-flex>
             <v-flex xs12>
@@ -89,7 +111,7 @@
                   :class="{
                     green: p.value == 1,
                     red: p.value == -1,
-                    blue: p.value == 0
+                    blue: p.value == 0,
                   }"
                 >
                   <v-avatar
@@ -154,8 +176,8 @@
 export default {
   props: {
     propUserId: {
-      required: true
-    }
+      required: true,
+    },
   },
   data() {
     const self = this;
@@ -163,38 +185,43 @@ export default {
     return {
       valid: false,
       name: "",
-      nameRules: [v => !!v || "Nombre Requerido"],
+      nameRules: [(v) => !!v || "Nombre Requerido"],
       email: "",
       emailRules: [
-        v => !!v || "E-mail is required",
-        v =>
+        (v) => !!v || "E-mail is required",
+        (v) =>
           /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(v) ||
-          "E-mail debe ser valido"
+          "E-mail debe ser valido",
       ],
       password: "",
       passwordRules: [
-        v => {
+        (v) => {
           if (v && v.length > 0 && v.length < 8) {
             return "La contraseña necesita un mínimo de 8 caracteres.";
           }
           return true;
-        }
+        },
       ],
       passwordConfirm: "",
       passwordConfirmRules: [
-        v => !(v !== self.password) || "Contraseña no coincide."
+        (v) => !(v !== self.password) || "Contraseña no coincide.",
       ],
       permissions: [],
       groups: [],
+      agency: null,
+      department: null,
+      jobTitle: "",
       active: "",
       options: {
         permissions: [],
         permissionValues: [
           { label: "Permitir", value: 1 },
           { label: "Denegar", value: -1 },
-          { label: "Heredar", value: 0 }
+          { label: "Heredar", value: 0 },
         ],
-        groups: []
+        groups: [],
+        agencies: [],
+        departments: [],
       },
       selectedPermission: {},
       selectedPermissionValue: 0,
@@ -203,8 +230,8 @@ export default {
         show: false,
         icon: "",
         color: "",
-        message: ""
-      }
+        message: "",
+      },
     };
   },
   mounted() {
@@ -235,7 +262,10 @@ export default {
         password: self.password ? self.password : null,
         active: self.active ? moment().format("YYYY-MM-DD") : null,
         permissions: self.permissions,
-        groups: self.groups
+        groups: self.groups,
+        agency_id: self.agency,
+        departments_id: self.department,
+        job_title: self.jobTitle,
       };
 
       self.$store.commit("showLoader");
@@ -246,7 +276,7 @@ export default {
           self.$store.commit("showSnackbar", {
             message: response.data.message,
             color: "success",
-            duration: 3000
+            duration: 3000,
           });
 
           self.$eventBus.$emit("USER_UPDATED");
@@ -259,7 +289,7 @@ export default {
             self.$store.commit("showSnackbar", {
               message: error.response.data.message,
               color: "error",
-              duration: 3000
+              duration: 3000,
             });
           } else if (error.request) {
             console.log(error.request);
@@ -271,7 +301,7 @@ export default {
     addSpecialPermission() {
       const self = this;
 
-      _.each(self.options.permissions, p => {
+      _.each(self.options.permissions, (p) => {
         if (self.selectedPermission === p.key) {
           if (!self.existsInPermissions(self.selectedPermission)) {
             p.value = self.selectedPermissionValue;
@@ -285,7 +315,7 @@ export default {
     existsInPermissions(permissionKey) {
       const self = this;
       let found = false;
-      _.each(self.permissions, p => {
+      _.each(self.permissions, (p) => {
         if (p.key === permissionKey) found = true;
       });
       return found;
@@ -303,16 +333,19 @@ export default {
         self.email = User.email;
         self.active = User.active !== null;
         self.permissions = User.permissions;
+        self.jobTitle = User.job_title
+        self.agency = User.agency_id
+        self.department = User.departments_id
 
         // groups
-        _.each(User.groups, g => {
+        _.each(User.groups, (g) => {
           self.groups[g.id] = true;
         });
 
         self.$store.commit("setBreadcrumbs", [
           { label: "Users", to: { name: "users.list" } },
           { label: User.name, to: "" },
-          { label: "Perfil", to: "" }
+          { label: "Perfil", to: "" },
         ]);
 
         cb();
@@ -322,7 +355,7 @@ export default {
       const self = this;
 
       let params = {
-        paginate: "no"
+        paginate: "no",
       };
 
       axios
@@ -336,19 +369,28 @@ export default {
       const self = this;
 
       let params = {
-        paginate: "no"
+        paginate: "no",
       };
 
       axios.get("/admin/groups", { params: params }).then(function(response) {
         self.options.groups = response.data.data;
 
-        _.each(self.options.groups, g => {
+        _.each(self.options.groups, (g) => {
           g.selected = false;
         });
 
         cb();
       });
-    }
-  }
+
+      axios
+        .get("/admin/tracking/sales_history/resources")
+        .then(function(response) {
+          let Data = response.data.data;
+          self.options.agencies = Data.agencies;
+          self.options.departments = Data.departments;
+          (cb || Function)();
+        });
+    },
+  },
 };
 </script>

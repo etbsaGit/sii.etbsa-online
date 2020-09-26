@@ -51,7 +51,7 @@ class GpsChips extends Model
         if ($v === null || $v === '') {
             return false;
         }
-        return $query->whereMonth('fecha_renovacion', $v);
+        return $query->whereMonth('fecha_activacion', $v);
     }
 
     public function scopeOfYear($query, $v)
@@ -59,7 +59,7 @@ class GpsChips extends Model
         if ($v === null || $v === '') {
             return false;
         }
-        return $query->whereYear('fecha_renovacion', $v);
+        return $query->whereYear('fecha_activacion', $v);
     }
 
     public function scopeOfAssigned($q, $v)
@@ -68,7 +68,7 @@ class GpsChips extends Model
             return false;
         }
         
-        return $q->whereNotNull('gps_id');
+        return $q->has('gps');
     }
 
     public function scopeOfDeallocated($q, $v)
@@ -77,7 +77,7 @@ class GpsChips extends Model
             return false;
         }
 
-        return $q->whereNull('gps_id');
+        return $q->doesntHave('gps');
     }
 
     public function scopeOfExpired($q, $v)

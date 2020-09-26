@@ -1,35 +1,37 @@
 import UserPolicy from "~/common/Gate/Policies/UserPolicy";
 import GpsPolicy from "~/common/Gate/Policies/GpsPolicy";
+import TrackingPolicy from "~/common/Gate/Policies/TrackingPolicy";
 
 export default class Gate {
-    constructor(user) {
-        this.user = user;
+  constructor(user) {
+    this.user = user;
 
-        this.policies = {
-            user: UserPolicy,
-            gps: GpsPolicy,
-        };
+    this.policies = {
+      user: UserPolicy,
+      gps: GpsPolicy,
+      tracking: TrackingPolicy,
+    };
 
-        // this.groups = {
-        //     group: GroupPolicy
-        // }
+    // this.groups = {
+    //     group: GroupPolicy
+    // }
+  }
+
+  before() {
+    return this.user.all_permissions["superuser"] === 1;
+  }
+
+  allow(action, type, model = null) {
+    if (this.before()) {
+      return true;
     }
 
-    before() {
-        return this.user.all_permissions["superuser"] === 1;
-    }
+    return this.policies[type][action](this.user.all_permissions, model);
+  }
 
-    allow(action, type, model = null) {
-        if (this.before()) {
-            return true;
-        }
-
-        return this.policies[type][action](this.user.all_permissions, model);
-    }
-
-    deny(action, type, model = null) {
-        return !this.allow(action, type, model);
-    }
+  deny(action, type, model = null) {
+    return !this.allow(action, type, model);
+  }
 }
 
 // bootstrap.js

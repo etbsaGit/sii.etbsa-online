@@ -20,6 +20,29 @@
                 :rules="emailRules"
               ></v-text-field>
             </v-flex>
+            <v-flex xs12 sm4>
+              <v-autocomplete
+                v-model="agency"
+                :items="options.agencies"
+                item-text="title"
+                item-value="id"
+                label="Agencia"
+                placeholder="Agencia a cual correponde."
+              ></v-autocomplete>
+            </v-flex>
+            <v-flex xs12 sm4>
+              <v-autocomplete
+                v-model="department"
+                :items="options.departments"
+                item-text="title"
+                item-value="id"
+                label="Departamento:"
+                placeholder="Departamento a cual correponde."
+              ></v-autocomplete>
+            </v-flex>
+            <v-flex xs12 sm4>
+              <v-text-field v-model="jobTitle" label="Puesto"></v-text-field>
+            </v-flex>
             <v-flex xs12 sm6>
               <v-text-field
                 label="Password"
@@ -47,7 +70,11 @@
               <h1 class="title">
                 <v-icon>mdi-key</v-icon> Special Permissions
               </h1>
-              <v-alert color="info" icon="mdi-information-outline" :value="true">
+              <v-alert
+                color="info"
+                icon="mdi-information-outline"
+                :value="true"
+              >
                 Los permisos especiales son permisos exclusivos para este
                 usuario. Permisos definidos aquí. Son más superiores que
                 cualquier permiso que tenga en su grupo. Así que si el usuario
@@ -96,7 +123,7 @@
                   :class="{
                     green: p.value == 1,
                     red: p.value == -1,
-                    blue: p.value == 0
+                    blue: p.value == 0,
                   }"
                 >
                   <v-avatar
@@ -129,7 +156,9 @@
             </v-flex>
             <v-flex xs12><v-spacer></v-spacer></v-flex>
             <v-flex xs12>
-              <h1 class="title"><v-icon>mdi-account-multiple</v-icon> Grupos</h1>
+              <h1 class="title">
+                <v-icon>mdi-account-multiple</v-icon> Grupos
+              </h1>
               <v-divider></v-divider>
             </v-flex>
             <v-layout wrap mx-2>
@@ -141,7 +170,12 @@
               </v-flex>
             </v-layout>
             <v-flex xs12>
-              <v-btn block @click="save()" :disabled="!valid" color="primary" dark
+              <v-btn
+                block
+                @click="save()"
+                :disabled="!valid"
+                color="primary"
+                dark
                 >Guardar</v-btn
               >
             </v-flex>
@@ -160,34 +194,39 @@ export default {
     return {
       valid: false,
       name: "",
-      nameRules: [v => !!v || "Name is required"],
+      nameRules: [(v) => !!v || "Name is required"],
       email: "",
       emailRules: [
-        v => !!v || "E-mail is required",
-        v =>
+        (v) => !!v || "E-mail is required",
+        (v) =>
           /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(v) ||
-          "E-mail must be valid"
+          "E-mail must be valid",
       ],
       password: "",
       passwordRules: [
-        v => !!v || "Password is required",
-        v => (v && v.length >= 8) || "Password must be atleast 8 characters."
+        (v) => !!v || "Password is required",
+        (v) => (v && v.length >= 8) || "Password must be atleast 8 characters.",
       ],
       passwordConfirm: "",
       passwordConfirmRules: [
-        v => !(v !== self.password) || "Password do not match."
+        (v) => !(v !== self.password) || "Password do not match.",
       ],
       permissions: [],
       groups: [],
+      agency: null,
+      department: null,
+      jobTitle: "",
       active: "",
       options: {
         permissions: [],
         permissionValues: [
           { label: "Allow", value: 1 },
           { label: "Deny", value: -1 },
-          { label: "Inherit", value: 0 }
+          { label: "Inherit", value: 0 },
         ],
-        groups: []
+        groups: [],
+        agencies: [],
+        departments: [],
       },
       selectedPermission: {},
       selectedPermissionValue: 0,
@@ -196,8 +235,8 @@ export default {
         show: false,
         icon: "",
         color: "",
-        message: ""
-      }
+        message: "",
+      },
     };
   },
   mounted() {
@@ -205,12 +244,12 @@ export default {
 
     const self = this;
 
-    self.loadPermissions(cb => {});
-    self.loadGroups(cb => {});
+    self.loadPermissions((cb) => {});
+    self.loadGroups((cb) => {});
 
     self.$store.commit("setBreadcrumbs", [
       { label: "Users", to: { name: "users.list" } },
-      { label: "Create", to: "" }
+      { label: "Create", to: "" },
     ]);
   },
   methods: {
@@ -228,7 +267,10 @@ export default {
         password: self.password,
         active: self.active ? moment().format("YYYY-MM-DD") : null,
         permissions: self.permissions,
-        groups: self.groups
+        groups: self.groups,
+        agency_id: self.agency,
+        departments_id: self.department,
+        job_title: self.jobTitle
       };
 
       self.$store.commit("showLoader");
@@ -239,7 +281,7 @@ export default {
           self.$store.commit("showSnackbar", {
             message: response.data.message,
             color: "success",
-            duration: 3000
+            duration: 3000,
           });
 
           self.$eventBus.$emit("USER_ADDED");
@@ -256,7 +298,7 @@ export default {
             self.$store.commit("showSnackbar", {
               message: error.response.data.message,
               color: "error",
-              duration: 3000
+              duration: 3000,
             });
           } else if (error.request) {
             console.log(error.request);
@@ -268,7 +310,7 @@ export default {
     addSpecialPermission() {
       const self = this;
 
-      _.each(self.options.permissions, p => {
+      _.each(self.options.permissions, (p) => {
         if (self.selectedPermission === p.key) {
           if (!self.existsInPermissions(self.selectedPermission)) {
             p.value = self.selectedPermissionValue;
@@ -280,7 +322,7 @@ export default {
     existsInPermissions(permissionKey) {
       const self = this;
       let found = false;
-      _.each(self.permissions, p => {
+      _.each(self.permissions, (p) => {
         if (p.key === permissionKey) found = true;
       });
       return found;
@@ -289,7 +331,7 @@ export default {
       const self = this;
 
       let params = {
-        paginate: "no"
+        paginate: "no",
       };
 
       axios
@@ -303,19 +345,28 @@ export default {
       const self = this;
 
       let params = {
-        paginate: "no"
+        paginate: "no",
       };
 
       axios.get("/admin/groups", { params: params }).then(function(response) {
         self.options.groups = response.data.data;
 
-        _.each(self.options.groups, g => {
+        _.each(self.options.groups, (g) => {
           g.selected = false;
         });
 
         cb();
       });
-    }
-  }
+
+      axios
+        .get("/admin/tracking/sales_history/resources")
+        .then(function(response) {
+          let Data = response.data.data;
+          self.options.agencies = Data.agencies;
+          self.options.departments = Data.departments;
+          (cb || Function)();
+        });
+    },
+  },
 };
 </script>

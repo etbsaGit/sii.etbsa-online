@@ -8,10 +8,9 @@
 
 namespace App\Components\User\Repositories;
 
-
 use App\Components\Core\BaseRepository;
-use App\Components\User\Models\User;
 use App\Components\Core\Utilities\Helpers;
+use App\Components\User\Models\User;
 
 class UserRepository extends BaseRepository
 {
@@ -28,8 +27,7 @@ class UserRepository extends BaseRepository
      */
     public function listUsers($params)
     {
-        return $this->get($params,['groups'],function($q) use ($params)
-        {
+        return $this->get($params, ['groups', 'agency', 'department'], function ($q) use ($params) {
             $q->ofGroups(Helpers::commasToArray($params['group_id'] ?? ''));
             $q->ofName($params['name'] ?? '');
             $q->ofEmail($params['email'] ?? '');
@@ -47,15 +45,13 @@ class UserRepository extends BaseRepository
      */
     public function delete(int $id)
     {
-        $ids = explode(',',$id);
+        $ids = explode(',', $id);
 
-        foreach ($ids as $id)
-        {
+        foreach ($ids as $id) {
             /** @var User $User */
             $User = $this->model->find($id);
 
-            if(!$User)
-            {
+            if (!$User) {
                 return false;
             };
 

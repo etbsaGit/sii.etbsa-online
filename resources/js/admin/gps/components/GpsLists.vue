@@ -1,137 +1,131 @@
 <template>
   <div class="component-wrap">
     <v-row>
-      <v-col sm="12" lg="3" class="mb-4 controls">
+      <v-col cols="12" xs="12" class="mb-2">
         <v-form ref="filterForm">
-          <v-text-field
-            prepend-icon="mdi-magnify"
-            label="Filtrar por Nombre"
-            v-model="filters.name"
-            clearable
-            class="mt-2"
-          ></v-text-field>
-          <v-row class="justify-space-between mx-auto">
-            <v-checkbox
-              v-model="filters.assigned"
-              label="Asignados"
-              hide-details
-            ></v-checkbox>
-            <v-checkbox
-              v-model="filters.deallocated"
-              label="Sin Asignar"
-              hide-details
-            ></v-checkbox>
-            <!-- <v-checkbox
-              v-model="filters.renewed"
-              label="Renovados"
-              hide-details
-            ></v-checkbox> -->
-            <v-checkbox
-              v-model="filters.expired"
-              label="Vencidos"
-              hide-details
-            ></v-checkbox>
-            <v-checkbox
-              v-model="filters.canceled"
-              label="Cancelados"
-              hide-details
-            ></v-checkbox>
+          <v-row>
+            <v-col cols="6" class="pa-0">
+              <v-text-field
+                prepend-icon="mdi-magnify"
+                label="Filtrar por Nombre"
+                v-model="filters.name"
+                clearable
+                hide-details=""
+                class="mt-2"
+              ></v-text-field
+            ></v-col>
+            <v-col cols="6" class="pa-0">
+              <v-autocomplete
+                hide-details
+                outlined
+                dense
+                v-model="filters.chipsId"
+                filled
+                small-chips
+                deletable-chips
+                clearable
+                prepend-icon="mdi-filter-variant"
+                label="Buscar CHIP"
+                :items="options.gpsChips"
+                item-text="sim"
+                item-value="sim"
+                class="mt-2"
+              ></v-autocomplete
+            ></v-col>
+            <v-col cols="6" class="pa-0">
+              <v-autocomplete
+                hide-details
+                outlined
+                dense
+                v-model="filters.groupId"
+                filled
+                multiple
+                small-chips
+                deletable-chips
+                clearable
+                prepend-icon="mdi-filter-variant"
+                label="Filtrar por Clientes"
+                :items="options.gpsGroup"
+                item-text="name"
+                item-value="id"
+                class="mt-2"
+              ></v-autocomplete
+            ></v-col>
+            <v-col cols="6" class="pa-0">
+              <v-select
+                hide-details
+                outlined
+                dense
+                v-model="filters.agency"
+                :items="options.agencies"
+                label="Sucursal"
+                :menu-props="{ offsetY: true }"
+                item-text="name"
+                item-value="name"
+                prepend-icon="mdi-filter-variant"
+                clearable
+                filled
+                class="mt-2"
+              ></v-select
+            ></v-col>
+            <v-col cols="6" class="pa-0">
+              <v-select
+                hide-details
+                outlined
+                dense
+                v-model="filters.department"
+                :items="options.departments"
+                label="Departamento"
+                :menu-props="{ offsetY: true }"
+                item-text="name"
+                item-value="name"
+                prepend-icon="mdi-filter-variant"
+                clearable
+                filled
+                class="mt-2"
+              ></v-select
+            ></v-col>
+            <v-col cols="6" class="pa-0">
+              <v-select
+                hide-details
+                outlined
+                dense
+                v-model="filters.payment_type"
+                :items="options.payment_type"
+                label="Tipo de Pago"
+                :menu-props="{ offsetY: true }"
+                prepend-icon="mdi-filter-variant"
+                clearable
+                filled
+                class="mt-2"
+              ></v-select>
+            </v-col>
+            <v-row class="justify-end mr-4">
+              <v-checkbox
+                v-model="filters.assigned"
+                label="Asignados"
+                hide-details
+              ></v-checkbox>
+              <v-checkbox
+                v-model="filters.deallocated"
+                label="Sin Asignar"
+                hide-details
+              ></v-checkbox>
+              <v-checkbox
+                v-model="filters.expired"
+                label="Vencidos"
+                hide-details
+              ></v-checkbox>
+              <v-checkbox
+                v-model="filters.canceled"
+                label="Cancelados"
+                hide-details
+              ></v-checkbox>
+            </v-row>
           </v-row>
-          <v-select
-            hide-details
-            outlined
-            dense
-            v-model="filters.agency"
-            :items="options.agencies"
-            label="Sucursal"
-            :menu-props="{ offsetY: true }"
-            item-text="name"
-            item-value="name"
-            prepend-icon="mdi-filter-variant"
-            clearable
-            filled
-            class="mt-2"
-          ></v-select>
-          <v-select
-            hide-details
-            outlined
-            dense
-            v-model="filters.department"
-            :items="options.departments"
-            label="Departamento"
-            :menu-props="{ offsetY: true }"
-            item-text="name"
-            item-value="name"
-            prepend-icon="mdi-filter-variant"
-            clearable
-            filled
-            class="mt-2"
-          ></v-select>
-          <v-select
-            hide-details
-            outlined
-            dense
-            v-model="filters.payment_type"
-            :items="options.payment_type"
-            label="Tipo de Pago"
-            :menu-props="{ offsetY: true }"
-            prepend-icon="mdi-filter-variant"
-            clearable
-            filled
-            class="mt-2"
-          ></v-select>
-          <v-autocomplete
-            hide-details
-            outlined
-            dense
-            v-model="filters.groupId"
-            filled
-            multiple
-            small-chips
-            deletable-chips
-            clearable
-            prepend-icon="mdi-filter-variant"
-            label="Filtrar por Clientes"
-            :items="options.gpsGroup"
-            item-text="name"
-            item-value="id"
-            class="mt-2"
-          ></v-autocomplete>
-          <v-autocomplete
-            hide-details
-            outlined
-            dense
-            v-model="filters.chipsId"
-            filled
-            multiple
-            small-chips
-            deletable-chips
-            clearable
-            prepend-icon="mdi-filter-variant"
-            label="Buscar CHIP"
-            :items="options.gpsChips"
-            item-text="sim"
-            item-value="sim"
-            class="mt-2"
-          ></v-autocomplete>
-          <!-- <v-select
-            hide-details
-            outlined
-            dense
-            v-model="filters.estatus"
-            :items="options.estatus"
-            label="Estatus GPS"
-            item-text="name"
-            item-value="name"
-            :menu-props="{ offsetY: true }"
-            prepend-icon="mdi-filter-variant"
-            clearable
-            filled
-            class="mt-2"
-          ></v-select> -->
         </v-form>
       </v-col>
-      <v-col sm="12" lg="9" class="pl-2">
+      <v-col cols="12" xs="12">
         <gps-widget-stats></gps-widget-stats>
         <v-data-table
           v-bind:headers="headers"
@@ -140,7 +134,6 @@
           :server-items-length="totalItems"
           dense
           fixed-header
-          height="500"
           class="elevation-4 text-uppercase caption"
         >
           <!-- Top -->
@@ -218,7 +211,7 @@
                       <v-icon class="blue--text">mdi-swap-horizontal</v-icon>
                     </v-list-item-icon>
                     <v-list-item-content>
-                      <v-list-item-title>Reasignar GPS</v-list-item-title>
+                      <v-list-item-title>Editar GPS</v-list-item-title>
                     </v-list-item-content>
                   </v-list-item>
                   <v-list-item @click="openDialogCancel(item)">
@@ -345,32 +338,30 @@
               </template>
             </v-edit-dialog>
           </template>
-
-          <template v-slot:[`item.renew_date`]="{ item }">
+          <template v-slot:[`item.installation_date`]="{ item }">
             <span class="overline text-capitalize">
-              {{ $appFormatters.formatDate(item.renew_date, "MMMM YYYY") }}
+              {{
+                $appFormatters.formatDate(item.installation_date, "MMM YYYY")
+              }}
             </span>
           </template>
-
-          <template v-slot:[`item.renew_days`]="{ item }">
+          <template v-slot:[`item.renew_date_large`]="{ item }">
+            <span class="overline text-capitalize">
+              {{ $appFormatters.formatDate(item.renew_date, "MMM YYYY") }}
+            </span>
+          </template>
+          <template v-slot:[`item.renew_date`]="{ item }">
             <span class="overline text-capitalize">
               <v-chip
                 :color="
                   getColor($appFormatters.formatTimeDiffNow(item.renew_date))
                 "
                 dark
-                x-small
+                small
               >
                 {{ $appFormatters.formatTimeDiffNow(item.renew_date, "days") }}
                 Dias
               </v-chip>
-            </span>
-          </template>
-          <template v-slot:[`item.installation_date`]="{ item }">
-            <span class="overline text-capitalize">
-              {{
-                $appFormatters.formatDate(item.installation_date, "MMMM YYYY")
-              }}
             </span>
           </template>
         </v-data-table>
@@ -471,7 +462,7 @@
     <v-dialog v-model="dialogReasign" max-width="500px">
       <v-card>
         <v-card-title>
-          Reasignar GPS
+          Editar GPS
         </v-card-title>
         <v-card-text>
           <v-text-field
@@ -501,7 +492,7 @@
           ></v-autocomplete>
           <v-text-field
             v-model="reasign_date"
-            label="Fecha Activacion"
+            label="Fecha Instalacion"
             type="date"
           ></v-text-field>
         </v-card-text>
@@ -559,45 +550,44 @@ export default {
           text: "SIM",
           value: "sim",
           align: "right",
-          sortable: true,
+          sortable: false,
         },
         {
-          text: "Grupo",
+          text: "Cliente:",
           value: "gps_group",
           align: "left",
           sortable: false,
         },
         {
-          text: "Costo",
+          text: "Costo:",
           value: "cost",
           align: "right",
           sortable: false,
         },
         {
-          text: "Facturado",
+          text: "Factura:",
           value: "amount",
           align: "center",
           sortable: false,
         },
         {
-          text: "Mes Renovacion",
-          value: "renew_date",
+          text: "Instalado en:",
+          value: "installation_date",
           align: "center",
-          width: 100,
-          sortable: false,
-        },
-        {
-          text: "Dias vence:",
-          value: "renew_days",
-          align: "center",
-          width: 125,
           class: "pa-0",
           sortable: true,
         },
         {
-          text: "Mes Instalacion",
-          value: "installation_date",
+          text: "Renovar en:",
+          value: "renew_date_large",
           align: "center",
+          sortable: false,
+        },
+        {
+          text: "Dias vence:",
+          value: "renew_date",
+          align: "center",
+          width: 125,
           class: "pa-0",
           sortable: true,
         },
@@ -805,7 +795,7 @@ export default {
         payment_type: self.filters.payment_type,
         estatus: self.filters.estatus,
         group_id: self.filters.groupId.join(","),
-        chips_id: self.filters.chipsId.join(","),
+        chips_id: self.filters.chipsId,
 
         assigned: self.filters.assigned ? self.filters.assigned : null,
         deallocated: self.filters.deallocated ? self.filters.deallocated : null,

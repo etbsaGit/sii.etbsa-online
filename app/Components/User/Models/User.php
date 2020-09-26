@@ -2,8 +2,8 @@
 
 namespace App\Components\User\Models;
 
-use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 
 /**
  * Class User
@@ -25,7 +25,9 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password','remember_token','permissions','last_login','active','activation_key'
+        'name', 'email', 'password', 'remember_token',
+        'permissions', 'last_login', 'active', 'activation_key',
+        'agency_id', 'departments_id', 'job_title','seller_key'
     ];
 
     /**
@@ -37,7 +39,7 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
-    protected $appends = ['groups','all_permissions'];
+    protected $appends = ['groups', 'all_permissions'];
 
     /**
      * the validation rules
