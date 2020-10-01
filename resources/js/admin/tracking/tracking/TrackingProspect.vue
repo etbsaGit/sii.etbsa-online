@@ -256,7 +256,22 @@
             v-model="isFormalized"
             label="Formalizo en Venta"
           ></v-switch>
-
+          <v-text-field
+            v-model="lastPrice"
+            hide-details
+            label="Ultimo Precio a Tratar:"
+            outlined
+            dense
+            :rules="[(v) => !!v || 'Requerido']"
+            class="mb-2"
+            reverse
+            type="number"
+            append-icon="mdi-currency-usd"
+          >
+            <template v-slot:default>
+              {{ lastPrice | money() }}
+            </template>
+          </v-text-field>
           <v-textarea
             v-model="input"
             hide-details
@@ -264,7 +279,6 @@
             solo
             outlined
             :rules="[(v) => !!v || 'Requerido']"
-            @keydown.enter="comment"
           >
             <template v-slot:append>
               <v-btn class="mx-0" depressed @click="comment">
@@ -291,6 +305,8 @@
                     "DD MMM YYYY hh:mm"
                   )
                 }}
+                <div class="caption">{{ event.last_price | money() }}</div>
+                <div class="caption">{{ event.user.name}}</div>
               </v-col>
             </v-row>
           </v-timeline-item>
@@ -319,6 +335,7 @@ export default {
     now: null,
     isFormalized: false,
     seller: null,
+    lastPrice: 0,
     options: {
       sellers: [],
     },
@@ -367,6 +384,7 @@ export default {
         estatus: self.isFormalized ? "formalizado" : self.row,
         date_next_tracking: self.now,
         message: self.input,
+        last_price: self.lastPrice,
       };
 
       axios
@@ -389,6 +407,7 @@ export default {
         .then(function(response) {
           let Tracking = response.data.data;
           self.tracking = Tracking;
+          self.lastPrice = Tracking.price;
 
           cb();
         });

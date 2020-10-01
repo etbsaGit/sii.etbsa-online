@@ -119,8 +119,10 @@ class TrackingProspectController extends AdminController
             $estatus = Estatus::where('key', $request['estatus'])->first();
             $tracking = $this->trackingRepository->find($id);
 
+            $request['user_id'] = Auth::user()->id;
             $tracking->historical()->create($request->all());
             $tracking->date_next_tracking = $request['date_next_tracking'];
+            $tracking->price = $request['last_price'];
             $tracking->estatus()->associate($estatus)->save();
             // $updated = $this->trackingRepository->update($id, $request->all());
         });

@@ -175,7 +175,15 @@
         </v-chip>
       </template>
       <template v-slot:[`item.date_next_tracking`]="{ item }">
-        <v-btn small text>
+        <v-btn
+          small
+          text
+          :color="
+            getColorDays(
+              $appFormatters.formatTimeDiffNow(item.date_next_tracking, 'days')
+            )
+          "
+        >
           {{
             `${$appFormatters.formatTimeDiffNow(
               item.date_next_tracking,
@@ -185,7 +193,7 @@
         </v-btn>
       </template>
       <template v-slot:[`item.updated_at`]="{ item }">
-        {{ $appFormatters.formatDate(item.updated_at, "l hh:mm a") }}
+        {{ $appFormatters.formatDate(item.updated_at, "L hh:mm a") }}
       </template>
     </v-data-table>
   </div>
@@ -381,6 +389,10 @@ export default {
     getColor(value) {
       if (value == "finalizado") return "red";
       else if (value == "formalizado") return "blue";
+      else return "primary";
+    },
+    getColorDays(value) {
+      if (value < 0) return "red";
       else return "primary";
     },
   },

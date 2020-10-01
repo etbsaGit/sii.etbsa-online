@@ -215,6 +215,7 @@ export default {
 
           // reset
           self.isLoading = false;
+          self.$router.push({ name: "tracking.list" });
         })
         .catch(function(error) {
           self.isLoading = false;
