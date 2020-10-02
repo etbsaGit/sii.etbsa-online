@@ -14,7 +14,7 @@ import Vue from "vue";
 import Vuetify from "vuetify";
 import es from "vuetify/es5/locale/es";
 import VueProgressBar from "vue-progressbar";
-import  Gate  from "~/common/Gate";
+import Gate from "~/common/Gate";
 import "~/plugins";
 
 // this is the vuetify theming options
@@ -34,10 +34,11 @@ Vue.use(VueProgressBar, {
   thickness: "5px",
   transition: {
     speed: "0.2s",
-    opacity: "0.6s"
+    opacity: "0.6s",
   },
   autoRevert: true,
   inverse: false,
+  autoFinish: false,
 });
 
 // global component registrations here
@@ -62,10 +63,10 @@ Vue.filter("money", (value, type = "MXN") =>
   }).format(value)
 );
 
-Vue.filter("percent", value =>
-    new Intl.NumberFormat("es-MX", {
-        style: "percent"
-    }).format(value)
+Vue.filter("percent", (value) =>
+  new Intl.NumberFormat("es-MX", {
+    style: "percent",
+  }).format(value)
 );
 
 const admin = new Vue({

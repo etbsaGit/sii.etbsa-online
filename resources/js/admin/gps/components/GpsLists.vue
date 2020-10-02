@@ -1079,10 +1079,7 @@ export default {
           },
           cancelCb: () => {
             self.cancel();
-            item.amount = 0;
-            item.invoice = "";
-            item.currency = "MXN";
-            item.exchange_rate = 1;
+            self.refresh();
           },
         });
       } else {
