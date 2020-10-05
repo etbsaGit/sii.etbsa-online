@@ -80,7 +80,7 @@ class SinglePageController extends AdminController
                 'nav_type' => MenuItem::$NAV_TYPE_NAV,
                 'icon' => 'mdi-store',
                 'route_type' => 'vue',
-                'route_name' => 'prospect.list',
+                'route_name' => 'tracking.list',
                 'visible' => true,
             ]),
             new MenuItem([

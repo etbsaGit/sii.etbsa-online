@@ -279,8 +279,7 @@ export default {
     self.$store.commit("showLoader");
 
     self.$store.commit("setBreadcrumbs", [
-      { label: "Users", to: { name: "users.list" } },
-      { label: "Vendedores", name: "" },
+      { label: "Segumientos", name: "" },
     ]);
     self.loadResources(() => {
       self.$store.commit("hideLoader");

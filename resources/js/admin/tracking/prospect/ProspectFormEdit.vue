@@ -12,13 +12,35 @@
             <v-flex xs12>
               <div class="body-2">Ingresar la informacion del Propecto</div>
             </v-flex>
-            <v-flex xs12 md8>
+            <v-flex xs12 md6>
               <v-text-field
                 label="Nombre Completo:"
                 v-model="full_name"
                 :rules="[(v) => !!v || 'Nombre Requerido']"
                 filled
               ></v-text-field>
+            </v-flex>
+            <v-flex xs12 md3>
+              <v-autocomplete
+                v-model="estate_id"
+                :items="options.estates"
+                item-text="name"
+                item-value="id"
+                label="Estado:"
+                hide-details
+                filled
+              ></v-autocomplete>
+            </v-flex>
+            <v-flex xs12 md3>
+              <v-autocomplete
+                :items="options.townships"
+                v-model="township_id"
+                label="Municipio"
+                item-text="name"
+                item-value="id"
+                filled
+                outline
+              ></v-autocomplete>
             </v-flex>
             <v-flex xs12 md4>
               <v-text-field v-model="rfc" label="RFC:" filled></v-text-field>
@@ -29,6 +51,7 @@
                 v-model="phone"
                 :rules="[(v) => !!v || 'Telefono Requerido']"
                 filled
+                counter="10"
               ></v-text-field>
             </v-flex>
             <v-flex xs12 md4>
@@ -38,10 +61,10 @@
                 filled
               ></v-text-field>
             </v-flex>
-            <v-flex xs12 md4>
+            <v-flex xs12 md6>
               <v-text-field
                 v-model="town"
-                label="Estado/Municipio:"
+                label="Nombre Racho/comunidad (optional):"
                 placeholder="¿De donde nos visita?"
                 filled
               ></v-text-field>
@@ -66,7 +89,9 @@
 </template>
 
 <script>
+import { mixinEstates } from "~/common/mixin/estate_township.js";
 export default {
+  mixins: [mixinEstates],
   props: {
     propProspectId: {
       required: true,
@@ -85,10 +110,13 @@ export default {
     };
   },
   mounted() {
-    this.loadProspect(() => {});
-    this.$store.commit("setBreadcrumbs", [
+    const self = this
+    self.loadEstates(() => {
+      self.loadProspect(()=>{});
+    });
+    self.$store.commit("setBreadcrumbs", [
       { label: "Prospectos", to: { name: "prospect.list" } },
-      { label: "Registrar", name: "" },
+      { label: "Modificar", name: "" },
     ]);
   },
   methods: {
@@ -101,6 +129,7 @@ export default {
         email: self.email,
         rfc: self.rfc,
         town: self.town,
+        township_id: self.township_id,
       };
 
       self.isLoading = true;
@@ -136,7 +165,7 @@ export default {
           }
         });
     },
-    loadProspect(cb) {
+    loadProspect() {
       const self = this;
 
       axios
@@ -144,11 +173,12 @@ export default {
         .then(function(response) {
           let Prospect = response.data.data;
           self.full_name = Prospect.full_name;
-          (self.phone = Prospect.phone),
-            (self.email = Prospect.email),
-            (self.rfc = Prospect.rfc),
-            (self.town = Prospect.town),
-            (cb || Function)();
+          self.phone = Prospect.phone;
+          self.email = Prospect.email;
+          self.rfc = Prospect.rfc;
+          self.town = Prospect.town;
+          self.estate_id = Prospect.township.estate_id;
+          self.township_id = Prospect.township.id;
         });
     },
   },

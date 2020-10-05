@@ -256,22 +256,29 @@
             v-model="isFormalized"
             label="Formalizo en Venta"
           ></v-switch>
-          <v-text-field
-            v-model="lastPrice"
-            hide-details
-            label="Ultimo Precio a Tratar:"
-            outlined
-            dense
-            :rules="[(v) => !!v || 'Requerido']"
-            class="mb-2"
-            reverse
-            type="number"
-            append-icon="mdi-currency-usd"
-          >
-            <template v-slot:default>
-              {{ lastPrice | money() }}
-            </template>
-          </v-text-field>
+          <v-row align="center">
+            <v-col cols="12" md="6">
+              <v-text-field
+                v-model="lastPrice"
+                hide-details
+                label="Ultimo Precio a Tratar:"
+                outlined
+                dense
+                :rules="[(v) => !!v || 'Requerido']"
+                class="mb-2"
+                reverse
+                type="number"
+                append-icon="mdi-currency-usd"
+              >
+              </v-text-field>
+            </v-col>
+            <v-col cols="12" md="6">
+              <v-radio-group v-model="radioContacted" row class="mt-0">
+                <v-radio v-for="n in radios" :key="n" :value="n" :label="n">
+                </v-radio>
+              </v-radio-group>
+            </v-col>
+          </v-row>
           <v-textarea
             v-model="input"
             hide-details
@@ -281,9 +288,13 @@
             :rules="[(v) => !!v || 'Requerido']"
           >
             <template v-slot:append>
-              <v-btn class="mx-0" depressed @click="comment">
-                Enviar
-              </v-btn>
+              <v-container fluid class="pa-0">
+                <v-col cols="12" class="pa-0">
+                  <v-btn class="mx-0" depressed @click="comment" block>
+                    Enviar
+                  </v-btn>
+                </v-col>
+              </v-container>
             </template>
           </v-textarea>
         </v-timeline-item>
@@ -306,7 +317,8 @@
                   )
                 }}
                 <div class="caption">{{ event.last_price | money() }}</div>
-                <div class="caption">{{ event.user.name}}</div>
+                <div class="caption">{{ event.user.name }}</div>
+                <div class="caption blue--text">{{ event.type_contacted }}</div>
               </v-col>
             </v-row>
           </v-timeline-item>
@@ -336,6 +348,8 @@ export default {
     isFormalized: false,
     seller: null,
     lastPrice: 0,
+    radioContacted: "Llamada",
+    radios: ["Llamada", "Visita", "En piso"],
     options: {
       sellers: [],
     },
@@ -385,6 +399,7 @@ export default {
         date_next_tracking: self.now,
         message: self.input,
         last_price: self.lastPrice,
+        type_contacted: self.radioContacted
       };
 
       axios

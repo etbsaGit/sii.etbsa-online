@@ -34,7 +34,7 @@ export default {
           title: "Prospectos",
           icon: "mdi-account",
           to: { name: "prospect.list" },
-          show: true,
+          show: this.$gate.allow("assignSeller", "tracking"),
         },
         {
           title: "Seguimientos",
