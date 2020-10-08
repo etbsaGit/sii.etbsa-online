@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Components\Common\Models\Estatus;
 use App\Components\Tracking\Repositories\TrackingRepository;
+use App\Notifications\TrackingAssigned;
 use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Components\User\Models\User;
 
 class TrackingProspectController extends AdminController
 {
@@ -69,6 +71,9 @@ class TrackingProspectController extends AdminController
         $estatus = Estatus::where('key', Estatus::ESTATUS_ACTIVO)->first();
         $tracking->estatus()->associate($estatus);
         $tracking->save();
+
+        $attended_by = User::find($request['attended_by']);
+        $attended_by->notify(new TrackingAssigned($tracking));
 
         return $this->sendResponseCreated($tracking);
     }

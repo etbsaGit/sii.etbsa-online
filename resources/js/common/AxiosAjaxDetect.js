@@ -26,8 +26,8 @@ class AxiosAjaxDetect {
         count--;
 
         if (count === 0) {
-          store.commit("hideLoader");
           endCb();
+          store.commit("hideLoader");
         }
 
         return response;
@@ -51,6 +51,7 @@ class AxiosAjaxDetect {
 
         count--;
         if (count === 0) {
+          store.commit("hideLoader");
           endCb();
         }
 
