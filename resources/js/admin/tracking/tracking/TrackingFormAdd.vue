@@ -70,13 +70,16 @@
               ></v-autocomplete>
             </v-flex>
             <v-flex xs12 md6>
-              <v-text-field
+              <v-combobox
                 v-model="title"
-                label="TITULO DEL SEGUIMIENTO"
-                placeholder="Producto de interes."
-                counter="80"
+                :items="categories"
+                label="CATEGORIA INTERES:"
+                placeholder="describir o seleccionar un opcion"
+                hide-details
+                multiple
                 filled
-              ></v-text-field>
+                chips
+              ></v-combobox>
             </v-flex>
             <v-flex xs12 md2>
               <v-text-field
@@ -137,7 +140,7 @@ export default {
     return {
       valid: false,
       isLoading: false,
-      title: "",
+      title: [],
       description: "",
       price: 0.0,
       row: "online",
@@ -145,6 +148,7 @@ export default {
       agency: null,
       department: null,
       seller: null,
+      categories: ["Tractor", "Maquinaria", "Implemento", "Coleccion", "Otro"],
       options: {
         prospects: [],
         agencies: [],
@@ -162,12 +166,6 @@ export default {
     });
   },
   watch: {
-    permissionKey(v) {
-      this.permissionKey = v.replace(" ", ".").toLowerCase();
-    },
-    title(v) {
-      this.permissionKey = v.replace(" ", ".").toLowerCase();
-    },
     department(v) {
       this.seller = null;
       !!this.agency ? this.loadSellers(() => {}) : false;
@@ -192,7 +190,7 @@ export default {
       const self = this;
 
       let payload = {
-        title: self.title,
+        title: self.title.join(', '),
         description_topic: self.description,
         price: self.price,
         prospect_id: self.prospect,

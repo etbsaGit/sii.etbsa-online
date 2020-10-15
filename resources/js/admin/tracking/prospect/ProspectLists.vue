@@ -79,9 +79,9 @@
           </v-list>
         </v-menu>
       </template>
-      <template v-slot:[`item.created_at`]="{ item }">
+      <!-- <template v-slot:[`item.created_at`]="{ item }">
         {{ $appFormatters.formatDate(item.created_at, "MMM DD,YYYY") }}
-      </template>
+      </template> -->
     </v-data-table>
   </div>
 </template>
@@ -106,15 +106,9 @@ export default {
           sortable: false,
         },
         {
-          text: "Registrado por",
-          value: "user.name",
-          align: "right",
-          sortable: false,
-        },
-        {
-          text: "Creado",
-          value: "created_at",
-          align: "right",
+          text: "Proviene:",
+          value: "town",
+          align: "left",
           sortable: false,
         },
       ],
