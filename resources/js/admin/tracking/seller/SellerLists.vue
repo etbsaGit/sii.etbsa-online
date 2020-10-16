@@ -73,6 +73,15 @@
               </div>
             </v-card-title>
             <v-card-text>
+              <div>Agencias:</div>
+              <v-chip
+                v-for="(type, key) in item.seller_agency"
+                :key="key"
+                class="ma-1"
+              >
+                {{ type.title }}
+              </v-chip>
+              <div>Departamentos:</div>
               <v-chip
                 v-for="(type, key) in item.seller_type"
                 :key="key"
@@ -84,7 +93,17 @@
           </v-card>
         </v-dialog>
       </template>
-        <template v-slot:[`item.updated_at`]="{ item }">
+      <template v-slot:[`item.groups`]="{ item }">
+        <v-avatar outlined>
+          <v-icon
+            v-if="item.groups.some((g) => g.name == 'Gerente')"
+            class="green--text"
+            >mdi-check-circle-outline</v-icon
+          >
+          <v-icon v-else class="grey--text">mdi-alert-circle-outline</v-icon>
+        </v-avatar>
+      </template>
+      <template v-slot:[`item.updated_at`]="{ item }">
         {{ $appFormatters.formatDate(item.updated_at, "MMM DD,YYYY") }}
       </template>
     </v-data-table>
@@ -105,14 +124,14 @@ export default {
         },
         { text: "Nombre", value: "name", align: "left", sortable: false },
         {
-          text: "Agencia",
-          value: "agency.title",
-          align: "left",
+          text: "Configuracion:",
+          value: "seller_type",
+          align: "center",
           sortable: false,
         },
         {
-          text: "Configuracion::",
-          value: "seller_type",
+          text: "Es Gerente:",
+          value: "groups",
           align: "center",
           sortable: false,
         },
@@ -136,9 +155,7 @@ export default {
   },
   mounted() {
     const self = this;
-    self.$store.commit("setBreadcrumbs", [
-      { label: "Vendedores", name: "" },
-    ]);
+    self.$store.commit("setBreadcrumbs", [{ label: "Vendedores", name: "" }]);
   },
   watch: {
     "pagination.page": function() {

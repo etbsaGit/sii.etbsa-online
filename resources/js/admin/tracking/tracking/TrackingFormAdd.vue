@@ -16,10 +16,14 @@
               <v-autocomplete
                 v-model="prospect"
                 :items="options.prospects"
-                item-text="full_name"
+                item-text="phone"
+                :hint="prospect.full_name"
+                persistent-hint
                 item-value="id"
-                label="PROSPECTO:"
-                placeholder="Seleccionar a un prospecto"
+                label="BUSCAR PROSPECTO:"
+                placeholder="ingrese numero de telefono"
+                return-object
+                clearable
               >
                 <template v-slot:prepend-inner>
                   <v-tooltip top>
@@ -67,37 +71,69 @@
                 item-value="id"
                 label="VENDEDOR SUGERIDO:"
                 placeholder="Vendedores disponibles:"
-              ></v-autocomplete>
+              >
+                <template v-slot:item="data">
+                  <template v-if="typeof data.item !== 'object'">
+                    <v-list-item-content
+                      v-text="data.item.name"
+                    ></v-list-item-content>
+                  </template>
+                  <template v-else>
+                    <v-list-item-avatar>
+                      <v-icon
+                        v-if="data.item.groups.some((g) => g.name == 'Gerente')"
+                        class="green--text"
+                        >mdi-check-circle-outline</v-icon
+                      >
+                      <v-icon v-else class="grey--text"
+                        >mdi-alert-circle-outline</v-icon
+                      >
+                    </v-list-item-avatar>
+                    <v-list-item-content>
+                      <v-list-item-title
+                        v-html="data.item.name"
+                      ></v-list-item-title>
+                    </v-list-item-content>
+                  </template>
+                </template>
+              </v-autocomplete>
             </v-flex>
-            <v-flex xs12 md6>
-              <v-combobox
+            <v-flex xs12 md4>
+              <v-select
                 v-model="title"
                 :items="categories"
                 label="CATEGORIA INTERES:"
                 placeholder="describir o seleccionar un opcion"
                 hide-details
-                multiple
                 filled
                 chips
-              ></v-combobox>
+              ></v-select>
             </v-flex>
-            <v-flex xs12 md2>
+            <v-flex xs12 md5>
+              <v-text-field
+                v-model="reference"
+                label="REFERENCIA:"
+                placeholder="Alguna Referencia del Producto de interes"
+                filled
+              ></v-text-field>
+            </v-flex>
+            <v-flex xs12 md3>
               <v-text-field
                 v-model="price"
-                label="Precio Consultado:"
+                label="PRECIO A TRATAR:"
                 prefix="$"
                 placeholder="0.00"
                 filled
               ></v-text-field>
             </v-flex>
-            <v-flex xs12 md4>
-              <div><strong>Prospecto contacto en:</strong></div>
+            <v-flex xs12 md6>
+              <div><strong>Prospecto contactado por medio de:</strong></div>
               <v-radio-group v-model="row" row hide-details class="mt-0">
                 <!-- <template v-slot:label>
                 </template> -->
-                <v-radio label="Online" value="online"></v-radio>
-                <v-radio label="Agencia" value="agencia"></v-radio>
-                <v-radio label="Campo" value="campo"></v-radio>
+                <v-radio label="ONLINE" value="online"></v-radio>
+                <v-radio label="EN AGENCIA" value="agencia"></v-radio>
+                <v-radio label="EN CAMPO" value="campo"></v-radio>
               </v-radio-group>
             </v-flex>
             <v-flex xs12>
@@ -140,15 +176,46 @@ export default {
     return {
       valid: false,
       isLoading: false,
-      title: [],
+      title: "",
+      reference: "",
       description: "",
-      price: 0.0,
+      price: null,
       row: "online",
-      prospect: null,
+      prospect: {
+        id: null,
+        full_name: "",
+        phone: "",
+      },
       agency: null,
       department: null,
       seller: null,
-      categories: ["Tractor", "Maquinaria", "Implemento", "Coleccion", "Otro"],
+      categories: [
+        "Colección JD",
+        "Colección JD Foraneo",
+        "Construcción",
+        "Construcción Foraneos",
+        "Construcción Seminuevos Foraneos",
+        "Implementos",
+        "Implementos Foraneos",
+        "Jardineria",
+        "Jardineria Foraneo",
+        "Maquinaria Diversa",
+        "Maquinaria Diversa Foraneo",
+        "Otros productos",
+        "Por definir",
+        "Refacciones",
+        "Refacciones Foraneo",
+        "Riego",
+        "Riego Foraneo",
+        "Seminuevos",
+        "Servicio",
+        "Tractores",
+        "Tractores Foraneos",
+        "Tractores Seminuevos",
+        "Tractores Seminuevos Foraneos",
+        "Trilladora",
+        "Venta en Linea",
+      ],
       options: {
         prospects: [],
         agencies: [],
@@ -163,16 +230,20 @@ export default {
       if (this.propProspectId) {
         this.prospect = parseInt(this.propProspectId);
       }
+      if (this.$gate.deny("assignSeller", "tracking")) {
+        this.agency = window.LSK_APP.AUTH_USER.agency_id;
+        this.department = window.LSK_APP.AUTH_USER.departments_id;
+      }
     });
   },
   watch: {
-    department(v) {
-      this.seller = null;
-      !!this.agency ? this.loadSellers(() => {}) : false;
-    },
     agency(v) {
-      this.seller = null;
-      !!this.department ? this.loadSellers(() => {}) : false;
+      this.seller = window.LSK_APP.AUTH_USER.id;
+      !!this.department && v ? this.loadSellers(() => {}) : false;
+    },
+    department(v) {
+      this.seller = window.LSK_APP.AUTH_USER.id;
+      !!this.agency && v ? this.loadSellers(() => {}) : false;
     },
   },
   computed: {
@@ -190,10 +261,11 @@ export default {
       const self = this;
 
       let payload = {
-        title: self.title.join(', '),
+        title: self.title,
+        reference: self.reference,
         description_topic: self.description,
         price: self.price,
-        prospect_id: self.prospect,
+        prospect_id: self.prospect.id,
         attended_by: self.seller,
         agency_id: self.agency,
         department_id: self.department,
@@ -248,6 +320,7 @@ export default {
       const self = this;
 
       let params = {
+        seller_agency_id: self.agency,
         seller_type_id: self.department,
         paginate: "no",
       };

@@ -21,13 +21,14 @@ class SellerRepository extends BaseRepository
      */
     public function listSellers($params)
     {
-        return $this->get($params, ['groups', 'seller_type', 'agency', 'department'], function ($q) use ($params) {
+        return $this->get($params, ['groups', 'seller_type', 'seller_agency', 'department'], function ($q) use ($params) {
             $q->whereHas('groups', function ($subq) {
                return $subq->whereIn('groups.name', ['Vendedor']);
             });
             $q->ofName($params['name'] ?? '');
 
             $q->ofSellerType(Helpers::commasToArray($params['seller_type_id'] ?? ''));
+            $q->ofSellerAgency(Helpers::commasToArray($params['seller_agency_id'] ?? ''));
             return $q;
         });
     }

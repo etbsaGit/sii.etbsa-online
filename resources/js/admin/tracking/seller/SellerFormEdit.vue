@@ -9,29 +9,44 @@
       <v-form v-model="valid" ref="permissionFormEdit" lazy-validation>
         <v-container grid-list-md>
           <v-layout row wrap>
-            <v-flex xs12>
-              <div class="body-2">Vendedor: {{ Seller.name }}</div>
-            </v-flex>
-            <v-flex xs12 md6>
+            <v-flex xs12 md3>
+              <div class="text-h6">Vendedor(a): {{ Seller.name }}</div>
               <v-text-field
                 label="Clave Vendedor"
                 v-model="title"
-              ></v-text-field>
-            </v-flex>
-            <v-flex xs12 md6>
-              <v-text-field
-                readonly
-                label="Agencia Pertenece:"
-                v-model="agency"
+                filled
+                hide-details
               ></v-text-field>
             </v-flex>
             <v-flex xs12>
               <h1 class="title">
-                <v-icon>mdi-account</v-icon> Configurar Vendedor
+                <v-icon>mdi-domain</v-icon> Configuracion Vendedor Sucursal
               </h1>
               <v-divider></v-divider>
             </v-flex>
-            <v-layout wrap mx-2>
+            <v-layout wrap mx-2 class="caption">
+              <v-flex
+                xs12
+                md3
+                v-for="(g, k) in options.agencies"
+                :key="k"
+                class="caption"
+              >
+                <v-switch
+                  dense
+                  hide-details
+                  v-bind:label="g.title"
+                  v-model="seller_agency[g.id]"
+                ></v-switch>
+              </v-flex>
+            </v-layout>
+            <v-flex xs12 mt-4>
+              <h1 class="title">
+                <v-icon>mdi-office-building</v-icon> Configuracion Vendedor Departamentos
+              </h1>
+              <v-divider></v-divider>
+            </v-flex>
+            <v-layout wrap mx-2 class="caption">
               <v-flex
                 xs12
                 md3
@@ -78,14 +93,15 @@ export default {
       valid: false,
       isLoading: false,
       title: "",
-      agency: "",
       seller_type: [],
+      seller_agency: [],
       options: {
         departments: [],
+        agencies: [],
       },
     };
   },
-  mounted() {
+  created() {
     this.loadSeller(() => {});
     this.loadResources(() => {});
   },
@@ -96,6 +112,7 @@ export default {
       let payload = {
         seller_key: self.title,
         seller_type: self.seller_type,
+        seller_agency: self.seller_agency,
       };
 
       self.isLoading = true;
@@ -110,6 +127,7 @@ export default {
           });
 
           self.$store.commit("hideLoader");
+          self.$router.push({ name: "sellers.list" });
         })
         .catch(function(error) {
           self.$store.commit("hideLoader");
@@ -133,11 +151,13 @@ export default {
       axios.get("/admin/sellers/" + self.propSellerId).then(function(response) {
         let Seller = response.data.data;
         self.Seller = Seller;
-        self.agency = Seller.agency.title;
         self.title = Seller.seller_key;
 
-        _.each(Seller.seller_type, (g) => {
+        _.each(self.Seller.seller_type, (g) => {
           self.seller_type[g.id] = true;
+        });
+        _.each(self.Seller.seller_agency, (g) => {
+          self.seller_agency[g.id] = true;
         });
 
         (cb || Function)();
@@ -155,8 +175,12 @@ export default {
         .then(function(response) {
           let Data = response.data.data;
           self.options.departments = Data.departments;
+          self.options.agencies = Data.agencies;
 
           _.each(self.options.departments, (d) => {
+            d.selected = false;
+          });
+          _.each(self.options.agencies, (d) => {
             d.selected = false;
           });
 

@@ -9,6 +9,7 @@
 namespace App\Components\User\Models;
 
 use App\Components\Common\Models\SellerType;
+use App\Components\Common\Models\SellerAgency;
 use Hash;
 use Illuminate\Support\Arr;
 
@@ -89,6 +90,11 @@ trait UserTrait
     public function seller_type()
     {
         return $this->belongsToMany(SellerType::class, 'sellers_type_pivot', 'user_id');
+    }
+
+    public function seller_agency()
+    {
+        return $this->belongsToMany(SellerAgency::class, 'sellers_agency_pivot', 'user_id');
     }
 
     public function agency()
@@ -524,6 +530,17 @@ trait UserTrait
 
         return $q->whereHas('seller_type', function ($q) use ($v) {
             return $q->whereIn('departments.id', $v);
+        });
+    }
+
+    public function scopeOfSellerAgency($q, $v)
+    {
+        if ($v === false || $v === '' || count($v) == 0 || $v[0] == '') {
+            return $q;
+        }
+
+        return $q->whereHas('seller_agency', function ($q) use ($v) {
+            return $q->whereIn('agencies.id', $v);
         });
     }
 }

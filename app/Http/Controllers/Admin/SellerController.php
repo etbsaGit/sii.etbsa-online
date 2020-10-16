@@ -54,7 +54,7 @@ class SellerController extends AdminController
      */
     public function show($id)
     {
-        $seller = $this->sellerRepository->find($id, ['seller_type','agency','department']);
+        $seller = $this->sellerRepository->find($id, ['seller_type','seller_agency']);
 
         if (!$seller) {
             return $this->sendResponseNotFound();
@@ -73,7 +73,9 @@ class SellerController extends AdminController
     public function update(Request $request, $id)
     {
         $validate = validator($request->all(),[
+            'seller_key' => 'string',
             'seller_type' => 'array',
+            'seller_agency' => 'array',
         ]);
 
         if($validate->fails()) return $this->sendResponseBadRequest($validate->errors()->first());
@@ -94,6 +96,7 @@ class SellerController extends AdminController
         $seller = $this->sellerRepository->find($id);
 
         $sellerTypeIds = [];
+        $sellerAgencyIds = [];
 
         if($seller_type = $request->get('seller_type',[]))
         {
@@ -102,8 +105,16 @@ class SellerController extends AdminController
                 if($shouldAttach) $sellerTypeIds[] = $sellerTypeId;
             }
         }
+        if($seller_agency = $request->get('seller_agency',[]))
+        {
+            foreach ($seller_agency as $sellerAgencyId => $shouldAttach)
+            {
+                if($shouldAttach) $sellerAgencyIds[] = $sellerAgencyId;
+            }
+        }
 
         $seller->seller_type()->sync($sellerTypeIds);
+        $seller->seller_agency()->sync($sellerAgencyIds);
 
         return $this->sendResponseUpdated();
     }

@@ -19,7 +19,7 @@ class Agency extends Model
      *
      * @var array
      */
-    protected $fillable = ['code','title'];
+    protected $fillable = ['code','title','line_id'];
 
     public function users()
     {

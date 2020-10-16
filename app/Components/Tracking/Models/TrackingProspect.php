@@ -11,7 +11,7 @@ class TrackingProspect extends Model
     protected $table = 'tracking_prospect';
     protected $primaryKey = 'id';
 
-    protected $fillable = ['title',
+    protected $fillable = ['title','reference',
         'description_topic', 'price', 'registered_by',
         'prospect_id', 'estatus_id',
         'assigned_by', 'attended_by',

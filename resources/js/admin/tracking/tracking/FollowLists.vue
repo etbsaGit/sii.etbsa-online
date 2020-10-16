@@ -219,7 +219,7 @@ export default {
           sortable: false,
         },
         {
-          text: "Atendido por:",
+          text: "Asignado a:",
           value: "attended_by.name",
           align: "left",
           sortable: false,
@@ -238,7 +238,7 @@ export default {
           sortable: false,
         },
         {
-          text: "Sig. Seg.",
+          text: "Sig. Seguimiento",
           value: "date_next_tracking",
           align: "center",
           width: 100,

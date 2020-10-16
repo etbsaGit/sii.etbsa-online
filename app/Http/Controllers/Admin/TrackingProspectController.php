@@ -47,11 +47,18 @@ class TrackingProspectController extends AdminController
     {
         $validate = validator($request->all(), [
             'title' => 'required|string',
+            'reference' => 'required|string',
             'description_topic' => 'required|string',
             'price' => 'numeric',
+            'agency_id' => 'required',
+            'department_id' => 'required',
+            'attended_by' => 'required',
         ], [
             'title.required' => 'El Titulo es requerido',
             'description_topic.required' => 'Descripcion de seguimiento es Requerido',
+            'attended_by.required' => 'Seleccione a un Vendedor',
+            'reference.required' => 'Especifique una referencia',
+            'title.required' => 'Especifique una Categoria',
         ]);
 
         if ($validate->fails()) {
@@ -181,7 +188,7 @@ class TrackingProspectController extends AdminController
         // $trackings = $this->trackingRepository->resource(request()->all());
         $agencies = DB::table('agencies')->get(['id', 'code', 'title']);
         $departments = DB::table('departments')->get(['id', 'title']);
-        $prospects = DB::table('prospect')->get(['id', 'full_name']);
+        $prospects = DB::table('prospect')->get(['id', 'full_name', 'phone']);
         // $type = DB::table('marketing_import')->distinct()->get(['SUCURSAL']);
         return $this->sendResponseOk(compact('agencies', 'departments', 'prospects'));
     }
