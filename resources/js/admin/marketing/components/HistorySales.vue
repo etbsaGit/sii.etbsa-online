@@ -245,7 +245,8 @@
         <v-tooltip top>
           <template v-slot:activator="{ on, attrs }">
             <span v-bind="attrs" v-on="on">
-              {{ item.TOTAL | money(item.MONEDA || "MXN") }}
+              <!-- {{ item.TOTAL | money(item.MONEDA || "MXN") }} -->
+              {{ item.TOTAL | money() }}
             </span>
           </template>
           <span>Folio Fiscal: {{ item.FOLIO_FISCAL }}</span>
