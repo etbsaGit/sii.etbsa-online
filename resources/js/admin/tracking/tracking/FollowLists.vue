@@ -140,16 +140,30 @@
         {{ item.id.toString().padStart(5, 0) }}
       </template>
       <template v-slot:[`item.title`]="{ item }">
-        <span
+        <!-- <span
           class="d-inline-block text-truncate text-uppercase"
           style="max-width: 200px;"
         >
           {{ item.title }}
-        </span>
+        </span> -->
+        <v-list-item dense class="pa-0">
+          <v-list-item-content class="pa-0">
+            <v-list-item-title>{{ item.title }}</v-list-item-title>
+            <v-list-item-subtitle>
+              {{ item.reference }}
+            </v-list-item-subtitle>
+          </v-list-item-content>
+        </v-list-item>
       </template>
       <template v-slot:[`item.prospect.full_name`]="{ item }">
-        <span class="d-inline-block text-truncate text-uppercase">
+        <span class="d-inline-block text-truncate text-capitalize"
+      style="max-width: 180px;">
           {{ item.prospect.full_name }}
+        </span>
+      </template>
+      <template v-slot:[`item.attended_by.name`]="{ item }">
+        <span class="d-inline-block text-truncate text-capitalize" style="max-width: 150px;">
+          {{ item.attended_by.name }}
         </span>
       </template>
       <template v-slot:[`item.agency-depto`]="{ item }">
@@ -157,9 +171,9 @@
         <v-list-item dense class="pa-0">
           <v-list-item-content class="pa-0">
             <v-list-item-title>{{ item.agency.title }}</v-list-item-title>
-            <v-list-item-subtitle>{{
-              item.department.title
-            }}</v-list-item-subtitle>
+            <v-list-item-subtitle>
+              {{ item.department.title }}
+            </v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
         <!-- </v-list> -->
@@ -278,9 +292,7 @@ export default {
     const self = this;
     self.$store.commit("showLoader");
 
-    self.$store.commit("setBreadcrumbs", [
-      { label: "Segumientos", name: "" },
-    ]);
+    self.$store.commit("setBreadcrumbs", [{ label: "Segumientos", name: "" }]);
     self.loadResources(() => {
       self.$store.commit("hideLoader");
     });

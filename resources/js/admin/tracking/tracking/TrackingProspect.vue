@@ -49,6 +49,10 @@
                 <v-list-item-subtitle>Titulo Seguimiento</v-list-item-subtitle>
                 <v-list-item-content>{{ tracking.title }}</v-list-item-content>
               </v-list-item-content>
+              <v-list-item-content>
+                <v-list-item-subtitle>Referencia</v-list-item-subtitle>
+                <v-list-item-content>{{ tracking.reference }}</v-list-item-content>
+              </v-list-item-content>
             </v-list-item>
 
             <v-list-item>
@@ -208,7 +212,7 @@
             </v-tooltip>
           </template>
           <v-radio-group v-model="row" row hide-details class="my-2">
-            <v-radio label="En Seguimiento" :value="'activo'"></v-radio>
+            <v-radio label="Proximo Seguimiento" :value="'activo'"></v-radio>
             <v-radio
               label="Finalizar Seguimiento"
               :value="'finalizado'"

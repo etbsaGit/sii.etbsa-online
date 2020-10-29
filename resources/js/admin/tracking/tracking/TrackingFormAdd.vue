@@ -16,12 +16,12 @@
               <v-autocomplete
                 v-model="prospect"
                 :items="options.prospects"
-                item-text="phone"
-                :hint="prospect.full_name"
+                item-text="full_name"
+                :hint="`TEL: ${prospect.phone}`"
                 persistent-hint
                 item-value="id"
                 label="BUSCAR PROSPECTO:"
-                placeholder="ingrese numero de telefono"
+                placeholder="Buscar por Nombre:"
                 return-object
                 clearable
               >
