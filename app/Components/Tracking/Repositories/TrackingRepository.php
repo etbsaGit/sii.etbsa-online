@@ -22,7 +22,8 @@ class TrackingRepository extends BaseRepository
      */
     public function listTracking($params)
     {
-        return $this->get($params, ['estatus', 'attended_by', 'prospect', 'agency', 'department'], function ($q) use ($params) {
+        return $this->get($params, ['estatus', 'prospect',
+            'agency', 'department'], function ($q) use ($params) {
 
             $q->ofTitle($params['title'] ?? '');
             $q->ofEstatus(Helpers::commasToArray($params['estatus_keys'] ?? ''));

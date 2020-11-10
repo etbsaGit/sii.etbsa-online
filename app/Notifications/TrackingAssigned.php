@@ -45,9 +45,11 @@ class TrackingAssigned extends Notification
         $url = url('/admin#/tracking-prospect/tracking/prospect/' . $this->tracking->id);
         return (new MailMessage)
             ->subject('Asignacion de Seguimiento SIIETBSA')
-            ->line('Se le ha asignado un nuevo Seguimiento')
+            ->greeting('Hola')
+            ->line('Se le ha asignado un nuevo Seguimiento de una prospectacion')
             ->action('Ir a SIIETBSA', $url)
-            ->line('Gracias por usar nuestro Sistema Integral.');
+            ->line('Gracias por usar nuestro Sistema Integral.')
+            ->salutation('Saludos Cordiales');
     }
 
     /**

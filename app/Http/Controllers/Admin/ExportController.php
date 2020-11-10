@@ -7,8 +7,10 @@ use Maatwebsite\Excel\Facades\Excel;
 
 use App\Components\Gps\Repositories\GpsRepository;
 use App\Components\Marketing\Repositories\MarketingRepository;
+use App\Components\Tracking\Repositories\TrackingRepository;
 use App\Exports\GpsExport;
 use App\Exports\MarketingExport;
+use App\Exports\TrackingExport;
 
 class ExportController extends AdminController
 {
@@ -17,15 +19,17 @@ class ExportController extends AdminController
      */
     private $gpsRepository;
     private $marketingRepository;
+    private $trackingRepository;
 
     /**
      * FileGroupController constructor.
      * @param GpsRepository $gpsRepository
      */
-    public function __construct(GpsRepository $gpsRepository,MarketingRepository $marketingRepository)
+    public function __construct(GpsRepository $gpsRepository,MarketingRepository $marketingRepository, TrackingRepository $trackingRepository)
     {
         $this->gpsRepository = $gpsRepository;
         $this->marketingRepository = $marketingRepository;
+        $this->trackingRepository = $trackingRepository;
     }
 
     /**
@@ -46,5 +50,12 @@ class ExportController extends AdminController
         $data = $this->marketingRepository->index($request->all());
 
         return Excel::download(new MarketingExport($data), 'maketing.xlsx');
+    }
+
+    public function exportTracking(Request $request)
+    {
+        $data = $this->trackingRepository->listTracking($request->all());
+
+        return Excel::download(new TrackingExport($data), 'tracking.xlsx');
     }
 }

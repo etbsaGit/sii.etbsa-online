@@ -6,7 +6,7 @@
         <v-col cols="6" md="4">
           <v-text-field
             prepend-icon="mdi-magnify"
-            label="Fitrar por Titulo seguimeinto"
+            label="Fitrar por Folio|Titulo|Referencia"
             v-model="filters.title"
             hide-details
             clearable
@@ -108,6 +108,26 @@
       fixed-header
       class="elevation-1 caption"
     >
+      <template v-slot:top>
+        <v-toolbar elevation="0">
+          <v-spacer></v-spacer>
+          <v-tooltip top>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                icon
+                color="green"
+                @click="exportTracking()"
+                v-bind="attrs"
+                v-on="on"
+              >
+                <v-icon>mdi-file-excel</v-icon>
+              </v-btn>
+            </template>
+            <span>Exportar</span>
+          </v-tooltip>
+        </v-toolbar>
+      </template>
+
       <template v-slot:[`item.action`]="{ item }">
         <v-menu offset-x>
           <template v-slot:activator="{ on, attrs }">
@@ -156,14 +176,19 @@
         </v-list-item>
       </template>
       <template v-slot:[`item.prospect.full_name`]="{ item }">
-        <span class="d-inline-block text-truncate text-capitalize"
-      style="max-width: 180px;">
+        <span
+          class="d-inline-block text-truncate text-capitalize"
+          style="max-width: 180px;"
+        >
           {{ item.prospect.full_name }}
         </span>
       </template>
-      <template v-slot:[`item.attended_by.name`]="{ item }">
-        <span class="d-inline-block text-truncate text-capitalize" style="max-width: 150px;">
-          {{ item.attended_by.name }}
+      <template v-slot:[`item.attended.name`]="{ item }">
+        <span
+          class="d-inline-block text-truncate text-capitalize"
+          style="max-width: 150px;"
+        >
+          {{ item.attended.name }}
         </span>
       </template>
       <template v-slot:[`item.agency-depto`]="{ item }">
@@ -234,7 +259,7 @@ export default {
         },
         {
           text: "Asignado a:",
-          value: "attended_by.name",
+          value: "attended.name",
           align: "left",
           sortable: false,
         },
@@ -405,6 +430,49 @@ export default {
     getColorDays(value) {
       if (value < 0) return "red";
       else return "primary";
+    },
+    exportTracking() {
+      const self = this;
+      self.$store.commit("showLoader");
+      let params = {
+        title: self.filters.title,
+        estatus_keys: self.filters.estatus.join(","),
+        agencies_id: self.filters.agencies.join(","),
+        departments_id: self.filters.departments.join(","),
+        prospects_id: self.filters.prospect.join(","),
+        sellers_id: self.filters.sellers.join(","),
+        page: self.pagination.page,
+        per_page: self.pagination.rowsPerPage,
+      };
+      axios
+        .get("/admin/tracking-export", {
+          params: params,
+          responseType: "blob",
+        })
+        .then((res) => {
+          const url = window.URL.createObjectURL(new Blob([res.data]));
+          const link = document.createElement("a");
+          link.href = url;
+          link.setAttribute("download", "tracking.xlsx"); //or any other extension
+          document.body.appendChild(link);
+          link.click();
+        })
+        .catch(function(error) {
+          if (error.response) {
+            self.$store.commit("showSnackbar", {
+              message: error.response.data.message,
+              color: "error",
+              duration: 3000,
+            });
+          } else if (error.request) {
+            console.log(error.request);
+          } else {
+            console.log("Error", error.message);
+          }
+        })
+        .finally(function() {
+          self.$store.commit("hideLoader");
+        });
     },
   },
 };

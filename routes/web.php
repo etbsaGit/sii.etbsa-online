@@ -40,6 +40,7 @@ Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function
     // Route::get('tracking/resources', 'TrackingProspectController@resources')->name('tracking-resources');
     Route::get('tracking/sales_history/resources', 'TrackingProspectController@resources')->name('trackingResources');
     Route::put('tracking/assignSeller/{id}', 'TrackingProspectController@assignSeller')->name('trackingAssignSeller');
+    Route::get('tracking-export', 'ExportController@exportTracking')->name('trackingExport');
 
     //Marketing
     Route::get('marketing/sales_history', 'MarketingController@salesHistory')->name('salesHistory');

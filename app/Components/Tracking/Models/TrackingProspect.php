@@ -11,29 +11,31 @@ class TrackingProspect extends Model
     protected $table = 'tracking_prospect';
     protected $primaryKey = 'id';
 
-    protected $fillable = ['title','reference',
-        'description_topic', 'price', 'registered_by',
+    protected $fillable = ['title', 'reference',
+        'description_topic', 'price', 'currency', 'registered_by',
         'prospect_id', 'estatus_id',
         'assigned_by', 'attended_by',
         'agency_id', 'department_id', 'date_next_tracking', 'first_contact',
     ];
+
+    protected $with = ['registered', 'assigned', 'attended', 'prospect'];
 
     public function estatus()
     {
         return $this->belongsTo(Estatus::class, 'estatus_id');
     }
 
-    public function registered_by()
+    public function registered()
     {
         return $this->belongsTo(User::class, 'registered_by');
     }
 
-    public function assigned_by()
+    public function assigned()
     {
         return $this->belongsTo(User::class, 'assigned_by');
     }
 
-    public function attended_by()
+    public function attended()
     {
         return $this->belongsTo(User::class, 'attended_by');
     }
@@ -64,7 +66,8 @@ class TrackingProspect extends Model
         }
 
         return $query->where('title', 'like', "%{$name}%")
-            ->orWhere('id', 'like', "%{$name}");
+            ->orWhere('id', 'like', "%{$name}")
+            ->orWhere('reference', 'like', "%{$name}%");
     }
 
     public function scopeOfProspect($q, $v)

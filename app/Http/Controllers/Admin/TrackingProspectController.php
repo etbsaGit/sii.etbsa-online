@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Components\Common\Models\Estatus;
 use App\Components\Tracking\Repositories\TrackingRepository;
+use App\Components\User\Models\User;
 use App\Notifications\TrackingAssigned;
 use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Components\User\Models\User;
 
 class TrackingProspectController extends AdminController
 {
@@ -55,7 +55,7 @@ class TrackingProspectController extends AdminController
             'attended_by' => 'required',
         ], [
             'title.required' => 'El Titulo es requerido',
-            'description_topic.required' => 'Descripcion de seguimiento es Requerido',
+            'description_topic.required' => 'Motivo del seguimiento es Requerido',
             'attended_by.required' => 'Seleccione a un Vendedor',
             'reference.required' => 'Especifique una referencia',
             'title.required' => 'Especifique una Categoria',
@@ -94,8 +94,7 @@ class TrackingProspectController extends AdminController
     public function show($id)
     {
         $tracking = $this->trackingRepository->find($id, [
-            'prospect', 'estatus', 'attended_by',
-            'agency', 'department', 'registered_by', 'assigned_by', 'historical',
+            'estatus', 'agency', 'department', 'historical',
         ]);
 
         if (!$tracking) {
@@ -135,6 +134,7 @@ class TrackingProspectController extends AdminController
             $tracking->historical()->create($request->all());
             $tracking->date_next_tracking = $request['date_next_tracking'];
             $tracking->price = $request['last_price'];
+            $tracking->currency = $request['last_currency'];
             $tracking->estatus()->associate($estatus)->save();
             // $updated = $this->trackingRepository->update($id, $request->all());
         });

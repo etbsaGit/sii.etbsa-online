@@ -98,7 +98,7 @@
                 </template>
               </v-autocomplete>
             </v-flex>
-            <v-flex xs12 md4>
+            <v-flex xs12 md3>
               <v-select
                 v-model="title"
                 :items="categories"
@@ -109,14 +109,42 @@
                 chips
               ></v-select>
             </v-flex>
-            <v-flex xs12 md5>
-              <v-text-field
-                v-model="reference"
-                label="REFERENCIA:"
-                placeholder="Alguna Referencia del Producto de interes"
-                filled
-              ></v-text-field>
-            </v-flex>
+            <template v-if="title != 'Tractores'">
+              <v-flex xs12 md6>
+                <v-text-field
+                  v-model="reference"
+                  label="REFERENCIA:"
+                  placeholder="Alguna Referencia del Producto de interes"
+                  filled
+                ></v-text-field>
+              </v-flex>
+            </template>
+            <template v-else>
+              <v-flex xs12 md3>
+                <v-autocomplete
+                  v-model="selectModel"
+                  :items="models"
+                  label="Modelo:"
+                  placeholder="Seleccione Modelo"
+                  required
+                  filled
+                  clearable
+                />
+              </v-flex>
+              <v-flex xs12 md3>
+                <v-select
+                  v-model="selectConfig"
+                  :items="configure"
+                  label="Configuracion Disponible:"
+                  :hint="selectConfig.hint"
+                  persistent-hint
+                  filled
+                  required
+                  prepend-icon="mdi-cogs"
+                  return-object
+                />
+              </v-flex>
+            </template>
             <v-flex xs12 md3>
               <v-text-field
                 v-model="price"
@@ -124,7 +152,13 @@
                 prefix="$"
                 placeholder="0.00"
                 filled
-              ></v-text-field>
+              >
+                <template v-slot:append>
+                  <v-btn text @click="changeCurrency()">
+                    {{ !!currency ? currency : "MXN" }}
+                  </v-btn>
+                </template>
+              </v-text-field>
             </v-flex>
             <v-flex xs12 md6>
               <div><strong>Prospecto contactado por medio de:</strong></div>
@@ -153,8 +187,9 @@
                 :disabled="!valid || isLoading"
                 color="primary"
                 dark
-                >Guardar</v-btn
               >
+                Guardar
+              </v-btn>
             </v-flex>
           </v-layout>
         </v-container>
@@ -165,6 +200,7 @@
 </template>
 
 <script>
+import data from "./agricola.json";
 export default {
   props: {
     propProspectId: {
@@ -191,28 +227,18 @@ export default {
       seller: null,
       categories: [
         "Colección JD",
-        "Colección JD Foraneo",
         "Construcción",
-        "Construcción Foraneos",
-        "Construcción Seminuevos Foraneos",
         "Implementos",
-        "Implementos Foraneos",
         "Jardineria",
-        "Jardineria Foraneo",
         "Maquinaria Diversa",
-        "Maquinaria Diversa Foraneo",
         "Otros productos",
         "Por definir",
         "Refacciones",
-        "Refacciones Foraneo",
         "Riego",
-        "Riego Foraneo",
         "Seminuevos",
         "Servicio",
         "Tractores",
-        "Tractores Foraneos",
         "Tractores Seminuevos",
-        "Tractores Seminuevos Foraneos",
         "Trilladora",
         "Venta en Linea",
       ],
@@ -222,6 +248,11 @@ export default {
         departments: [],
         sellers: [],
       },
+      tractores: data,
+      selectTipo: {},
+      selectModel: {},
+      selectConfig: {},
+      currency: "MXN",
     };
   },
   mounted() {
@@ -245,6 +276,19 @@ export default {
       this.seller = window.LSK_APP.AUTH_USER.id;
       !!this.agency && v ? this.loadSellers(() => {}) : false;
     },
+    selectTipo: function() {
+      this.selectModel = {};
+      this.selectConfig = {};
+    },
+    selectModel: function() {
+      this.selectConfig = {};
+    },
+    selectConfig: function(v) {
+      if (!!v) {
+        this.price = v.value.Precio;
+        this.currency = v.value["Tipo Moneda"];
+      }
+    },
   },
   computed: {
     availableSeller() {
@@ -255,16 +299,52 @@ export default {
         return true;
       }
     },
+    tipos() {
+      return [...new Set(this.tractores.map((item) => item.Tipo))];
+    },
+    models() {
+      const filter = this.tractores.filter((word) => word.Tipo === "Tractor");
+      return [...new Set(filter.map((item) => `${item.Modelo}`))];
+    },
+    configure() {
+      const result = [];
+      const map = new Map();
+      const filter = this.tractores.filter(
+        (item) => `${item.Modelo}` === this.selectModel
+      );
+      for (const item of filter) {
+        if (!map.has(this.configuracion(item))) {
+          map.set(this.configuracion(item), true); // set any value to Map
+          result.push({
+            text: this.configuracion(item),
+            value: item,
+            hint: `${item.Modelo} ${item.field4} ${
+              item["Traccion Sencilla"] === "SI" ? "Traccion Sencilla | " : ""
+            } ${item["Doble Traccion"] === "SI" ? "Doble Traccion | " : ""} ${
+              item["Power Reverser"] === "SI" ? "Power Reverser | " : ""
+            } ${item.Creeper === "SI" ? "Creeper | " : ""} ${
+              item["Con Cabina"] === "SI" ? "Con Cabina | " : ""
+            } ${item["Cabina Premium"] === "SI" ? "Cabina Premium | " : ""} ${
+              item["Doble rodado"] === "SI" ? "Doble rodado | " : ""
+            } ${item.Ams === "SI" ? "AMS Incluido | " : ""}`,
+          });
+        }
+      }
+      return result;
+    },
   },
   methods: {
     save() {
       const self = this;
-
+      if (self.selectConfig.hint) {
+        self.reference = self.selectConfig.hint;
+      }
       let payload = {
         title: self.title,
         reference: self.reference,
         description_topic: self.description,
         price: self.price,
+        currency: self.currency,
         prospect_id: self.prospect.id,
         attended_by: self.seller,
         agency_id: self.agency,
@@ -331,6 +411,24 @@ export default {
       });
 
       // return seller;
+    },
+    configuracion(item) {
+      return `${item.Modelo} ${item.field4} ${
+        item["Traccion Sencilla"] === "SI" ? "TS" : ""
+      } ${item["Doble Traccion"] === "SI" ? "DT" : ""} ${
+        item["Power Reverser"] === "SI" ? "PR" : ""
+      } ${item.Creeper === "SI" ? "Creeper" : ""} ${
+        item["Con Cabina"] === "SI" ? "c/CAB" : ""
+      }${item["Cabina Premium"] === "SI" ? "CAB/Premium" : ""} ${
+        item["Doble rodado"] === "SI" ? "DR" : ""
+      }${item.Ams === "SI" ? "AMS Incluido" : ""}`;
+    },
+    changeCurrency() {
+      if (this.currency == "MXN") {
+        this.currency = "USD";
+      } else {
+        this.currency = "MXN";
+      }
     },
   },
 };

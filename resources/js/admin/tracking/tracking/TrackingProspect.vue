@@ -51,7 +51,9 @@
               </v-list-item-content>
               <v-list-item-content>
                 <v-list-item-subtitle>Referencia</v-list-item-subtitle>
-                <v-list-item-content>{{ tracking.reference }}</v-list-item-content>
+                <v-list-item-content>{{
+                  tracking.reference
+                }}</v-list-item-content>
               </v-list-item-content>
             </v-list-item>
 
@@ -174,19 +176,19 @@
                   </v-dialog>
                 </v-list-item-subtitle>
                 <v-list-item-title>{{
-                  tracking.attended_by.name
+                  tracking.attended.name
                 }}</v-list-item-title>
               </v-list-item-content>
               <v-list-item-content>
                 <v-list-item-subtitle>Asignado por:</v-list-item-subtitle>
                 <v-list-item-title>{{
-                  tracking.assigned_by.name
+                  tracking.assigned.name
                 }}</v-list-item-title>
               </v-list-item-content>
               <v-list-item-content>
                 <v-list-item-subtitle>Registrado por:</v-list-item-subtitle>
                 <v-list-item-title>{{
-                  tracking.registered_by.name
+                  tracking.registered.name
                 }}</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
@@ -274,6 +276,12 @@
                 type="number"
                 append-icon="mdi-currency-usd"
               >
+                <!-- :prefix="tracking.currency" -->
+                <template v-slot:prepend>
+                  <v-btn text @click="changeCurrency()">
+                    {{ lastCurrency }}
+                  </v-btn>
+                </template>
               </v-text-field>
             </v-col>
             <v-col cols="12" md="6">
@@ -286,7 +294,7 @@
           <v-textarea
             v-model="input"
             hide-details
-            label="Escrbir Comentario..."
+            label="Escribir Comentario..."
             solo
             outlined
             :rules="[(v) => !!v || 'Requerido']"
@@ -311,16 +319,16 @@
             color="pink"
             small
           >
-            <v-row justify="space-between" class="overline">
-              <v-col cols="7" v-text="event.message"></v-col>
-              <v-col class="text-right" cols="5">
+            <v-row justify="space-between align-center" class="overline">
+              <v-col cols="8" v-text="event.message" class="blue-grey lighten-5 elevation-2"></v-col>
+              <v-col class="text-right" cols="4">
                 {{
                   $appFormatters.formatDate(
                     event.created_at,
                     "DD MMM YYYY hh:mm"
                   )
                 }}
-                <div class="caption">{{ event.last_price | money() }}</div>
+                <div class="caption">{{ event.last_price | money() }} {{ event.last_currency }}</div>
                 <div class="caption">{{ event.user.name }}</div>
                 <div class="caption blue--text">{{ event.type_contacted }}</div>
               </v-col>
@@ -352,6 +360,7 @@ export default {
     isFormalized: false,
     seller: null,
     lastPrice: 0,
+    lastCurrency: "MXN",
     radioContacted: "Llamada",
     radios: ["Llamada", "Visita", "En piso"],
     options: {
@@ -403,7 +412,8 @@ export default {
         date_next_tracking: self.now,
         message: self.input,
         last_price: self.lastPrice,
-        type_contacted: self.radioContacted
+        last_currency: self.lastCurrency,
+        type_contacted: self.radioContacted,
       };
 
       axios
@@ -427,6 +437,7 @@ export default {
           let Tracking = response.data.data;
           self.tracking = Tracking;
           self.lastPrice = Tracking.price;
+          self.lastCurrency = Tracking.currency;
 
           cb();
         });
@@ -458,7 +469,7 @@ export default {
       const self = this;
       self.$store.commit("showLoader");
       let department = [self.tracking.department_id];
-      self.seller = self.tracking.attended_by.id;
+      self.seller = self.tracking.attended_by;
 
       let params = {
         agency: self.agency,
@@ -471,6 +482,14 @@ export default {
       });
 
       // return seller;
+    },
+    changeCurrency() {
+      const self = this;
+      if (self.lastCurrency == "MXN") {
+        self.lastCurrency = "USD";
+      } else {
+        self.lastCurrency = "MXN";
+      }
     },
   },
 };
