@@ -276,12 +276,19 @@ export default {
       this.seller = window.LSK_APP.AUTH_USER.id;
       !!this.agency && v ? this.loadSellers(() => {}) : false;
     },
+    title: function() {
+      this.selectModel = {};
+      this.selectConfig = {};
+      this.price = "";
+    },
     selectTipo: function() {
       this.selectModel = {};
       this.selectConfig = {};
+      this.price = "";
     },
     selectModel: function() {
       this.selectConfig = {};
+      this.price = "";
     },
     selectConfig: function(v) {
       if (!!v) {
