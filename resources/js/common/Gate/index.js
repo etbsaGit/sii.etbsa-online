@@ -1,6 +1,7 @@
 import UserPolicy from "~/common/Gate/Policies/UserPolicy";
 import GpsPolicy from "~/common/Gate/Policies/GpsPolicy";
 import TrackingPolicy from "~/common/Gate/Policies/TrackingPolicy";
+import VehiclesPolicy from "~/common/Gate/Policies/VehiclesPolicy";
 
 export default class Gate {
   constructor(user) {
@@ -10,6 +11,7 @@ export default class Gate {
       user: UserPolicy,
       gps: GpsPolicy,
       tracking: TrackingPolicy,
+      vehicles: VehiclesPolicy,
     };
 
     // this.groups = {

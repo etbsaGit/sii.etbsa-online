@@ -27,8 +27,10 @@ class User extends Authenticatable
     protected $fillable = [
         'name', 'email', 'password', 'remember_token',
         'permissions', 'last_login', 'active', 'activation_key',
-        'agency_id', 'departments_id', 'job_title','seller_key'
+        'agency_id', 'departments_id', 'job_title', 'seller_key'
     ];
+
+    protected $with = ['agency'];
 
     /**
      * The attributes that should be hidden for arrays.

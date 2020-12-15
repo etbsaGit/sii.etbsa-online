@@ -11,6 +11,7 @@ class Estatus extends Model
     const ESTATUS_ACTIVO = 'activo';
     const ESTATUS_FINALIZADO = 'finalizado';
     const ESTATUS_FORMALIZADO = 'formalizado';
+    const ESTATUS_AUTORIZADO = 'autorizado';
 
 
        /**

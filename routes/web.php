@@ -46,6 +46,12 @@ Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function
     Route::get('marketing/sales_history', 'MarketingController@salesHistory')->name('salesHistory');
     Route::get('marketing/sales_history/resources', 'MarketingController@resources')->name('salesHistoryResources');
     Route::get('marketing/export', 'ExportController@exportMarketing')->name('marketingExport');
+
+    // ResourcesController
+    Route::get('resource/agencies', 'ResourcesShareController@getAgencies')->name('resources.agencies');
+    Route::get('resource/users', 'ResourcesShareController@getUser')->name('resources.users');
+
+
 });
 
 //Clear Cache facade value:

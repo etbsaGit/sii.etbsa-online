@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: darryldecode
@@ -74,7 +75,17 @@ class SinglePageController extends AdminController
                 'visible' => false,
             ]),
             new MenuItem([
-                'group_requirements' => ['GERENTE','DIRECCION','Vendedor','Super User'],
+                'group_requirements' => ['FLOTILLA', 'Super User'],
+                'permission_requirements' => ['flotilla.menu'],
+                'label' => 'Flotilla de Unidades',
+                'nav_type' => MenuItem::$NAV_TYPE_NAV,
+                'icon' => 'mdi-car',
+                'route_type' => 'vue',
+                'route_name' => 'vehicle.list',
+                'visible' => true,
+            ]),
+            new MenuItem([
+                'group_requirements' => ['GERENTE', 'DIRECCION', 'Vendedor', 'Super User'],
                 'permission_requirements' => [],
                 'label' => 'Seguimiento Prospectos',
                 'nav_type' => MenuItem::$NAV_TYPE_NAV,
@@ -84,7 +95,7 @@ class SinglePageController extends AdminController
                 'visible' => true,
             ]),
             new MenuItem([
-                'group_requirements' => ['GERENTE','DIRECCION','Super User'],
+                'group_requirements' => ['GERENTE', 'DIRECCION', 'Super User'],
                 'permission_requirements' => [],
                 'label' => 'Historico Ventas',
                 'nav_type' => MenuItem::$NAV_TYPE_NAV,

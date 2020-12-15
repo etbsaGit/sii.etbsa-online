@@ -35,7 +35,7 @@ class GpsChipsRepository extends BaseRepository
             $q->ofImei($params['imei'] ?? '');
             $q->ofMonth($params['month'] ?? '');
             $q->ofYear($params['year'] ?? '');
-            
+
             if (!($assigned && $deallocated)) {
                 $q->ofAssigned($assigned);
                 $q->ofDeallocated($deallocated);
@@ -65,7 +65,7 @@ class GpsChipsRepository extends BaseRepository
                 return false;
             };
 
-            $GpsChips->gps()->dissociate();
+            // $GpsChips->gps()->dissociate();
             $GpsChips->delete();
         }
 

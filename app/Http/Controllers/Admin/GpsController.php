@@ -232,7 +232,6 @@ class GpsController extends AdminController
     {
         $year = Carbon::now()->year;
         $stats = [];
-        $list;
 
         for ($month = 1; $month <= 12; $month++) {
             $params = [

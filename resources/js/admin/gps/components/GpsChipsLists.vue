@@ -385,14 +385,13 @@ export default {
     },
     trash(chip) {
       const self = this;
-
       self.$store.commit("showDialog", {
         type: "confirm",
         title: "Confirm Deletion",
         message: "Are you sure you want to delete this gps chip?",
         okCb: () => {
           axios
-            .delete("/admin/chips/" + chip.id)
+            .delete("/admin/chips/" + chip.sim)
             .then(function(response) {
               self.$store.commit("showSnackbar", {
                 message: response.data.message,
