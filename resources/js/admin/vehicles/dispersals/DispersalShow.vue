@@ -1,129 +1,141 @@
 <template>
-  <div class="component-wrap">
-    <!-- form -->
-    <v-container grid-list-md>
-      <!-- <v-form v-model="valid" ref="dispersalForm" lazy-validation> -->
-      <!-- <v-row class="align-center"> -->
-      <v-col cols="12">
-        <v-card class="mx-auto" dark>
-          <v-list-item two-line>
-            <v-list-item-content>
-              <v-list-item-title class="headline">
-                Matricula: {{ Dispersal.vehicle.matricula }}
-              </v-list-item-title>
-              <v-list-item-subtitle>
-                {{
-                  $appFormatters.formatDate(
-                    Dispersal.created_at,
-                    "MMMM, DD yyyy"
-                  )
-                }}
-              </v-list-item-subtitle>
-            </v-list-item-content>
-            <v-spacer></v-spacer>
-            <v-chip class="ma-2" label>
-              {{ Dispersal.estatus.title }}
-            </v-chip>
-          </v-list-item>
+  <!-- form -->
+  <v-container>
+    <!-- <v-form v-model="valid" ref="dispersalForm" lazy-validation> -->
+    <!-- <v-row class="align-center"> -->
+    <v-col cols="12">
+      <v-card class="mx-auto" dark max-width="700">
+        <v-list-item two-line>
+          <v-list-item-content>
+            <v-list-item-title class="headline">
+              Matricula: {{ Dispersal.vehicle.matricula }}
+            </v-list-item-title>
+            <v-list-item-subtitle>
+              {{
+                $appFormatters.formatDate(Dispersal.created_at, "MMMM, DD yyyy")
+              }}
+            </v-list-item-subtitle>
+          </v-list-item-content>
+          <v-spacer></v-spacer>
+          <v-chip class="ma-2" label>
+            {{ Dispersal.estatus.title }}
+          </v-chip>
+        </v-list-item>
 
-          <v-card-text class="py-0">
-            <v-row align="center">
-              <v-col class="display-3 text-center" cols="4">
+        <v-card-text class="py-0">
+          <v-row align="center">
+            <v-col
+              class="display-3 text-center elevation-5"
+              cols="12"
+              xs="12"
+              md="4"
+            >
+              <v-edit-dialog
+                :return-value.sync="Dispersal.gas_lts"
+                large
+                persistent
+                save-text="Cambiar"
+              >
                 {{ Dispersal.gas_lts }} Lts
-              </v-col>
-              <v-col cols="8">
-                <v-list-item>
-                  <v-list-item-icon>
-                    <v-icon>mdi-car-cruise-control</v-icon>
-                  </v-list-item-icon>
-                  <v-list-item-subtitle>
-                    {{ Dispersal.kilometraje_anterior }} km (anterior)
-                  </v-list-item-subtitle>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-icon>
-                    <v-icon>mdi-car-cruise-control</v-icon>
-                  </v-list-item-icon>
-                  <v-list-item-subtitle>
-                    {{ Dispersal.kilometraje_actual }} km (actual)
-                  </v-list-item-subtitle>
-                </v-list-item>
+                <template v-slot:input>
+                  <v-text-field v-model.lazy="Dispersal.gas_lts">
+                  </v-text-field>
+                </template>
+              </v-edit-dialog>
+            </v-col>
+            <v-col cols="12" xs="12" md="8">
+              <v-list-item>
+                <v-list-item-icon>
+                  <v-icon>mdi-car-cruise-control</v-icon>
+                </v-list-item-icon>
+                <v-list-item-subtitle>
+                  {{ Dispersal.kilometraje_anterior }} km (anterior)
+                </v-list-item-subtitle>
+              </v-list-item>
+              <v-list-item>
+                <v-list-item-icon>
+                  <v-icon>mdi-car-cruise-control</v-icon>
+                </v-list-item-icon>
+                <v-list-item-subtitle>
+                  {{ Dispersal.kilometraje_actual }} km (actual)
+                </v-list-item-subtitle>
+              </v-list-item>
 
-                <v-list-item>
-                  <v-list-item-icon>
-                    <v-icon>mdi-car-coolant-level</v-icon>
-                  </v-list-item-icon>
-                  <v-list-item-subtitle>
-                    <v-progress-linear
-                      color="green lighten-1"
-                      height="10"
-                      :value="Dispersal.odometro_percent_gas"
+              <v-list-item>
+                <v-list-item-icon>
+                  <v-icon>mdi-car-coolant-level</v-icon>
+                </v-list-item-icon>
+                <v-list-item-subtitle>
+                  <v-progress-linear
+                    color="green lighten-1"
+                    height="10"
+                    :value="Dispersal.odometro_percent_gas"
+                  >
+                    <strong class="caption"
+                      >{{ Dispersal.odometro_percent_gas }}%</strong
                     >
-                      <strong class="caption"
-                        >{{ Dispersal.odometro_percent_gas }}%</strong
-                      >
-                    </v-progress-linear>
-                  </v-list-item-subtitle>
-                </v-list-item>
-              </v-col>
-            </v-row>
-          </v-card-text>
+                  </v-progress-linear>
+                </v-list-item-subtitle>
+              </v-list-item>
+            </v-col>
+          </v-row>
+        </v-card-text>
 
-          <v-list class="transparent" dense>
-            <v-list-item>
-              <v-list-item-title>Destino / Motivo</v-list-item-title>
-              <v-list-item-subtitle class="text-right">
-                <span class="overline"> {{ Dispersal.destino }} </span>,
-                {{ Dispersal.motivo }}
-              </v-list-item-subtitle>
-            </v-list-item>
-            <v-list-item>
-              <v-list-item-title>Con Cargo a:</v-list-item-title>
-              <v-list-item-subtitle class="text-right">
-                {{ Dispersal.cargo_a.title }} / {{ Dispersal.con_cargo_a }}
-              </v-list-item-subtitle>
-            </v-list-item>
-            <v-list-item>
-              <v-list-item-title>Tarjeta:</v-list-item-title>
-              <v-list-item-subtitle class="text-right">
-                {{ Dispersal.tarjeta }}
-              </v-list-item-subtitle>
-            </v-list-item>
-            <v-list-item>
-              <v-list-item-title>Solicitante:</v-list-item-title>
-              <v-list-item-subtitle class="text-right">
-                {{ Dispersal.user.name }}
-              </v-list-item-subtitle>
-            </v-list-item>
-          </v-list>
+        <v-list class="transparent text-uppercase" dense>
+          <v-list-item>
+            <v-list-item-title>Destino / Motivo</v-list-item-title>
+            <v-list-item-subtitle class="text-right">
+              <span class="overline"> {{ Dispersal.destino }} </span>,
+              {{ Dispersal.motivo }}
+            </v-list-item-subtitle>
+          </v-list-item>
+          <v-list-item>
+            <v-list-item-title>Con Cargo a:</v-list-item-title>
+            <v-list-item-subtitle class="text-right">
+              {{ Dispersal.cargo_a.title }} / {{ Dispersal.con_cargo_a }}
+            </v-list-item-subtitle>
+          </v-list-item>
+          <v-list-item>
+            <v-list-item-title>Tarjeta:</v-list-item-title>
+            <v-list-item-subtitle class="text-right">
+              {{ Dispersal.tarjeta }}
+            </v-list-item-subtitle>
+          </v-list-item>
+          <v-list-item>
+            <v-list-item-title>Solicitante:</v-list-item-title>
+            <v-list-item-subtitle class="text-right">
+              {{ Dispersal.user.name }}
+            </v-list-item-subtitle>
+          </v-list-item>
+        </v-list>
 
-          <v-divider></v-divider>
+        <v-divider></v-divider>
 
-          <v-card-actions class="justify-end">
-            <v-btn
-              color="primary"
-              @click="change_estatus('dispersal:autorizado')"
-            >
-              Autorizar
-            </v-btn>
-            <v-btn
-              text
-              color="error"
-              @click="change_estatus('dispersal:rechazada')"
-            >
-              Denegar
-            </v-btn>
-            <v-btn
-              text
-              color="orange"
-              @click="change_estatus('dispersal:dispersado')"
-            >
-              Dispersado
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-col>
-      <!-- <v-col cols="4">
+        <v-card-actions class="justify-end">
+          <v-btn
+            color="primary"
+            @click="change_estatus('dispersal:autorizado')"
+          >
+            Autorizar
+          </v-btn>
+          <v-btn
+            text
+            color="error"
+            @click="change_estatus('dispersal:rechazada')"
+          >
+            Denegar
+          </v-btn>
+          <v-btn
+            text
+            color="orange"
+            @click="change_estatus('dispersal:dispersado')"
+          >
+            Dispersado
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-col>
+    <!-- <v-col cols="4">
           <v-card>
             <v-card-title>Acciones</v-card-title>
             <v-row>
@@ -139,11 +151,10 @@
             </v-row>
           </v-card>
         </v-col> -->
-      <!-- </v-row> -->
-      <!-- </v-form> -->
-    </v-container>
-    <!-- /form -->
-  </div>
+    <!-- </v-row> -->
+    <!-- </v-form> -->
+  </v-container>
+  <!-- /form -->
 </template>
 
 <script>
@@ -174,7 +185,7 @@ export default {
         users: [],
         vehicles: [],
       },
-    };
+    }; 
   },
   created() {
     this.$store.commit("setBreadcrumbs", [

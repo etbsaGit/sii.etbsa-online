@@ -50,9 +50,34 @@ import store from "~/common/Store";
 import eventBus from "~/common/Event";
 import formatters from "~/common/Formatters";
 import AxiosAjaxDetct from "~/common/AxiosAjaxDetect";
+import VueCurrencyFilter from "vue-currency-filter";
 
 Vue.use(formatters);
 Vue.use(eventBus);
+
+Vue.use(VueCurrencyFilter, [
+  {
+    // default name 'currency'
+    symbol: "$",
+    thousandsSeparator: ",",
+    fractionCount: 2,
+    fractionSeparator: ".",
+    symbolPosition: "front",
+    symbolSpacing: false,
+    avoidEmptyDecimals: "00",
+  },
+  {
+    // default name 'currency_2'
+    name: "kms",
+    symbol: "KMS",
+    thousandsSeparator: ",",
+    fractionCount: 2,
+    fractionSeparator: ".",
+    symbolPosition: "back",
+    symbolSpacing: true,
+    avoidEmptyDecimals: "",
+  },
+]);
 
 Vue.filter("money", (value, type = "MXN") =>
   new Intl.NumberFormat("es-MX", {

@@ -12,6 +12,16 @@
             clearable
           ></v-text-field>
         </v-col>
+         <v-col cols="6" md="4">
+          <v-select
+            prepend-icon="mdi-magnify"
+            v-model="filters.category"
+            :items="options.categories"
+            label="CATEGORIA INTERES:"
+            hide-details
+            outlined
+          ></v-select>
+        </v-col>
         <v-col cols="6" md="4">
           <v-autocomplete
             v-model="filters.prospect"
@@ -125,6 +135,34 @@
             </template>
             <span>Exportar</span>
           </v-tooltip>
+          <v-tooltip top>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                icon
+                color="grey"
+                @click="loadTrackings(() => {})"
+                v-bind="attrs"
+                v-on="on"
+              >
+                <v-icon>mdi-refresh</v-icon>
+              </v-btn>
+            </template>
+            <span>Refrescar</span>
+          </v-tooltip>
+          <v-tooltip top>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                icon
+                color="error"
+                @click="reset()"
+                v-bind="attrs"
+                v-on="on"
+              >
+                <v-icon>mdi-filter-remove-outline</v-icon>
+              </v-btn>
+            </template>
+            <span>Reset Filtro</span>
+          </v-tooltip>
         </v-toolbar>
       </template>
 
@@ -226,67 +264,69 @@
           {{
             `${$appFormatters.formatTimeDiffNow(
               item.date_next_tracking,
-              "days"
-            ) || "0"} dias`
+              'days'
+            ) || '0'} dias`
           }}
         </v-btn>
       </template>
       <template v-slot:[`item.updated_at`]="{ item }">
-        {{ $appFormatters.formatDate(item.updated_at, "L hh:mm a") }}
+        {{ $appFormatters.formatDate(item.updated_at, 'L hh:mm a') }}
       </template>
     </v-data-table>
   </div>
 </template>
 
 <script>
+import { mapValues } from 'lodash';
+
 export default {
   data() {
     return {
       headers: [
-        { text: "Action", value: "action", align: "center", sortable: false },
-        { text: "Folio", value: "id", align: "left", sortable: false },
+        { text: 'Action', value: 'action', align: 'center', sortable: false },
+        { text: 'Folio', value: 'id', align: 'left', sortable: false },
         {
-          text: "Titulo Seguimiento",
-          value: "title",
-          align: "left",
+          text: 'Titulo Seguimiento',
+          value: 'title',
+          align: 'left',
           sortable: false,
         },
         {
-          text: "Prospecto:",
-          value: "prospect.full_name",
-          align: "left",
+          text: 'Prospecto:',
+          value: 'prospect.full_name',
+          align: 'left',
           sortable: false,
         },
         {
-          text: "Asignado a:",
-          value: "attended.name",
-          align: "left",
+          text: 'Asignado a:',
+          value: 'attended.name',
+          align: 'left',
           sortable: false,
         },
         {
-          text: "Agencia / Departamento",
-          value: "agency-depto",
+          text: 'Agencia / Departamento',
+          value: 'agency-depto',
           width: 150,
           sortable: false,
         },
         {
-          text: "Estatus",
-          value: "estatus.title",
-          align: "center",
+          text: 'Estatus',
+          value: 'estatus.title',
+          align: 'center',
           width: 100,
           sortable: false,
         },
         {
-          text: "Sig. Seguimiento",
-          value: "date_next_tracking",
-          align: "center",
+          text: 'Sig. Seguimiento',
+          value: 'date_next_tracking',
+          align: 'center',
           width: 100,
           sortable: false,
         },
         {
-          text: "Ultimo Cambio",
-          value: "updated_at",
-          align: "right",
+          text: 'Ultimo Cambio',
+          value: 'updated_at',
+          align: 'right',
           sortable: false,
         },
       ],
@@ -297,12 +337,13 @@ export default {
       },
 
       filters: {
-        title: "",
+        title: '',
         estatus: [],
         agencies: [],
         departments: [],
         sellers: [],
         prospect: [],
+        category: '',
       },
 
       options: {
@@ -310,29 +351,46 @@ export default {
         agencies: [],
         departments: [],
         sellers: [],
+        categories: [
+          'Colección JD',
+          'Construcción',
+          'Implementos',
+          'Jardineria',
+          'Maquinaria Diversa',
+          'Otros productos',
+          'Por definir',
+          'Refacciones',
+          'Riego',
+          'Seminuevos',
+          'Servicio',
+          'Tractores',
+          'Tractores Seminuevos',
+          'Trilladora',
+          'Venta en Linea',
+        ],
       },
     };
   },
   mounted() {
     const self = this;
-    self.$store.commit("showLoader");
+    self.$store.commit('showLoader');
 
-    self.$store.commit("setBreadcrumbs", [{ label: "Segumientos", name: "" }]);
+    self.$store.commit('setBreadcrumbs', [{ label: 'Segumientos', name: '' }]);
     self.loadResources(() => {
-      self.$store.commit("hideLoader");
+      self.$store.commit('hideLoader');
     });
   },
   watch: {
-    "pagination.page": function() {
+    'pagination.page': function() {
       this.loadTrackings(() => {});
     },
-    "pagination.rowsPerPage": function() {
+    'pagination.rowsPerPage': function() {
       this.loadTrackings(() => {});
     },
     filters: {
       handler: _.debounce(function(v) {
         this.loadTrackings(() => {
-          this.$store.commit("hideLoader");
+          this.$store.commit('hideLoader');
         });
       }, 700),
       deep: true,
@@ -342,58 +400,59 @@ export default {
     trash(seller) {
       const self = this;
 
-      self.$store.commit("showDialog", {
-        type: "confirm",
-        title: "Confirm Deletion",
-        message: "Are you sure you want to delete this seller?",
+      self.$store.commit('showDialog', {
+        type: 'confirm',
+        title: 'Confirm Deletion',
+        message: 'Are you sure you want to delete this seller?',
         okCb: () => {
           axios
-            .delete("/admin/sellers/" + seller.id)
+            .delete('/admin/sellers/' + seller.id)
             .then(function(response) {
-              self.$store.commit("showSnackbar", {
+              self.$store.commit('showSnackbar', {
                 message: response.data.message,
-                color: "success",
+                color: 'success',
                 duration: 3000,
               });
 
               self.loadTrackings(() => {});
             })
             .catch(function(error) {
-              self.$store.commit("hideLoader");
+              self.$store.commit('hideLoader');
 
               if (error.response) {
-                self.$store.commit("showSnackbar", {
+                self.$store.commit('showSnackbar', {
                   message: error.response.data.message,
-                  color: "error",
+                  color: 'error',
                   duration: 3000,
                 });
               } else if (error.request) {
                 console.log(error.request);
               } else {
-                console.log("Error", error.message);
+                console.log('Error', error.message);
               }
             });
         },
         cancelCb: () => {
-          console.log("CANCEL");
+          console.log('CANCEL');
         },
       });
     },
     loadTrackings(cb) {
       const self = this;
-      self.$store.commit("showLoader");
+      self.$store.commit('showLoader');
       let params = {
         title: self.filters.title,
-        estatus_keys: self.filters.estatus.join(","),
-        agencies_id: self.filters.agencies.join(","),
-        departments_id: self.filters.departments.join(","),
-        prospects_id: self.filters.prospect.join(","),
-        sellers_id: self.filters.sellers.join(","),
+        category: self.filters.category,
+        estatus_keys: self.filters.estatus.join(','),
+        agencies_id: self.filters.agencies.join(','),
+        departments_id: self.filters.departments.join(','),
+        prospects_id: self.filters.prospect.join(','),
+        sellers_id: self.filters.sellers.join(','),
         page: self.pagination.page,
         per_page: self.pagination.rowsPerPage,
       };
 
-      axios.get("/admin/tracking", { params: params }).then(function(response) {
+      axios.get('/admin/tracking', { params: params }).then(function(response) {
         self.items = response.data.data.data;
         self.totalItems = response.data.data.total;
         self.pagination.totalItems = response.data.data.total;
@@ -404,10 +463,10 @@ export default {
       const self = this;
 
       let params = {
-        paginate: "no",
+        paginate: 'no',
       };
       axios
-        .get("/admin/tracking/sales_history/resources")
+        .get('/admin/tracking/sales_history/resources')
         .then(function(response) {
           let Data = response.data.data;
           self.options.agencies = Data.agencies;
@@ -415,7 +474,7 @@ export default {
           self.options.prospects = Data.prospects;
         });
 
-      axios.get("/admin/sellers", { params: params }).then(function(response) {
+      axios.get('/admin/sellers', { params: params }).then(function(response) {
         self.options.sellers = response.data.data;
         (cb || Function)();
       });
@@ -423,56 +482,59 @@ export default {
       // return seller;
     },
     getColor(value) {
-      if (value == "finalizado") return "red";
-      else if (value == "formalizado") return "blue";
-      else return "primary";
+      if (value == 'finalizado') return 'red';
+      else if (value == 'formalizado') return 'blue';
+      else return 'primary';
     },
     getColorDays(value) {
-      if (value < 0) return "red";
-      else return "primary";
+      if (value < 0) return 'red';
+      else return 'primary';
     },
     exportTracking() {
       const self = this;
-      self.$store.commit("showLoader");
+      self.$store.commit('showLoader');
       let params = {
         title: self.filters.title,
-        estatus_keys: self.filters.estatus.join(","),
-        agencies_id: self.filters.agencies.join(","),
-        departments_id: self.filters.departments.join(","),
-        prospects_id: self.filters.prospect.join(","),
-        sellers_id: self.filters.sellers.join(","),
+        estatus_keys: self.filters.estatus.join(','),
+        agencies_id: self.filters.agencies.join(','),
+        departments_id: self.filters.departments.join(','),
+        prospects_id: self.filters.prospect.join(','),
+        sellers_id: self.filters.sellers.join(','),
         page: self.pagination.page,
         per_page: self.pagination.rowsPerPage,
       };
       axios
-        .get("/admin/tracking-export", {
+        .get('/admin/tracking-export', {
           params: params,
-          responseType: "blob",
+          responseType: 'blob',
         })
         .then((res) => {
           const url = window.URL.createObjectURL(new Blob([res.data]));
-          const link = document.createElement("a");
+          const link = document.createElement('a');
           link.href = url;
-          link.setAttribute("download", "tracking.xlsx"); //or any other extension
+          link.setAttribute('download', 'tracking.xlsx'); //or any other extension
           document.body.appendChild(link);
           link.click();
         })
         .catch(function(error) {
           if (error.response) {
-            self.$store.commit("showSnackbar", {
+            self.$store.commit('showSnackbar', {
               message: error.response.data.message,
-              color: "error",
+              color: 'error',
               duration: 3000,
             });
           } else if (error.request) {
             console.log(error.request);
           } else {
-            console.log("Error", error.message);
+            console.log('Error', error.message);
           }
         })
         .finally(function() {
-          self.$store.commit("hideLoader");
+          self.$store.commit('hideLoader');
         });
+    },
+    reset() {
+      this.filters = mapValues(this.filters, () => []);
     },
   },
 };

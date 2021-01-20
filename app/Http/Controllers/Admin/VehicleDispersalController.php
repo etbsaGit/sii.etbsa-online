@@ -107,7 +107,7 @@ class VehicleDispersalController extends AdminController
         DB::transaction(function () use ($id, $request) {
             $estatus = Estatus::where('key', $request['estatus_key'])->first();
             $dispersal = $this->vehicleDispersalRepository->find($id);
-
+            // $dispersal['gas_lts'] = $request['gas_lts'];
             $dispersal->estatus()->associate($estatus)->save();
         });
 

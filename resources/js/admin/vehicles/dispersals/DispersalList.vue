@@ -12,19 +12,19 @@
           ></v-text-field>
         </v-col>
         <!-- <v-col cols="6"> -->
-          <v-autocomplete
-            v-model="filters.agencies"
-            :items="options.agencies"
-            item-text="title"
-            item-value="id"
-            label="Filtrar Cargo A Sucursal:"
-            prepend-icon="mdi-magnify"
-            hide-details
-            clearable
-            multiple
-            filled
-          ></v-autocomplete>
-          <!-- </v-col> -->
+        <v-autocomplete
+          v-model="filters.agencies"
+          :items="options.agencies"
+          item-text="title"
+          item-value="id"
+          label="Filtrar Cargo A Sucursal:"
+          prepend-icon="mdi-magnify"
+          hide-details
+          clearable
+          multiple
+          filled
+        ></v-autocomplete>
+        <!-- </v-col> -->
         <v-row class="justify-space-around">
           <v-checkbox
             v-model="filters.estatus"
@@ -105,6 +105,7 @@
           </v-list>
         </v-menu>
       </template>
+
       <template v-slot:[`item.folio`]="{ item }">
         {{ item.id.toString().padStart(5, 0) }}
       </template>
@@ -119,6 +120,7 @@
           </v-list-item-content>
         </v-list-item>
       </template>
+
       <template v-slot:[`item.cargoA`]="{ item }">
         <v-list-item dense class="pa-0">
           <v-list-item-content class="pa-0">
@@ -129,18 +131,20 @@
           </v-list-item-content>
         </v-list-item>
       </template>
+
       <template v-slot:[`item.kms`]="{ item }">
         <v-list-item dense class="pa-0">
           <v-list-item-content class="pa-0">
-            <v-list-item-title
-              >{{ item.kilometraje_actual }} kms</v-list-item-title
-            >
+            <v-list-item-title>{{
+              item.kilometraje_actual | kms
+            }}</v-list-item-title>
             <v-list-item-subtitle>
-              {{ item.kilometraje_anterior }} kms
+              {{ item.kilometraje_anterior | kms }}
             </v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
       </template>
+
       <template v-slot:[`item.tank`]="{ item }">
         <v-progress-linear
           color="green lighten-1"
@@ -150,6 +154,7 @@
           <strong>{{ item.odometro_percent_gas }}%</strong>
         </v-progress-linear>
       </template>
+
       <template v-slot:[`item.created_at`]="{ item }">
         <span class="caption">
           {{ $appFormatters.formatDate(item.created_at, "DD-MMM-yyyy") }}
@@ -226,13 +231,12 @@ export default {
       pagination: {
         rowsPerPage: 10,
       },
-       options: {
-
+      options: {
         agencies: [],
       },
       filters: {
         title: "",
-        estatus: ['dispersal:pendiente'],
+        estatus: ["dispersal:pendiente"],
         agencies: [],
       },
     };
@@ -243,7 +247,7 @@ export default {
       { label: "Flotilla", to: { name: "vehicle.list" } },
       { label: "Dispercion", name: "" },
     ]);
-    this.loadResource(()=>{})
+    this.loadResource(() => {});
   },
   watch: {
     "pagination.page": function() {
@@ -324,7 +328,7 @@ export default {
           (cb || Function)();
         });
     },
-        loadResource(cb) {
+    loadResource(cb) {
       const self = this;
       axios.get("/admin/resource/agencies").then(function(response) {
         let Data = response.data.data;
@@ -332,6 +336,18 @@ export default {
         (cb || Function)();
       });
     },
+    itemRowBackground(item) {
+      return item.estatus.key > "dispersal:autorizado" ? "style-1" : "style-2";
+    },
   },
 };
 </script>
+
+<style>
+.style-1 {
+  background-color: rgb(215, 215, 44);
+}
+.style-2 {
+  background-color: rgb(114, 114, 67);
+}
+</style>

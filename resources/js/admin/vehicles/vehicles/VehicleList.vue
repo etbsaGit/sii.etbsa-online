@@ -103,6 +103,9 @@
           </v-list-item-content>
         </v-list-item>
       </template>
+      <template v-slot:[`item.ultimo_kilometraje`]="{ item }">
+        {{ item.ultimo_kilometraje | kms }}
+      </template>
       <template v-slot:[`item.updated_at`]="{ item }">
         {{ $appFormatters.formatDate(item.updated_at, "MMM DD,YYYY") }}
       </template>

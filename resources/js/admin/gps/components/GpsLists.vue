@@ -252,8 +252,8 @@
 
           <template v-slot:[`item.cost`]="{ item }">
             <template v-if="item.chip">
-              <span class="button">
-                {{ item.chip.costo | money() }}
+              <span class="caption">
+                {{ item.chip.costo | currency }}
               </span>
             </template>
             <template v-else>
@@ -268,7 +268,7 @@
               <v-tooltip top>
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn text pa-0 v-bind="attrs" v-on="on" small>{{
-                    item.amount | money(item.currency)
+                    item.amount | currency(`${item.currency} $`)
                   }}</v-btn>
                 </template>
                 <span>{{ item.invoice }}</span>
@@ -561,7 +561,7 @@ export default {
         {
           text: "Costo:",
           value: "cost",
-          align: "right",
+          align: "left",
           sortable: false,
         },
         {

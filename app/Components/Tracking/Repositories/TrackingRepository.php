@@ -22,10 +22,13 @@ class TrackingRepository extends BaseRepository
      */
     public function listTracking($params)
     {
-        return $this->get($params, ['estatus', 'prospect',
-            'agency', 'department'], function ($q) use ($params) {
+        return $this->get($params, [
+            'estatus', 'prospect',
+            'agency', 'department'
+        ], function ($q) use ($params) {
 
             $q->ofTitle($params['title'] ?? '');
+            $q->ofTitle($params['category'] ?? '');
             $q->ofEstatus(Helpers::commasToArray($params['estatus_keys'] ?? ''));
             $q->ofAgency(Helpers::commasToArray($params['agencies_id'] ?? ''));
             $q->ofDepartment(Helpers::commasToArray($params['departments_id'] ?? ''));
@@ -57,8 +60,6 @@ class TrackingRepository extends BaseRepository
             }
 
             return $q;
-
         });
     }
-
 }

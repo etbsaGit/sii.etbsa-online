@@ -180,14 +180,25 @@ class TrackingProspectController extends AdminController
             return false;
         };
 
-        $tracking->historical()->create($historical->toArray());
+        $tracking->historical()->create($tracking->toArray());
     }
 
     public function resources()
     {
         // $trackings = $this->trackingRepository->resource(request()->all());
-        $agencies = DB::table('agencies')->get(['id', 'code', 'title']);
-        $departments = DB::table('departments')->get(['id', 'title']);
+        if (Auth::user()->isSuperUser()) {
+            $agencies = DB::table('agencies')->get(['id', 'code', 'title']);
+            $departments = DB::table('departments')->get(['id', 'title']);
+        } else {
+
+            $agencies = Auth::user()->seller_agency->map(function ($i, $k) {
+                return ['id' => $i->id, 'code' => $i->code, 'title' => $i->title];
+            });
+            $departments = Auth::user()->seller_type->map(function ($i, $k) {
+                return ['id' => $i->id, 'title' => $i->title];
+            });
+        }
+
         $prospects = DB::table('prospect')->get(['id', 'full_name', 'phone']);
         // $type = DB::table('marketing_import')->distinct()->get(['SUCURSAL']);
         return $this->sendResponseOk(compact('agencies', 'departments', 'prospects'));

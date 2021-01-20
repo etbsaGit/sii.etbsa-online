@@ -37,6 +37,9 @@
             <v-btn small text class="mt-1">
               Contacto por: {{ tracking.first_contact }}
             </v-btn>
+            <v-btn small text class="mt-1">
+              Se Registro:  {{ $appFormatters.formatDate(tracking.created_at, "L hh:mm a") }}
+            </v-btn>
           </v-card-subtitle>
           <v-divider></v-divider>
           <v-list two-line dense>
