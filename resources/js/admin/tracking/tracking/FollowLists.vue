@@ -1,112 +1,169 @@
 <template>
   <div class="component-wrap">
     <!-- search -->
-    <v-card>
-      <v-row class="mx-2 my-0">
-        <v-col cols="6" md="4">
-          <v-text-field
-            prepend-icon="mdi-magnify"
-            label="Fitrar por Folio|Titulo|Referencia"
-            v-model="filters.title"
-            hide-details
-            clearable
-          ></v-text-field>
-        </v-col>
-         <v-col cols="6" md="4">
-          <v-select
-            prepend-icon="mdi-magnify"
-            v-model="filters.category"
-            :items="options.categories"
-            label="CATEGORIA INTERES:"
-            hide-details
-            outlined
-          ></v-select>
-        </v-col>
-        <v-col cols="6" md="4">
-          <v-autocomplete
-            v-model="filters.prospect"
-            :items="options.prospects"
-            item-text="full_name"
-            item-value="id"
-            label="Filtro Prospecto:"
-            prepend-icon="mdi-magnify"
-            hide-details
-            clearable
-            multiple
-          ></v-autocomplete>
-        </v-col>
-        <v-col cols="6" md="4">
-          <v-autocomplete
-            v-model="filters.agencies"
-            :items="options.agencies"
-            item-text="title"
-            item-value="id"
-            label="Filtrar Agencia:"
-            prepend-icon="mdi-magnify"
-            hide-details
-            clearable
-            multiple
-          ></v-autocomplete>
-        </v-col>
-        <v-col cols="6" md="4">
-          <v-autocomplete
-            v-model="filters.departments"
-            :items="options.departments"
-            item-text="title"
-            item-value="id"
-            label="Filtrar Depto."
-            prepend-icon="mdi-magnify"
-            hide-details
-            clearable
-            multiple
-          ></v-autocomplete>
-        </v-col>
-        <!-- <v-col cols="6" md="4">
-          <v-autocomplete
-            v-model="filters.sellers"
-            :items="options.sellers"
-            item-text="name"
-            item-value="id"
-            label="Filtro Vendedor:"
-            prepend-icon="mdi-magnify"
-            hide-details
-            clearable
-            multiple
-          ></v-autocomplete>
-        </v-col> -->
-        <v-row class="justify-space-around">
-          <v-checkbox
-            v-model="filters.estatus"
-            label="Activo"
-            value="activo"
-            hide-details
-          ></v-checkbox>
-          <v-checkbox
-            v-model="filters.estatus"
-            label="Finalizado"
-            value="finalizado"
-            hide-details
-          ></v-checkbox>
-          <v-checkbox
-            v-model="filters.estatus"
-            label="Formalizado"
-            value="formalizado"
-            hide-details
-          ></v-checkbox>
-        </v-row>
-      </v-row>
-      <div class="flex-grow-1 pa-2 text-right">
-        <v-btn
-          @click="$router.push({ name: 'tracking.create' })"
-          class="primary lighten-1"
-          small
-          dark
+    <v-expansion-panels>
+      <v-expansion-panel>
+        <v-expansion-panel-header
+          disable-icon-rotate
+          color="grey lighten-3"
+          class="titlle text-uppercase font-weight-bold"
         >
-          Levantar un Seguimiento
-          <v-icon small right>mdi-plus-box</v-icon>
-        </v-btn>
-      </div>
-    </v-card>
+          Filtros
+          <template v-slot:actions>
+            <v-icon>
+              mdi-magnify
+            </v-icon>
+          </template>
+        </v-expansion-panel-header>
+        <v-expansion-panel-content class="pa-0">
+          <v-form ref="formSearch">
+            <v-row class="mx-2 my-0">
+              <v-col cols="12" md="4">
+                <v-text-field
+                  append-icon="mdi-magnify"
+                  label="Buscar Folio:"
+                  v-model="filters.folio"
+                  outlined
+                  hide-details
+                  clearable
+                  dense
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-text-field
+                  append-icon="mdi-magnify"
+                  label="Fitrar por Titulo Seguimiento"
+                  v-model="filters.title"
+                  outlined
+                  hide-details
+                  clearable
+                  dense
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-select
+                  append-icon="mdi-magnify"
+                  v-model="filters.category"
+                  :items="options.categories"
+                  label="Categoria:"
+                  hide-details
+                  outlined
+                  dense
+                ></v-select>
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-autocomplete
+                  v-model="filters.prospect"
+                  :items="options.prospects"
+                  item-text="full_name"
+                  item-value="id"
+                  label="Filtro Prospecto:"
+                  hide-details
+                  clearable
+                  multiple
+                  outlined
+                  dense
+                ></v-autocomplete>
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-autocomplete
+                  v-model="filters.agencies"
+                  :items="options.agencies"
+                  item-text="title"
+                  item-value="id"
+                  label="Filtrar Agencia:"
+                  hide-details
+                  clearable
+                  multiple
+                  outlined
+                  dense
+                ></v-autocomplete>
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-autocomplete
+                  v-model="filters.departments"
+                  :items="options.departments"
+                  item-text="title"
+                  item-value="id"
+                  label="Filtrar Depto."
+                  hide-details
+                  clearable
+                  multiple
+                  outlined
+                  dense
+                ></v-autocomplete>
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-autocomplete
+                  v-model="filters.sellers"
+                  :items="options.sellers"
+                  item-text="name"
+                  item-value="id"
+                  label="Filtro Vendedor:"
+                  hide-details
+                  clearable
+                  multiple
+                  outlined
+                  dense
+                ></v-autocomplete>
+              </v-col>
+              <v-col cols="12" md="6">
+                <v-radio-group v-model="filters.estatus" row dense>
+                  <v-radio label="Activos" value="activo" />
+                  <v-radio label="Finalizados" value="finalizado" />
+                  <v-radio label="Fomalizados" value="formalizado" />
+                  <v-radio label="Todos" value="todos" />
+                </v-radio-group>
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-dialog
+                  ref="dialog"
+                  v-model="modal"
+                  :return-value.sync="date"
+                  persistent
+                  width="354px"
+                >
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-text-field
+                      v-model="dateRangeText"
+                      label="Rango de Fechas"
+                      placeholder="Seleccione un Rango de fechas"
+                      prepend-icon="mdi-calendar"
+                      readonly
+                      outlined
+                      hide-details
+                      dense
+                      color="orange"
+                      v-bind="attrs"
+                      v-on="on"
+                      append-outer-icon="mdi-close"
+                      @click:append-outer="(filters.dates = []), (date = [])"
+                    ></v-text-field>
+                  </template>
+                  <v-date-picker v-model="date" range>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                      text
+                      color="primary"
+                      @click="(modal = false), (date = [])"
+                    >
+                      Cancel
+                    </v-btn>
+                    <v-btn
+                      text
+                      color="primary"
+                      @click="$refs.dialog.save((filters.dates = date))"
+                    >
+                      OK
+                    </v-btn>
+                  </v-date-picker>
+                </v-dialog>
+              </v-col>
+            </v-row>
+          </v-form>
+        </v-expansion-panel-content>
+      </v-expansion-panel>
+    </v-expansion-panels>
     <!-- /search -->
     <!-- data table -->
     <v-data-table
@@ -120,6 +177,15 @@
     >
       <template v-slot:top>
         <v-toolbar elevation="0">
+          <v-btn
+            @click="$router.push({ name: 'tracking.create' })"
+            class="primary lighten-1"
+            small
+            dark
+          >
+            Levantar un Seguimiento
+            <v-icon small right>mdi-plus</v-icon>
+          </v-btn>
           <v-spacer></v-spacer>
           <v-tooltip top>
             <template v-slot:activator="{ on, attrs }">
@@ -198,12 +264,6 @@
         {{ item.id.toString().padStart(5, 0) }}
       </template>
       <template v-slot:[`item.title`]="{ item }">
-        <!-- <span
-          class="d-inline-block text-truncate text-uppercase"
-          style="max-width: 200px;"
-        >
-          {{ item.title }}
-        </span> -->
         <v-list-item dense class="pa-0">
           <v-list-item-content class="pa-0">
             <v-list-item-title>{{ item.title }}</v-list-item-title>
@@ -277,11 +337,11 @@
 </template>
 
 <script>
-import { mapValues } from 'lodash';
-
 export default {
   data() {
     return {
+      date: [],
+      modal: false,
       headers: [
         { text: 'Action', value: 'action', align: 'center', sortable: false },
         { text: 'Folio', value: 'id', align: 'left', sortable: false },
@@ -337,13 +397,15 @@ export default {
       },
 
       filters: {
-        title: '',
-        estatus: [],
+        folio: null,
+        title: null,
+        category: null,
+        prospect: [],
+        estatus: 'activo',
         agencies: [],
         departments: [],
         sellers: [],
-        prospect: [],
-        category: '',
+        dates: [],
       },
 
       options: {
@@ -380,12 +442,29 @@ export default {
       self.$store.commit('hideLoader');
     });
   },
+  computed: {
+    // dateRangeText() {
+    //   return this.filters.dates.length > 0 ? this.filters.dates.join(',') : [];
+    // },
+      dateRangeText: {
+      // getter
+      get: function () {
+        return this.filters.dates.join(',')
+      },
+      // setter
+      set: function (newValue) {
+        newValue ? this.filters.dates = newValue.split(' ') : []
+      }
+     }
+  },
   watch: {
-    'pagination.page': function() {
-      this.loadTrackings(() => {});
-    },
-    'pagination.rowsPerPage': function() {
-      this.loadTrackings(() => {});
+    pagination: {
+      handler: _.debounce(function(v) {
+        this.loadTrackings(() => {
+          this.$store.commit('hideLoader');
+        });
+      }, 700),
+      deep: true,
     },
     filters: {
       handler: _.debounce(function(v) {
@@ -441,15 +520,15 @@ export default {
       const self = this;
       self.$store.commit('showLoader');
       let params = {
-        title: self.filters.title,
-        category: self.filters.category,
-        estatus_keys: self.filters.estatus.join(','),
-        agencies_id: self.filters.agencies.join(','),
-        departments_id: self.filters.departments.join(','),
-        prospects_id: self.filters.prospect.join(','),
-        sellers_id: self.filters.sellers.join(','),
+        ...self.filters,
+        estatus: self.filters.estatus,
+        sellers: self.filters.sellers.join(','),
+        prospect: self.filters.prospect.join(','),
+        agencies: self.filters.agencies.join(','),
+        departments: self.filters.departments.join(','),
+        dates: self.dateRangeText,
         page: self.pagination.page,
-        per_page: self.pagination.rowsPerPage,
+        per_page: self.pagination.itemsPerPage,
       };
 
       axios.get('/admin/tracking', { params: params }).then(function(response) {
@@ -534,8 +613,14 @@ export default {
         });
     },
     reset() {
-      this.filters = mapValues(this.filters, () => []);
+      this.filters.dates = [];
+      this.$refs.formSearch.reset();
     },
+    // filterByDateRange(dates){
+    //   // alert(`Selecciono rango de fechas ${dates}`);
+    //   const self = this;
+    //  self.filters.dates = dates
+    // }
   },
 };
 </script>
