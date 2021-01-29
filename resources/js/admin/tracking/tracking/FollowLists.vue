@@ -256,6 +256,16 @@
                   <v-list-item-title>Ver Seguimiento</v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
+              <v-list-item
+                @click="resetToActive(item.id)"
+              >
+                <v-list-item-icon>
+                  <v-icon class="blue--text">mdi-undo-variant</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-item-title>Regresar como Activo</v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
             </v-list-item-group>
           </v-list>
         </v-menu>
@@ -572,15 +582,16 @@ export default {
     exportTracking() {
       const self = this;
       self.$store.commit('showLoader');
-      let params = {
-        title: self.filters.title,
-        estatus_keys: self.filters.estatus.join(','),
-        agencies_id: self.filters.agencies.join(','),
-        departments_id: self.filters.departments.join(','),
-        prospects_id: self.filters.prospect.join(','),
-        sellers_id: self.filters.sellers.join(','),
+        let params = {
+        ...self.filters,
+        estatus: self.filters.estatus,
+        sellers: self.filters.sellers.join(','),
+        prospect: self.filters.prospect.join(','),
+        agencies: self.filters.agencies.join(','),
+        departments: self.filters.departments.join(','),
+        dates: self.dateRangeText,
         page: self.pagination.page,
-        per_page: self.pagination.rowsPerPage,
+        per_page: self.pagination.itemsPerPage,
       };
       axios
         .get('/admin/tracking-export', {
@@ -616,11 +627,20 @@ export default {
       this.filters.dates = [];
       this.$refs.formSearch.reset();
     },
-    // filterByDateRange(dates){
-    //   // alert(`Selecciono rango de fechas ${dates}`);
-    //   const self = this;
-    //  self.filters.dates = dates
-    // }
+    resetToActive(id){
+      const self = this
+       axios
+        .put("/admin/tracking/resetToActive/" + id)
+        .then(function(response) {
+          self.$store.commit("showSnackbar", {
+            message: response.data.message,
+            color: "success",
+            duration: 3000,
+          });
+          self.loadTrackings(() => {})
+          cb();
+        });
+    }
   },
 };
 </script>

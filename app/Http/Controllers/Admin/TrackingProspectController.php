@@ -49,16 +49,21 @@ class TrackingProspectController extends AdminController
             'title' => 'required|string',
             'reference' => 'required|string',
             'description_topic' => 'required|string',
-            'price' => 'numeric',
+            'price' => 'required|numeric',
             'agency_id' => 'required',
             'department_id' => 'required',
             'attended_by' => 'required',
+            'prospect_id' => 'required',
         ], [
-            'title.required' => 'El Titulo es requerido',
             'description_topic.required' => 'Motivo del seguimiento es Requerido',
             'attended_by.required' => 'Seleccione a un Vendedor',
             'reference.required' => 'Especifique una referencia',
             'title.required' => 'Especifique una Categoria',
+            'agency_id.required' => 'Agencia Asignada es Requerido',
+            'department_id.required' => 'A quien Corresponde es Requerido',
+            'prospect_id.required' => 'El Prospecto es Requerido',
+            'price.required' => 'El Precio es Requerido',
+            'price.numeric' => 'El Precio debe ser un Numero Valido',
         ]);
 
         if ($validate->fails()) {
@@ -160,6 +165,17 @@ class TrackingProspectController extends AdminController
         }
 
         return $this->sendResponseOk([], "Se Asigno Vendedor Correctamente.");
+    }
+
+    public function resetToActive(Request $request, $id)
+    {
+        $updated = $this->trackingRepository->update($id, ['estatus_id' => 1]);
+
+        if (!$updated) {
+            return $this->sendResponseBadRequest("Failed update");
+        }
+
+        return $this->sendResponseOk([], "Se Asigno el Estatus a Activo");
     }
     /**
      * Remove the specified resource from storage.

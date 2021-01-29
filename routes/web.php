@@ -40,6 +40,7 @@ Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function
     // Route::get('tracking/resources', 'TrackingProspectController@resources')->name('tracking-resources');
     Route::get('tracking/sales_history/resources', 'TrackingProspectController@resources')->name('trackingResources');
     Route::put('tracking/assignSeller/{id}', 'TrackingProspectController@assignSeller')->name('trackingAssignSeller');
+    Route::put('tracking/resetToActive/{id}', 'TrackingProspectController@resetToActive')->name('tracking.resetToActive');
     Route::get('tracking-export', 'ExportController@exportTracking')->name('trackingExport');
 
     //Marketing
@@ -50,8 +51,6 @@ Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function
     // ResourcesController
     Route::get('resource/agencies', 'ResourcesShareController@getAgencies')->name('resources.agencies');
     Route::get('resource/users', 'ResourcesShareController@getUser')->name('resources.users');
-
-
 });
 
 //Clear Cache facade value:

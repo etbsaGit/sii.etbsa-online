@@ -78,17 +78,21 @@ class TrackingProspect extends Model
             $query->where(function ($query) use ($category) {
                 $query->orWhere('title', 'like', '%' . $category . '%');
             });
-        })->when($filters['prospect'] ?? null, function ($query, $search) {
-            $query->whereHas('prospect', function ($query) use ($search) {
-                $query->whereIn('id', Helpers::commasToArray($search));
+        })->when($filters['prospect'] ?? null, function ($query, $prospect) {
+            $query->whereHas('prospect', function ($query) use ($prospect) {
+                $query->whereIn('id', Helpers::commasToArray($prospect));
             });
-        })->when($filters['agencies'] ?? null, function ($query, $search) {
-            $query->whereHas('agency', function ($query) use ($search) {
-                $query->whereIn('id', Helpers::commasToArray($search));
+        })->when($filters['sellers'] ?? null, function ($query, $sellers) {
+            $query->whereHas('attended', function ($query) use ($sellers) {
+                $query->whereIn('id', Helpers::commasToArray($sellers));
             });
-        })->when($filters['departments'] ?? null, function ($query, $search) {
-            $query->whereHas('department', function ($query) use ($search) {
-                $query->whereIn('id', Helpers::commasToArray($search));
+        })->when($filters['agencies'] ?? null, function ($query, $agencies) {
+            $query->whereHas('agency', function ($query) use ($agencies) {
+                $query->whereIn('id', Helpers::commasToArray($agencies));
+            });
+        })->when($filters['departments'] ?? null, function ($query, $departments) {
+            $query->whereHas('department', function ($query) use ($departments) {
+                $query->whereIn('id', Helpers::commasToArray($departments));
             });
         })->when($filters['estatus'] ?? null, function ($query, $estatus) {
             if ($estatus !== "todos") {

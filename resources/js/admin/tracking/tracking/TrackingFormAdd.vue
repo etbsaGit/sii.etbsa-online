@@ -3,173 +3,200 @@
     <!-- form -->
     <v-card>
       <v-card-title>
-        <v-icon>mdi-account</v-icon> Levantar Seguimiento
+        <v-icon>mdi-account</v-icon> Levantar un Seguimiento a Prospecto
       </v-card-title>
       <v-divider class="mb-2"></v-divider>
-      <v-form v-model="valid" ref="permissionFormEdit" lazy-validation>
+      <v-form v-model="valid" ref="formAddTracking" lazy-validation>
         <v-container grid-list-md>
           <v-layout row wrap>
-            <v-flex xs12>
-              <div class="body-2">Datos de Seguimiento</div>
-            </v-flex>
-            <v-flex xs12 md8>
-              <v-autocomplete
-                v-model="prospect"
-                :items="options.prospects"
-                item-text="full_name"
-                :hint="`TEL: ${prospect.phone}`"
-                persistent-hint
-                item-value="id"
-                label="BUSCAR PROSPECTO:"
-                placeholder="Buscar por Nombre:"
-                return-object
-                clearable
-              >
-                <template v-slot:prepend-inner>
-                  <v-tooltip top>
-                    <template v-slot:activator="{ on, attrs }">
-                      <v-icon
-                        key="icon-add"
-                        color="success"
-                        @click="$router.push({ name: 'prospect.create' })"
-                        v-bind="attrs"
-                        v-on="on"
-                        >mdi-account-plus
-                      </v-icon>
+            <!-- column 1 -->
+            <v-flex xs12 md6>
+              <v-flex xs12>
+                <v-autocomplete
+                  v-model="prospect"
+                  :items="options.prospects"
+                  item-text="full_name"
+                  :hint="`TEL: ${prospect.phone || ''}`"
+                  persistent-hint
+                  item-value="id"
+                  label="BUSCAR PROSPECTO:"
+                  placeholder="Buscar por Nombre:"
+                  return-object
+                  clearable
+                  outlined
+                  dense
+                  :rules="[(v) => (!!v && !!v.id) || 'Campo Requerido']"
+                >
+                  <template v-slot:prepend-inner>
+                    <v-tooltip top>
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-icon
+                          key="icon-add"
+                          color="success"
+                          @click="$router.push({ name: 'prospect.create' })"
+                          v-bind="attrs"
+                          v-on="on"
+                          >mdi-account-plus
+                        </v-icon>
+                      </template>
+                      <span>Registrar Nuevo</span>
+                    </v-tooltip>
+                  </template>
+                </v-autocomplete>
+              </v-flex>
+              <v-flex xs12 md12>
+                <v-autocomplete
+                  v-model="agency"
+                  :items="options.agencies"
+                  item-text="title"
+                  item-value="id"
+                  label="AGENCIA ASIGNADA:"
+                  placeholder="Agencia a quien correponde."
+                  outlined
+                  dense
+                  :rules="requiredRule"
+                ></v-autocomplete>
+              </v-flex>
+              <v-flex xs12 md12>
+                <v-autocomplete
+                  v-model="department"
+                  :items="options.departments"
+                  item-text="title"
+                  item-value="id"
+                  label="CORRESPONDE A:"
+                  placeholder="Departamento a quien correponde."
+                  outlined
+                  dense
+                  :rules="requiredRule"
+                ></v-autocomplete>
+              </v-flex>
+              <v-flex xs12 md12>
+                <v-autocomplete
+                  v-model="seller"
+                  :disabled="availableSeller"
+                  :items="options.sellers"
+                  item-text="name"
+                  item-value="id"
+                  label="VENDEDOR SUGERIDO:"
+                  placeholder="Vendedores disponibles:"
+                  outlined
+                  dense
+                  :rules="requiredRule"
+                >
+                  <template v-slot:item="data">
+                    <template v-if="typeof data.item !== 'object'">
+                      <v-list-item-content
+                        v-text="data.item.name"
+                      ></v-list-item-content>
                     </template>
-                    <span>Registrar Nuevo</span>
-                  </v-tooltip>
-                </template>
-              </v-autocomplete>
-            </v-flex>
-            <v-flex xs12 md4>
-              <v-autocomplete
-                v-model="agency"
-                :items="options.agencies"
-                item-text="title"
-                item-value="id"
-                label="AGENCIA ASIGNADA:"
-                placeholder="Agencia a quien correponde."
-              ></v-autocomplete>
-            </v-flex>
-            <v-flex xs12 md4>
-              <v-autocomplete
-                v-model="department"
-                :items="options.departments"
-                item-text="title"
-                item-value="id"
-                label="CORRESPONDE A:"
-                placeholder="Departamento a quien correponde."
-              ></v-autocomplete>
-            </v-flex>
-            <v-flex xs12 md8>
-              <v-autocomplete
-                v-model="seller"
-                :disabled="availableSeller"
-                :items="options.sellers"
-                item-text="name"
-                item-value="id"
-                label="VENDEDOR SUGERIDO:"
-                placeholder="Vendedores disponibles:"
-              >
-                <template v-slot:item="data">
-                  <template v-if="typeof data.item !== 'object'">
-                    <v-list-item-content
-                      v-text="data.item.name"
-                    ></v-list-item-content>
+                    <template v-else>
+                      <v-list-item-avatar>
+                        <v-icon
+                          v-if="
+                            data.item.groups.some((g) => g.name == 'Gerente')
+                          "
+                          class="green--text"
+                          >mdi-check-circle-outline</v-icon
+                        >
+                        <v-icon v-else class="grey--text"
+                          >mdi-alert-circle-outline</v-icon
+                        >
+                      </v-list-item-avatar>
+                      <v-list-item-content>
+                        <v-list-item-title
+                          v-html="data.item.name"
+                        ></v-list-item-title>
+                      </v-list-item-content>
+                    </template>
                   </template>
-                  <template v-else>
-                    <v-list-item-avatar>
-                      <v-icon
-                        v-if="data.item.groups.some((g) => g.name == 'Gerente')"
-                        class="green--text"
-                        >mdi-check-circle-outline</v-icon
-                      >
-                      <v-icon v-else class="grey--text"
-                        >mdi-alert-circle-outline</v-icon
-                      >
-                    </v-list-item-avatar>
-                    <v-list-item-content>
-                      <v-list-item-title
-                        v-html="data.item.name"
-                      ></v-list-item-title>
-                    </v-list-item-content>
-                  </template>
-                </template>
-              </v-autocomplete>
+                </v-autocomplete>
+              </v-flex>
             </v-flex>
-            <v-flex xs12 md3>
-              <v-select
-                v-model="title"
-                :items="categories"
-                label="CATEGORIA INTERES:"
-                placeholder="describir o seleccionar un opcion"
-                hide-details
-                filled
-                chips
-              ></v-select>
-            </v-flex>
-            <template v-if="title != 'Tractores'">
-              <v-flex xs12 md6>
+
+            <!-- column 2 -->
+            <v-flex xs12 md6>
+              <v-flex xs12 md12>
+                <v-select
+                  v-model="title"
+                  :items="categories"
+                  label="CATEGORIA INTERES:"
+                  placeholder="describir o seleccionar un opcion"
+                  filled
+                  outlined
+                  dense
+                  :rules="requiredRule"
+                ></v-select>
+              </v-flex>
+              <v-flex xs12 md12 v-if="title != 'Tractores'">
                 <v-text-field
                   v-model="reference"
                   label="REFERENCIA:"
                   placeholder="Alguna Referencia del Producto de interes"
                   filled
+                  dense
+                  class="title"
+                  :rules="requiredRule"
                 ></v-text-field>
               </v-flex>
-            </template>
-            <template v-else>
-              <v-flex xs12 md3>
-                <v-autocomplete
-                  v-model="selectModel"
-                  :items="models"
-                  label="Modelo:"
-                  placeholder="Seleccione Modelo"
-                  required
+              <template v-else>
+                <v-layout row wrap>
+                  <v-flex xs6>
+                    <v-autocomplete
+                      v-model="selectModel"
+                      :items="models"
+                      label="Modelo:"
+                      placeholder="Seleccione Modelo"
+                      required
+                      outlined
+                      filled
+                      dense
+                      clearable
+                      :rules="requiredRule"
+                    />
+                  </v-flex>
+                  <v-flex xs6>
+                    <v-select
+                      v-model="selectConfig"
+                      :items="configure"
+                      label="Configuracion:"
+                      :hint="selectConfig.hint"
+                      persistent-hint
+                      filled
+                      outlined
+                      required
+                      dense
+                      prepend-icon="mdi-cogs"
+                      return-object
+                    />
+                  </v-flex>
+                </v-layout>
+              </template>
+              <v-flex xs12 md12>
+                <v-text-field
+                  v-model="price"
+                  label="PRECIO A TRATAR:"
+                  prefix="$"
+                  placeholder="0.00"
                   filled
-                  clearable
-                />
+                  dense
+                  :rules="requiredRule"
+                >
+                  <template v-slot:append>
+                    <v-btn text color="success" @click="changeCurrency()">
+                      {{ !!currency ? currency : 'MXN' }}
+                    </v-btn>
+                  </template>
+                </v-text-field>
               </v-flex>
-              <v-flex xs12 md3>
-                <v-select
-                  v-model="selectConfig"
-                  :items="configure"
-                  label="Configuracion Disponible:"
-                  :hint="selectConfig.hint"
-                  persistent-hint
-                  filled
-                  required
-                  prepend-icon="mdi-cogs"
-                  return-object
-                />
-              </v-flex>
-            </template>
-            <v-flex xs12 md3>
-              <v-text-field
-                v-model="price"
-                label="PRECIO A TRATAR:"
-                prefix="$"
-                placeholder="0.00"
-                filled
-              >
-                <template v-slot:append>
-                  <v-btn text @click="changeCurrency()">
-                    {{ !!currency ? currency : "MXN" }}
-                  </v-btn>
-                </template>
-              </v-text-field>
             </v-flex>
-            <v-flex xs12 md6>
-              <div><strong>Prospecto contactado por medio de:</strong></div>
-              <v-radio-group v-model="row" row hide-details class="mt-0">
-                <!-- <template v-slot:label>
-                </template> -->
+            <v-layout row align-center mx-3>
+              <div class="overline">El Prospecto fue contactado:</div>
+              <v-radio-group v-model="row" row dense :rules="requiredRule">
                 <v-radio label="ONLINE" value="online"></v-radio>
                 <v-radio label="EN AGENCIA" value="agencia"></v-radio>
                 <v-radio label="EN CAMPO" value="campo"></v-radio>
               </v-radio-group>
-            </v-flex>
+            </v-layout>
             <v-flex xs12>
               <v-textarea
                 v-model="description"
@@ -177,6 +204,14 @@
                 placeholder="Motivo del Seguimiento, detalle producto, precios, etc"
                 counter="500"
                 filled
+                outlined
+                class="title"
+                :rules="[
+                  (v) => !!v || 'Motivo Requerido',
+                  (v) =>
+                    (v && v.length >= 25) ||
+                    'Motico debe tener al menos 25 caracteres',
+                ]"
               ></v-textarea>
             </v-flex>
             <v-flex xs12>
@@ -200,7 +235,7 @@
 </template>
 
 <script>
-import data from "./agricola.json";
+import data from './agricola.json';
 export default {
   props: {
     propProspectId: {
@@ -211,36 +246,37 @@ export default {
   data() {
     return {
       valid: false,
+      requiredRule: [(v) => !!v || 'Campo Requerido'],
       isLoading: false,
-      title: "",
-      reference: "",
-      description: "",
+      title: null,
+      reference: null,
+      description: null,
       price: null,
-      row: "online",
+      row: 'online',
       prospect: {
         id: null,
-        full_name: "",
-        phone: "",
+        full_name: null,
+        phone: null,
       },
       agency: null,
       department: null,
       seller: null,
       categories: [
-        "Colección JD",
-        "Construcción",
-        "Implementos",
-        "Jardineria",
-        "Maquinaria Diversa",
-        "Otros productos",
-        "Por definir",
-        "Refacciones",
-        "Riego",
-        "Seminuevos",
-        "Servicio",
-        "Tractores",
-        "Tractores Seminuevos",
-        "Trilladora",
-        "Venta en Linea",
+        'Colección JD',
+        'Construcción',
+        'Implementos',
+        'Jardineria',
+        'Maquinaria Diversa',
+        'Otros productos',
+        'Por definir',
+        'Refacciones',
+        'Riego',
+        'Seminuevos',
+        'Servicio',
+        'Tractores',
+        'Tractores Seminuevos',
+        'Trilladora',
+        'Venta en Linea',
       ],
       options: {
         prospects: [],
@@ -252,7 +288,7 @@ export default {
       selectTipo: {},
       selectModel: {},
       selectConfig: {},
-      currency: "MXN",
+      currency: 'MXN',
     };
   },
   mounted() {
@@ -261,7 +297,7 @@ export default {
       if (this.propProspectId) {
         this.prospect = parseInt(this.propProspectId);
       }
-      if (this.$gate.deny("assignSeller", "tracking")) {
+      if (this.$gate.deny('assignSeller', 'tracking')) {
         this.agency = window.LSK_APP.AUTH_USER.agency_id;
         this.department = window.LSK_APP.AUTH_USER.departments_id;
       }
@@ -279,21 +315,21 @@ export default {
     title: function() {
       this.selectModel = {};
       this.selectConfig = {};
-      this.price = "";
+      this.price = '';
     },
     selectTipo: function() {
       this.selectModel = {};
       this.selectConfig = {};
-      this.price = "";
+      this.price = '';
     },
     selectModel: function() {
       this.selectConfig = {};
-      this.price = "";
+      this.price = '';
     },
     selectConfig: function(v) {
       if (!!v) {
         this.price = v.value.Precio;
-        this.currency = v.value["Tipo Moneda"];
+        this.currency = v.value['Tipo Moneda'];
       }
     },
   },
@@ -310,7 +346,7 @@ export default {
       return [...new Set(this.tractores.map((item) => item.Tipo))];
     },
     models() {
-      const filter = this.tractores.filter((word) => word.Tipo === "Tractor");
+      const filter = this.tractores.filter((word) => word.Tipo === 'Tractor');
       return [...new Set(filter.map((item) => `${item.Modelo}`))];
     },
     configure() {
@@ -326,14 +362,14 @@ export default {
             text: this.configuracion(item),
             value: item,
             hint: `${item.Modelo} ${item.field4} ${
-              item["Traccion Sencilla"] === "SI" ? "Traccion Sencilla | " : ""
-            } ${item["Doble Traccion"] === "SI" ? "Doble Traccion | " : ""} ${
-              item["Power Reverser"] === "SI" ? "Power Reverser | " : ""
-            } ${item.Creeper === "SI" ? "Creeper | " : ""} ${
-              item["Con Cabina"] === "SI" ? "Con Cabina | " : ""
-            } ${item["Cabina Premium"] === "SI" ? "Cabina Premium | " : ""} ${
-              item["Doble rodado"] === "SI" ? "Doble rodado | " : ""
-            } ${item.Ams === "SI" ? "AMS Incluido | " : ""}`,
+              item['Traccion Sencilla'] === 'SI' ? 'Traccion Sencilla | ' : ''
+            } ${item['Doble Traccion'] === 'SI' ? 'Doble Traccion | ' : ''} ${
+              item['Power Reverser'] === 'SI' ? 'Power Reverser | ' : ''
+            } ${item.Creeper === 'SI' ? 'Creeper | ' : ''} ${
+              item['Con Cabina'] === 'SI' ? 'Con Cabina | ' : ''
+            } ${item['Cabina Premium'] === 'SI' ? 'Cabina Premium | ' : ''} ${
+              item['Doble rodado'] === 'SI' ? 'Doble rodado | ' : ''
+            } ${item.Ams === 'SI' ? 'AMS Incluido | ' : ''}`,
           });
         }
       }
@@ -342,6 +378,7 @@ export default {
   },
   methods: {
     save() {
+      if (!this.$refs.formAddTracking.validate()) return;
       const self = this;
       if (self.selectConfig.hint) {
         self.reference = self.selectConfig.hint;
@@ -362,39 +399,39 @@ export default {
       self.isLoading = true;
 
       axios
-        .post("/admin/tracking", payload)
+        .post('/admin/tracking', payload)
         .then(function(response) {
-          self.$store.commit("showSnackbar", {
+          self.$store.commit('showSnackbar', {
             message: response.data.message,
-            color: "success",
+            color: 'success',
             duration: 3000,
           });
 
           // reset
           self.isLoading = false;
-          self.$router.push({ name: "tracking.list" });
+          self.$router.push({ name: 'tracking.list' });
         })
         .catch(function(error) {
           self.isLoading = false;
-          self.$store.commit("hideLoader");
+          self.$store.commit('hideLoader');
 
           if (error.response) {
-            self.$store.commit("showSnackbar", {
+            self.$store.commit('showSnackbar', {
               message: error.response.data.message,
-              color: "error",
+              color: 'error',
               duration: 3000,
             });
           } else if (error.request) {
             console.log(error.request);
           } else {
-            console.log("Error", error.message);
+            console.log('Error', error.message);
           }
         });
     },
     loadResources(cb) {
       const self = this;
       axios
-        .get("/admin/tracking/sales_history/resources")
+        .get('/admin/tracking/sales_history/resources')
         .then(function(response) {
           let Data = response.data.data;
           self.options.agencies = Data.agencies;
@@ -409,32 +446,32 @@ export default {
       let params = {
         seller_agency_id: self.agency,
         seller_type_id: self.department,
-        paginate: "no",
+        paginate: 'no',
       };
-      self.$store.commit("showLoader");
-      axios.get("/admin/sellers", { params: params }).then(function(response) {
+      self.$store.commit('showLoader');
+      axios.get('/admin/sellers', { params: params }).then(function(response) {
         self.options.sellers = response.data.data;
-        self.$store.commit("hideLoader");
+        self.$store.commit('hideLoader');
       });
 
       // return seller;
     },
     configuracion(item) {
       return `${item.Modelo} ${item.field4} ${
-        item["Traccion Sencilla"] === "SI" ? "TS" : ""
-      } ${item["Doble Traccion"] === "SI" ? "DT" : ""} ${
-        item["Power Reverser"] === "SI" ? "PR" : ""
-      } ${item.Creeper === "SI" ? "Creeper" : ""} ${
-        item["Con Cabina"] === "SI" ? "c/CAB" : ""
-      }${item["Cabina Premium"] === "SI" ? "CAB/Premium" : ""} ${
-        item["Doble rodado"] === "SI" ? "DR" : ""
-      }${item.Ams === "SI" ? "AMS Incluido" : ""}`;
+        item['Traccion Sencilla'] === 'SI' ? 'TS' : ''
+      } ${item['Doble Traccion'] === 'SI' ? 'DT' : ''} ${
+        item['Power Reverser'] === 'SI' ? 'PR' : ''
+      } ${item.Creeper === 'SI' ? 'Creeper' : ''} ${
+        item['Con Cabina'] === 'SI' ? 'c/CAB' : ''
+      }${item['Cabina Premium'] === 'SI' ? 'CAB/Premium' : ''} ${
+        item['Doble rodado'] === 'SI' ? 'DR' : ''
+      }${item.Ams === 'SI' ? 'AMS Incluido' : ''}`;
     },
     changeCurrency() {
-      if (this.currency == "MXN") {
-        this.currency = "USD";
+      if (this.currency == 'MXN') {
+        this.currency = 'USD';
       } else {
-        this.currency = "MXN";
+        this.currency = 'MXN';
       }
     },
   },

@@ -45,7 +45,7 @@ class ProspectController extends AdminController
             'full_name' => 'required',
             'township_id' => 'required',
             'phone' => 'size:10|required|unique:prospect,phone',
-        ],[
+        ], [
             'phone.unique' => 'El Telefono ya se encuentra registrado',
             'phone.size' => 'el Telefono debe tener 10 Digitos',
             'phone.required' => 'El Telefono es requerido',
@@ -95,17 +95,17 @@ class ProspectController extends AdminController
      */
     public function update(Request $request, $id)
     {
-        $validate = validator($request->all(),[
+        $validate = validator($request->all(), [
             'full_name' => 'required',
         ]);
 
-        if($validate->fails()) return $this->sendResponseBadRequest($validate->errors()->first());
+        if ($validate->fails()) return $this->sendResponseBadRequest($validate->errors()->first());
 
         $payload = $request->all();
 
-        $updated = $this->prospectRepository->update($id,$payload);
+        $updated = $this->prospectRepository->update($id, $payload);
 
-        if(!$updated) return $this->sendResponseBadRequest("Failed update");
+        if (!$updated) return $this->sendResponseBadRequest("Failed update");
         return $this->sendResponseUpdated();
     }
 
@@ -117,7 +117,7 @@ class ProspectController extends AdminController
      */
     public function destroy($id)
     {
-        
+
         try {
             $this->prospectRepository->delete($id);
         } catch (\Exception $e) {
@@ -125,10 +125,5 @@ class ProspectController extends AdminController
         }
 
         return $this->sendResponseDeleted();
-    }
-
-    public function resource(Type $var = null)
-    {
-        # code...
     }
 }
