@@ -45,6 +45,7 @@ class ProspectController extends AdminController
             'full_name' => 'required',
             'township_id' => 'required',
             'phone' => 'size:10|required|unique:prospect,phone',
+            'is_moral' => 'required',
         ], [
             'phone.unique' => 'El Telefono ya se encuentra registrado',
             'phone.size' => 'el Telefono debe tener 10 Digitos',

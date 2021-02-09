@@ -12,15 +12,33 @@
             <v-flex xs12>
               <div class="body-2">Ingresar la informacion del Propecto</div>
             </v-flex>
-            <v-flex xs12 md6>
+            <v-flex xs12 md3>
+              <v-switch
+                v-model="is_moral"
+                flat
+                :label="`Persona ${is_moral ? 'Fisica' : 'Moral'}`"
+                class="mx-auto"
+              ></v-switch>
+            </v-flex>
+            <v-flex xs12 md9>
               <v-text-field
-                label="Nombre Completo:"
+                label="Nombre a quien va dirigido:"
                 v-model="full_name"
                 :rules="[(v) => !!v || 'Nombre Requerido']"
                 filled
               ></v-text-field>
             </v-flex>
-            <v-flex xs12 md3>
+            <v-flex xs12 md8 v-if="is_moral">
+              <v-text-field
+                label="Razon Social:"
+                v-model="company"
+                filled
+              ></v-text-field>
+            </v-flex>
+            <v-flex xs12 md4 lg4>
+              <v-text-field v-model="rfc" label="RFC:" filled></v-text-field>
+            </v-flex>
+            <v-flex xs12 md4>
               <v-autocomplete
                 v-model="estate_id"
                 :items="options.estates"
@@ -31,7 +49,7 @@
                 :rules="[(v) => !!v || 'Estado Requerido']"
               ></v-autocomplete>
             </v-flex>
-            <v-flex xs12 md3>
+            <v-flex xs12 md4>
               <v-autocomplete
                 :items="options.townships"
                 v-model="township_id"
@@ -43,9 +61,7 @@
                 outline
               ></v-autocomplete>
             </v-flex>
-            <v-flex xs12 md4 lg4>
-              <v-text-field v-model="rfc" label="RFC:" filled></v-text-field>
-            </v-flex>
+
             <v-flex xs12 md4 lg4>
               <v-text-field
                 label="Telefono:"
@@ -62,7 +78,7 @@
                 filled
               ></v-text-field>
             </v-flex>
-            <v-flex xs12 md6>
+            <v-flex xs12>
               <v-text-field
                 v-model="town"
                 label="Nombre Racho/comunidad (optional):"
@@ -102,6 +118,8 @@ export default {
       email: "",
       rfc: "",
       town: "",
+      company: null,
+      is_moral: false,
     };
   },
   mounted() {
@@ -121,13 +139,15 @@ export default {
         email: self.email,
         rfc: self.rfc,
         township_id: self.township_id,
+        is_moral: self.is_moral,
+        company: self.company,
       };
 
       self.isLoading = true;
 
       axios
         .post("/admin/prospects", payload)
-        .then(function(response) {
+        .then(function (response) {
           self.$store.commit("showSnackbar", {
             message: response.data.message,
             color: "success",
@@ -139,7 +159,7 @@ export default {
           self.isLoading = false;
           self.$router.push({ name: "prospect.list" });
         })
-        .catch(function(error) {
+        .catch(function (error) {
           self.isLoading = false;
           self.$store.commit("hideLoader");
 

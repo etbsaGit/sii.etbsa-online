@@ -3,7 +3,7 @@
     <!-- form -->
     <v-card>
       <v-card-title>
-        <v-icon>mdi-account-box-outline</v-icon> Editar Prospecto
+        <v-icon>mdi-account-box-outline</v-icon> Registrar Nuevo Prospecto
       </v-card-title>
       <v-divider class="mb-2"></v-divider>
       <v-form v-model="valid" ref="prospectFormAdd" lazy-validation>
@@ -12,26 +12,44 @@
             <v-flex xs12>
               <div class="body-2">Ingresar la informacion del Propecto</div>
             </v-flex>
-            <v-flex xs12 md6>
+            <v-flex xs12 md3>
+              <v-switch
+                v-model="is_moral"
+                flat
+                :label="`Persona ${is_moral ? 'Fisica' : 'Moral'}`"
+                class="mx-auto"
+              ></v-switch>
+            </v-flex>
+            <v-flex xs12 md9>
               <v-text-field
-                label="Nombre Completo:"
+                label="Nombre a quien va dirigido:"
                 v-model="full_name"
                 :rules="[(v) => !!v || 'Nombre Requerido']"
                 filled
               ></v-text-field>
             </v-flex>
-            <v-flex xs12 md3>
+            <v-flex xs12 md8 v-if="is_moral">
+              <v-text-field
+                label="Razon Social:"
+                v-model="company"
+                filled
+              ></v-text-field>
+            </v-flex>
+            <v-flex xs12 md4 lg4>
+              <v-text-field v-model="rfc" label="RFC:" filled></v-text-field>
+            </v-flex>
+            <v-flex xs12 md4>
               <v-autocomplete
                 v-model="estate_id"
                 :items="options.estates"
                 item-text="name"
                 item-value="id"
                 label="Estado:"
-                hide-details
                 filled
+                :rules="[(v) => !!v || 'Estado Requerido']"
               ></v-autocomplete>
             </v-flex>
-            <v-flex xs12 md3>
+            <v-flex xs12 md4>
               <v-autocomplete
                 :items="options.townships"
                 v-model="township_id"
@@ -39,13 +57,12 @@
                 item-text="name"
                 item-value="id"
                 filled
+                :rules="[(v) => !!v || 'Municipio Requerido']"
                 outline
               ></v-autocomplete>
             </v-flex>
-            <v-flex xs12 md4>
-              <v-text-field v-model="rfc" label="RFC:" filled></v-text-field>
-            </v-flex>
-            <v-flex xs12 md4>
+
+            <v-flex xs12 md4 lg4>
               <v-text-field
                 label="Telefono:"
                 v-model="phone"
@@ -54,14 +71,14 @@
                 counter="10"
               ></v-text-field>
             </v-flex>
-            <v-flex xs12 md4>
+            <v-flex xs12 md4 lg4>
               <v-text-field
                 v-model="email"
                 label="email:"
                 filled
               ></v-text-field>
             </v-flex>
-            <v-flex xs12 md6>
+            <v-flex xs12>
               <v-text-field
                 v-model="town"
                 label="Nombre Racho/comunidad (optional):"
@@ -77,8 +94,9 @@
                 :disabled="!valid || isLoading"
                 color="primary"
                 dark
-                >Guardar</v-btn
               >
+                Actualizar
+              </v-btn>
             </v-flex>
           </v-layout>
         </v-container>
@@ -107,12 +125,14 @@ export default {
       email: "",
       rfc: "",
       town: "",
+      is_moral: false,
+      company: null,
     };
   },
   mounted() {
-    const self = this
+    const self = this;
     self.loadEstates(() => {
-      self.loadProspect(()=>{});
+      self.loadProspect(() => {});
     });
     self.$store.commit("setBreadcrumbs", [
       { label: "Prospectos", to: { name: "prospect.list" } },
@@ -130,13 +150,15 @@ export default {
         rfc: self.rfc,
         town: self.town,
         township_id: self.township_id,
+        is_moral: self.is_moral,
+        company: self.company,
       };
 
       self.isLoading = true;
 
       axios
         .put("/admin/prospects/" + self.propProspectId, payload)
-        .then(function(response) {
+        .then(function (response) {
           self.$store.commit("showSnackbar", {
             message: response.data.message,
             color: "success",
@@ -148,7 +170,7 @@ export default {
           self.isLoading = false;
           self.$router.push({ name: "prospect.list" });
         })
-        .catch(function(error) {
+        .catch(function (error) {
           self.isLoading = false;
           self.$store.commit("hideLoader");
 
@@ -170,7 +192,7 @@ export default {
 
       axios
         .get("/admin/prospects/" + self.propProspectId)
-        .then(function(response) {
+        .then(function (response) {
           let Prospect = response.data.data;
           self.full_name = Prospect.full_name;
           self.phone = Prospect.phone;
@@ -179,6 +201,8 @@ export default {
           self.town = Prospect.town;
           self.estate_id = Prospect.township.estate_id;
           self.township_id = Prospect.township.id;
+          self.is_moral = Prospect.is_moral;
+          self.company = Prospect.company;
         });
     },
   },

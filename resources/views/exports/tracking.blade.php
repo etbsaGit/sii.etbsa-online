@@ -16,6 +16,7 @@
             <th>Medio Contacto</th>
             <th>Ultimo Cambio</th>
             <th>Fecha Registro</th>
+            <th>Utimo Comentario</th>
         </tr>
     </thead>
     <tbody>
@@ -36,6 +37,7 @@
             <td>{{ $item->first_contact ?? 'S/A' }}</td>
             <td>{{ $item->updated_at ?? 'S/A' }}</td>
             <td>{{ $item->created_at ?? 'S/A' }}</td>
+            <td>{{ $item->historical->last()->message ?? '' }}</td>
         </tr>
         @endforeach
     </tbody>

@@ -79,6 +79,16 @@
           </v-list>
         </v-menu>
       </template>
+      <template v-slot:[`item.full_name`]="{ item }">
+        <v-list-item dense class="pa-0">
+          <v-list-item-content class="pa-0">
+            <v-list-item-title>{{ item.full_name }}</v-list-item-title>
+            <v-list-item-subtitle v-if="item.is_moral">
+              {{ item.company }}
+            </v-list-item-subtitle>
+          </v-list-item-content>
+        </v-list-item>
+      </template>
       <!-- <template v-slot:[`item.created_at`]="{ item }">
         {{ $appFormatters.formatDate(item.created_at, "MMM DD,YYYY") }}
       </template> -->
@@ -93,7 +103,7 @@ export default {
       headers: [
         { text: "Action", value: "action", align: "left", sortable: false },
         {
-          text: "Nombre Prospecto",
+          text: "Dirigido a / Razon Social",
           value: "full_name",
           align: "left",
           sortable: false,
@@ -131,13 +141,13 @@ export default {
     // ]);
   },
   watch: {
-    "pagination.page": function() {
+    "pagination.page": function () {
       this.loadProspects(() => {});
     },
-    "pagination.rowsPerPage": function() {
+    "pagination.rowsPerPage": function () {
       this.loadProspects(() => {});
     },
-    "filters.full_name": _.debounce(function() {
+    "filters.full_name": _.debounce(function () {
       const self = this;
       self.loadProspects(() => {});
     }, 700),
@@ -153,7 +163,7 @@ export default {
         okCb: () => {
           axios
             .delete("/admin/sellers/" + seller.id)
-            .then(function(response) {
+            .then(function (response) {
               self.$store.commit("showSnackbar", {
                 message: response.data.message,
                 color: "success",
@@ -162,7 +172,7 @@ export default {
 
               self.loadProspects(() => {});
             })
-            .catch(function(error) {
+            .catch(function (error) {
               self.$store.commit("hideLoader");
 
               if (error.response) {
@@ -194,7 +204,7 @@ export default {
 
       axios
         .get("/admin/prospects", { params: params })
-        .then(function(response) {
+        .then(function (response) {
           self.items = response.data.data.data;
           self.totalItems = response.data.data.total;
           self.pagination.totalItems = response.data.data.total;

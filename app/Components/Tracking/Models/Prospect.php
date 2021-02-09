@@ -12,7 +12,7 @@ class Prospect extends Model
     protected $primaryKey = 'id';
     protected $with = ['township'];
 
-    protected $fillable = ['full_name', 'phone', 'registered_by', 'email', 'rfc', 'town','township_id'];
+    protected $fillable = ['full_name', 'phone', 'registered_by', 'email', 'rfc', 'town', 'township_id', 'is_moral', 'company'];
     protected $appends = ['tracking_count'];
 
     /**

@@ -56,7 +56,7 @@
           </v-list>
         </v-navigation-drawer>
 
-        <v-app-bar app clipped-left hide-on-scroll>
+        <v-app-bar app clipped-left>
           <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
           <v-toolbar-title>{{ config("app.name") }}</v-toolbar-title>
           <v-spacer></v-spacer>

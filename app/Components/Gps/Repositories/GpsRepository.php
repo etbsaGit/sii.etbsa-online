@@ -122,15 +122,15 @@ class GpsRepository extends BaseRepository
         return $stats;
     }
 
-    public function assignChip(Type $var = null)
-    {
-        # code...
-    }
+    // public function assignChip(Type $var = null)
+    // {
+    //     # code...
+    // }
 
-    public function assignGroup(Type $var = null)
-    {
-        # code...
-    }
+    // public function assignGroup(Type $var = null)
+    // {
+    //     # code...
+    // }
 
     public function keepHistorical(int $id)
     {
@@ -149,7 +149,6 @@ class GpsRepository extends BaseRepository
             ]);
 
             $gps->historical()->create($historical->toArray());
-
         }
     }
 
