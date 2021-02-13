@@ -1,7 +1,9 @@
 <template>
   <v-card class="mx-auto" elevation="0">
     <v-toolbar flat class="overline">
-      <span class="text-primary text-md-h4 text-sm-overline"> Folio: #{{ folio }}</span>
+      <span class="text-primary text-md-h4 text-sm-overline">
+        Folio: #{{ folio }}</span
+      >
       <v-spacer></v-spacer>
       <v-tooltip left>
         <template v-slot:activator="{ on, attrs }">
@@ -62,7 +64,7 @@
             <v-divider></v-divider>
             <v-list-item three-line>
               <v-list-item-content>
-                <v-list-item-title class="headline mb-1">
+                <v-list-item-title class="headline text-wrap mb-1">
                   {{ info.detail.reference }}
                 </v-list-item-title>
                 <v-list-item-subtitle class="subtitle-1 text-uppercase">
@@ -95,7 +97,7 @@
             <v-divider></v-divider>
             <v-list-item three-line>
               <v-list-item-content>
-                <v-list-item-title class="headline mb-1">
+                <v-list-item-title class="headline text-wrap mb-2">
                   {{ info.prospect.full_name }}
                 </v-list-item-title>
                 <v-list-item-subtitle class="body-1">
@@ -113,7 +115,10 @@
                   <span class="text--primary">Email:</span>
                   {{ info.prospect.email || '' }}
                 </v-list-item-subtitle>
-                <v-list-item-subtitle v-if="info.prospect.township" class="body-1">
+                <v-list-item-subtitle
+                  v-if="info.prospect.township"
+                  class="body-1"
+                >
                   <span class="text--primary">Ciudad:</span>
                   {{ info.prospect.township.name }},
                   {{ info.prospect.township.estate.name }}
