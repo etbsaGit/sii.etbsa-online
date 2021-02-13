@@ -55,7 +55,7 @@
           <v-select
             v-model="form.assertiveness"
             :items="options.assertiveness"
-            label="Certividad:"
+            label="Certeza:"
             :rules="[(v) => !!v || 'Requerido']"
             outlined
             dense

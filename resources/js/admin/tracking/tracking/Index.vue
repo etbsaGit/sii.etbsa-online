@@ -458,7 +458,7 @@ export default {
           class: "blue-grey lighten-5",
         },
         {
-          text: "Certividad",
+          text: "Certeza",
           value: "assertiveness",
           align: "center",
           width: 150,
