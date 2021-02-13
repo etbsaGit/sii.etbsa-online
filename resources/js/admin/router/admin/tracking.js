@@ -39,12 +39,18 @@ export const tracking = [
       {
         path: "tracking",
         name: "tracking.list",
-        component: require("@admin/tracking/tracking/FollowLists").default,
+        component: require("@admin/tracking/tracking/Index").default,
       },
       {
         path: "tracking/create/:propProspectId?",
         name: "tracking.create",
-        component: require("@admin/tracking/tracking/TrackingFormAdd").default,
+        component: require("@admin/tracking/tracking/Create").default,
+        props: true,
+      },
+      {
+        path: "tracking/edit/:propTrackingId",
+        name: "tracking.edit",
+        component: require("@admin/tracking/tracking/Edit").default,
         props: true,
       },
       {

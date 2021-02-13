@@ -141,7 +141,6 @@ class GpsController extends AdminController
         // }
 
         return $this->sendResponseOk([], "GPS RENOVADO.");
-
     }
 
     public function cancelled(Request $request, $id)
@@ -186,17 +185,18 @@ class GpsController extends AdminController
             'gps_chip_id' => 'required',
             'gps_group_id' => 'required',
             'installation_date' => 'required',
+            'description' => 'required',
             // 'gps_chip_id' => 'required|unique:gps,gps_chip_id',
         ], [
             'name.required' => 'Nombre GPS es Requrido',
+            'description.required' => 'Es necesario un Comentario',
             // 'gps_chip_id.unique' => 'Error Chip Duplicado, Ya se encuentra Asignado',
         ]);
 
         if ($validate->fails()) {
             return $this->sendResponseBadRequest($validate->errors()->first());
         }
-        $updated = false;
-        DB::transaction(function () use ($id, $request, $updated) {
+        DB::transaction(function () use ($id, $request) {
             $this->gpsRepository->keepHistorical($id);
             $renew = new Carbon($request->installation_date);
             $renew->setYear(Carbon::now()->year);
@@ -205,7 +205,7 @@ class GpsController extends AdminController
             $request['estatus'] = 'REASIGNADO';
             $request['cancellation_date'] = null;
             $request['uploaded_by'] = auth()->user()->id;
-            $updated = $this->gpsRepository->update($id, $request->all());
+            $this->gpsRepository->update($id, $request->all());
         });
 
         // if (!$updated) {
@@ -245,7 +245,6 @@ class GpsController extends AdminController
         }
 
         return $this->sendResponseOk($stats, "Get Estadisticas GPS.");
-
     }
 
     // public function update_dates()

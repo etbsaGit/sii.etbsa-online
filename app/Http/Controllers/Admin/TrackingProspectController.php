@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Components\Common\Models\Estatus;
+use App\Components\Tracking\Models\Prospect;
+use App\Components\Tracking\Models\TrackingProspect;
 use App\Components\Tracking\Repositories\TrackingRepository;
 use App\Components\User\Models\User;
 use App\Notifications\TrackingAssigned;
+use App\Notifications\TrackingNewHistorical;
 use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -69,25 +72,24 @@ class TrackingProspectController extends AdminController
         if ($validate->fails()) {
             return $this->sendResponseBadRequest($validate->errors()->first());
         }
+        DB::transaction(function () use ($request) {
+            $request['registered_by'] = Auth::user()->id;
+            $request['assigned_by'] = Auth::user()->id;
 
-        $request['registered_by'] = Auth::user()->id;
-        $request['assigned_by'] = Auth::user()->id;
-        // $request['estatus_id'] = 1;
+            /** @var Prospect $tracking */
+            $tracking = $this->trackingRepository->create($request->all());
 
-        /** @var Prospect $tracking */
-        $tracking = $this->trackingRepository->create($request->all());
+            if (!$tracking) {
+                return $this->sendResponseBadRequest("Failed create.");
+            }
+            $estatus = Estatus::where('key', Estatus::ESTATUS_ACTIVO)->first();
+            $tracking->estatus()->associate($estatus);
+            $tracking->save();
 
-        if (!$tracking) {
-            return $this->sendResponseBadRequest("Failed create.");
-        }
-        $estatus = Estatus::where('key', Estatus::ESTATUS_ACTIVO)->first();
-        $tracking->estatus()->associate($estatus);
-        $tracking->save();
+            $tracking->attended->notify(new TrackingAssigned($tracking->id));
+        });
 
-        $attended_by = User::find($request['attended_by']);
-        $attended_by->notify(new TrackingAssigned($tracking));
-
-        return $this->sendResponseCreated($tracking);
+        return $this->sendResponseCreated([],'Se Registro Nuevo Seguimiento');
     }
 
     /**
@@ -96,17 +98,50 @@ class TrackingProspectController extends AdminController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(TrackingProspect $tracking)
     {
-        $tracking = $this->trackingRepository->find($id, [
-            'estatus', 'agency', 'department', 'historical',
-        ]);
+        $data = [
+            'detail' => $tracking->only(
+                'id',
+                'title',
+                'reference',
+                'description_topic',
+                'price',
+                'currency',
+                'first_contact',
+                'assertiveness',
+                'invoice',
+                'tracking_condition',
+                'created_at'
+            ),
+            'agency' => $tracking->agency->title,
+            'department' => $tracking->department->title,
+            'attended_by' => $tracking->attended->name,
+            'assigned_by' => $tracking->assigned->name,
+            'registered_by' => $tracking->registered->name,
+            'estatus' => $tracking->estatus->only('id', 'title', 'key'),
+            'prospect' => $tracking->prospect()->with('township')->first()
+                ->only('full_name', 'email', 'is_moral', 'company', 'rfc', 'town', 'phone', 'township'),
+            'historical' => $tracking->historical->map(function ($H) {
+                return [
+                    'id' => $H->id,
+                    'message' => $H->message,
+                    'last_price' => $H->last_price,
+                    'last_currency' => $H->last_currency,
+                    'last_assertiveness' => $H->last_assertiveness,
+                    'invoice' => $H->invoice,
+                    'type_contacted' => $H->type_contacted,
+                    'user' => $H->user->name,
+                    'created_at' => $H->created_at,
+                ];
+            }),
+        ];
 
         if (!$tracking) {
             return $this->sendResponseNotFound();
         }
 
-        return $this->sendResponseOk($tracking);
+        return $this->sendResponseOk($data);
     }
 
     /**
@@ -116,11 +151,17 @@ class TrackingProspectController extends AdminController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function addHistoricalTracking(Request $request, $id)
     {
 
         $validate = validator($request->all(), [
+            'estatus' => 'required|string',
             'message' => 'required|string',
+            'currency' => 'required',
+            'assertiveness' => 'required|numeric',
+            'last_assertiveness' => 'required|numeric',
+            'date_next_tracking' => ['required_if:estatus,"activo"|date'],
+            'invoice' => ['exclude_unless:estatus,"fomalizado"|required'],
         ], [
             'message.required' => 'El mensaje es requerido',
         ]);
@@ -128,44 +169,79 @@ class TrackingProspectController extends AdminController
         if ($validate->fails()) {
             return $this->sendResponseBadRequest($validate->errors()->first());
         }
-        //Evaluar Estatus
-
-        $updated = false;
-        DB::transaction(function () use ($id, $request, $updated) {
+        DB::transaction(function () use ($id, $request) {
             $estatus = Estatus::where('key', $request['estatus'])->first();
             $tracking = $this->trackingRepository->find($id);
 
             $request['user_id'] = Auth::user()->id;
             $tracking->historical()->create($request->all());
-            $tracking->date_next_tracking = $request['date_next_tracking'];
-            $tracking->price = $request['last_price'];
-            $tracking->currency = $request['last_currency'];
+            $this->trackingRepository->update($id, $request->all());
             $tracking->estatus()->associate($estatus)->save();
-            // $updated = $this->trackingRepository->update($id, $request->all());
+
+            $tracking->attended->notify(new TrackingNewHistorical($tracking));
         });
 
-        return $this->sendResponseOk([], "Updated.");
+        return $this->sendResponseOk([], "Seguimiento Guardado.");
     }
-    public function assignSeller(Request $request, $id)
+
+    public function edit(TrackingProspect $tracking)
+    {
+        $data = $tracking->only(
+            'id',
+            'price',
+            'title',
+            'currency',
+            'reference',
+            'agency_id',
+            'prospect_id',
+            'attended_by',
+            'department_id',
+            'first_contact',
+            'description_topic',
+            'tracking_condition',
+        );
+
+        if (!$tracking) {
+            return $this->sendResponseNotFound();
+        }
+
+        return $this->sendResponseOk($data);
+    }
+
+    public function update(Request $request, $id)
     {
         $validate = validator($request->all(), [
+            'title' => 'required|string',
+            'reference' => 'required|string',
+            'description_topic' => 'required|string',
+            'price' => 'required|numeric',
+            'agency_id' => 'required',
+            'department_id' => 'required',
             'attended_by' => 'required',
+            'prospect_id' => 'required',
         ], [
-            'attended_by.required' => 'Vendedor es Requerido',
+            'description_topic.required' => 'Motivo del seguimiento es Requerido',
+            'attended_by.required' => 'Seleccione a un Vendedor',
+            'reference.required' => 'Especifique una referencia',
+            'title.required' => 'Especifique una Categoria',
+            'agency_id.required' => 'Agencia Asignada es Requerido',
+            'department_id.required' => 'A quien Corresponde es Requerido',
+            'prospect_id.required' => 'El Prospecto es Requerido',
+            'price.required' => 'El Precio es Requerido',
+            'price.numeric' => 'El Precio debe ser un Numero Valido',
         ]);
+
 
         if ($validate->fails()) {
             return $this->sendResponseBadRequest($validate->errors()->first());
         }
-        $request['assigned_by'] = Auth::user()->id;
-        $updated = $this->trackingRepository->update($id, $request->all());
+        DB::transaction(function () use ($id, $request) {
+            $this->trackingRepository->update($id, $request->all());
+        });
 
-        if (!$updated) {
-            return $this->sendResponseBadRequest("Failed update");
-        }
-
-        return $this->sendResponseOk([], "Se Asigno Vendedor Correctamente.");
+        return $this->sendResponseOk([], "Se actualizo el Seguimiento.");
     }
+
 
     public function resetToActive(Request $request, $id)
     {
@@ -188,25 +264,12 @@ class TrackingProspectController extends AdminController
         //
     }
 
-    public function historical($id)
-    {
-        $tracking = $this->model->find($id);
-
-        if (!$tracking) {
-            return false;
-        };
-
-        $tracking->historical()->create($tracking->toArray());
-    }
-
     public function resources()
     {
-        // $trackings = $this->trackingRepository->resource(request()->all());
         if (Auth::user()->isSuperUser()) {
             $agencies = DB::table('agencies')->get(['id', 'code', 'title']);
             $departments = DB::table('departments')->get(['id', 'title']);
         } else {
-
             $agencies = Auth::user()->seller_agency->map(function ($i, $k) {
                 return ['id' => $i->id, 'code' => $i->code, 'title' => $i->title];
             });
@@ -214,9 +277,7 @@ class TrackingProspectController extends AdminController
                 return ['id' => $i->id, 'title' => $i->title];
             });
         }
-
-        $prospects = DB::table('prospect')->get(['id', 'full_name', 'phone']);
-        // $type = DB::table('marketing_import')->distinct()->get(['SUCURSAL']);
+        $prospects = Prospect::with('township')->get()->map->only('id', 'full_name', 'email', 'company', 'rfc', 'town', 'phone', 'township');
         return $this->sendResponseOk(compact('agencies', 'departments', 'prospects'));
     }
 }

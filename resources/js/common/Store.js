@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 
+import Assertiveness from '@admin/tracking/tracking/resources/assertiveness.json';
+
 Vue.use(Vuex);
 
 export default new Vuex.Store({
@@ -25,7 +27,9 @@ export default new Vuex.Store({
         dialogMessage: '',
         dialogIcon: null,
         dialogOkCb: ()=>{},
-        dialogCancelCb: ()=>{},
+        dialogCancelCb: () => { },
+        
+        Assertiveness
     },
     mutations: {
 

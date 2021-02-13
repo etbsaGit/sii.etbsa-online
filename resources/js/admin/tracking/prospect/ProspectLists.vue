@@ -89,9 +89,6 @@
           </v-list-item-content>
         </v-list-item>
       </template>
-      <!-- <template v-slot:[`item.created_at`]="{ item }">
-        {{ $appFormatters.formatDate(item.created_at, "MMM DD,YYYY") }}
-      </template> -->
     </v-data-table>
   </div>
 </template>
@@ -101,24 +98,24 @@ export default {
   data() {
     return {
       headers: [
-        { text: "Action", value: "action", align: "left", sortable: false },
+        { text: 'Action', value: 'action', align: 'left', sortable: false },
         {
-          text: "Dirigido a / Razon Social",
-          value: "full_name",
-          align: "left",
+          text: 'Dirigido a / Razon Social',
+          value: 'full_name',
+          align: 'left',
           sortable: false,
         },
-        { text: "Telefono", value: "phone", align: "left", sortable: false },
+        { text: 'Telefono', value: 'phone', align: 'left', sortable: false },
         {
-          text: "Seguimientos Activos:",
-          value: "tracking_count",
-          align: "center",
+          text: 'Seguimientos Activos:',
+          value: 'tracking_count',
+          align: 'center',
           sortable: false,
         },
         {
-          text: "Proviene:",
-          value: "town",
-          align: "left",
+          text: 'Proviene:',
+          value: 'town',
+          align: 'left',
           sortable: false,
         },
       ],
@@ -129,7 +126,7 @@ export default {
       },
 
       filters: {
-        full_name: "",
+        full_name: '',
       },
     };
   },
@@ -141,13 +138,13 @@ export default {
     // ]);
   },
   watch: {
-    "pagination.page": function () {
+    'pagination.page': function() {
       this.loadProspects(() => {});
     },
-    "pagination.rowsPerPage": function () {
+    'pagination.rowsPerPage': function() {
       this.loadProspects(() => {});
     },
-    "filters.full_name": _.debounce(function () {
+    'filters.full_name': _.debounce(function() {
       const self = this;
       self.loadProspects(() => {});
     }, 700),
@@ -156,40 +153,40 @@ export default {
     trash(seller) {
       const self = this;
 
-      self.$store.commit("showDialog", {
-        type: "confirm",
-        full_name: "Confirm Deletion",
-        message: "Are you sure you want to delete this seller?",
+      self.$store.commit('showDialog', {
+        type: 'confirm',
+        full_name: 'Confirm Deletion',
+        message: 'Are you sure you want to delete this seller?',
         okCb: () => {
           axios
-            .delete("/admin/sellers/" + seller.id)
-            .then(function (response) {
-              self.$store.commit("showSnackbar", {
+            .delete('/admin/sellers/' + seller.id)
+            .then(function(response) {
+              self.$store.commit('showSnackbar', {
                 message: response.data.message,
-                color: "success",
+                color: 'success',
                 duration: 3000,
               });
 
               self.loadProspects(() => {});
             })
-            .catch(function (error) {
-              self.$store.commit("hideLoader");
+            .catch(function(error) {
+              self.$store.commit('hideLoader');
 
               if (error.response) {
-                self.$store.commit("showSnackbar", {
+                self.$store.commit('showSnackbar', {
                   message: error.response.data.message,
-                  color: "error",
+                  color: 'error',
                   duration: 3000,
                 });
               } else if (error.request) {
                 console.log(error.request);
               } else {
-                console.log("Error", error.message);
+                console.log('Error', error.message);
               }
             });
         },
         cancelCb: () => {
-          console.log("CANCEL");
+          console.log('CANCEL');
         },
       });
     },
@@ -203,8 +200,8 @@ export default {
       };
 
       axios
-        .get("/admin/prospects", { params: params })
-        .then(function (response) {
+        .get('/admin/prospects', { params: params })
+        .then(function(response) {
           self.items = response.data.data.data;
           self.totalItems = response.data.data.total;
           self.pagination.totalItems = response.data.data.total;

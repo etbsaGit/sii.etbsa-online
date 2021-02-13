@@ -10,7 +10,10 @@ class TrackingHistoricalProspect extends Model
     protected $table = 'tracking_historical';
     protected $primaryKey = 'id';
 
-    protected $fillable = ['message','tracking_id','user_id','last_price','last_currency','type_contacted'];
+    protected $fillable = [
+        'message', 'tracking_id', 'user_id', 'last_price',
+        'last_currency', 'type_contacted', 'last_assertiveness', 'type_contacted' ,'invoice'
+    ];
     protected $with = ['user'];
 
     public function tracking()

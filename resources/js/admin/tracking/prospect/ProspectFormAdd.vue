@@ -16,7 +16,7 @@
               <v-switch
                 v-model="is_moral"
                 flat
-                :label="`Persona ${is_moral ? 'Fisica' : 'Moral'}`"
+                :label="`Persona ${is_moral ? 'Moral' : 'Fisica'}`"
                 class="mx-auto"
               ></v-switch>
             </v-flex>

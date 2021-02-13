@@ -130,7 +130,7 @@ const admin = new Vue({
   router,
   store,
   data: () => ({
-    drawer: true,
+    drawer: false,
   }),
   mounted() {
     const self = this;

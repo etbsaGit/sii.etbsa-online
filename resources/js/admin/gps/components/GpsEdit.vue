@@ -19,15 +19,15 @@
           </p>
           <div>Fecha Instalacion:</div>
           <p class="text--primary">
-            {{ $appFormatters.formatDate(GPS.installation_date, "LL") }}
+            {{ $appFormatters.formatDate(GPS.installation_date, 'LL') }}
           </p>
           <div>Fecha Renovacion:</div>
           <p class="text--primary">
-            {{ $appFormatters.formatDate(GPS.renew_date, "LL") }}
+            {{ $appFormatters.formatDate(GPS.renew_date, 'LL') }}
           </p>
           <div>Fecha Cancelacion:</div>
           <p class="text--primary">
-            {{ $appFormatters.formatDate(GPS.cancellation_date, "LL") }}
+            {{ $appFormatters.formatDate(GPS.cancellation_date, 'LL') }}
           </p>
         </v-card-text>
       </v-card>
@@ -47,7 +47,7 @@
           </p>
           <div>Departamento:</div>
           <p class="text--primary">
-            {{ GPS.gps_group.department || "S/A" }}
+            {{ GPS.gps_group.department || 'S/A' }}
           </p>
           <div>Tipo de Pago:</div>
           <p class="text--primary">
@@ -67,7 +67,7 @@
           </p>
           <div>Datos Facturacion:</div>
           <p class="text-h6 text--primary">
-            {{ GPS.invoice || "Sin Factura" }}
+            {{ GPS.invoice || 'Sin Factura' }}
           </p>
           <div>importe Factura:</div>
           <p class="text-h6 text--primary">
@@ -83,7 +83,7 @@
           </p>
           <div>Ultima actualizacion</div>
           <p class="text--primary">
-            {{ $appFormatters.formatDate(GPS.updated_at, "LLL") }}
+            {{ $appFormatters.formatDate(GPS.updated_at, 'LLL') }}
           </p>
           <div>Ultimo Comentario:</div>
           <div
@@ -104,6 +104,9 @@
       dense
       disable-pagination
       hide-default-footer
+      :single-expand="singleExpand"
+      :expanded.sync="expanded"
+      show-expand
       class="elevation-1 mx-auto caption"
     >
       <template v-slot:[`item.amount`]="{ item }">
@@ -113,14 +116,19 @@
       </template>
       <template v-slot:[`item.renew_date`]="{ item }">
         <span class="overline text-capitalize">
-          <!-- {{ $appFormatters.formatDate(item.installation_date) }} -->
-          {{ $appFormatters.formatDate(item.renew_date, "MMM YYYY") }}
+          {{ $appFormatters.formatDate(item.renew_date, 'MMM YYYY') }}
         </span>
       </template>
       <template v-slot:[`item.created_at`]="{ item }">
         <span class="overline text-capitalize">
-          {{ $appFormatters.formatDate(item.created_at, "MMMDD YYYY HH:MM") }}
+          {{ $appFormatters.formatDate(item.created_at, 'MMMDD YYYY HH:MM') }}
         </span>
+      </template>
+      <template v-slot:expanded-item="{ item }">
+        <td :colspan="headers.length" class="overline">
+          Comentario:
+          <span class="font-weight-bold"> {{ item.description }}</span>
+        </td>
       </template>
     </v-data-table>
   </v-container>
@@ -135,61 +143,64 @@ export default {
   },
   data() {
     return {
+      expanded: [],
+      singleExpand: false,
       GPS: {},
       headers: [
         {
-          text: "Nombre GPS",
-          value: "name",
-          align: "left",
+          text: 'Nombre GPS',
+          value: 'name',
+          align: 'left',
         },
         {
-          text: "SIM",
-          value: "gps_chip_id",
-          align: "right",
+          text: 'SIM',
+          value: 'gps_chip_id',
+          align: 'right',
         },
         {
-          text: "Cliente",
-          value: "gps_group.name",
-          align: "left",
+          text: 'Cliente',
+          value: 'gps_group.name',
+          align: 'left',
         },
         {
-          text: "Factura",
-          value: "invoice",
-          align: "center",
+          text: 'Factura',
+          value: 'invoice',
+          align: 'center',
         },
         {
-          text: "Importe",
-          value: "amount",
-          align: "center",
+          text: 'Importe',
+          value: 'amount',
+          align: 'center',
         },
         {
-          text: "Forma de Pago",
-          value: "payment_type",
-          align: "center",
+          text: 'Forma de Pago',
+          value: 'payment_type',
+          align: 'center',
         },
         {
-          text: "Fecha de Renovacion",
-          value: "renew_date",
-          align: "center",
+          text: 'Fecha de Renovacion',
+          value: 'renew_date',
+          align: 'center',
         },
         {
-          text: "Estatus",
-          value: "estatus",
-          align: "center",
-          class: "pa-0",
+          text: 'Estatus',
+          value: 'estatus',
+          align: 'center',
+          class: 'pa-0',
         },
         {
-          text: "Usuario",
-          value: "user.name",
-          align: "center",
-          class: "pa-0",
+          text: 'Usuario',
+          value: 'user.name',
+          align: 'center',
+          class: 'pa-0',
         },
         {
-          text: "Fecha Movimiento",
-          value: "created_at",
-          align: "center",
-          class: "pa-0",
+          text: 'Fecha Movimiento',
+          value: 'created_at',
+          align: 'center',
+          class: 'pa-0',
         },
+        { text: '', value: 'data-table-expand' },
       ],
     };
   },
@@ -201,7 +212,7 @@ export default {
     loadGps(cb) {
       const self = this;
 
-      axios.get("/admin/gps/" + self.propGpsId).then(function(response) {
+      axios.get('/admin/gps/' + self.propGpsId).then(function(response) {
         self.GPS = response.data.data;
         cb();
       });

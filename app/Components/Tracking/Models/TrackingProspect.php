@@ -20,6 +20,7 @@ class TrackingProspect extends Model
         'prospect_id', 'estatus_id',
         'assigned_by', 'attended_by',
         'agency_id', 'department_id', 'date_next_tracking', 'first_contact',
+        'assertiveness', 'invoice', 'tracking_condition'
     ];
 
     protected $with = ['registered', 'assigned', 'attended', 'prospect'];

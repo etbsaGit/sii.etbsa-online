@@ -341,13 +341,13 @@
           <template v-slot:[`item.installation_date`]="{ item }">
             <span class="overline text-capitalize">
               {{
-                $appFormatters.formatDate(item.installation_date, "MMM YYYY")
+                $appFormatters.formatDate(item.installation_date, 'MMM YYYY')
               }}
             </span>
           </template>
           <template v-slot:[`item.renew_date_large`]="{ item }">
             <span class="overline text-capitalize">
-              {{ $appFormatters.formatDate(item.renew_date, "MMM YYYY") }}
+              {{ $appFormatters.formatDate(item.renew_date, 'MMM YYYY') }}
             </span>
           </template>
           <template v-slot:[`item.renew_date`]="{ item }">
@@ -359,7 +359,7 @@
                 dark
                 small
               >
-                {{ $appFormatters.formatTimeDiffNow(item.renew_date, "days") }}
+                {{ $appFormatters.formatTimeDiffNow(item.renew_date, 'days') }}
                 Dias
               </v-chip>
             </span>
@@ -459,67 +459,92 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="dialogReasign" max-width="500px">
+    <v-dialog v-model="dialogReasign" max-width="555px">
       <v-card>
-        <v-card-title>
-          Editar GPS
-        </v-card-title>
-        <v-card-text>
-          <v-text-field
-            label="Nombre GPS"
-            v-model="reasign_name"
-            filled
-          ></v-text-field>
-          <v-autocomplete
-            v-model="reasign_sim"
-            filled
-            clearable
-            prepend-icon="mdi-filter-variant"
-            label="Asignar CHIP"
-            :items="options.gpsChips"
-            item-text="sim"
-            item-value="sim"
-          ></v-autocomplete>
-          <v-autocomplete
-            v-model="reasign_group"
-            filled
-            clearable
-            prepend-icon="mdi-filter-variant"
-            label="Asignar Grupo/Cliente"
-            :items="options.gpsGroup"
-            item-text="name"
-            item-value="id"
-          ></v-autocomplete>
-          <v-text-field
-            v-model="reasign_date"
-            label="Fecha Instalacion"
-            type="date"
-          ></v-text-field>
-        </v-card-text>
-        <v-card-actions>
-          <v-btn color="error" @click="(dialogReasign = false), (item = {})">
-            Cancelar
-          </v-btn>
-          <v-btn color="primary" text @click="reasign(item)">
-            OK
-          </v-btn>
-        </v-card-actions>
+        <v-form v-model="validReasign" ref="formReasing" lazy-validation>
+          <v-card-title>
+            Editar GPS
+            <v-spacer></v-spacer>
+            <v-btn color="error" @click="(dialogReasign = false), (item = {})">
+              Cancelar
+            </v-btn>
+          </v-card-title>
+          <v-card-text>
+            <v-text-field
+              label="Nombre GPS"
+              v-model="reasign_name"
+              filled
+              dense
+              outlined
+              :rules="[(v) => !!v || 'Es Requerido']"
+            ></v-text-field>
+            <v-autocomplete
+              v-model="reasign_sim"
+              filled
+              clearable
+              prepend-icon="mdi-filter-variant"
+              label="Asignar CHIP"
+              :items="options.gpsChips"
+              item-text="sim"
+              item-value="sim"
+              dense
+              outlined
+              :rules="[(v) => !!v || 'Es Requerido']"
+            ></v-autocomplete>
+            <v-autocomplete
+              v-model="reasign_group"
+              filled
+              clearable
+              prepend-icon="mdi-filter-variant"
+              label="Asignar Grupo/Cliente"
+              :items="options.gpsGroup"
+              item-text="name"
+              item-value="id"
+              dense
+              outlined
+              :rules="[(v) => !!v || 'Es Requerido']"
+            ></v-autocomplete>
+            <v-textarea
+              v-model="reasign_description"
+              filled
+              clearable
+              prepend-icon="mdi-message"
+              label="Comentario"
+              outlined
+              class="title"
+              :rules="[(v) => !!v || 'Es Requerido']"
+            >
+            </v-textarea>
+            <v-text-field
+              v-model="reasign_date"
+              label="Fecha Instalacion"
+              type="date"
+              outlined
+              :rules="[(v) => !!v || 'Es Requerido']"
+            ></v-text-field>
+          </v-card-text>
+          <v-card-actions>
+            <v-btn color="primary" block @click="reasign(item)" :disabled="!validReasign">
+              Guardar
+            </v-btn>
+          </v-card-actions>
+        </v-form>
       </v-card>
     </v-dialog>
   </div>
 </template>
 
 <script>
-import GpsAdd from "@admin/gps/components/GpsAdd.vue";
-import GpsEdit from "@admin/gps/components/GpsEdit.vue";
-import GpsCard from "@admin/gps/components/GpsAmountsCard.vue";
-import GpsWidgetStats from "@admin/gps/components/widgets/GpsStats.vue";
+import GpsAdd from '@admin/gps/components/GpsAdd.vue';
+import GpsEdit from '@admin/gps/components/GpsEdit.vue';
+import GpsCard from '@admin/gps/components/GpsAmountsCard.vue';
+import GpsWidgetStats from '@admin/gps/components/widgets/GpsStats.vue';
 
-import optionMonths from "~/api/months.json";
-import optionYears from "~/api/years.json";
-import optionAgencies from "~/api/agencies.json";
-import optionDepartments from "~/api/departments.json";
-import optionEstatus from "~/api/estatus_gps.json";
+import optionMonths from '~/api/months.json';
+import optionYears from '~/api/years.json';
+import optionAgencies from '~/api/agencies.json';
+import optionDepartments from '~/api/departments.json';
+import optionEstatus from '~/api/estatus_gps.json';
 export default {
   components: {
     GpsAdd,
@@ -530,77 +555,79 @@ export default {
   data() {
     return {
       validInLine: false,
+      validReasign: true,
       drawer: false,
       headers: [
         {
-          value: "action",
-          align: "center",
+          value: 'action',
+          align: 'center',
           divider: true,
           width: 10,
-          class: "pa-auto",
+          class: 'pa-auto',
           sortable: false,
         },
         {
-          text: "Nombre GPS",
-          value: "name",
-          align: "left",
+          text: 'Nombre GPS',
+          value: 'name',
+          align: 'left',
           sortable: true,
         },
         {
-          text: "SIM",
-          value: "sim",
-          align: "right",
+          text: 'SIM',
+          value: 'sim',
+          align: 'right',
           sortable: false,
         },
         {
-          text: "Cliente:",
-          value: "gps_group",
-          align: "left",
+          text: 'Cliente:',
+          value: 'gps_group',
+          align: 'left',
           sortable: false,
         },
         {
-          text: "Costo:",
-          value: "cost",
-          align: "left",
+          text: 'Costo:',
+          value: 'cost',
+          align: 'left',
           sortable: false,
         },
         {
-          text: "Factura:",
-          value: "amount",
-          align: "center",
+          text: 'Factura:',
+          value: 'amount',
+          align: 'center',
           sortable: false,
         },
         {
-          text: "Instalado en:",
-          value: "installation_date",
-          align: "center",
-          class: "pa-0",
+          text: 'Instalado en:',
+          value: 'installation_date',
+          align: 'center',
+          class: 'pa-0',
           sortable: true,
         },
         {
-          text: "Renovar en:",
-          value: "renew_date_large",
-          align: "center",
+          text: 'Renovar en:',
+          value: 'renew_date_large',
+          align: 'center',
           sortable: false,
         },
         {
-          text: "Dias vence:",
-          value: "renew_date",
-          align: "center",
+          text: 'Dias vence:',
+          value: 'renew_date',
+          align: 'center',
           width: 125,
-          class: "pa-0",
+          class: 'pa-0',
           sortable: true,
         },
       ],
       item: {},
       dialogCancelled: false,
       dialogReasign: false,
-      cancelled_date: "",
-      description: "",
-      reasign_date: "",
-      reasign_sim: "",
-      reasign_name: "",
-      reasign_group: "",
+      cancelled_date: '',
+      description: '',
+      reasign_date: '',
+      reasign_sim: '',
+      reasign_name: '',
+      reasign_group: '',
+      reasign_description: '',
       items: [],
       items_np: [],
       itemEditInLine: {},
@@ -622,7 +649,7 @@ export default {
         agencies: optionAgencies,
         departments: optionDepartments,
         estatus: optionEstatus,
-        payment_type: ["CARGO", "CONTADO", "CREDITO"],
+        payment_type: ['CARGO', 'CONTADO', 'CREDITO'],
       },
       filters: {
         indexMonth: null,
@@ -649,18 +676,18 @@ export default {
   mounted() {
     const self = this;
 
-    self.$eventBus.$on(["GPS_ADDED", "GPS_UPDATED", "GPS_DELETED"], () => {
+    self.$eventBus.$on(['GPS_ADDED', 'GPS_UPDATED', 'GPS_DELETED'], () => {
       self.loadGps(() => {});
       self.loadGpsGroup(() => {});
       self.loadGpsChips(() => {});
     });
 
-    self.$eventBus.$on(["STAT_QUERY"], (data) => {
-      self.$store.commit("showLoader");
+    self.$eventBus.$on(['STAT_QUERY'], (data) => {
+      self.$store.commit('showLoader');
       self.filters.indexMonth = data.month;
       self.filters.month = data.month + 1;
       self.filters.type_query = data.type_query;
-      self.$store.commit("hideLoader");
+      self.$store.commit('hideLoader');
     });
 
     self.loadGpsGroup(() => {});
@@ -684,11 +711,12 @@ export default {
         const self = this;
         self.reasign_date = self.$appFormatters.formatDate(
           self.item.installation_date,
-          "yyyy-MM-DD"
+          'yyyy-MM-DD'
         );
         self.reasign_sim = parseInt(self.item.gps_chip_id);
         self.reasign_name = self.item.name;
         self.reasign_group = self.item.gps_group_id;
+        self.reasign_description = null;
       }, 700),
       deep: true,
     },
@@ -698,7 +726,7 @@ export default {
       return moment.months(this.filters.indexMonth);
     },
     formTitle() {
-      return this.editedIndex === -1 ? "Registrar Nuevo GPS" : "Detalle GPS";
+      return this.editedIndex === -1 ? 'Registrar Nuevo GPS' : 'Detalle GPS';
     },
     formEdit() {
       return this.editedIndex !== -1;
@@ -738,7 +766,7 @@ export default {
       if (self.items_np.length > 0) {
         return self.items_np
           .map((item) => {
-            return item.currency == "USD" ? parseFloat(item.amount) : 0;
+            return item.currency == 'USD' ? parseFloat(item.amount) : 0;
           })
           .reduce((acc, curr) => {
             return parseFloat(acc) + parseFloat(curr);
@@ -758,19 +786,19 @@ export default {
     refresh() {
       const self = this;
       self.pagination.page = 1;
-      self.$eventBus.$emit("GPS_ADDED");
+      self.$eventBus.$emit('GPS_ADDED');
     },
     openDialogCancel(item) {
       this.item = {};
-      this.cancelled_date = "";
-      this.description = "";
+      this.cancelled_date = '';
+      this.description = '';
       this.item = item;
       this.dialogCancelled = true;
     },
     openDialogReasign(item) {
       this.item = {};
-      this.reasign_date = "";
-      this.reasign_sim = "";
+      this.reasign_date = '';
+      this.reasign_sim = '';
       this.item = item;
       this.dialogReasign = true;
     },
@@ -794,7 +822,7 @@ export default {
         department: self.filters.department,
         payment_type: self.filters.payment_type,
         estatus: self.filters.estatus,
-        group_id: self.filters.groupId.join(","),
+        group_id: self.filters.groupId.join(','),
         chips_id: self.filters.chipsId,
 
         assigned: self.filters.assigned ? self.filters.assigned : null,
@@ -803,20 +831,20 @@ export default {
         // renewed: self.filters.renewed ? self.filters.renewed : null,
         canceled: self.filters.canceled ? self.filters.canceled : null,
 
-        order_sort: self.pagination.sortDesc[0] ? "desc" : "asc",
-        order_by: self.pagination.sortBy[0] || "name",
+        order_sort: self.pagination.sortDesc[0] ? 'desc' : 'asc',
+        order_by: self.pagination.sortBy[0] || 'name',
         page: self.pagination.page,
         per_page: self.pagination.itemsPerPage,
       };
 
       // no paginate
-      const no_paginate = { ...params, paginate: "no" };
+      const no_paginate = { ...params, paginate: 'no' };
       // const no_paginate = { paginate: "no" };
-      axios.get("/admin/gps", { params: no_paginate }).then(function(response) {
+      axios.get('/admin/gps', { params: no_paginate }).then(function(response) {
         self.items_np = response.data.data;
       });
 
-      axios.get("/admin/gps", { params: params }).then(function(response) {
+      axios.get('/admin/gps', { params: params }).then(function(response) {
         self.items = response.data.data.data;
         self.totalItems = response.data.data.total;
         self.pagination.totalItems = response.data.data.total;
@@ -826,11 +854,11 @@ export default {
     loadGpsGroup(cb) {
       const self = this;
       let params = {
-        paginate: "no",
+        paginate: 'no',
       };
 
       axios
-        .get("/admin/gpsCustomers", { params: params })
+        .get('/admin/gpsCustomers', { params: params })
         .then(function(response) {
           self.options.gpsGroup = response.data.data;
           cb();
@@ -839,11 +867,11 @@ export default {
     loadGpsChips(cb) {
       const self = this;
       let params = {
-        paginate: "no",
+        paginate: 'no',
         // deallocated: false,
       };
 
-      axios.get("/admin/chips", { params: params }).then(function(response) {
+      axios.get('/admin/chips', { params: params }).then(function(response) {
         self.options.gpsChips = response.data.data;
         cb();
       });
@@ -851,50 +879,50 @@ export default {
     trash(gps) {
       const self = this;
 
-      self.$store.commit("showDialog", {
-        type: "confirm",
-        title: "Confirm Deletion",
-        message: "Are you sure you want to delete this GPS?",
+      self.$store.commit('showDialog', {
+        type: 'confirm',
+        title: 'Confirm Deletion',
+        message: 'Are you sure you want to delete this GPS?',
         okCb: () => {
           axios
-            .delete("/admin/gps/" + gps.id)
+            .delete('/admin/gps/' + gps.id)
             .then(function(response) {
-              self.$store.commit("showSnackbar", {
+              self.$store.commit('showSnackbar', {
                 message: response.data.message,
-                color: "success",
+                color: 'success',
                 duration: 3000,
               });
 
-              self.$eventBus.$emit("GPS_DELETED");
-              self.$eventBus.$emit("GPS_GROUP_DELETED");
-              self.$eventBus.$emit("GPS_CHIP_UPDATED");
+              self.$eventBus.$emit('GPS_DELETED');
+              self.$eventBus.$emit('GPS_GROUP_DELETED');
+              self.$eventBus.$emit('GPS_CHIP_UPDATED');
             })
             .catch(function(error) {
               if (error.response) {
-                self.$store.commit("showSnackbar", {
+                self.$store.commit('showSnackbar', {
                   message: error.response.data.message,
-                  color: "error",
+                  color: 'error',
                   duration: 3000,
                 });
               } else if (error.request) {
                 console.log(error.request);
               } else {
-                console.log("Error", error.message);
+                console.log('Error', error.message);
               }
             });
         },
         cancelCb: () => {
-          console.log("CANCEL");
+          console.log('CANCEL');
         },
       });
     },
     cancelled(gps) {
       const self = this;
 
-      self.$store.commit("showDialog", {
-        type: "confirm",
-        title: "Confirmar Cancelacion",
-        message: "¿Seguro en Cancelar el GPS?",
+      self.$store.commit('showDialog', {
+        type: 'confirm',
+        title: 'Confirmar Cancelacion',
+        message: '¿Seguro en Cancelar el GPS?',
         okCb: () => {
           let payload = {
             // cancellation_date: this.$appFormatters.formatDate(
@@ -905,82 +933,84 @@ export default {
             description: this.description,
           };
           axios
-            .post("/admin/gps/cancelled/" + gps.id, payload)
+            .post('/admin/gps/cancelled/' + gps.id, payload)
             .then(function(response) {
-              self.$store.commit("showSnackbar", {
+              self.$store.commit('showSnackbar', {
                 message: response.data.message,
-                color: "success",
+                color: 'success',
                 duration: 3000,
               });
 
-              self.$eventBus.$emit("GPS_DELETED");
-              self.$eventBus.$emit("GPS_GROUP_DELETED");
-              self.$eventBus.$emit("GPS_CHIP_UPDATED");
+              self.$eventBus.$emit('GPS_DELETED');
+              self.$eventBus.$emit('GPS_GROUP_DELETED');
+              self.$eventBus.$emit('GPS_CHIP_UPDATED');
               self.dialogCancelled = false;
             })
             .catch(function(error) {
               if (error.response) {
-                self.$store.commit("showSnackbar", {
+                self.$store.commit('showSnackbar', {
                   message: error.response.data.message,
-                  color: "error",
+                  color: 'error',
                   duration: 3000,
                 });
               } else if (error.request) {
                 console.log(error.request);
               } else {
-                console.log("Error", error.message);
+                console.log('Error', error.message);
               }
             });
         },
         cancelCb: () => {
-          console.log("CANCEL");
+          console.log('CANCEL');
         },
       });
     },
     reasign(gps) {
+      if (!this.$refs.formReasing.validate()) return;
       const self = this;
 
-      self.$store.commit("showDialog", {
-        type: "confirm",
-        title: "Confirmar Reasignacion",
-        message: "¿Seguro en Reasignar el GPS?",
+      self.$store.commit('showDialog', {
+        type: 'confirm',
+        title: 'Confirmar Reasignacion',
+        message: '¿Seguro en Reasignar el GPS?',
         okCb: () => {
           let payload = {
             name: self.reasign_name,
             gps_chip_id: self.reasign_sim,
             gps_group_id: self.reasign_group,
+            description: self.reasign_description,
             installation_date: self.reasign_date,
           };
           axios
-            .post("/admin/gps/reasign/" + gps.id, payload)
+            .post('/admin/gps/reasign/' + gps.id, payload)
             .then(function(response) {
-              self.$store.commit("showSnackbar", {
+              self.$store.commit('showSnackbar', {
                 message: response.data.message,
-                color: "success",
+                color: 'success',
                 duration: 3000,
               });
 
-              self.$eventBus.$emit("GPS_DELETED");
-              self.$eventBus.$emit("GPS_GROUP_DELETED");
-              self.$eventBus.$emit("GPS_CHIP_UPDATED");
+              self.$eventBus.$emit('GPS_DELETED');
+              self.$eventBus.$emit('GPS_GROUP_DELETED');
+              self.$eventBus.$emit('GPS_CHIP_UPDATED');
               self.dialogReasign = false;
             })
             .catch(function(error) {
               if (error.response) {
-                self.$store.commit("showSnackbar", {
+                self.$store.commit('showSnackbar', {
                   message: error.response.data.message,
-                  color: "error",
+                  color: 'error',
                   duration: 3000,
                 });
               } else if (error.request) {
                 console.log(error.request);
               } else {
-                console.log("Error", error.message);
+                console.log('Error', error.message);
               }
             });
         },
         cancelCb: () => {
-          console.log("CANCEL");
+          console.log('CANCEL');
         },
       });
     },
@@ -988,92 +1018,92 @@ export default {
       const self = this;
       if (self.$refs.formInLine.validate()) {
         if (renew) item.renew = renew;
-        self.$store.commit("showDialog", {
-          type: "confirm",
-          title: "Confirmar Cambio",
-          message: "¿Seguro Realizar Cambios al GPS?",
+        self.$store.commit('showDialog', {
+          type: 'confirm',
+          title: 'Confirmar Cambio',
+          message: '¿Seguro Realizar Cambios al GPS?',
           okCb: () => {
             axios
-              .put("/admin/gps/" + item.id, item)
+              .put('/admin/gps/' + item.id, item)
               .then(function(response) {
-                self.$store.commit("showSnackbar", {
+                self.$store.commit('showSnackbar', {
                   message: response.data.message,
-                  color: "success",
+                  color: 'success',
                   duration: 3000,
                 });
 
-                self.$eventBus.$emit("GPS_UPDATED");
-                self.$eventBus.$emit("GPS_GROUP_UPDATED");
+                self.$eventBus.$emit('GPS_UPDATED');
+                self.$eventBus.$emit('GPS_GROUP_UPDATED');
               })
               .catch(function(error) {
                 item.amount = 0;
-                item.invoice = "";
-                item.currency = "MXN";
+                item.invoice = '';
+                item.currency = 'MXN';
                 item.exchange_rate = 1;
                 if (error.response) {
-                  self.$store.commit("showSnackbar", {
+                  self.$store.commit('showSnackbar', {
                     message: error.response.data.message,
-                    color: "error",
+                    color: 'error',
                     duration: 3000,
                   });
                 } else if (error.request) {
                   console.log(error.request);
                 } else {
-                  console.log("Error", error.message);
+                  console.log('Error', error.message);
                 }
               });
           },
           cancelCb: () => {
             self.cancel();
             item.amount = 0;
-            item.invoice = "";
-            item.currency = "MXN";
+            item.invoice = '';
+            item.currency = 'MXN';
             item.exchange_rate = 1;
           },
         });
       } else {
         self.cancel();
         item.amount = 0;
-        item.invoice = "";
-        item.currency = "MXN";
+        item.invoice = '';
+        item.currency = 'MXN';
         item.exchange_rate = 1;
       }
     },
     renewInvoice(item) {
       const self = this;
       if (self.$refs.formInLine.validate()) {
-        self.$store.commit("showDialog", {
-          type: "confirm",
-          title: "Confirmar Cambio",
-          message: "¿Seguro en Renovacion de  GPS?",
+        self.$store.commit('showDialog', {
+          type: 'confirm',
+          title: 'Confirmar Cambio',
+          message: '¿Seguro en Renovacion de  GPS?',
           okCb: () => {
             axios
-              .post("/admin/gps/renewInvoice/" + item.id, item)
+              .post('/admin/gps/renewInvoice/' + item.id, item)
               .then(function(response) {
-                self.$store.commit("showSnackbar", {
+                self.$store.commit('showSnackbar', {
                   message: response.data.message,
-                  color: "success",
+                  color: 'success',
                   duration: 3000,
                 });
 
-                self.$eventBus.$emit("GPS_UPDATED");
-                self.$eventBus.$emit("GPS_GROUP_UPDATED");
+                self.$eventBus.$emit('GPS_UPDATED');
+                self.$eventBus.$emit('GPS_GROUP_UPDATED');
               })
               .catch(function(error) {
                 item.amount = 0;
-                item.invoice = "";
-                item.currency = "MXN";
+                item.invoice = '';
+                item.currency = 'MXN';
                 item.exchange_rate = 1;
                 if (error.response) {
-                  self.$store.commit("showSnackbar", {
+                  self.$store.commit('showSnackbar', {
                     message: error.response.data.message,
-                    color: "error",
+                    color: 'error',
                     duration: 3000,
                   });
                 } else if (error.request) {
                   console.log(error.request);
                 } else {
-                  console.log("Error", error.message);
+                  console.log('Error', error.message);
                 }
               });
           },
@@ -1085,23 +1115,23 @@ export default {
       } else {
         self.cancel();
         item.amount = 0;
-        item.invoice = "";
-        item.currency = "MXN";
+        item.invoice = '';
+        item.currency = 'MXN';
         item.exchange_rate = 1;
       }
     },
     cancel() {
       const self = this;
-      self.$store.commit("showSnackbar", {
-        message: "Cancel",
-        color: "error lighten-1",
+      self.$store.commit('showSnackbar', {
+        message: 'Cancel',
+        color: 'error lighten-1',
         duration: 3000,
       });
     },
     getColor(value) {
-      if (value < 31) return "red";
-      else if (value < 62) return "orange";
-      else return "green";
+      if (value < 31) return 'red';
+      else if (value < 62) return 'orange';
+      else return 'green';
     },
     exportGps() {
       const self = this;
@@ -1116,46 +1146,46 @@ export default {
         agency: self.filters.agency,
         department: self.filters.department,
         payment_type: self.filters.payment_type,
-        group_id: self.filters.groupId.join(","),
-        chips_id: self.filters.chipsId.join(","),
+        group_id: self.filters.groupId.join(','),
+        chips_id: self.filters.chipsId.join(','),
         assigned: self.filters.assigned ? self.filters.assigned : null,
         deallocated: self.filters.deallocated ? self.filters.deallocated : null,
         expired: self.filters.expired ? self.filters.expired : null,
         // renewed: self.filters.renewed ? self.filters.renewed : null,
         canceled: self.filters.canceled ? self.filters.canceled : null,
-        order_sort: self.pagination.sortDesc[0] ? "desc" : "asc",
-        order_by: self.pagination.sortBy[0] || "name",
-        paginate: "no",
+        order_sort: self.pagination.sortDesc[0] ? 'desc' : 'asc',
+        order_by: self.pagination.sortBy[0] || 'name',
+        paginate: 'no',
       };
-      self.$store.commit("showLoader");
+      self.$store.commit('showLoader');
       axios
-        .get("/admin/gps-export", {
+        .get('/admin/gps-export', {
           params: params,
-          responseType: "blob",
+          responseType: 'blob',
         })
         .then((res) => {
           const url = window.URL.createObjectURL(new Blob([res.data]));
-          const link = document.createElement("a");
+          const link = document.createElement('a');
           link.href = url;
-          link.setAttribute("download", "gps.xlsx"); //or any other extension
+          link.setAttribute('download', 'gps.xlsx'); //or any other extension
           document.body.appendChild(link);
           link.click();
         })
         .catch(function(error) {
           if (error.response) {
-            self.$store.commit("showSnackbar", {
+            self.$store.commit('showSnackbar', {
               message: error.response.data.message,
-              color: "error",
+              color: 'error',
               duration: 3000,
             });
           } else if (error.request) {
             console.log(error.request);
           } else {
-            console.log("Error", error.message);
+            console.log('Error', error.message);
           }
         })
         .finally(function() {
-          self.$store.commit("hideLoader");
+          self.$store.commit('hideLoader');
         });
     },
     renewGpsStats(GpsMonth = [], month) {
@@ -1169,7 +1199,7 @@ export default {
         (item) =>
           moment(item.renew_date).year() ==
           moment()
-            .add(1, "y")
+            .add(1, 'y')
             .year()
         // && moment(item.installation_date).year() < moment().year()
       );
@@ -1190,7 +1220,7 @@ export default {
       return (
         moment(date).year() ==
         moment()
-          .add(1, "y")
+          .add(1, 'y')
           .year()
       );
     },

@@ -162,14 +162,15 @@
         </v-expansion-panel-content>
       </v-expansion-panel>
     </v-expansion-panels>
-    <!-- /search -->
+
     <!-- data table -->
     <v-data-table
       v-bind:headers="headers"
-      :options.sync="pagination"
       :items="items"
+      :options.sync="pagination"
       :server-items-length="totalItems"
       dense
+      caption
       fixed-header
       class="elevation-1 caption"
     >
@@ -254,7 +255,10 @@
                   <v-list-item-title>Ver Seguimiento</v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
-              <v-list-item @click="resetToActive(item.id)">
+              <v-list-item
+                v-if="$gate.allow('isGerente', 'tracking')"
+                @click="resetToActive(item.id)"
+              >
                 <v-list-item-icon>
                   <v-icon class="blue--text">mdi-undo-variant</v-icon>
                 </v-list-item-icon>
@@ -267,14 +271,19 @@
         </v-menu>
       </template>
       <template v-slot:[`item.id`]="{ item }">
-        {{ item.id.toString().padStart(5, 0) }}
+        <span class="caption"> #{{ item.id.toString().padStart(5, 0) }} </span>
       </template>
       <template v-slot:[`item.title`]="{ item }">
         <v-list-item dense class="pa-0">
           <v-list-item-content class="pa-0">
             <v-list-item-title>{{ item.title }}</v-list-item-title>
             <v-list-item-subtitle>
-              {{ item.reference }}
+              <span
+                class="d-inline-block text-truncate text-capitalize caption"
+                style="max-width: 150px"
+              >
+                {{ item.reference }}
+              </span>
             </v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
@@ -282,7 +291,7 @@
       <template v-slot:[`item.price`]="{ item }">
         <span
           class="d-inline-block text-truncate text-capitalize caption"
-          style="max-width: 180px"
+          style="max-width: 150px"
         >
           {{ item.price | money(item.currency) }}
         </span>
@@ -292,7 +301,12 @@
           <v-list-item-content class="pa-0">
             <v-list-item-title>{{ item.prospect.full_name }}</v-list-item-title>
             <v-list-item-subtitle v-if="item.prospect.is_moral">
-              {{ item.prospect.company }}
+              <span
+                class="d-inline-block text-truncate text-capitalize caption"
+                style="max-width: 200px"
+              >
+                {{ item.prospect.company }}
+              </span>
             </v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
@@ -306,92 +320,126 @@
         </span>
       </template>
       <template v-slot:[`item.agency-depto`]="{ item }">
-        <!-- <v-list two-line dense flat > -->
         <v-list-item dense class="pa-0 caption">
-          <v-list-item-content class="pa-0">
+          <v-list-item-content class="pa-0 caption">
             <v-list-item-title>{{ item.agency.title }}</v-list-item-title>
             <v-list-item-subtitle>
               {{ item.department.title }}
             </v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
-        <!-- </v-list> -->
       </template>
       <template v-slot:[`item.estatus.title`]="{ item }">
         <v-chip
           dark
-          x-small
+          small
+          label
           :color="getColor(item.estatus.key)"
-          class="text-uppercase caption"
+          class="text-uppercase buttom white--text"
         >
           {{ item.estatus.title }}
         </v-chip>
       </template>
       <template v-slot:[`item.date_next_tracking`]="{ item }">
-        <v-btn
-          x-small
-          class="white--text"
-          :color="
-            getColorDays(
-              $appFormatters.formatTimeDiffNow(item.date_next_tracking, 'days')
-            )
-          "
+        <v-chip
+          small
+          label
+          class="text-uppercase buttom white--text"
+          :color="getColorDays(item.date_next_tracking)"
         >
           {{
-            `${
-              $appFormatters.formatTimeDiffNow(
-                item.date_next_tracking,
-                "days"
-              ) || "0"
-            } dias`
+            $appFormatters.formatTimeDiffNow(item.date_next_tracking, "days") ||
+            "0"
           }}
-        </v-btn>
+          dias
+        </v-chip>
+      </template>
+      <template v-slot:[`item.assertiveness`]="{ item }">
+        <v-progress-linear
+          v-if="getAssertiveness(item.assertiveness)"
+          height="25"
+          :value="getAssertiveness(item.assertiveness).value * 100"
+          :color="getAssertiveness(item.assertiveness).color"
+        >
+          <template v-slot:default="{ value }">
+            <v-tooltip left>
+              <template v-slot:activator="{ on, attrs }">
+                <strong v-bind="attrs" v-on="on">
+                  {{ Math.ceil(value) }}%
+                </strong>
+              </template>
+              <span>{{ getAssertiveness(item.assertiveness).text }}</span>
+            </v-tooltip>
+          </template>
+        </v-progress-linear>
       </template>
       <template v-slot:[`item.updated_at`]="{ item }">
-        {{ $appFormatters.formatDate(item.updated_at, "L hh:mm a") }}
+        {{ $appFormatters.formatDate(item.updated_at, "L") }}
       </template>
     </v-data-table>
   </div>
 </template>
 
 <script>
+import Categories from "@admin/tracking/tracking/resources/categories.json";
+import { mapState } from "vuex";
 export default {
   data() {
     return {
       date: [],
       modal: false,
       headers: [
-        { text: "Action", value: "action", align: "center", sortable: false },
-        { text: "Folio", value: "id", align: "left", sortable: false },
+        {
+          text: "",
+          value: "action",
+          align: "center",
+          width: 25,
+          sortable: false,
+          class: "blue-grey lighten-5",
+        },
+        {
+          text: "Folio",
+          value: "id",
+          align: "left",
+          sortable: false,
+          class: "blue-grey lighten-5",
+        },
         {
           text: "Titulo / Referencia",
           value: "title",
           align: "left",
+          width: "150",
           sortable: false,
+          class: "blue-grey lighten-5",
         },
         {
           text: "Precio",
           value: "price",
           align: "right",
-          sortable: false,
+          sortable: true,
+          class: "blue-grey lighten-5",
         },
         {
           text: "Prospecto:",
           value: "prospect.full_name",
           align: "left",
+          width: "150",
           sortable: false,
+          class: "blue-grey lighten-5",
         },
         {
           text: "Atendido por:",
           value: "attended.name",
           align: "left",
           sortable: false,
+          class: "blue-grey lighten-5",
         },
         {
           text: "Agencia / Departamento",
           value: "agency-depto",
           width: 150,
           sortable: false,
+          class: "blue-grey lighten-5",
         },
         {
           text: "Estatus",
@@ -399,20 +447,31 @@ export default {
           align: "center",
           width: 100,
           sortable: false,
+          class: "blue-grey lighten-5",
         },
         {
-          text: "Sig. Seguimiento",
+          text: "Sig. Seg.",
           value: "date_next_tracking",
           align: "center",
-          width: 160,
+          width: 150,
           sortable: true,
+          class: "blue-grey lighten-5",
+        },
+        {
+          text: "Certividad",
+          value: "assertiveness",
+          align: "center",
+          width: 150,
+          sortable: true,
+          class: "blue-grey lighten-5",
         },
         {
           text: "Ultimo Cambio",
           value: "updated_at",
-          align: "right",
-          width: 200,
+          align: "center",
+          width: 100,
           sortable: true,
+          class: "blue-grey lighten-5",
         },
       ],
       items: [],
@@ -438,45 +497,22 @@ export default {
         agencies: [],
         departments: [],
         sellers: [],
-        categories: [
-          "Colección JD",
-          "Construcción",
-          "Implementos",
-          "Jardineria",
-          "Maquinaria Diversa",
-          "Otros productos",
-          "Por definir",
-          "Refacciones",
-          "Riego",
-          "Seminuevos",
-          "Servicio",
-          "Tractores",
-          "Tractores Seminuevos",
-          "Trilladora",
-          "Venta en Linea",
-        ],
+        categories: Categories,
       },
     };
   },
   mounted() {
     const self = this;
-    self.$store.commit("showLoader");
 
-    self.$store.commit("setBreadcrumbs", [{ label: "Segumientos", name: "" }]);
-    self.loadResources(() => {
-      self.$store.commit("hideLoader");
-    });
+    self.$store.commit("setBreadcrumbs", [{ label: "Seguimientos", name: "" }]);
+    self.loadResources(() => {});
   },
   computed: {
-    // dateRangeText() {
-    //   return this.filters.dates.length > 0 ? this.filters.dates.join(',') : [];
-    // },
+    ...mapState(["Assertiveness"]),
     dateRangeText: {
-      // getter
       get: function () {
         return this.filters.dates.join(",");
       },
-      // setter
       set: function (newValue) {
         newValue ? (this.filters.dates = newValue.split(" ")) : [];
       },
@@ -485,17 +521,13 @@ export default {
   watch: {
     pagination: {
       handler: _.debounce(function (v) {
-        this.loadTrackings(() => {
-          this.$store.commit("hideLoader");
-        });
+        this.loadTrackings(() => {});
       }, 700),
       deep: true,
     },
     filters: {
       handler: _.debounce(function (v) {
-        this.loadTrackings(() => {
-          this.$store.commit("hideLoader");
-        });
+        this.loadTrackings(() => {});
       }, 700),
       deep: true,
     },
@@ -521,8 +553,6 @@ export default {
               self.loadTrackings(() => {});
             })
             .catch(function (error) {
-              self.$store.commit("hideLoader");
-
               if (error.response) {
                 self.$store.commit("showSnackbar", {
                   message: error.response.data.message,
@@ -543,10 +573,8 @@ export default {
     },
     loadTrackings(cb) {
       const self = this;
-      self.$store.commit("showLoader");
       let params = {
         ...self.filters,
-        estatus: self.filters.estatus,
         sellers: self.filters.sellers.join(","),
         prospect: self.filters.prospect.join(","),
         agencies: self.filters.agencies.join(","),
@@ -586,8 +614,6 @@ export default {
         self.options.sellers = response.data.data;
         (cb || Function)();
       });
-
-      // return seller;
     },
     getColor(value) {
       if (value == "finalizado") return "red";
@@ -595,15 +621,19 @@ export default {
       else return "primary";
     },
     getColorDays(value) {
-      if (value < 0) return "red";
+      let days = this.$appFormatters.formatTimeDiffNow(value, "days");
+      if (days < 0) return "red";
       else return "primary";
+    },
+    getAssertiveness(value) {
+      return this.Assertiveness.find((item) => {
+        return item.value == value;
+      });
     },
     exportTracking() {
       const self = this;
-      self.$store.commit("showLoader");
       let params = {
         ...self.filters,
-        estatus: self.filters.estatus,
         sellers: self.filters.sellers.join(","),
         prospect: self.filters.prospect.join(","),
         agencies: self.filters.agencies.join(","),
@@ -611,6 +641,7 @@ export default {
         dates: self.dateRangeText,
         page: self.pagination.page,
         per_page: self.pagination.itemsPerPage,
+        paginate: "no",
       };
       axios
         .get("/admin/tracking-export", {
@@ -637,9 +668,6 @@ export default {
           } else {
             console.log("Error", error.message);
           }
-        })
-        .finally(function () {
-          self.$store.commit("hideLoader");
         });
     },
     reset() {

@@ -26,7 +26,7 @@
   <div id="admin">
     <template>
       <v-app id="inspire">
-        <v-navigation-drawer v-model="drawer" app clipped left>
+        <v-navigation-drawer v-model="drawer" app clipped left temporary>
           <v-list dense>
             @foreach($nav as $n)
             @if($n->navType==\App\Components\Core\Menu\MenuItem::$NAV_TYPE_NAV

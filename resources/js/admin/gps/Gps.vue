@@ -1,18 +1,14 @@
 <template>
   <div class="page_wrap_vue">
-    <v-tabs color="primary" v-model="active">
-      <v-tab key="gps" href="#gps" ripple>
-        GPS
-      </v-tab>
+    <v-tabs v-model="active" centered icons-and-text grow color="success" class="elevation-4 mb-2">
+      <v-tab key="gps" href="#gps" ripple> GPS </v-tab>
       <v-tab key="manage-groups-gps" href="#manage-groups-gps" ripple>
         Clientes
       </v-tab>
       <v-tab key="manage-chips-gps" href="#manage-chips-gps" ripple>
         Chips GPS
       </v-tab>
-      <v-tab key="upload" href="#upload" ripple v-if="false">
-        Upload
-      </v-tab>
+      <v-tab key="upload" href="#upload" ripple v-if="false"> Upload </v-tab>
 
       <v-tab-item value="gps">
         <v-card flat>
@@ -56,7 +52,7 @@ export default {
     GpsUpload,
     GpsGroupLists,
     ChipsLists,
-    GpsLists
+    GpsLists,
   },
   mounted() {
     const self = this;
@@ -67,15 +63,15 @@ export default {
   },
   data() {
     return {
-      active: "gps"
+      active: "gps",
     };
   },
   watch: {
     active(v) {
       console.log("active tab: " + v);
-    }
+    },
   },
-  methods: {}
+  methods: {},
 };
 </script>
 
