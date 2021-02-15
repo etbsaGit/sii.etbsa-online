@@ -45,7 +45,7 @@ export default {
         department_id: null,
         first_contact: 'online',
         description_topic: null,
-        tracking_condition: 'Contado',
+        tracking_condition: 'Por definir',
       },
     };
   },

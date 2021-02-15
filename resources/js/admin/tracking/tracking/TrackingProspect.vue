@@ -42,9 +42,22 @@ export default {
       return this.Tracking.historical.slice().reverse();
     },
     propTracking() {
-      let { id, price, currency } = this.Tracking.detail;
+      let {
+        id,
+        price,
+        currency,
+        tracking_condition,
+        assertiveness,
+      } = this.Tracking.detail;
       let estatus = this.Tracking.estatus;
-      return { id, price, currency, estatus };
+      return {
+        id,
+        price,
+        currency,
+        estatus,
+        tracking_condition,
+        assertiveness,
+      };
     },
   },
 

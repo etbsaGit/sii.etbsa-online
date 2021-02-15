@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Components\Tracking\Repositories\ProspectRepository;
 use Illuminate\Http\Request;
 use Auth;
+use Illuminate\Validation\Rule;
 
 class ProspectController extends AdminController
 {
@@ -48,7 +49,7 @@ class ProspectController extends AdminController
             'is_moral' => 'required',
         ], [
             'phone.unique' => 'El Telefono ya se encuentra registrado',
-            'phone.size' => 'el Telefono debe tener 10 Digitos',
+            'phone.size' => 'El Telefono debe tener 10 Digitos',
             'phone.required' => 'El Telefono es requerido',
             'township_id.required' => 'El Municipio es requerido',
             'full_name.required' => 'El Nombre es requerido',
@@ -61,13 +62,13 @@ class ProspectController extends AdminController
         $request['registered_by'] = Auth::user()->id;
 
         /** @var Prospect $prospect */
-        $prospect = $this->prospectRepository->create($request->all());
+        $created = $this->prospectRepository->create($request->all());
 
-        if (!$prospect) {
-            return $this->sendResponseBadRequest("Failed create.");
+        if (!$created) {
+            return $this->sendResponseBadRequest('Pospecto no Credo');
         }
 
-        return $this->sendResponseCreated($prospect);
+        return $this->sendResponseCreated([], 'Prospecto Registrado');
     }
 
     /**
@@ -78,7 +79,7 @@ class ProspectController extends AdminController
      */
     public function show($id)
     {
-        $prospect = $this->prospectRepository->find($id, []);
+        $prospect = $this->prospectRepository->find($id);
 
         if (!$prospect) {
             return $this->sendResponseNotFound();
@@ -98,6 +99,15 @@ class ProspectController extends AdminController
     {
         $validate = validator($request->all(), [
             'full_name' => 'required',
+            'township_id' => 'required',
+            'phone' => ['required', 'size:10', Rule::unique('prospect')->ignore($id)],
+            'is_moral' => 'required',
+        ], [
+            'phone.unique' => 'El Telefono ya se encuentra registrado',
+            'phone.size' => 'El Telefono debe tener 10 Digitos',
+            'phone.required' => 'El Telefono es requerido',
+            'township_id.required' => 'El Municipio es requerido',
+            'full_name.required' => 'El Nombre es requerido',
         ]);
 
         if ($validate->fails()) return $this->sendResponseBadRequest($validate->errors()->first());
@@ -106,7 +116,7 @@ class ProspectController extends AdminController
 
         $updated = $this->prospectRepository->update($id, $payload);
 
-        if (!$updated) return $this->sendResponseBadRequest("Failed update");
+        if (!$updated) return $this->sendResponseBadRequest();
         return $this->sendResponseUpdated();
     }
 
@@ -118,13 +128,11 @@ class ProspectController extends AdminController
      */
     public function destroy($id)
     {
-
         try {
             $this->prospectRepository->delete($id);
         } catch (\Exception $e) {
             return $this->sendResponseBadRequest("Failed to delete");
         }
-
         return $this->sendResponseDeleted();
     }
 }

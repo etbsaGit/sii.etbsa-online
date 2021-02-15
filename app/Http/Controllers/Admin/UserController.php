@@ -12,6 +12,7 @@ use App\Components\Core\Utilities\Helpers;
 use App\Components\User\Models\User;
 use App\Components\User\Repositories\UserRepository;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class UserController extends AdminController
 {
@@ -102,7 +103,7 @@ class UserController extends AdminController
     {
         $validate = validator($request->all(),[
             'name' => 'required',
-            'email' => 'required|email',
+            'email' => ['required', 'max:50', 'email', Rule::unique('users')->ignore($id)],
             'permissions' => 'array',
             'groups' => 'array',
         ]);

@@ -32,7 +32,7 @@
             v-text="event.message"
             class="blue-grey lighten-5 elevation-2"
           ></v-col>
-          <v-col cols="12" md="2" class="text-right">
+          <v-col cols="12" md="2" class="text-center">
             <v-tooltip left>
               <template v-slot:activator="{ on, attrs }">
                 <v-progress-circular
@@ -45,6 +45,7 @@
                     percenAssertiveness(event.last_assertiveness).value * 100
                   "
                   :color="percenAssertiveness(event.last_assertiveness).color"
+                  dark
                 >
                   {{
                     percenAssertiveness(event.last_assertiveness).value

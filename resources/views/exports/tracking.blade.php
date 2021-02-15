@@ -10,6 +10,7 @@
             <th>T. Moneda</th>
             <th>Agencia</th>
             <th>Departamento</th>
+            <th>Certeza</th>
             <th>Vendedor Asignado</th>
             <th>Registrado por</th>
             <th>Estatus</th>
@@ -31,6 +32,7 @@
             <td>{{ $item->currency ?? 'MXN' }}</td>
             <td>{{ $item->agency->title ?? 'S/A' }}</td>
             <td>{{ $item->department->title ?? 'S/A' }}</td>
+            <td>{{ $item->assertiveness * 100 ?? 'S/A' }}%</td>
             <td>{{ $item->attended->name ?? 'S/A' }}</td>
             <td>{{ $item->registered->name ?? 'S/A' }}</td>
             <td>{{ $item->estatus->title ?? 'S/A' }}</td>

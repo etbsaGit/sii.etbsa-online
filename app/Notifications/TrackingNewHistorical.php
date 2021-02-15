@@ -20,9 +20,9 @@ class TrackingNewHistorical extends Notification
      *
      * @return void
      */
-    public function __construct(TrackingProspect  $id)
+    public function __construct(TrackingProspect  $tracking)
     {
-        $this->Tracking = $id;
+        $this->Tracking = $tracking;
     }
 
     /**

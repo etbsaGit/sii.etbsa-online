@@ -23,17 +23,17 @@ export const tracking = [
       {
         path: "prospect",
         name: "prospect.list",
-        component: require("@admin/tracking/prospect/ProspectLists").default,
+        component: require("@admin/tracking/prospect/Index").default,
       },
       {
         path: "prospect/create",
         name: "prospect.create",
-        component: require("@admin/tracking/prospect/ProspectFormAdd").default,
+        component: require("@admin/tracking/prospect/Create").default,
       },
       {
         path: "prospect/edit/:propProspectId",
         name: "prospect.edit",
-        component: require("@admin/tracking/prospect/ProspectFormEdit").default,
+        component: require("@admin/tracking/prospect/Edit").default,
         props: true
       },
       {

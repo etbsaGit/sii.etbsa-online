@@ -123,7 +123,7 @@
         class="title"
         :rules="rules"
       ></v-text-field>
-      <v-row v-else-if="!editting" no-gutters>
+      <v-row v-else-if="!editing" no-gutters>
         <v-col cols="4">
           <v-autocomplete
             v-model="selectModel"
@@ -181,7 +181,7 @@
           <v-select
             v-model="form.tracking_condition"
             :items="options.condition"
-            label="CONDICION del Seguimiento:"
+            label="Condicion de operacion:"
             filled
             outlined
             dense
@@ -236,7 +236,7 @@ export default {
     },
     propProspectId: {
       required: false,
-      type: String,
+      type: [Number,String],
     },
   },
   mounted() {
@@ -258,7 +258,7 @@ export default {
         agencies: [],
         departments: [],
         sellers: [],
-        condition: ['Contado', 'Financiamiento', 'Renta'],
+        condition: ['Por definir','Contado', 'Financiamiento', 'Renta'],
         tractors: Tractors,
       },
     };

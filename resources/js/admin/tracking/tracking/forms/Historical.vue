@@ -77,6 +77,19 @@
             </template>
           </v-select>
         </v-col>
+        <v-col cols="12" md="6">
+          <v-select
+            v-model="form.tracking_condition"
+            :items="options.condition"
+            label="Condicion de operacion:"
+            :rules="[(v) => !!v || 'Requerido']"
+            outlined
+            dense
+            filled
+            hide-details
+          >
+          </v-select>
+        </v-col>
         <v-col cols="12" md="6" v-if="form.estatus == 'formalizado'">
           <v-text-field
             v-model="form.invoice"
@@ -133,13 +146,7 @@
         filled
       >
       </v-textarea>
-      <v-btn
-        depressed
-        block
-        :disabled="!valid"
-        color="success"
-        @click="submit"
-      >
+      <v-btn depressed block :disabled="!valid" color="success" @click="submit">
         Enviar
         <v-icon right dark> mdi-send </v-icon>
       </v-btn>
@@ -166,18 +173,22 @@ export default {
       invoice: null,
       currency: null,
       assertiveness: 0.1,
+      tracking_condition: null,
       date_next_tracking: null,
       type_contacted: 'Llamada',
       estatus: 'activo',
     },
     options: {
       type_contacted: ['Llamada', 'Visita Campo', 'En Agencia'],
+      condition: ['Por definir', 'Contado', 'Financiamiento', 'Renta'],
       assertiveness: Assertiveness,
     },
   }),
   mounted() {
     this.form.price = this.Tracking.price;
     this.form.currency = this.Tracking.currency;
+    this.form.tracking_condition = this.Tracking.tracking_condition;
+    this.form.assertiveness = this.Tracking.assertiveness;
   },
   methods: {
     submit() {

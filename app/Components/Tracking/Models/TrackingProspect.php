@@ -79,6 +79,10 @@ class TrackingProspect extends Model
             $query->where(function ($query) use ($category) {
                 $query->orWhere('title', 'like', '%' . $category . '%');
             });
+        })->when($filters['assertiveness'] ?? null, function ($query, $assertiveness) {
+            $query->where(function ($query) use ($assertiveness) {
+                $query->orWhere('assertiveness', $assertiveness);
+            });
         })->when($filters['prospect'] ?? null, function ($query, $prospect) {
             $query->whereHas('prospect', function ($query) use ($prospect) {
                 $query->whereIn('id', Helpers::commasToArray($prospect));

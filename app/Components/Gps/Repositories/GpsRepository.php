@@ -80,43 +80,39 @@ class GpsRepository extends BaseRepository
 
     public function stats($params)
     {
-        $Total = $this->get($params, [], function ($q) use ($params) {
-            $q->ofTotalGps($params['month']);
-            return $q;
-        })->count();
+        $Total = $this->model::all()
+            ->ofTotalGps($params['month'])
+            ->count();
 
-        $Nuevos = $this->get($params, [], function ($q) use ($params) {
-            $q->ofTotalGps($params['month']);
-            $q->OfNewGps();
-            return $q;
-        })->count();
 
-        $Renovados = $this->get($params, [], function ($q) use ($params) {
-            $q->ofTotalGps($params['month']);
-            $q->OfReNewGps();
-            return $q;
-        })->count();
+        // $Nuevos = $this->get($params, [], function ($q) use ($params) {
+        //     $q->ofTotalGps($params['month'])
+        //         ->OfNewGps()->count();
+        // });
 
-        $PorRenovar = $this->get($params, [], function ($q) use ($params) {
-            $q->ofTotalGps($params['month']);
-            $q->OfToReNewGps();
-            return $q;
-        })->count();
+        // $Renovados = $this->get($params, [], function ($q) use ($params) {
+        //     $q->ofTotalGps($params['month'])
+        //         ->OfReNewGps()->count();
+        // });
 
-        $Cancelados = $this->get($params, [], function ($q) use ($params) {
-            $q->ofCanceledGps($params['month']);
-            return $q;
-        })->count();
+        // $PorRenovar = $this->get($params, [], function ($q) use ($params) {
+        //     $q->ofTotalGps($params['month'])
+        //         ->OfToReNewGps()->count();
+        // });
 
-        $Porcentaje = $Renovados / ($Total - $Nuevos);
+        // $Cancelados = $this->get($params, [], function ($q) use ($params) {
+        //     $q->ofCanceledGps($params['month'])->count();
+        // });
+
+        // $Porcentaje = $Renovados / ($Total - $Nuevos);
 
         $stats = [
             'Total' => $Total,
-            'Nuevos' => $Nuevos,
-            'Renovados' => $Renovados,
-            'PorRenovar' => $PorRenovar,
-            'Cancelados' => $Cancelados,
-            'Porcentaje' => $Porcentaje,
+            // 'Nuevos' => $Nuevos,
+            // 'Renovados' => $Renovados,
+            // 'PorRenovar' => $PorRenovar,
+            // 'Cancelados' => $Cancelados,
+            // 'Porcentaje' => $Porcentaje,
         ];
 
         return $stats;

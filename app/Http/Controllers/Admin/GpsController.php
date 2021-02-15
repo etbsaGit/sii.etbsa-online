@@ -198,10 +198,10 @@ class GpsController extends AdminController
         }
         DB::transaction(function () use ($id, $request) {
             $this->gpsRepository->keepHistorical($id);
-            $renew = new Carbon($request->installation_date);
-            $renew->setYear(Carbon::now()->year);
+            // $renew = new Carbon($request->installation_date);
+            // $renew->setYear(Carbon::now()->year);
 
-            $request['renew_date'] = $renew;
+            $request['renew_date'] = $request->installation_date;
             $request['estatus'] = 'REASIGNADO';
             $request['cancellation_date'] = null;
             $request['uploaded_by'] = auth()->user()->id;
@@ -233,16 +233,14 @@ class GpsController extends AdminController
         $year = Carbon::now()->year;
         $stats = [];
 
-        for ($month = 1; $month <= 12; $month++) {
-            $params = [
-                'month' => $month,
-                'year' => $year,
-                // 'month_installation' => $month,
-                // 'year_installation' => $month,
-                'paginate' => 'no',
-            ];
-            $stats[] = $this->gpsRepository->stats($params);
-        }
+        // for ($month = 1; $month <= 12; $month++) {
+        //     $params = [
+        //         'month' => $month,
+        //         'year' => $year,
+        //         'paginate' => 'no',
+        //     ];
+        //     $stats[] = $this->gpsRepository->stats($params);
+        // }
 
         return $this->sendResponseOk($stats, "Get Estadisticas GPS.");
     }

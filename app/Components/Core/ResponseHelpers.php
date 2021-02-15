@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: darryldecode
@@ -9,7 +10,7 @@
 namespace App\Components\Core;
 
 
-Trait ResponseHelpers
+trait ResponseHelpers
 {
     /**
      * send response to ajax request
@@ -20,14 +21,14 @@ Trait ResponseHelpers
      * @param array $headers
      * @return \Illuminate\Http\Response
      */
-    public function sendResponse($data = null, $message = '', $statusCode = 200,$headers = [])
+    public function sendResponse($data = null, $message = '', $statusCode = 200, $headers = [])
     {
         $d = [
             'message' => $message,
             'data' => $data
         ];
 
-        return response($d,$statusCode,$headers);
+        return response($d, $statusCode, $headers);
     }
 
     /**
@@ -38,9 +39,9 @@ Trait ResponseHelpers
      * @param array $headers
      * @return \Illuminate\Http\Response
      */
-    public function sendResponseOk($data = [],string $message = "Resource found.", array $headers = [])
+    public function sendResponseOk($data = [], string $message = "Recurso Encontrado.", array $headers = [])
     {
-        return $this->sendResponse($data,$message,200,$headers);
+        return $this->sendResponse($data, $message, 200, $headers);
     }
 
     /**
@@ -50,9 +51,9 @@ Trait ResponseHelpers
      * @param array $headers
      * @return \Illuminate\Http\Response
      */
-    public function sendResponseNotFound(string $message = "Resource not found.", array $headers = [])
+    public function sendResponseNotFound(string $message = "Recurso no encontrado.", array $headers = [])
     {
-        return $this->sendResponse([],$message,404,$headers);
+        return $this->sendResponse([], $message, 404, $headers);
     }
 
     /**
@@ -62,9 +63,9 @@ Trait ResponseHelpers
      * @param array $headers
      * @return \Illuminate\Http\Response
      */
-    public function sendResponseBadRequest(string $message = "Bad Request.", array $headers = [])
+    public function sendResponseBadRequest(string $message = "Solicitud Incorrecta.", array $headers = [])
     {
-        return $this->sendResponse([],$message,400,$headers);
+        return $this->sendResponse([], $message, 400, $headers);
     }
 
     /**
@@ -75,9 +76,9 @@ Trait ResponseHelpers
      * @param array $headers
      * @return \Illuminate\Http\Response
      */
-    public function sendResponseCreated($data = [], string $message = "Resource created.", array $headers = [])
+    public function sendResponseCreated($data = [], string $message = "Regsitro Creado.", array $headers = [])
     {
-        return $this->sendResponse($data,$message,201,$headers);
+        return $this->sendResponse($data, $message, 201, $headers);
     }
 
     /**
@@ -88,9 +89,9 @@ Trait ResponseHelpers
      * @param array $headers
      * @return \Illuminate\Http\Response
      */
-    public function sendResponseUpdated($data = [],string $message = "Resource updated.", array $headers = [])
+    public function sendResponseUpdated($data = [], string $message = "Registro Actualizado.", array $headers = [])
     {
-        return $this->sendResponse($data,$message,200,$headers);
+        return $this->sendResponse($data, $message, 200, $headers);
     }
 
     /**
@@ -100,9 +101,9 @@ Trait ResponseHelpers
      * @param array $headers
      * @return \Illuminate\Http\Response
      */
-    public function sendResponseDeleted(string $message = "Resource deleted.",array $headers = [])
+    public function sendResponseDeleted(string $message = "Regsitro Eliminado.", array $headers = [])
     {
-        return $this->sendResponse([],$message,200,$headers);
+        return $this->sendResponse([], $message, 200, $headers);
     }
 
     /**
@@ -112,9 +113,9 @@ Trait ResponseHelpers
      * @param array $headers
      * @return \Illuminate\Http\Response
      */
-    public function sendResponseForbidden(string $message = "Action forbidden.",array $headers = [])
+    public function sendResponseForbidden(string $message = "Accion Prohibida.", array $headers = [])
     {
-        return $this->sendResponse([],$message,403,$headers);
+        return $this->sendResponse([], $message, 403, $headers);
     }
 
     /**
@@ -124,6 +125,6 @@ Trait ResponseHelpers
      */
     public function sendResponseNoContent()
     {
-        return response(null,204);
+        return response(null, 204);
     }
 }

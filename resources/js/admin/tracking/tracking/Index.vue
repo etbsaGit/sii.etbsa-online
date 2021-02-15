@@ -105,13 +105,30 @@
                   dense
                 ></v-autocomplete>
               </v-col>
-              <v-col cols="12" md="6">
-                <v-radio-group v-model="filters.estatus" row dense>
-                  <v-radio label="Activos" value="activo" />
-                  <v-radio label="Finalizados" value="finalizado" />
-                  <v-radio label="Fomalizados" value="formalizado" />
-                  <v-radio label="Todos" value="todos" />
-                </v-radio-group>
+              <v-col cols="12" md="4">
+                <v-select
+                  v-model="filters.assertiveness"
+                  :items="options.assertiveness"
+                  label="Certeza:"
+                  dense
+                  outlined
+                  clearable
+                  hide-details
+                >
+                  <template v-slot:item="data">
+                    <v-list-item-content>
+                      <v-list-item-title
+                        class="overline"
+                        v-text="data.item.text"
+                      ></v-list-item-title>
+                    </v-list-item-content>
+                    <v-list-item-action>
+                      <v-btn :color="data.item.color" dark>
+                        {{ data.item.value | percent }}
+                      </v-btn>
+                    </v-list-item-action>
+                  </template>
+                </v-select>
               </v-col>
               <v-col cols="12" md="4">
                 <v-dialog
@@ -156,6 +173,14 @@
                     </v-btn>
                   </v-date-picker>
                 </v-dialog>
+              </v-col>
+              <v-col cols="12" md="6">
+                <v-radio-group v-model="filters.estatus" row dense>
+                  <v-radio label="Activos" value="activo" />
+                  <v-radio label="Finalizados" value="finalizado" />
+                  <v-radio label="Fomalizados" value="formalizado" />
+                  <v-radio label="Todos" value="todos" />
+                </v-radio-group>
               </v-col>
             </v-row>
           </v-form>
@@ -348,8 +373,8 @@
           :color="getColorDays(item.date_next_tracking)"
         >
           {{
-            $appFormatters.formatTimeDiffNow(item.date_next_tracking, "days") ||
-            "0"
+            $appFormatters.formatTimeDiffNow(item.date_next_tracking, 'days') ||
+              '0'
           }}
           dias
         </v-chip>
@@ -374,15 +399,16 @@
         </v-progress-linear>
       </template>
       <template v-slot:[`item.updated_at`]="{ item }">
-        {{ $appFormatters.formatDate(item.updated_at, "L") }}
+        {{ $appFormatters.formatDate(item.updated_at, 'L') }}
       </template>
     </v-data-table>
   </div>
 </template>
 
 <script>
-import Categories from "@admin/tracking/tracking/resources/categories.json";
-import { mapState } from "vuex";
+import Categories from '@admin/tracking/tracking/resources/categories.json';
+import Assertiveness from '@admin/tracking/tracking/resources/assertiveness.json';
+import { mapState } from 'vuex';
 export default {
   data() {
     return {
@@ -390,88 +416,88 @@ export default {
       modal: false,
       headers: [
         {
-          text: "",
-          value: "action",
-          align: "center",
+          text: '',
+          value: 'action',
+          align: 'center',
           width: 25,
           sortable: false,
-          class: "blue-grey lighten-5",
+          class: 'blue-grey lighten-5',
         },
         {
-          text: "Folio",
-          value: "id",
-          align: "left",
+          text: 'Folio',
+          value: 'id',
+          align: 'left',
           sortable: false,
-          class: "blue-grey lighten-5",
+          class: 'blue-grey lighten-5',
         },
         {
-          text: "Titulo / Referencia",
-          value: "title",
-          align: "left",
-          width: "150",
+          text: 'Titulo / Referencia',
+          value: 'title',
+          align: 'left',
+          width: '150',
           sortable: false,
-          class: "blue-grey lighten-5",
+          class: 'blue-grey lighten-5',
         },
         {
-          text: "Precio",
-          value: "price",
-          align: "right",
+          text: 'Precio',
+          value: 'price',
+          align: 'right',
           sortable: true,
-          class: "blue-grey lighten-5",
+          class: 'blue-grey lighten-5',
         },
         {
-          text: "Prospecto:",
-          value: "prospect.full_name",
-          align: "left",
-          width: "150",
+          text: 'Prospecto:',
+          value: 'prospect.full_name',
+          align: 'left',
+          width: '150',
           sortable: false,
-          class: "blue-grey lighten-5",
+          class: 'blue-grey lighten-5',
         },
         {
-          text: "Atendido por:",
-          value: "attended.name",
-          align: "left",
+          text: 'Atendido por:',
+          value: 'attended.name',
+          align: 'left',
           sortable: false,
-          class: "blue-grey lighten-5",
+          class: 'blue-grey lighten-5',
         },
         {
-          text: "Agencia / Departamento",
-          value: "agency-depto",
+          text: 'Agencia / Departamento',
+          value: 'agency-depto',
           width: 150,
           sortable: false,
-          class: "blue-grey lighten-5",
+          class: 'blue-grey lighten-5',
         },
         {
-          text: "Estatus",
-          value: "estatus.title",
-          align: "center",
+          text: 'Estatus',
+          value: 'estatus.title',
+          align: 'center',
           width: 100,
           sortable: false,
-          class: "blue-grey lighten-5",
+          class: 'blue-grey lighten-5',
         },
         {
-          text: "Sig. Seg.",
-          value: "date_next_tracking",
-          align: "center",
+          text: 'Sig. Seg.',
+          value: 'date_next_tracking',
+          align: 'center',
           width: 150,
           sortable: true,
-          class: "blue-grey lighten-5",
+          class: 'blue-grey lighten-5',
         },
         {
-          text: "Certeza",
-          value: "assertiveness",
-          align: "center",
+          text: 'Certeza',
+          value: 'assertiveness',
+          align: 'center',
           width: 150,
           sortable: true,
-          class: "blue-grey lighten-5",
+          class: 'blue-grey lighten-5',
         },
         {
-          text: "Ultimo Cambio",
-          value: "updated_at",
-          align: "center",
+          text: 'Ultimo Cambio',
+          value: 'updated_at',
+          align: 'center',
           width: 100,
           sortable: true,
-          class: "blue-grey lighten-5",
+          class: 'blue-grey lighten-5',
         },
       ],
       items: [],
@@ -484,8 +510,9 @@ export default {
         folio: null,
         title: null,
         category: null,
+        assertiveness: null,
         prospect: [],
-        estatus: "activo",
+        estatus: 'activo',
         agencies: [],
         departments: [],
         sellers: [],
@@ -498,35 +525,36 @@ export default {
         departments: [],
         sellers: [],
         categories: Categories,
+        assertiveness: Assertiveness,
       },
     };
   },
   mounted() {
     const self = this;
 
-    self.$store.commit("setBreadcrumbs", [{ label: "Seguimientos", name: "" }]);
+    self.$store.commit('setBreadcrumbs', [{ label: 'Seguimientos', name: '' }]);
     self.loadResources(() => {});
   },
   computed: {
-    ...mapState(["Assertiveness"]),
+    ...mapState(['Assertiveness']),
     dateRangeText: {
-      get: function () {
-        return this.filters.dates.join(",");
+      get: function() {
+        return this.filters.dates.join(',');
       },
-      set: function (newValue) {
-        newValue ? (this.filters.dates = newValue.split(" ")) : [];
+      set: function(newValue) {
+        newValue ? (this.filters.dates = newValue.split(' ')) : [];
       },
     },
   },
   watch: {
     pagination: {
-      handler: _.debounce(function (v) {
+      handler: _.debounce(function(v) {
         this.loadTrackings(() => {});
       }, 700),
       deep: true,
     },
     filters: {
-      handler: _.debounce(function (v) {
+      handler: _.debounce(function(v) {
         this.loadTrackings(() => {});
       }, 700),
       deep: true,
@@ -536,38 +564,38 @@ export default {
     trash(seller) {
       const self = this;
 
-      self.$store.commit("showDialog", {
-        type: "confirm",
-        title: "Confirm Deletion",
-        message: "Are you sure you want to delete this seller?",
+      self.$store.commit('showDialog', {
+        type: 'confirm',
+        title: 'Confirm Deletion',
+        message: 'Are you sure you want to delete this seller?',
         okCb: () => {
           axios
-            .delete("/admin/sellers/" + seller.id)
-            .then(function (response) {
-              self.$store.commit("showSnackbar", {
+            .delete('/admin/sellers/' + seller.id)
+            .then(function(response) {
+              self.$store.commit('showSnackbar', {
                 message: response.data.message,
-                color: "success",
+                color: 'success',
                 duration: 3000,
               });
 
               self.loadTrackings(() => {});
             })
-            .catch(function (error) {
+            .catch(function(error) {
               if (error.response) {
-                self.$store.commit("showSnackbar", {
+                self.$store.commit('showSnackbar', {
                   message: error.response.data.message,
-                  color: "error",
+                  color: 'error',
                   duration: 3000,
                 });
               } else if (error.request) {
                 console.log(error.request);
               } else {
-                console.log("Error", error.message);
+                console.log('Error', error.message);
               }
             });
         },
         cancelCb: () => {
-          console.log("CANCEL");
+          console.log('CANCEL');
         },
       });
     },
@@ -575,55 +603,53 @@ export default {
       const self = this;
       let params = {
         ...self.filters,
-        sellers: self.filters.sellers.join(","),
-        prospect: self.filters.prospect.join(","),
-        agencies: self.filters.agencies.join(","),
-        departments: self.filters.departments.join(","),
+        sellers: self.filters.sellers.join(','),
+        prospect: self.filters.prospect.join(','),
+        agencies: self.filters.agencies.join(','),
+        departments: self.filters.departments.join(','),
         dates: self.dateRangeText,
-        order_sort: self.pagination.sortDesc[0] ? "desc" : "asc",
-        order_by: self.pagination.sortBy[0] || "id",
+        order_sort: self.pagination.sortDesc[0] ? 'desc' : 'asc',
+        order_by: self.pagination.sortBy[0] || 'id',
         page: self.pagination.page,
         per_page: self.pagination.itemsPerPage,
       };
 
-      axios
-        .get("/admin/tracking", { params: params })
-        .then(function (response) {
-          self.items = response.data.data.data;
-          self.totalItems = response.data.data.total;
-          self.pagination.totalItems = response.data.data.total;
-          (cb || Function)();
-        });
+      axios.get('/admin/tracking', { params: params }).then(function(response) {
+        self.items = response.data.data.data;
+        self.totalItems = response.data.data.total;
+        self.pagination.totalItems = response.data.data.total;
+        (cb || Function)();
+      });
     },
     loadResources(cb) {
       const self = this;
 
       let params = {
-        paginate: "no",
+        paginate: 'no',
       };
       axios
-        .get("/admin/tracking/sales_history/resources")
-        .then(function (response) {
+        .get('/admin/tracking/sales_history/resources')
+        .then(function(response) {
           let Data = response.data.data;
           self.options.agencies = Data.agencies;
           self.options.departments = Data.departments;
           self.options.prospects = Data.prospects;
         });
 
-      axios.get("/admin/sellers", { params: params }).then(function (response) {
+      axios.get('/admin/sellers', { params: params }).then(function(response) {
         self.options.sellers = response.data.data;
         (cb || Function)();
       });
     },
     getColor(value) {
-      if (value == "finalizado") return "red";
-      else if (value == "formalizado") return "blue";
-      else return "primary";
+      if (value == 'finalizado') return 'red';
+      else if (value == 'formalizado') return 'blue';
+      else return 'primary';
     },
     getColorDays(value) {
-      let days = this.$appFormatters.formatTimeDiffNow(value, "days");
-      if (days < 0) return "red";
-      else return "primary";
+      let days = this.$appFormatters.formatTimeDiffNow(value, 'days');
+      if (days < 0) return 'red';
+      else return 'primary';
     },
     getAssertiveness(value) {
       return this.Assertiveness.find((item) => {
@@ -634,39 +660,39 @@ export default {
       const self = this;
       let params = {
         ...self.filters,
-        sellers: self.filters.sellers.join(","),
-        prospect: self.filters.prospect.join(","),
-        agencies: self.filters.agencies.join(","),
-        departments: self.filters.departments.join(","),
+        sellers: self.filters.sellers.join(','),
+        prospect: self.filters.prospect.join(','),
+        agencies: self.filters.agencies.join(','),
+        departments: self.filters.departments.join(','),
         dates: self.dateRangeText,
         page: self.pagination.page,
         per_page: self.pagination.itemsPerPage,
-        paginate: "no",
+        paginate: 'no',
       };
       axios
-        .get("/admin/tracking-export", {
+        .get('/admin/tracking-export', {
           params: params,
-          responseType: "blob",
+          responseType: 'blob',
         })
         .then((res) => {
           const url = window.URL.createObjectURL(new Blob([res.data]));
-          const link = document.createElement("a");
+          const link = document.createElement('a');
           link.href = url;
-          link.setAttribute("download", "tracking.xlsx"); //or any other extension
+          link.setAttribute('download', 'tracking.xlsx'); //or any other extension
           document.body.appendChild(link);
           link.click();
         })
-        .catch(function (error) {
+        .catch(function(error) {
           if (error.response) {
-            self.$store.commit("showSnackbar", {
+            self.$store.commit('showSnackbar', {
               message: error.response.data.message,
-              color: "error",
+              color: 'error',
               duration: 3000,
             });
           } else if (error.request) {
             console.log(error.request);
           } else {
-            console.log("Error", error.message);
+            console.log('Error', error.message);
           }
         });
     },
@@ -676,17 +702,15 @@ export default {
     },
     resetToActive(id) {
       const self = this;
-      axios
-        .put("/admin/tracking/resetToActive/" + id)
-        .then(function (response) {
-          self.$store.commit("showSnackbar", {
-            message: response.data.message,
-            color: "success",
-            duration: 3000,
-          });
-          self.loadTrackings(() => {});
-          cb();
+      axios.put('/admin/tracking/resetToActive/' + id).then(function(response) {
+        self.$store.commit('showSnackbar', {
+          message: response.data.message,
+          color: 'success',
+          duration: 3000,
         });
+        self.loadTrackings(() => {});
+        cb();
+      });
     },
   },
 };

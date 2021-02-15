@@ -1,29 +1,26 @@
 <template>
   <div class="component-wrap">
     <!-- search -->
-    <v-card flat>
-      <div class="d-flex flex-row align-center">
-        <v-row class="mx-2 my-0">
-          <v-col cols="12">
-            <v-text-field
-              v-model="filters.full_name"
-              prepend-icon="mdi-magnify"
-              label="Fitrar por Nombre / Telefono"
-              clearable
-            ></v-text-field>
-          </v-col>
-        </v-row>
-        <div class="flex-grow-1 pa-2 text-right">
-          <v-btn
-            @click="$router.push({ name: 'prospect.create' })"
-            class="primary lighten-1"
-            dark
-          >
-            Registrar Prospecto
-            <v-icon right>mdi-cogs</v-icon>
-          </v-btn>
-        </div>
-      </div>
+    <v-card flat class="py-4 px-2 d-flex flex-row align-center">
+      <v-text-field
+        v-model="filters.full_name"
+        prepend-icon="mdi-magnify"
+        label="Fitrar por Nombre / Telefono"
+        outlined
+        dense
+        filled
+        hide-details
+        clearable
+      ></v-text-field>
+      <v-spacer></v-spacer>
+      <v-btn
+        @click="$router.push({ name: 'prospect.create' })"
+        class="primary"
+        dark
+      >
+        Registrar Prospecto
+        <v-icon right>mdi-plus</v-icon>
+      </v-btn>
     </v-card>
     <!-- /search -->
     <!-- data table -->
@@ -132,10 +129,7 @@ export default {
   },
   mounted() {
     const self = this;
-    // self.$store.commit("setBreadcrumbs", [
-    //   { label: "Users", to: { name: "users.list" } },
-    //   { label: "Vendedores", name: "" },
-    // ]);
+    self.$store.commit('setBreadcrumbs', [{ label: 'Prospectos', name: '' }]);
   },
   watch: {
     'pagination.page': function() {
@@ -193,20 +187,18 @@ export default {
     loadProspects(cb) {
       const self = this;
 
-      let params = {
+      let filters = {
         full_name: self.filters.full_name,
         page: self.pagination.page,
         per_page: self.pagination.rowsPerPage,
       };
 
-      axios
-        .get('/admin/prospects', { params: params })
-        .then(function(response) {
-          self.items = response.data.data.data;
-          self.totalItems = response.data.data.total;
-          self.pagination.totalItems = response.data.data.total;
-          (cb || Function)();
-        });
+      axios.get('/admin/prospects', { params: filters }).then((response) => {
+        self.items = response.data.data.data;
+        self.totalItems = response.data.data.total;
+        self.pagination.totalItems = response.data.data.total;
+        (cb || Function)();
+      });
     },
   },
 };

@@ -77,19 +77,20 @@ class TrackingProspectController extends AdminController
             $request['assigned_by'] = Auth::user()->id;
 
             /** @var Prospect $tracking */
-            $tracking = $this->trackingRepository->create($request->all());
+            $created = $this->trackingRepository->create($request->all());
+            $tracking = $this->trackingRepository->find($created->id);
 
-            if (!$tracking) {
+            if (!$created) {
                 return $this->sendResponseBadRequest("Failed create.");
             }
             $estatus = Estatus::where('key', Estatus::ESTATUS_ACTIVO)->first();
             $tracking->estatus()->associate($estatus);
             $tracking->save();
 
-            $tracking->attended->notify(new TrackingAssigned($tracking->id));
+            $tracking->attended->notify(new TrackingAssigned($tracking));
         });
 
-        return $this->sendResponseCreated([],'Se Registro Nuevo Seguimiento');
+        return $this->sendResponseCreated([], 'Se Registro Nuevo Seguimiento');
     }
 
     /**

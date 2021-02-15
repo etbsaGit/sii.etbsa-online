@@ -22,7 +22,7 @@ export let mixinEstates = {
       axios.get("/admin/estates").then(function(response) {
         let Resource = response.data.data;
         self.options.estates = Resource.estates;
-        cb();
+         (cb || Function)();
       });
     },
     loadTownships(id) {
@@ -34,7 +34,6 @@ export let mixinEstates = {
       axios.get("/admin/townships/" + id).then(function(response) {
         let Resource = response.data.data;
         self.options.townships = Resource.townships;
-        cb();
       });
     },
   },
