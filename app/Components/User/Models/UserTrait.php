@@ -488,7 +488,8 @@ trait UserTrait
      */
     public function getValidationRules()
     {
-        return self::$rules;
+        // return self::$rules;
+        return $this->rules;
     }
 
     public function scopeOfName($query, $name)
