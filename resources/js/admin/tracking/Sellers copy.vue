@@ -1,23 +1,25 @@
 <template>
   <v-container fluid>
-    <div class="d-flex flex-column">
-      <v-tabs grow centered icons-and-text>
-        <template v-for="item in Tabs">
-          <v-tab v-if="item.show" :key="item.title" :to="item.to">
-            {{ item.title }}
-            <v-icon left>{{ item.icon }}</v-icon>
-          </v-tab>
-        </template>
-      </v-tabs>
-      <div
-        style="min-width: 100px; max-width: 100%;"
-        class="flex-grow-1 flex-shrink-0"
-      >
-        <v-slide-x-transition>
-          <router-view></router-view>
-        </v-slide-x-transition>
-      </div>
-    </div>
+    <v-tabs
+      v-model="activeTab"
+      centered
+      icons-and-text
+      grow
+      show-arrows
+      color="success"
+      class="elevation-4 mb-2"
+      background-color="grey lighten-4"
+    >
+      <template v-for="item in Tabs">
+        <v-tab v-if="item.show" :key="item.title" :to="item.to">
+          {{ item.title }}
+          <v-icon left>{{ item.icon }}</v-icon>
+        </v-tab>
+      </template>
+    </v-tabs>
+    <v-slide-x-transition>
+      <router-view></router-view>
+    </v-slide-x-transition>
   </v-container>
 </template>
 

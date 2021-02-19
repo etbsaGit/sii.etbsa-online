@@ -9,6 +9,16 @@
             prepend-icon="mdi-magnify"
             label="Fitrar por Nombre"
             clearable
+            outlined
+          ></v-text-field>
+        </div>
+        <div class="flex-grow-1 pa-2">
+          <v-text-field
+            v-model="filters.email"
+            prepend-icon="mdi-magnify"
+            label="Fitrar por Email"
+            clearable
+            outlined
           ></v-text-field>
         </div>
       </div>
@@ -76,7 +86,7 @@
               <div>Agencias:</div>
               <v-chip
                 v-for="(type, key) in item.seller_agency"
-                :key="key"
+                :key="`suc-${key}`"
                 class="ma-1"
               >
                 {{ type.title }}
@@ -84,7 +94,7 @@
               <div>Departamentos:</div>
               <v-chip
                 v-for="(type, key) in item.seller_type"
-                :key="key"
+                :key="`depto-${key}`"
                 class="ma-1"
               >
                 {{ type.title }}
@@ -104,7 +114,7 @@
         </v-avatar>
       </template>
       <template v-slot:[`item.updated_at`]="{ item }">
-        {{ $appFormatters.formatDate(item.updated_at, "MMM DD,YYYY") }}
+        {{ $appFormatters.formatDate(item.updated_at, 'MMM DD,YYYY') }}
       </template>
     </v-data-table>
   </div>
@@ -115,30 +125,31 @@ export default {
   data() {
     return {
       headers: [
-        { text: "Action", value: "action", align: "left", sortable: false },
+        { text: 'Action', value: 'action', align: 'left', sortable: false },
         {
-          text: "Clave Vendedor",
-          value: "seller_key",
-          align: "left",
+          text: 'Clave Vendedor',
+          value: 'seller_key',
+          align: 'left',
           sortable: false,
         },
-        { text: "Nombre", value: "name", align: "left", sortable: false },
+        { text: 'Nombre', value: 'name', align: 'left', sortable: false },
+        { text: 'Email', value: 'email', align: 'left', sortable: false },
         {
-          text: "Configuracion:",
-          value: "seller_type",
-          align: "center",
-          sortable: false,
-        },
-        {
-          text: "Es Gerente:",
-          value: "groups",
-          align: "center",
+          text: 'Configuracion:',
+          value: 'seller_type',
+          align: 'center',
           sortable: false,
         },
         {
-          text: "Ultimo Cambio",
-          value: "updated_at",
-          align: "right",
+          text: 'Es Gerente:',
+          value: 'groups',
+          align: 'center',
+          sortable: false,
+        },
+        {
+          text: 'Ultimo Cambio',
+          value: 'updated_at',
+          align: 'right',
           sortable: false,
         },
       ],
@@ -149,22 +160,26 @@ export default {
       },
 
       filters: {
-        title: "",
+        title: '',
       },
     };
   },
   mounted() {
     const self = this;
-    self.$store.commit("setBreadcrumbs", [{ label: "Vendedores", name: "" }]);
+    self.$store.commit('setBreadcrumbs', [{ label: 'Vendedores', name: '' }]);
   },
   watch: {
-    "pagination.page": function() {
+    'pagination.page': function() {
       this.loadSellers(() => {});
     },
-    "pagination.rowsPerPage": function() {
+    'pagination.rowsPerPage': function() {
       this.loadSellers(() => {});
     },
-    "filters.title": _.debounce(function() {
+    'filters.title': _.debounce(function() {
+      const self = this;
+      self.loadSellers(() => {});
+    }, 700),
+    'filters.email': _.debounce(function() {
       const self = this;
       self.loadSellers(() => {});
     }, 700),
@@ -173,40 +188,40 @@ export default {
     trash(seller) {
       const self = this;
 
-      self.$store.commit("showDialog", {
-        type: "confirm",
-        title: "Confirm Deletion",
-        message: "Are you sure you want to delete this seller?",
+      self.$store.commit('showDialog', {
+        type: 'confirm',
+        title: 'Confirm Deletion',
+        message: 'Are you sure you want to delete this seller?',
         okCb: () => {
           axios
-            .delete("/admin/sellers/" + seller.id)
+            .delete('/admin/sellers/' + seller.id)
             .then(function(response) {
-              self.$store.commit("showSnackbar", {
+              self.$store.commit('showSnackbar', {
                 message: response.data.message,
-                color: "success",
+                color: 'success',
                 duration: 3000,
               });
 
               self.loadSellers(() => {});
             })
             .catch(function(error) {
-              self.$store.commit("hideLoader");
+              self.$store.commit('hideLoader');
 
               if (error.response) {
-                self.$store.commit("showSnackbar", {
+                self.$store.commit('showSnackbar', {
                   message: error.response.data.message,
-                  color: "error",
+                  color: 'error',
                   duration: 3000,
                 });
               } else if (error.request) {
                 console.log(error.request);
               } else {
-                console.log("Error", error.message);
+                console.log('Error', error.message);
               }
             });
         },
         cancelCb: () => {
-          console.log("CANCEL");
+          console.log('CANCEL');
         },
       });
     },
@@ -215,11 +230,12 @@ export default {
 
       let params = {
         name: self.filters.title,
+        email: self.filters.email,
         page: self.pagination.page,
         per_page: self.pagination.rowsPerPage,
       };
 
-      axios.get("/admin/sellers", { params: params }).then(function(response) {
+      axios.get('/admin/sellers', { params: params }).then(function(response) {
         self.items = response.data.data.data;
         self.totalItems = response.data.data.total;
         self.pagination.totalItems = response.data.data.total;

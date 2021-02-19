@@ -85,18 +85,16 @@
         </v-app-bar>
 
         <v-main>
-          <div>
-            <v-breadcrumbs :items="getBreadcrumbs">
-              <template v-slot:item="props">
-                <v-breadcrumbs-item :to="props.item.to" exact :key="props.item.label" :disabled="props.item.disabled">
-                  <template v-slot:divider>
-                    <v-icon>mdi-forward</v-icon>
-                  </template>
-                  @{{ props.item.label }}
-                </v-breadcrumbs-item>
-              </template>
-            </v-breadcrumbs>
-          </div>
+          <v-breadcrumbs :items="getBreadcrumbs">
+            <template v-slot:item="props">
+              <v-breadcrumbs-item :to="props.item.to" exact :key="props.item.label" :disabled="props.item.disabled">
+                <template v-slot:divider>
+                  <v-icon>mdi-forward</v-icon>
+                </template>
+                @{{ props.item.label }}
+              </v-breadcrumbs-item>
+            </template>
+          </v-breadcrumbs>
           <v-divider></v-divider>
           <transition name="fade">
             <router-view></router-view>

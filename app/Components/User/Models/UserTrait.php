@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: darryl
@@ -139,7 +140,6 @@ trait UserTrait
             if (!property_exists($metaClass, $v['key'])) {
                 $metaClass->{$v['key']} = null;
             }
-
         }
 
         return $metaClass;
@@ -247,14 +247,12 @@ trait UserTrait
                 if ($p['key'] == $Permission->key) {
                     unset($userCurrentPermissions[$index]);
                 }
-
             }
         } elseif ($permission instanceof Permission) {
             foreach ($userCurrentPermissions as $index => $p) {
                 if ($p['key'] == $permission->key) {
                     unset($userCurrentPermissions[$index]);
                 }
-
             }
         } else {
             return false;
@@ -508,7 +506,7 @@ trait UserTrait
             return false;
         }
 
-        return $query->where('email', '=', $email);
+        return $query->where('email', 'LIKE', "%{$email}%");
     }
 
     public function scopeOfGroups($q, $v)

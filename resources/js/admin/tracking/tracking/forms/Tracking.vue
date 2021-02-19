@@ -6,7 +6,7 @@
         :items="options.prospects"
         item-text="full_name"
         item-value="id"
-        label="BUSCAR PROSPECTO:"
+        label="PROSPECTO:"
         placeholder="Buscar por Nombre:"
         clearable
         outlined
@@ -14,7 +14,7 @@
         :rules="rules"
         eager
       >
-        <template v-slot:prepend-inner>
+        <template v-slot:prepend>
           <v-tooltip top>
             <template v-slot:activator="{ on, attrs }">
               <v-icon
@@ -30,25 +30,23 @@
           </v-tooltip>
         </template>
         <template v-slot:item="data">
-          <template>
-            <v-list-item-content>
-              <v-list-item-title
-                v-text="`${data.item.full_name}, Tel:${data.item.phone}`"
-              />
-              <v-list-item-subtitle
-                v-text="`${data.item.company || ''} ${data.item.rfc || ''}`"
-              />
-              <v-list-item-subtitle
-                v-text="
-                  `${data.item.email || ''} | ${
-                    data.item.township ? data.item.township.name : ''
-                  }, ${
-                    data.item.township ? data.item.township.estate.name : ''
-                  } ${data.item.town || ''}`
-                "
-              />
-            </v-list-item-content>
-          </template>
+          <v-list-item-content>
+            <v-list-item-title v-text="data.item.full_name" />
+            <v-list-item-subtitle
+              v-text="`${data.item.company || ''} ${data.item.rfc || ''}`"
+            />
+            <v-list-item-subtitle
+              v-text="`Tel: ${data.item.phone} ${data.item.email || ''}`"
+            />
+            <v-list-item-subtitle
+              v-text="
+                `${data.item.township ? data.item.township.name : ''} ${
+                  data.item.township ? data.item.township.estate.name : ''
+                }`
+              "
+            />
+            <v-list-item-subtitle v-text="data.item.town" />
+          </v-list-item-content>
         </template>
       </v-autocomplete>
       <v-autocomplete
@@ -234,10 +232,6 @@ export default {
       type: Boolean,
       default: false,
     },
-    propProspectId: {
-      required: false,
-      type: [Number,String],
-    },
   },
   mounted() {
     this.loadResources(() => {
@@ -258,7 +252,7 @@ export default {
         agencies: [],
         departments: [],
         sellers: [],
-        condition: ['Por definir','Contado', 'Financiamiento', 'Renta'],
+        condition: ['Por definir', 'Contado', 'Financiamiento', 'Renta'],
         tractors: Tractors,
       },
     };

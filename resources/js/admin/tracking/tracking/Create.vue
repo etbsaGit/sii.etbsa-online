@@ -5,7 +5,9 @@
     </v-card-title>
     <v-divider class="mb-3"></v-divider>
     <v-form ref="form" v-model="valid" lazy-validation>
-      <tracking-form :form.sync="form"></tracking-form>
+      <tracking-form
+        :form.sync="form"
+      ></tracking-form>
     </v-form>
     <v-card-actions>
       <v-btn
@@ -28,7 +30,7 @@ export default {
   props: {
     propProspectId: {
       required: false,
-      type: String,
+      type: [String, Number],
     },
   },
   data() {

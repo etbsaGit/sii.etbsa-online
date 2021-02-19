@@ -1,4 +1,4 @@
-export const tracking = [
+export const TrackingProspect = [
   {
     path: "/tracking-prospect",
     name: "trackingProspect",

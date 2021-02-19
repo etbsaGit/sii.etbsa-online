@@ -87,7 +87,7 @@ class TrackingProspectController extends AdminController
             $tracking->estatus()->associate($estatus);
             $tracking->save();
 
-            $tracking->attended->notify(new TrackingAssigned($tracking));
+            // $tracking->attended->notify(new TrackingAssigned($tracking));
         });
 
         return $this->sendResponseCreated([], 'Se Registro Nuevo Seguimiento');
@@ -179,7 +179,7 @@ class TrackingProspectController extends AdminController
             $this->trackingRepository->update($id, $request->all());
             $tracking->estatus()->associate($estatus)->save();
 
-            $tracking->attended->notify(new TrackingNewHistorical($tracking));
+            // $tracking->attended->notify(new TrackingNewHistorical($tracking));
         });
 
         return $this->sendResponseOk([], "Seguimiento Guardado.");

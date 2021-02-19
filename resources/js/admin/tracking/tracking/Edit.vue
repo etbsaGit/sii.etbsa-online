@@ -28,7 +28,7 @@ export default {
   props: {
     propTrackingId: {
       required: false,
-      type: String,
+      type: [String, Number],
     },
   },
   data() {

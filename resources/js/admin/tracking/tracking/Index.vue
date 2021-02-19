@@ -318,7 +318,15 @@
           class="d-inline-block text-truncate text-capitalize caption"
           style="max-width: 150px"
         >
-          {{ item.price | money(item.currency) }}
+          {{ item.price | currency }}
+        </span>
+      </template>
+      <template v-slot:[`item.currency`]="{ item }">
+        <span
+          class="d-inline-block text-truncate text-capitalize caption"
+          style="max-width: 150px"
+        >
+          {{ item.currency }}
         </span>
       </template>
       <template v-slot:[`item.prospect.full_name`]="{ item }">
@@ -380,23 +388,23 @@
         </v-chip>
       </template>
       <template v-slot:[`item.assertiveness`]="{ item }">
-        <v-progress-linear
-          v-if="getAssertiveness(item.assertiveness)"
-          height="25"
-          :value="getAssertiveness(item.assertiveness).value * 100"
-          :color="getAssertiveness(item.assertiveness).color"
-        >
-          <template v-slot:default="{ value }">
-            <v-tooltip left>
-              <template v-slot:activator="{ on, attrs }">
-                <strong v-bind="attrs" v-on="on">
-                  {{ Math.ceil(value) }}%
-                </strong>
+        <v-tooltip left>
+          <template v-slot:activator="{ on, attrs }">
+            <v-progress-linear
+              v-if="getAssertiveness(item.assertiveness)"
+              height="25"
+              :value="getAssertiveness(item.assertiveness).value * 100"
+              :color="getAssertiveness(item.assertiveness).color"
+              v-bind="attrs"
+              v-on="on"
+            >
+              <template v-slot:default="{ value }">
+                <strong> {{ Math.ceil(value) }}% </strong>
               </template>
-              <span>{{ getAssertiveness(item.assertiveness).text }}</span>
-            </v-tooltip>
+            </v-progress-linear>
           </template>
-        </v-progress-linear>
+          <span>{{ getAssertiveness(item.assertiveness).text }}</span>
+        </v-tooltip>
       </template>
       <template v-slot:[`item.updated_at`]="{ item }">
         {{ $appFormatters.formatDate(item.updated_at, 'L') }}
@@ -442,6 +450,14 @@ export default {
           text: 'Precio',
           value: 'price',
           align: 'right',
+          sortable: true,
+          class: 'blue-grey lighten-5',
+        },
+        {
+          text: 'Moneda',
+          value: 'currency',
+          align: 'center',
+          width: '100',
           sortable: true,
           class: 'blue-grey lighten-5',
         },
