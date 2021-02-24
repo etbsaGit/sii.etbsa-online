@@ -141,18 +141,21 @@
         <v-list-item-content class="px-2">
           <v-card class="mx-auto" outlined elevation="4" color="cyan lighten-5">
             <v-toolbar flat dense class="overline">
-              Sucursal
+              Ejecutivo y Sucursal
               <v-spacer></v-spacer>
             </v-toolbar>
             <v-divider></v-divider>
             <v-list-item three-line>
               <v-list-item-content>
                 <v-list-item-subtitle>
-                  Ejecutivo a asignado:
+                  Ejecutivo asignado:
                 </v-list-item-subtitle>
                 <v-list-item-title class="headline mb-1">
                   {{ info.attended_by }}
                 </v-list-item-title>
+                <v-list-item-subtitle>
+                  {{ info.attended_email }}
+                </v-list-item-subtitle>
                 <v-list-item-subtitle>
                   {{ info.agency }} - {{ info.department }}
                 </v-list-item-subtitle>

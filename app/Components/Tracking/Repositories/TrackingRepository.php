@@ -41,4 +41,25 @@ class TrackingRepository extends BaseRepository
             }
         );
     }
+    public function diaryTracking()
+    {
+        return $this->get(
+            ['paginate' => 'no'],
+            [],
+            function ($query) {
+                $query->whereHas('historical')
+                    ->where(function ($query) {
+                        $query->whereIn('estatus_id', [1]);
+                    })
+                    ->when(Auth::user()->isSuperUser(), function ($query) {
+                        return $query;
+                    }, function ($query) {
+                        $query->where(function ($query) {
+                            $query->filterForManagers(Auth::user());
+                        });
+                    });
+                return $query;
+            }
+        );
+    }
 }

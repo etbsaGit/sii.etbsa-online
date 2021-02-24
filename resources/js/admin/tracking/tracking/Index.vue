@@ -210,6 +210,15 @@
             Levantar un Seguimiento
             <v-icon small right>mdi-plus</v-icon>
           </v-btn>
+          <v-btn
+            @click="$router.push({ name: 'tracking.diary' })"
+            class="accent lighten-1 ml-2"
+            small
+            dark
+          >
+            Calendario
+            <v-icon small right>mdi-calendar-account</v-icon>
+          </v-btn>
           <v-spacer></v-spacer>
           <v-tooltip top>
             <template v-slot:activator="{ on, attrs }">
@@ -266,12 +275,7 @@
           <v-list shaped dense>
             <v-list-item-group>
               <v-list-item
-                @click="
-                  $router.push({
-                    name: 'tracking.prospect',
-                    params: { propTrackingId: item.id },
-                  })
-                "
+                @click="(dialogs.id = item.id), (dialogs.show = true)"
               >
                 <v-list-item-icon>
                   <v-icon class="blue--text">mdi-information-outline</v-icon>
@@ -410,6 +414,36 @@
         {{ $appFormatters.formatDate(item.updated_at, 'L') }}
       </template>
     </v-data-table>
+
+    <v-dialog
+      v-model="dialogs.show"
+      fullscreen
+      transition="dialog-bottom-transition"
+      :overlay="false"
+    >
+      <v-card>
+        <v-toolbar class="primary">
+          <v-toolbar-title class="white--text">
+            Detalle Seguimiento
+          </v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-toolbar-items>
+            <v-btn
+              icon
+              x-large
+              color="error"
+              @click.native="(dialogs.show = false), (dialogs.id = null)"
+            >
+              <v-icon>mdi-close-box</v-icon>
+            </v-btn>
+          </v-toolbar-items>
+        </v-toolbar>
+        <tracking-prospect
+          v-if="dialogs.show && dialogs.id"
+          :propTrackingId="dialogs.id"
+        ></tracking-prospect>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -417,9 +451,15 @@
 import Categories from '@admin/tracking/tracking/resources/categories.json';
 import Assertiveness from '@admin/tracking/tracking/resources/assertiveness.json';
 import { mapState } from 'vuex';
+import TrackingProspect from './TrackingProspect.vue';
 export default {
+  components: { TrackingProspect },
   data() {
     return {
+      dialogs: {
+        show: false,
+        id: null,
+      },
       date: [],
       modal: false,
       headers: [

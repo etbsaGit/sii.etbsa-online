@@ -26,12 +26,24 @@
         color="pink"
         small
       >
-        <v-row class="overline" align="center">
-          <v-col
-            cols="12" md="7"
-            v-text="event.message"
-            class="blue-grey lighten-5 elevation-2"
-          ></v-col>
+        <v-row class="overline" align="center" no-gutters>
+          <v-col cols="12" md="7">
+            <div class="d-flex flex-column">
+              <div
+                class="blue-grey lighten-5 elevation-2 pa-3"
+                v-text="event.message"
+              ></div>
+              <span class="overline" v-if="event.date_next_tracking">
+                Fecha para Segumiento:
+                {{
+                  $appFormatters.formatDate(
+                    event.date_next_tracking,
+                    'LL hh:mm'
+                  )
+                }}
+              </span>
+            </div>
+          </v-col>
           <v-col cols="12" md="2" class="text-center">
             <v-tooltip left>
               <template v-slot:activator="{ on, attrs }">
@@ -53,20 +65,22 @@
                   }}
                 </v-progress-circular>
               </template>
-              <span>{{
-                percenAssertiveness(event.last_assertiveness).text
-              }}</span>
+              <span>
+                {{ percenAssertiveness(event.last_assertiveness).text }}
+              </span>
             </v-tooltip>
           </v-col>
           <v-col cols="12" md="3" class="text-right">
-            <div class="caption">{{ `Factura/Pedido: ${event.invoice || 'S/R'}` }}</div>
+            <div v-if="event.invoice" class="caption">
+              {{ `Factura/Pedido: ${event.invoice}` }}
+            </div>
             <div>
               {{
                 $appFormatters.formatDate(event.created_at, 'DD MMM YYYY hh:mm')
               }}
             </div>
             <div class="caption">
-              {{ event.last_price | money() }} {{ event.last_currency }}
+              {{ event.last_price | currency() }} {{ event.last_currency }}
             </div>
             <div class="caption">{{ event.user }}</div>
             <div class="caption blue--text">

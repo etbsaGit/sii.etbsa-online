@@ -6,10 +6,10 @@ use App\Components\Common\Models\Estatus;
 use App\Components\Tracking\Models\Prospect;
 use App\Components\Tracking\Models\TrackingProspect;
 use App\Components\Tracking\Repositories\TrackingRepository;
-use App\Components\User\Models\User;
 use App\Notifications\TrackingAssigned;
 use App\Notifications\TrackingNewHistorical;
 use Auth;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -87,7 +87,7 @@ class TrackingProspectController extends AdminController
             $tracking->estatus()->associate($estatus);
             $tracking->save();
 
-            // $tracking->attended->notify(new TrackingAssigned($tracking));
+            $tracking->attended->notify(new TrackingAssigned($tracking));
         });
 
         return $this->sendResponseCreated([], 'Se Registro Nuevo Seguimiento');
@@ -113,11 +113,13 @@ class TrackingProspectController extends AdminController
                 'assertiveness',
                 'invoice',
                 'tracking_condition',
+                'date_next_tracking',
                 'created_at'
             ),
             'agency' => $tracking->agency->title,
             'department' => $tracking->department->title,
             'attended_by' => $tracking->attended->name,
+            'attended_email' => $tracking->attended->email,
             'assigned_by' => $tracking->assigned->name,
             'registered_by' => $tracking->registered->name,
             'estatus' => $tracking->estatus->only('id', 'title', 'key'),
@@ -133,6 +135,7 @@ class TrackingProspectController extends AdminController
                     'invoice' => $H->invoice,
                     'type_contacted' => $H->type_contacted,
                     'user' => $H->user->name,
+                    'date_next_tracking' => $H->date_next_tracking,
                     'created_at' => $H->created_at,
                 ];
             }),
@@ -179,7 +182,7 @@ class TrackingProspectController extends AdminController
             $this->trackingRepository->update($id, $request->all());
             $tracking->estatus()->associate($estatus)->save();
 
-            // $tracking->attended->notify(new TrackingNewHistorical($tracking));
+            $tracking->attended->notify(new TrackingNewHistorical($tracking));
         });
 
         return $this->sendResponseOk([], "Seguimiento Guardado.");
@@ -280,5 +283,35 @@ class TrackingProspectController extends AdminController
         }
         $prospects = Prospect::with('township')->get()->map->only('id', 'full_name', 'email', 'company', 'rfc', 'town', 'phone', 'township');
         return $this->sendResponseOk(compact('agencies', 'departments', 'prospects'));
+    }
+
+
+    public function diaryTrackings()
+    {
+
+        $d = $this->trackingRepository->diaryTracking();
+        $colors = [
+            'green darken-4',
+            'grey darken-1',
+            'deep-purple',
+        ];
+        $event = [];
+        foreach ($d as $tracking) {
+            $event[] = [
+                'id' => $tracking->id,
+                'name' => 'Folio: #' . $tracking->id . ' ' . ($tracking->historical->last()->type_contacted ?? 'Sin Seguimiento'),
+                'start' => Carbon::createFromDate($tracking->date_next_tracking)->toDateString(),
+                'end' => Carbon::createFromDate($tracking->date_next_tracking)->toDateString(),
+                'color' => $colors[$tracking->estatus->id - 1],
+                'details' => $tracking->historical->last()->message ?? '',
+                'timed' => true,
+                'attended' => $tracking->attended->name,
+                'estatus' => $tracking->estatus->title,
+                'prospect' => $tracking->prospect->full_name,
+                'title' => $tracking->title,
+                'reference' => $tracking->reference,
+            ];
+        }
+        return $this->sendResponseOk(compact('event'), "list tracking ok.");
     }
 }

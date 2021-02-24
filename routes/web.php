@@ -41,6 +41,7 @@ Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function
     // Route::put('tracking/assignSeller/{id}', 'TrackingProspectController@assignSeller')->name('trackingAssignSeller');
     Route::put('tracking/historical/{id}', 'TrackingProspectController@addHistoricalTracking')->name('tracking.addHistoricalTracking');
     Route::put('tracking/resetToActive/{id}', 'TrackingProspectController@resetToActive')->name('tracking.resetToActive');
+    Route::get('tracking/historical/diary', 'TrackingProspectController@diaryTrackings')->name('tracking.diary');
     Route::get('tracking-export', 'ExportController@exportTracking')->name('trackingExport');
 
     //Marketing
