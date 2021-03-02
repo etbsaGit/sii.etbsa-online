@@ -48,7 +48,21 @@ class GpsRepository extends BaseRepository
                 $q->ofCanceledGps($month);
             }
 
+            // $q->ofName($params['name'] ?? '');
+            // $q->ofGpsGroups(Helpers::commasToArray($params['group_id'] ?? ''));
+            // $q->ofGpsChips(Helpers::commasToArray($params['chips_id'] ?? ''));
+            // $q->ofAgency($params['agency'] ?? '');
+            // $q->ofDepartment($params['department'] ?? '');
+            // $q->ofPayment($params['payment_type'] ?? '');
+            // $q->ofEstatus($params['estatus'] ?? '');
 
+
+            // if (!($assigned && $deallocated)) {
+            //     $q->ofExpired($expired);
+            // }
+
+
+            // $canceled ? $q->ofCancelled($canceled) : $q->whereNull('cancellation_date');
 
             return $q;
         });

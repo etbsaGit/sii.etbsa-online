@@ -64,6 +64,11 @@ class TrackingProspect extends Model
         return $this->hasMany(TrackingHistoricalProspect::class, 'tracking_id', 'id');
     }
 
+    public function messages()
+    {
+        return $this->hasMany(MessageTracking::class, 'tracking_id', 'id');
+    }
+
     public function scopeFilter($query, array $filters)
     {
         $query->when($filters['folio'] ?? null, function ($query, $folio) {

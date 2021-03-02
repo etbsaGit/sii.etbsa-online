@@ -89,9 +89,20 @@
           >
             <v-icon>mdi-filter-remove-outline</v-icon>
           </v-btn>
-          <!-- <v-btn icon color="green">
-            <v-icon>mdi-file-excel</v-icon>
-          </v-btn> -->
+          <v-tooltip top>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                icon
+                color="green"
+                @click="exportGpsChips()"
+                v-bind="attrs"
+                v-on="on"
+              >
+                <v-icon>mdi-file-excel</v-icon>
+              </v-btn>
+            </template>
+            <span>Exportar</span>
+          </v-tooltip>
           <v-tooltip top>
             <template v-slot:activator="{ on, attrs }">
               <v-btn
@@ -227,11 +238,11 @@
 </template>
 
 <script>
-import GpsChipAdd from "@admin/gps/components/GpsChipAdd.vue";
-import GpsChipEdit from "@admin/gps/components/GpsChipEdit.vue";
+import GpsChipAdd from '@admin/gps/components/GpsChipAdd.vue';
+import GpsChipEdit from '@admin/gps/components/GpsChipEdit.vue';
 
-import optionMonths from "~/api/months.json";
-import optionYears from "~/api/years.json";
+import optionMonths from '~/api/months.json';
+import optionYears from '~/api/years.json';
 export default {
   components: {
     GpsChipAdd,
@@ -241,36 +252,36 @@ export default {
     return {
       headers: [
         {
-          text: "",
-          value: "action",
-          align: "center",
+          text: '',
+          value: 'action',
+          align: 'center',
           divider: true,
           width: 10,
-          class: "pa-auto",
+          class: 'pa-auto',
           sortable: false,
         },
         {
-          text: "SIM",
-          value: "sim",
-          align: "left",
+          text: 'SIM',
+          value: 'sim',
+          align: 'left',
           sortable: true,
         },
         {
-          text: "IMEI",
-          value: "imei",
-          align: "left",
+          text: 'IMEI',
+          value: 'imei',
+          align: 'left',
           sortable: true,
         },
         {
-          text: "Costo",
-          value: "costo",
-          align: "left",
+          text: 'Costo',
+          value: 'costo',
+          align: 'left',
           sortable: false,
         },
         {
-          text: "Fecha Activacion",
-          value: "fecha_activacion",
-          align: "center",
+          text: 'Fecha Activacion',
+          value: 'fecha_activacion',
+          align: 'center',
           sortable: true,
         },
         // {
@@ -280,9 +291,9 @@ export default {
         //   sortable: true,
         // },
         {
-          text: "Asignado",
-          value: "gps_id",
-          align: "center",
+          text: 'Asignado',
+          value: 'gps_id',
+          align: 'center',
           sortable: true,
         },
       ],
@@ -293,7 +304,7 @@ export default {
       },
       editedIndex: -1,
       dialogs: {
-        title: "",
+        title: '',
         show: false,
         gpsChip: null,
       },
@@ -302,8 +313,8 @@ export default {
         years: optionYears,
       },
       filters: {
-        sim: "",
-        imei: "",
+        sim: '',
+        imei: '',
         month: null,
         year: null,
         assigned: null,
@@ -316,7 +327,7 @@ export default {
     const self = this;
 
     self.$eventBus.$on(
-      ["GPS_CHIP_ADDED", "GPS_CHIP_UPDATED", "GPS_CHIP_DELETED"],
+      ['GPS_CHIP_ADDED', 'GPS_CHIP_UPDATED', 'GPS_CHIP_DELETED'],
       () => {
         self.loadGpsChips(() => {});
       }
@@ -339,8 +350,8 @@ export default {
   computed: {
     formTitle() {
       return this.editedIndex === -1
-        ? "Registrar CHIP de GPS"
-        : "Editar CHIP de GPS";
+        ? 'Registrar CHIP de GPS'
+        : 'Editar CHIP de GPS';
     },
     formAdd() {
       return this.editedIndex === -1;
@@ -368,62 +379,106 @@ export default {
         assigned: self.filters.assigned ? self.filters.assigned : null,
         deallocated: self.filters.deallocated ? self.filters.deallocated : null,
         expired: self.filters.expired ? self.filters.expired : null,
-        order_sort: self.pagination.sortDesc[0] ? "desc" : "asc",
-        order_by: self.pagination.sortBy[0] || "sim",
+        order_sort: self.pagination.sortDesc[0] ? 'desc' : 'asc',
+        order_by: self.pagination.sortBy[0] || 'sim',
         page: self.pagination.page,
         per_page: self.pagination.itemsPerPage,
       };
 
+      axios.get('/admin/chips', { params: params }).then(function(response) {
+        self.items = response.data.data.data;
+        self.totalItems = response.data.data.total;
+        self.pagination.totalItems = response.data.data.total;
+        (cb || Function)();
+      });
+    },
+    exportGpsChips() {
+      const self = this;
+
+      let params = {
+        sim: self.filters.sim,
+        month: self.filters.month,
+        year: self.filters.year,
+        imei: self.filters.imei,
+        assigned: self.filters.assigned ? self.filters.assigned : null,
+        deallocated: self.filters.deallocated ? self.filters.deallocated : null,
+        expired: self.filters.expired ? self.filters.expired : null,
+        order_by: self.pagination.sortBy[0] || 'sim',
+        paginate: 'no',
+      };
+
+      self.$store.commit('showLoader');
       axios
-        .get("/admin/chips", { params: params })
-        .then(function(response) {
-          self.items = response.data.data.data;
-          self.totalItems = response.data.data.total;
-          self.pagination.totalItems = response.data.data.total;
-          (cb || Function)();
+        .get('/admin/gps-chips-export', {
+          params: params,
+          responseType: 'blob',
+        })
+        .then((res) => {
+          const url = window.URL.createObjectURL(new Blob([res.data]));
+          const link = document.createElement('a');
+          link.href = url;
+          link.setAttribute('download', 'gps-chips.xlsx'); //or any other extension
+          document.body.appendChild(link);
+          link.click();
+        })
+        .catch(function(error) {
+          if (error.response) {
+            self.$store.commit('showSnackbar', {
+              message: error.response.data.message,
+              color: 'error',
+              duration: 3000,
+            });
+          } else if (error.request) {
+            console.log(error.request);
+          } else {
+            console.log('Error', error.message);
+          }
+        })
+        .finally(function() {
+          self.$store.commit('hideLoader');
         });
     },
     trash(chip) {
       const self = this;
-      self.$store.commit("showDialog", {
-        type: "confirm",
-        title: "Confirm Deletion",
-        message: "Are you sure you want to delete this gps chip?",
+      self.$store.commit('showDialog', {
+        type: 'confirm',
+        title: 'Confirm Deletion',
+        message: 'Are you sure you want to delete this gps chip?',
         okCb: () => {
           axios
-            .delete("/admin/chips/" + chip.sim)
+            .delete('/admin/chips/' + chip.sim)
             .then(function(response) {
-              self.$store.commit("showSnackbar", {
+              self.$store.commit('showSnackbar', {
                 message: response.data.message,
-                color: "success",
+                color: 'success',
                 duration: 3000,
               });
 
-              self.$eventBus.$emit("GPS_CHIP_DELETED");
+              self.$eventBus.$emit('GPS_CHIP_DELETED');
             })
             .catch(function(error) {
               if (error.response) {
-                self.$store.commit("showSnackbar", {
+                self.$store.commit('showSnackbar', {
                   message: error.response.data.message,
-                  color: "error",
+                  color: 'error',
                   duration: 3000,
                 });
               } else if (error.request) {
                 console.log(error.request);
               } else {
-                console.log("Error", error.message);
+                console.log('Error', error.message);
               }
             });
         },
         cancelCb: () => {
-          console.log("CANCEL");
+          console.log('CANCEL');
         },
       });
     },
     getColor(date) {
-      if (date < 31) return "red";
-      else if (date < 62) return "orange";
-      else return "green";
+      if (date < 31) return 'red';
+      else if (date < 62) return 'orange';
+      else return 'green';
     },
   },
 };

@@ -5,6 +5,11 @@ export const TrackingProspect = [
     component: require('@admin/tracking/Sellers').default,
     children: [
       {
+        path: 'notification',
+        name: 'notification.list',
+        component: require('@admin/tracking/tracking/Notification').default,
+      },
+      {
         path: 'sellers',
         name: 'sellers.list',
         component: require('@admin/tracking/seller/SellerLists').default,

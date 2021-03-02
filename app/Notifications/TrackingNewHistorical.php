@@ -52,14 +52,21 @@ class TrackingNewHistorical extends Notification
 
         $url = url('/admin#/tracking-prospect/tracking/prospect/' . $this->Tracking->id);
         return (new MailMessage)
-            ->subject('Notificacion de Seguimiento SIIETBSA Folio:' . $this->Tracking->id)
+            ->subject('SIIETBSA Actualizacion Seguimiento Folio:' . $this->Tracking->id)
             ->cc($ccUsers)
             ->greeting('Hola')
+            ->line('Folio: ' . $this->Tracking->id)
             ->line('Hay un nuevo Mensaje en su Seguimiento: ' . $this->Tracking->title)
             ->line('Referencia: ' . $this->Tracking->reference)
-            ->line('Folio: ' . $this->Tracking->id)
+            ->line('Condicion de Operacion: ' . $this->Tracking->tracking_condition)
+            ->line('Motivo: ' . $this->Tracking->description_topic)
             ->line('Prospecto: ' . $this->Tracking->prospect->full_name)
+            ->line('Telefono: ' . $this->Tracking->prospect->phone)
+            ->line('Ultimo Precio a tratar: $' . number_format($this->Tracking->price, 2) . ' ' . $this->Tracking->currency)
+            ->line('Vendedor Asignado: ' . $this->Tracking->attended->name)
+            ->line('Agencia y Departamento: ' . $this->Tracking->agency->title . ' / ' . $this->Tracking->department->title)
             ->line('Nuevo Estatus: ' . $this->Tracking->estatus->title)
+            ->line('Mensaje: ' . $this->Tracking->historical->last()->message)
             ->action('Ir a SIIETBSA', $url)
             ->line('Gracias por usar nuestro Sistema Integral SIIETBSA.')
             ->salutation('Saludos Cordiales por parte del Departamento de Sistemas');

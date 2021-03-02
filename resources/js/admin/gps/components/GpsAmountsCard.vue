@@ -5,7 +5,7 @@
         {{ propTitle }}
       </p>
       <div class="text--primary text-h5">
-        {{ propAmount | money() }}
+        {{ propAmount | currency() }} {{ propCurrency }}
       </div>
     </v-card-text>
   </v-card>
@@ -15,16 +15,16 @@
 export default {
   props: {
     propTitle: {
-      required: true
+      required: true,
     },
     propAmount: {
       type: Number,
       default: 0,
-      required: true
+      required: true,
     },
     propCurrency: {
       default: 'MXN',
-    }
-  }
-}
+    },
+  },
+};
 </script>

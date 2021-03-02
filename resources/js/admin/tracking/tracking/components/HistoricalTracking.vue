@@ -5,7 +5,9 @@
       class="white--text mb-6"
       color="orange"
       large
-      v-if="Tracking.estatus.key == 'activo'"
+      v-if="
+        Tracking.estatus.key == 'activo' && $gate.auth().id == Tracking.owner
+      "
     >
       <template v-slot:icon>
         <v-tooltip top>
@@ -29,12 +31,13 @@
         <v-row class="overline" align="center" no-gutters>
           <v-col cols="12" md="7">
             <div class="d-flex flex-column">
-              <div
-                class="blue-grey lighten-5 elevation-2 pa-3"
-                v-text="event.message"
-              ></div>
+              <div class="blue-grey lighten-5 elevation-2 pa-3">
+                <!-- v-text="event.message" -->
+                <p v-text="event.message"></p>
+                <!-- <v-btn icon><v-icon color="blue">mdi-message</v-icon></v-btn> -->
+              </div>
               <span class="overline" v-if="event.date_next_tracking">
-                Fecha para Segumiento:
+                Fecha del seguimiento:
                 {{
                   $appFormatters.formatDate(
                     event.date_next_tracking,
@@ -107,10 +110,11 @@ export default {
       type: Array,
     },
   },
+
   computed: {
     ...mapState(['Assertiveness']),
     initials() {
-      var names = window.LSK_APP.AUTH_USER.name.split(' '),
+      var names = this.$gate.auth().name.split(' '),
         initials = names[0].substring(0, 1).toUpperCase();
 
       if (names.length > 1) {
@@ -118,8 +122,11 @@ export default {
       }
       return {
         init: initials,
-        full_name: window.LSK_APP.AUTH_USER.name,
+        full_name: this.$gate.auth().name,
       };
+    },
+    owner() {
+      return this.$gate.auth().id;
     },
   },
   methods: {

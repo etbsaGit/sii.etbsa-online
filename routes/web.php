@@ -43,6 +43,12 @@ Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function
     Route::put('tracking/resetToActive/{id}', 'TrackingProspectController@resetToActive')->name('tracking.resetToActive');
     Route::get('tracking/historical/diary', 'TrackingProspectController@diaryTrackings')->name('tracking.diary');
     Route::get('tracking-export', 'ExportController@exportTracking')->name('trackingExport');
+    Route::post('tracking/message', 'MessageTrackingController@store')->name('message.tracking.store');
+    Route::get('tracking/messages/{tracking}', 'MessageTrackingController@getMessagesTracking')->name('message.tracking.getMessagesTracking');
+
+    //Notification
+    Route::get('notification', 'NotificationController@index')->name('notification.index');
+    Route::delete('notification/{notification}', 'NotificationController@destroy')->name('notification.destroy');
 
     //Marketing
     Route::get('marketing/sales_history', 'MarketingController@salesHistory')->name('salesHistory');

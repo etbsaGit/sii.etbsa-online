@@ -75,7 +75,7 @@
           </p>
         </v-card-text>
       </v-card>
-      <v-card class="mx-auto my-auto" min-width="300">
+      <v-card class="mx-auto my-auto" min-width="300" v-if="GPS.user">
         <v-card-text>
           <div>Usuario que Registro:</div>
           <p class="text-h6 text--primary">
@@ -97,40 +97,41 @@
       </v-card>
     </v-card>
     <v-divider class="my-4"></v-divider>
-    <v-data-table
-      v-show="GPS.historical.length > 0"
-      :items="GPS.historical"
-      :headers="headers"
-      dense
-      disable-pagination
-      hide-default-footer
-      :single-expand="singleExpand"
-      :expanded.sync="expanded"
-      show-expand
-      class="elevation-1 mx-auto caption"
-    >
-      <template v-slot:[`item.amount`]="{ item }">
-        <span class="overline text-capitalize">
-          {{ item.amount | money(item.currency) }}
-        </span>
-      </template>
-      <template v-slot:[`item.renew_date`]="{ item }">
-        <span class="overline text-capitalize">
-          {{ $appFormatters.formatDate(item.renew_date, 'MMM YYYY') }}
-        </span>
-      </template>
-      <template v-slot:[`item.created_at`]="{ item }">
-        <span class="overline text-capitalize">
-          {{ $appFormatters.formatDate(item.created_at, 'MMMDD YYYY HH:MM') }}
-        </span>
-      </template>
-      <template v-slot:expanded-item="{ item }">
-        <td :colspan="headers.length" class="overline">
-          Comentario:
-          <span class="font-weight-bold"> {{ item.description }}</span>
-        </td>
-      </template>
-    </v-data-table>
+    <template v-if="GPS.historical">
+      <v-data-table
+        :items="GPS.historical"
+        :headers="headers"
+        dense
+        disable-pagination
+        hide-default-footer
+        :single-expand="singleExpand"
+        :expanded.sync="expanded"
+        show-expand
+        class="elevation-1 mx-auto caption"
+      >
+        <template v-slot:[`item.amount`]="{ item }">
+          <span class="overline text-capitalize">
+            {{ item.amount | money(item.currency) }}
+          </span>
+        </template>
+        <template v-slot:[`item.renew_date`]="{ item }">
+          <span class="overline text-capitalize">
+            {{ $appFormatters.formatDate(item.renew_date, 'MMM YYYY') }}
+          </span>
+        </template>
+        <template v-slot:[`item.created_at`]="{ item }">
+          <span class="overline text-capitalize">
+            {{ $appFormatters.formatDate(item.created_at, 'MMMDD YYYY HH:MM') }}
+          </span>
+        </template>
+        <template v-slot:expanded-item="{ item }">
+          <td :colspan="headers.length" class="overline">
+            Comentario:
+            <span class="font-weight-bold"> {{ item.description }}</span>
+          </td>
+        </template>
+      </v-data-table>
+    </template>
   </v-container>
 </template>
 
@@ -207,6 +208,11 @@ export default {
   created() {
     const self = this;
     self.loadGps(() => {});
+  },
+  computed: {
+    historical() {
+      return this.GPS.historical;
+    },
   },
   methods: {
     loadGps(cb) {

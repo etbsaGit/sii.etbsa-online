@@ -102,16 +102,6 @@
             </v-col>
             <v-row class="justify-end mr-4">
               <v-checkbox
-                v-model="filters.assigned"
-                label="Asignados"
-                hide-details
-              ></v-checkbox>
-              <v-checkbox
-                v-model="filters.deallocated"
-                label="Sin Asignar"
-                hide-details
-              ></v-checkbox>
-              <v-checkbox
                 v-model="filters.expired"
                 label="Vencidos"
                 hide-details
@@ -126,7 +116,7 @@
         </v-form>
       </v-col>
       <v-col cols="12" xs="12">
-        <gps-widget-stats></gps-widget-stats>
+        <!-- <gps-widget-stats></gps-widget-stats> -->
         <v-data-table
           v-bind:headers="headers"
           :options.sync="pagination"
@@ -134,7 +124,7 @@
           :server-items-length="totalItems"
           dense
           fixed-header
-          class="elevation-4 text-uppercase caption"
+          class="elevation-4 caption"
         >
           <!-- Top -->
           <template v-slot:top>
@@ -368,7 +358,7 @@
       </v-col>
     </v-row>
     <!-- cards importes totales -->
-    <v-row
+    <!-- <v-row
       v-show="countAmountCost >= 0 && countAmountInvoice >= 0"
       class="justify-center"
     >
@@ -391,7 +381,7 @@
           propCurrency="USD"
         ></gps-card
       ></v-col>
-    </v-row>
+    </v-row> -->
     <!-- dialog -->
     <v-dialog
       v-model="dialogs.show"
@@ -413,8 +403,9 @@
             <v-btn
               text
               @click.native="(dialogs.show = false), (editedIndex = -1)"
-              >Done</v-btn
             >
+              Done
+            </v-btn>
           </v-toolbar-items>
         </v-toolbar>
         <v-card-text>
@@ -524,7 +515,12 @@
             ></v-text-field>
           </v-card-text>
           <v-card-actions>
-            <v-btn color="primary" block @click="reasign(item)" :disabled="!validReasign">
+            <v-btn
+              color="primary"
+              block
+              @click="reasign(item)"
+              :disabled="!validReasign"
+            >
               Guardar
             </v-btn>
           </v-card-actions>
@@ -539,6 +535,7 @@ import GpsAdd from '@admin/gps/components/GpsAdd.vue';
 import GpsEdit from '@admin/gps/components/GpsEdit.vue';
 import GpsCard from '@admin/gps/components/GpsAmountsCard.vue';
 import GpsWidgetStats from '@admin/gps/components/widgets/GpsStats.vue';
+import GpsWidgetStatsChips from '@admin/gps/components/widgets/GpsStatsChips.vue';
 
 import optionMonths from '~/api/months.json';
 import optionYears from '~/api/years.json';
@@ -551,6 +548,8 @@ export default {
     GpsEdit,
     GpsCard,
     GpsWidgetStats,
+    GpsWidgetStats,
+    GpsWidgetStatsChips,
   },
   data() {
     return {
@@ -592,6 +591,12 @@ export default {
         },
         {
           text: 'Factura:',
+          value: 'invoice',
+          align: 'center',
+          sortable: false,
+        },
+        {
+          text: 'Monto:',
           value: 'amount',
           align: 'center',
           sortable: false,

@@ -118,6 +118,7 @@ class TrackingProspectController extends AdminController
             ),
             'agency' => $tracking->agency->title,
             'department' => $tracking->department->title,
+            'owner' => $tracking->attended->id,
             'attended_by' => $tracking->attended->name,
             'attended_email' => $tracking->attended->email,
             'assigned_by' => $tracking->assigned->name,

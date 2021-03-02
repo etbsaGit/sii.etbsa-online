@@ -4,13 +4,12 @@
     <v-expansion-panels>
       <v-expansion-panel>
         <v-expansion-panel-header
-          disable-icon-rotate
           color="grey lighten-3"
           class="titlle text-uppercase font-weight-bold"
         >
-          Filtros
+          <span> <v-icon>mdi-magnify</v-icon> Filtros </span>
           <template v-slot:actions>
-            <v-icon> mdi-magnify </v-icon>
+            <v-icon> mdi-arrow-down </v-icon>
           </template>
         </v-expansion-panel-header>
         <v-expansion-panel-content class="pa-0">
@@ -200,7 +199,7 @@
       class="elevation-1 caption"
     >
       <template v-slot:top>
-        <v-toolbar elevation="0">
+        <v-row class="ma-2" align="center">
           <v-btn
             @click="$router.push({ name: 'tracking.create' })"
             class="primary lighten-1"
@@ -220,6 +219,7 @@
             <v-icon small right>mdi-calendar-account</v-icon>
           </v-btn>
           <v-spacer></v-spacer>
+          <notification></notification>
           <v-tooltip top>
             <template v-slot:activator="{ on, attrs }">
               <v-btn
@@ -239,7 +239,11 @@
               <v-btn
                 icon
                 color="grey"
-                @click="loadTrackings(() => {})"
+                @click="
+                  loadTrackings(() => {
+                    $eventBus.$emit('NOTIFICATION');
+                  })
+                "
                 v-bind="attrs"
                 v-on="on"
               >
@@ -262,7 +266,7 @@
             </template>
             <span>Reset Filtro</span>
           </v-tooltip>
-        </v-toolbar>
+        </v-row>
       </template>
 
       <template v-slot:[`item.action`]="{ item }">
@@ -452,8 +456,9 @@ import Categories from '@admin/tracking/tracking/resources/categories.json';
 import Assertiveness from '@admin/tracking/tracking/resources/assertiveness.json';
 import { mapState } from 'vuex';
 import TrackingProspect from './TrackingProspect.vue';
+import Notification from './components/Notification.vue';
 export default {
-  components: { TrackingProspect },
+  components: { TrackingProspect, Notification },
   data() {
     return {
       dialogs: {
@@ -617,46 +622,9 @@ export default {
     },
   },
   methods: {
-    trash(seller) {
-      const self = this;
-
-      self.$store.commit('showDialog', {
-        type: 'confirm',
-        title: 'Confirm Deletion',
-        message: 'Are you sure you want to delete this seller?',
-        okCb: () => {
-          axios
-            .delete('/admin/sellers/' + seller.id)
-            .then(function(response) {
-              self.$store.commit('showSnackbar', {
-                message: response.data.message,
-                color: 'success',
-                duration: 3000,
-              });
-
-              self.loadTrackings(() => {});
-            })
-            .catch(function(error) {
-              if (error.response) {
-                self.$store.commit('showSnackbar', {
-                  message: error.response.data.message,
-                  color: 'error',
-                  duration: 3000,
-                });
-              } else if (error.request) {
-                console.log(error.request);
-              } else {
-                console.log('Error', error.message);
-              }
-            });
-        },
-        cancelCb: () => {
-          console.log('CANCEL');
-        },
-      });
-    },
     loadTrackings(cb) {
       const self = this;
+
       let params = {
         ...self.filters,
         sellers: self.filters.sellers.join(','),
@@ -753,6 +721,7 @@ export default {
         });
     },
     reset() {
+      this.$eventBus.$emit('NOTIFICATION');
       this.filters.dates = [];
       this.$refs.formSearch.reset();
     },

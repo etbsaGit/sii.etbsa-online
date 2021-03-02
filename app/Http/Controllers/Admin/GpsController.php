@@ -233,31 +233,10 @@ class GpsController extends AdminController
         $year = Carbon::now()->year;
         $stats = [];
 
-        // for ($month = 1; $month <= 12; $month++) {
-        //     $params = [
-        //         'month' => $month,
-        //         'year' => $year,
-        //         'paginate' => 'no',
-        //     ];
-        //     $stats[] = $this->gpsRepository->stats($params);
-        // }
+        for ($month = 1; $month <= 12; $month++) {
+            $stats[] = $this->gpsRepository->getStatsGps($month, $year);
+        }
 
         return $this->sendResponseOk($stats, "Get Estadisticas GPS.");
     }
-
-    // public function update_dates()
-    // {
-    //     $g = 'App\Components\Gps\Models\Gps'::all();
-
-    //     foreach ($g as $gps) {
-    //         $gps->installation_date = $gps->chip->fecha_activacion ?? null;
-    //         $renew = new Carbon($gps->installation_date);
-    //         $renew->setYear(Carbon::now()->year);
-    //         $gps->renew_date = $renew;
-    //         $gps->save();
-    //     }
-
-    //     return $this->sendResponseOk([], "updated-date.");
-    // }
-
 }

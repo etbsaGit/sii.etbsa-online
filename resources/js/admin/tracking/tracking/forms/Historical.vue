@@ -207,6 +207,7 @@ export default {
         .then(() => {
           self.$refs.form.resetValidation();
           self.$eventBus.$emit('MESSAGE_ADDED');
+          self.$eventBus.$emit('NOTIFICATION');
           self.$store.commit('showSnackbar', {
             message: response.data.message,
             color: 'success',
