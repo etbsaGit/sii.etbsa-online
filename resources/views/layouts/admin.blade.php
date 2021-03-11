@@ -120,17 +120,15 @@
       <!-- dialog confirm -->
       <v-dialog v-show="showDialog" v-model="showDialog" absolute max-width="450px">
         <v-card>
-          <v-card-title>
-            <div class="headline">
-              <v-icon v-if="dialogIcon">@{{ dialogIcon }}</v-icon>
-              @{{ dialogTitle }}
-            </div>
+          <v-card-title class="headline grey lighten-2 text-uppercase">
+            <v-icon v-if="dialogIcon">@{{ dialogIcon }}</v-icon>
+            @{{ dialogTitle }}
           </v-card-title>
-          <v-card-text class="body-1">@{{ dialogMessage }}</v-card-text>
+          <v-card-text class="body-1 pt-3">@{{ dialogMessage }}</v-card-text>
           <v-card-actions v-if="dialogType=='confirm'">
             <v-spacer></v-spacer>
-            <v-btn color="error lighten-1" @click.native="dialogCancel">Cancel</v-btn>
-            <v-btn color="success darken-1" text @click.native="dialogOk">Ok</v-btn>
+            <v-btn color="error lighten-1" small @click.native="dialogCancel">Cancelar</v-btn>
+            <v-btn color="success darken-1" text @click.native="dialogOk">Aceptar</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>

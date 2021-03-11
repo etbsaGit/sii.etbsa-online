@@ -142,7 +142,7 @@
                       v-model="dateRangeText"
                       label="Rango de Fechas"
                       placeholder="Seleccione un Rango de fechas"
-                      prepend-icon="mdi-calendar"
+                      prepend-inner-icon="mdi-calendar"
                       readonly
                       outlined
                       hide-details
@@ -172,14 +172,6 @@
                     </v-btn>
                   </v-date-picker>
                 </v-dialog>
-              </v-col>
-              <v-col cols="12" md="6">
-                <v-radio-group v-model="filters.estatus" row dense>
-                  <v-radio label="Activos" value="activo" />
-                  <v-radio label="Finalizados" value="finalizado" />
-                  <v-radio label="Fomalizados" value="formalizado" />
-                  <v-radio label="Todos" value="todos" />
-                </v-radio-group>
               </v-col>
             </v-row>
           </v-form>
@@ -219,6 +211,12 @@
             <v-icon small right>mdi-calendar-account</v-icon>
           </v-btn>
           <v-spacer></v-spacer>
+          <v-radio-group v-model="filters.estatus" row dense>
+            <v-radio label="Activos" value="activo" />
+            <v-radio label="Finalizados" value="finalizado" />
+            <v-radio label="Fomalizados" value="formalizado" />
+            <v-radio label="Todos" value="todos" />
+          </v-radio-group>
           <notification></notification>
           <v-tooltip top>
             <template v-slot:activator="{ on, attrs }">

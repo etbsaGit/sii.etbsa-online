@@ -5,10 +5,9 @@
       class="white--text mb-6"
       color="orange"
       large
-      v-if="
-        Tracking.estatus.key == 'activo' && $gate.auth().id == Tracking.owner
-      "
+      v-if="Tracking.estatus.key == 'activo'"
     >
+      <!-- && $gate.auth().id == Tracking.owner -->
       <template v-slot:icon>
         <v-tooltip top>
           <template v-slot:activator="{ on, attrs }">

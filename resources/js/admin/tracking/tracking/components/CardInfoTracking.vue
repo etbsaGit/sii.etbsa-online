@@ -70,6 +70,9 @@
                 <v-list-item-subtitle class="subtitle-1 text-uppercase">
                   {{ created_at_format }}
                 </v-list-item-subtitle>
+                <v-list-item-subtitle class="subtitle-1 text-uppercase">
+                  {{ info.detail.price | currency }} {{ info.detail.currency }}
+                </v-list-item-subtitle>
                 <v-list-item-title
                   class="pt-4 text-wrap text-button"
                   v-text="info.detail.description_topic"

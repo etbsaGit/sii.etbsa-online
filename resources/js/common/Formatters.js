@@ -2,16 +2,16 @@ export default {
   install(Vue, options) {
     Vue.prototype.$appFormatters = {
       formatDate: function(dateString, format) {
-        return moment(dateString).format(format ? format : "MMMDD, YYYY");
+        return moment(dateString).format(format ? format : 'YYYY-MM-DD');
       },
       formatTimeFromNow: (dateString) => {
         return moment(dateString).fromNow(true);
       },
       formatTimeDiffNow: (dateString, format) => {
-        return moment(dateString).diff(Date.now(), format ? format : "days");
+        return moment(dateString).diff(Date.now(), format ? format : 'days');
       },
       formatTimeDiffDays: (dateString, end) => {
-        return moment(dateString).diff(end, "days");
+        return moment(dateString).diff(end, 'days');
       },
       formatLetterMonth: (numberMonth) => {
         return moment.months(numberMonth);

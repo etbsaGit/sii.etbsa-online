@@ -7,12 +7,14 @@
     center-active
   >
     <v-slide-item
-      v-for="(month, n) in items"
-      :key="n"
+      v-for="stat in stats"
+      :key="stat.Month"
       v-slot:default="{ toggle }"
     >
       <v-card flat class="mx-2" @click="toggle">
-        <div class="text-center overline">Mes {{ months[n] }} {{ year }}</div>
+        <div class="text-center overline">
+          Mes {{ months[stat.Month - 1] }} {{ year }}
+        </div>
         <v-card-text class="py-0">
           <v-chip-group>
             <v-tooltip top>
@@ -22,9 +24,9 @@
                   small
                   v-bind="attrs"
                   v-on="on"
-                  @click="emitQuery(n, 'totales')"
+                  @click="emitQuery(stat.Month, 'totales')"
                 >
-                  {{ month.Total }}
+                  {{ stat.Total }}
                 </v-chip>
               </template>
               <span>GPS Totales</span>
@@ -37,9 +39,9 @@
                   small
                   v-bind="attrs"
                   v-on="on"
-                  @click="emitQuery(n, 'nuevos')"
+                  @click="emitQuery(stat.Month, 'nuevos')"
                 >
-                  {{ month.Nuevos }}
+                  {{ stat.Nuevos }}
                 </v-chip>
               </template>
               <span>GPS Nuevos </span>
@@ -52,9 +54,9 @@
                   small
                   v-bind="attrs"
                   v-on="on"
-                  @click="emitQuery(n, 'renovados')"
+                  @click="emitQuery(stat.Month, 'renovados')"
                 >
-                  {{ month.Renovados }}
+                  {{ stat.Renovados }}
                 </v-chip>
               </template>
               <span>GPS Renovados </span>
@@ -67,9 +69,9 @@
                   small
                   v-bind="attrs"
                   v-on="on"
-                  @click="emitQuery(n, 'por_renovar')"
+                  @click="emitQuery(stat.Month, 'por_renovar')"
                 >
-                  {{ month.PorRenovar }}
+                  {{ stat.PorRenovar }}
                 </v-chip>
               </template>
               <span>GPS Por Renovar </span>
@@ -82,9 +84,9 @@
                   small
                   v-bind="attrs"
                   v-on="on"
-                  @click="emitQuery(n, 'cancelados')"
+                  @click="emitQuery(stat.Month, 'cancelados')"
                 >
-                  {{ month.Cancelados }}
+                  {{ stat.Cancelados }}
                 </v-chip>
               </template>
               <span>GPS Cancelados </span>
@@ -92,7 +94,7 @@
             <v-tooltip top>
               <template v-slot:activator="{ on, attrs }">
                 <v-chip dark small v-bind="attrs" v-on="on">
-                  {{ month.Porcentaje | percent() }}
+                  {{ stat.Porcentaje | percent() }}
                 </v-chip>
               </template>
               <span>Porcentaje Renovados </span>
@@ -105,32 +107,34 @@
 </template>
 
 <script>
+import { months } from '~/api/dates';
+
 export default {
   data: () => ({
     model: null,
-    months: [],
-    year: "",
-    items: [],
+    months: months,
+    year: '',
+    stats: [],
   }),
   created() {
-    const self = this;
-    self.$eventBus.$on(["GPS_ADDED", "GPS_UPDATED", "GPS_DELETED"], () => {
-      self.fetchGps(() => {});
+    const _this = this;
+    _this.$eventBus.$on(['GPS_ADDED', 'GPS_UPDATED', 'GPS_DELETED'], () => {
+      _this.fetchGps(() => {});
     });
-    self.fetchGps(() => {});
-    self.months = moment.months();
-    self.year = moment().year();
+    _this.fetchGps(() => {});
+    // _this.months = moment.months();
+    _this.year = moment().year();
   },
   methods: {
     fetchGps(cb) {
-      const self = this;
-      axios.post("/admin/gps/statsMonths").then(function(response) {
-        self.items = response.data.data;
+      const _this = this;
+      axios.get('/admin/gps/stats/allYear').then(function(response) {
+        _this.stats = response.data.data;
       });
     },
-    emitQuery(month, type_query) {
-      const self = this;
-      self.$eventBus.$emit("STAT_QUERY", { month, type_query });
+    emitQuery(month, stat_query) {
+      const _this = this;
+      _this.$eventBus.$emit('STAT_QUERY', { month, stat_query });
     },
   },
 };

@@ -2,6 +2,7 @@
 
 namespace App\Components\Gps\Models;
 
+use App\Components\Core\Utilities\Helpers;
 use Carbon\Carbon;
 use App\Components\User\Models\User;
 use Illuminate\Database\Eloquent\Model;
@@ -20,6 +21,7 @@ class Gps extends Model
         'exchange_rate',
         'amount',
         'invoice',
+        'invoice_date',
         'payment_type',
         'estatus',
         'installation_date',
@@ -30,7 +32,7 @@ class Gps extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class,'uploaded_by');
+        return $this->belongsTo(User::class, 'uploaded_by');
     }
 
     /**
@@ -48,169 +50,59 @@ class Gps extends Model
      */
     public function chip()
     {
-        // return $this->hasOne(GpsChips::class,'sim','gps_chip_id');
-        return $this->belongsTo(GpsChips::class,'gps_chip_id');
+        return $this->belongsTo(GpsChips::class, 'gps_chip_id');
     }
 
     public function historical()
     {
-        return $this->hasMAny(GpsHistorical::class,'gps_id','id');
+        return $this->hasMAny(GpsHistorical::class, 'gps_id', 'id');
     }
 
-    public function scopeOfName($query, $name)
+    public function scopeFilter($query, array $filters)
     {
-        if ($name === null || $name === '') {
-            return false;
-        }
-
-        return $query->where('name', 'like', "%{$name}%");
-    }
-
-    public function scopeOfPayment($query, $v)
-    {
-        if ($v === null || $v === '') {
-            return false;
-        }
-
-        return $query->where('payment_type', 'LIKE', "%{$v}%");
-    }
-    public function scopeOfEstatus($query, $v)
-    {
-        if ($v === null || $v === '') {
-            return false;
-        }
-
-        return $query->where('estatus', 'LIKE', "%{$v}%");
-    }
-
-    public function scopeOfMonth($query, $v)
-    {
-        if ($v === null || $v === '') {
-            return false;
-        }
-        return $query->whereMonth('renew_date', $v);
-    }
-
-    public function scopeOfYear($query, $v)
-    {
-        if ($v === null || $v === '') {
-            return false;
-        }
-        return $query->whereYear('renew_date', $v);
-    }
-    public function scopeOfMonthInstallation($query, $v)
-    {
-        if ($v === null || $v === '') {
-            return false;
-        }
-        return $query->whereMonth('installation_date', $v);
-    }
-
-    public function scopeOfYearInstallation($query, $v)
-    {
-        if ($v === null || $v === '') {
-            return false;
-        }
-        return $query->whereYear('installation_date', $v);
-    }
-    public function scopeOfMonthCancelled($query, $v)
-    {
-        if ($v === null || $v === '') {
-            return false;
-        }
-        return $query->whereMonth('cancellation_date', $v);
-    }
-
-    public function scopeOfYearCancelled($query, $v)
-    {
-        if ($v === null || $v === '') {
-            return false;
-        }
-        return $query->whereYear('cancellation_date', $v);
-    }
-
-    public function scopeOfGpsGroups($q, $v)
-    {
-        if ($v === false || $v === '' || count($v) == 0 || $v[0] == '') {
-            return $q;
-        }
-
-        return $q->whereHas('gpsGroup', function ($q) use ($v) {
-            return $q->whereIn('id', $v);
-        });
-    }
-    public function scopeOfGpsChips($q, $v)
-    {
-        if ($v === false || $v === '' || count($v) == 0 || $v[0] == '') {
-            return $q;
-        }
-
-        return $q->whereHas('chip', function ($q) use ($v) {
-            return $q->whereIn('sim', $v);
+        $query->when($filters['name'] ?? null, function ($query, $name) {
+            $query->where(function ($query) use ($name) {
+                $query->orWhere('name', 'like', '%' . $name . '%');
+            });
+        })->when($filters['sim'] ?? null, function ($query, $sim) {
+            $query->whereHas('chip', function ($query) use ($sim) {
+                return $query->whereIn('sim', Helpers::commasToArray($sim));
+            });
+        })->when($filters['customer'] ?? null, function ($query, $customer) {
+            $query->whereHas('gpsGroup', function ($query) use ($customer) {
+                return $query->whereIn('id', Helpers::commasToArray($customer));
+            });
+        })->when($filters['agency'] ?? null, function ($query, $agency) {
+            $query->whereHas('gpsGroup', function ($query) use ($agency) {
+                return $query->where('agency', $agency);
+            });
+        })->when($filters['department'] ?? null, function ($query, $deparment) {
+            $query->whereHas('gpsGroup', function ($query) use ($deparment) {
+                return $query->where('department', $deparment);
+            });
+        })->when($filters['canceled'] ?? null, function ($query) {
+            return $query->whereNotNull('cancellation_date');
+        })->when($filters['defeated'] ?? null, function ($query) {
+            return $query->whereYear('renew_date', '<=', Carbon::now()->year);
         });
     }
 
-
-    public function scopeOfAgency($q, $v)
+    public function scopeFilterCanceled($query)
     {
-        if ($v === null || $v === '') {
-            return false;
-        }
-        return $q->whereHas('gpsGroup', function ($q) use ($v) {
-            return $q->where('agency', $v);
+        $query->whereNotNull('cancellation_date');
+    }
+
+    public function scopeFilterByDateRange($query, $rangeDates)
+    {
+        $query->when($rangeDates ?? null, function ($query, $dates) {
+            $query->where(function ($query) use ($dates) {
+                // $dates = Helpers::commasToArray($dates) ?? null;
+                if (count($dates) == 2) {
+                    $from = date($dates[0]);
+                    $to = date($dates[1]);
+                    $query->whereBetween('installation_date', [$from, $to]);
+                }
+            });
         });
-    }
-    public function scopeOfDepartment($q, $v)
-    {
-        if ($v === null || $v === '') {
-            return false;
-        }
-
-        return $q->whereHas('gpsGroup', function ($q) use ($v) {
-            return $q->where('department', $v);
-        });
-    }
-
-    public function scopeOfAssigned($q, $v)
-    {
-        if ($v === null || $v == false) {
-            return false;
-        }
-
-        return $q->has('chip');
-    }
-
-    public function scopeOfDeallocated($q, $v)
-    {
-        if ($v === null || $v == false) {
-            return false;
-        }
-
-        return $q->doesntHave('chip');
-    }
-
-    public function scopeOfExpired($q, $v)
-    {
-        if ($v === null || $v == false) {
-            return false;
-        }
-
-        return $q->whereDate('renew_date', '<=', Carbon::now());
-    }
-    public function scopeOfRenewed($q, $v)
-    {
-        if ($v === null || $v == false) {
-            return false;
-        }
-
-        return $q->whereYear('renew_date', '>=', Carbon::now()->addYear()->year);
-    }
-
-    public function scopeOfCancelled($q,$v){
-        if ($v === null || $v == false) {
-            return false;
-        }
-
-        return $q->whereNotNull('cancellation_date');
     }
 }
