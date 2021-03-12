@@ -5,9 +5,8 @@
       class="white--text mb-6"
       color="orange"
       large
-      v-if="Tracking.estatus.key == 'activo'"
+      v-if="Tracking.assertiveness < 1"
     >
-      <!-- && $gate.auth().id == Tracking.owner -->
       <template v-slot:icon>
         <v-tooltip top>
           <template v-slot:activator="{ on, attrs }">
@@ -54,7 +53,7 @@
                   v-on="on"
                   :rotate="360"
                   :size="64"
-                  :width="10"
+                  :width="5"
                   :value="
                     percenAssertiveness(event.last_assertiveness).value * 100
                   "

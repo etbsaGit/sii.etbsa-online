@@ -75,7 +75,6 @@
             class="mx-2"
             type="date"
             :rules="rules"
-            :readonly="editing"
             outlined
             filled
             dense

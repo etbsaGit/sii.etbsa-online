@@ -12,7 +12,7 @@
             v-on="on"
             :rotate="360"
             :size="56"
-            :width="10"
+            :width="5"
             :value="percenAssertiveness.value * 100"
             :color="percenAssertiveness.color"
           >

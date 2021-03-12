@@ -1,13 +1,23 @@
 <template>
   <v-form ref="form" v-model="valid" lazy-validation v-if="Tracking">
     <v-radio-group v-model="form.estatus" row hide-details class="my-2">
-      <v-radio label="Proximo Seguimiento" :value="'activo'"></v-radio>
+      <v-radio
+        v-if="
+          Tracking.estatus.key == 'activo' && $gate.auth().id == Tracking.owner
+        "
+        label="Proximo Seguimiento"
+        :value="'activo'"
+      ></v-radio>
       <v-radio label="Finalizar Seguimiento" :value="'finalizado'"></v-radio>
       <v-radio label="Formalizar Seguimiento" :value="'formalizado'"></v-radio>
     </v-radio-group>
     <v-card color="grey lighten-4" class="pa-2">
       <v-row align="center">
-        <v-col cols="12" md="6" v-if="form.estatus == 'activo'">
+        <v-col
+          cols="12"
+          md="6"
+          v-if="form.estatus == 'activo' && $gate.auth().id == Tracking.owner"
+        >
           <v-dialog
             ref="dialog"
             v-model="dialogCalendar"
@@ -189,6 +199,7 @@ export default {
     this.form.currency = this.Tracking.currency;
     this.form.tracking_condition = this.Tracking.tracking_condition;
     this.form.assertiveness = this.Tracking.assertiveness;
+    this.form.estatus = this.setEstatus();
   },
   methods: {
     submit() {
@@ -197,7 +208,10 @@ export default {
 
       let payload = {
         ...self.form,
-        last_assertiveness: self.form.assertiveness,
+        last_assertiveness:
+          self.form.estatus == 'formalizado' ? 1 : self.form.assertiveness,
+        assertiveness:
+          self.form.estatus == 'formalizado' ? 1 : self.form.assertiveness,
         last_price: self.form.price,
         last_currency: self.form.currency,
       };
@@ -235,6 +249,13 @@ export default {
     changeCurrency() {
       const self = this;
       self.form.currency = self.form.currency === 'MXN' ? 'USD' : 'MXN';
+    },
+    setEstatus() {
+      return this.$gate.auth().id == this.Tracking.owner
+        ? 'activo'
+        : this.Tracking.estatus.key == 'formalizado'
+        ? 'formalizado'
+        : 'finalizado';
     },
   },
 };
