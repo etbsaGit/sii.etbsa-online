@@ -137,16 +137,24 @@
           </v-list>
         </v-menu>
       </template>
-      <template #[`item.name`]="{ value }">
-        <span
-          class="caption font-weight-bold text-no-wrap text-uppercase"
-          v-text="value"
-        />
+      <template #[`item.name`]="{ item }">
+        <v-list-item dense>
+          <v-list-item-content class="py-0">
+            <v-list-item-title
+              class="caption font-weight-bold text-no-wrap text-uppercase"
+            >
+              {{ item.name }}
+            </v-list-item-title>
+            <v-list-item-subtitle
+              v-if="item.gps_group"
+              class="caption text-no-wrap text-uppercase"
+            >
+              {{ item.gps_group.name }}
+            </v-list-item-subtitle>
+          </v-list-item-content>
+        </v-list-item>
       </template>
-      <template #[`item.gps_group.name`]="{ value }">
-        <span class="caption text-no-wrap" v-text="value" />
-      </template>
-      <template #[`item.chio.sim`]="{ value }">
+      <template #[`item.chip.sim`]="{ value }">
         <span class="caption text-no-wrap" v-text="value" />
       </template>
       <template #[`item.chip.costo`]="{ value }">
@@ -178,9 +186,15 @@
           facturar
         </v-btn>
       </template>
-      <template #[`item.amount`]="{ value }">
-        <span class="caption font-weight-black text-no-wrap">
-          {{ value | currency }}
+      <template #[`item.amount`]="{ item }">
+        <span
+          v-if="!invoiced(item.renew_date)"
+          class="caption font-weight-black text-no-wrap"
+        >
+          {{ item.amount | currency }} {{ item.currency }}
+        </span>
+        <span v-else class="caption font-weight-black text-no-wrap">
+          {{ 0 | currency }} {{ item.currency }}
         </span>
       </template>
       <template #[`item.installation_date`]="{ value }">
@@ -296,7 +310,6 @@
         @change="toggle.change"
       />
     </drawer-rigth-filter>
-
     <v-dialog
       v-if="dialog.show"
       v-model="dialog.show"
@@ -361,19 +374,11 @@ export default {
           sortable: false,
         },
         {
-          text: 'Nombre GPS',
+          text: 'Nombre GPS / Cliente',
           value: 'name',
           align: 'left',
           class: 'overline',
           class: 'overline blue lighten-4',
-          sortable: false,
-        },
-        {
-          text: 'Cliente:',
-          value: 'gps_group.name',
-          align: 'left',
-          class: 'overline blue lighten-4',
-          divider: true,
           sortable: false,
         },
         {
@@ -399,12 +404,6 @@ export default {
           value: 'amount',
           align: 'right',
           sortable: true,
-        },
-        {
-          text: 'Moneda:',
-          value: 'currency',
-          align: 'left',
-          sortable: false,
         },
         {
           text: 'Instalado en:',

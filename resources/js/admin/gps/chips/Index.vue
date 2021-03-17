@@ -169,26 +169,13 @@
           {{ $appFormatters.formatDate(item.fecha_activacion) }}
         </span>
       </template>
-      <!-- <template v-slot:[`item.fecha_renovacion`]="{ item }">
-        <span class="overline text-capitalize">
-          <v-chip
-            :color="
-              getColor($appFormatters.formatTimeDiffNow(item.fecha_renovacion))
-            "
-            dark
-            small
-          >
-            {{
-              $appFormatters.formatTimeDiffNow(item.fecha_renovacion, "days")
-            }}
-            Dias
-          </v-chip>
-        </span>
-      </template> -->
 
-      <template v-slot:[`item.gps_id`]="{ item }">
+      <template v-slot:[`item.gps.id`]="{ item }">
         <v-avatar outlined>
-          <v-tooltip top v-if="item.gps != null">
+          <v-icon class="grey--text" v-if="item.gps == null"
+            >mdi-alert-rhombus-outline</v-icon
+          >
+          <v-tooltip top v-else-if="item.gps.name">
             <template v-slot:activator="{ on, attrs }">
               <v-icon class="green--text" v-bind="attrs" v-on="on"
                 >mdi-check-circle-outline</v-icon
@@ -196,7 +183,6 @@
             </template>
             <span>{{ item.gps.name }}</span>
           </v-tooltip>
-          <v-icon class="grey--text" v-else>mdi-alert-rhombus-outline</v-icon>
         </v-avatar>
       </template>
     </v-data-table>
@@ -284,17 +270,11 @@ export default {
           align: 'center',
           sortable: true,
         },
-        // {
-        //   text: "Fecha Renovacion",
-        //   value: "fecha_renovacion",
-        //   align: "center",
-        //   sortable: true,
-        // },
         {
           text: 'Asignado',
-          value: 'gps_id',
+          value: 'gps.id',
           align: 'center',
-          sortable: true,
+          sortable: false,
         },
       ],
       items: [],

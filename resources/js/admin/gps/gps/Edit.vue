@@ -28,22 +28,25 @@
           <thead>
             <tr>
               <th class="text-left">
+                #
+              </th>
+              <th class="text-left">
                 Factura
               </th>
               <th class="text-left">
                 Importe Moneda
               </th>
-
               <th class="text-left">
                 Fecha Facturacion
               </th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(item, index) in desserts" :key="index">
-              <td>{{ item.calories }}</td>
-              <td>{{ item.calories | currency }} {{ item.name }}</td>
-              <td>01-01-2020</td>
+            <tr v-for="(item, index) in historical" :key="index">
+              <td>{{ index + 1 }}</td>
+              <td>{{ item.invoice }}</td>
+              <td>{{ item.amount | currency }} {{ item.currency }}</td>
+              <td>{{ item.invoice_date }}</td>
             </tr>
           </tbody>
         </template>
@@ -67,50 +70,37 @@ export default {
     return {
       valid: true,
       form: {},
+      historical: [],
       options: {
         groups: [],
         chips: [],
         types: ['CONTADO', 'CREDITO', 'CARGO'],
       },
-      desserts: [
-        {
-          name: 'MXN',
-          calories: 159,
-        },
-        {
-          name: 'MXN',
-          calories: 237,
-        },
-      ],
     };
   },
   mounted() {
-    // this.$store.commit('setBreadcrumbs', [
-    //   { label: 'GPS', to: { name: 'gps' } },
-    //   { label: 'Detalle', to: { name: '' } },
-    // ]);
     this.loadGps(() => {});
     this.loadOptions(() => {});
   },
   methods: {
     save() {
       if (!this.$refs.form.validate()) return;
-      const self = this;
+      const _this = this;
 
       axios
-        .put(`/admin/gps/${self.propGpsId}`, self.form)
+        .put(`/admin/gps/${_this.propGpsId}`, _this.form)
         .then(function(response) {
-          self.$store.commit('showSnackbar', {
+          _this.$store.commit('showSnackbar', {
             message: response.data.message,
             color: 'success',
             duration: 3000,
           });
 
-          self.$eventBus.$emit('GPS_REFRESH');
+          _this.$eventBus.$emit('GPS_REFRESH');
         })
         .catch(function(error) {
           if (error.response) {
-            self.$store.commit('showSnackbar', {
+            _this.$store.commit('showSnackbar', {
               message: error.response.data.message,
               color: 'error',
               duration: 3000,
@@ -123,33 +113,35 @@ export default {
         });
     },
     loadGps(cb) {
-      const self = this;
+      const _this = this;
       axios
-        .get('/admin/gps/' + self.propGpsId + '/edit')
+        .get('/admin/gps/' + _this.propGpsId + '/edit')
         .then(function(response) {
           let Gps = response.data.data;
-          self.form = {
+          _this.form = {
             ...Gps,
-            installation_date: self.$appFormatters.formatDate(
+            installation_date: _this.$appFormatters.formatDate(
               Gps.installation_date
             ),
-            renew_date: self.$appFormatters.formatDate(Gps.renew_date),
+            renew_date: _this.$appFormatters.formatDate(Gps.renew_date),
             invoice_date: Gps.invoice_date
-              ? self.$appFormatters.formatDate(Gps.invoice_date || '')
+              ? _this.$appFormatters.formatDate(Gps.invoice_date || '')
               : null,
           };
 
-          self.$store.commit('showSnackbar', {
+          _this.historical = Gps.historical;
+
+          _this.$store.commit('showSnackbar', {
             message: response.data.message,
             color: 'success',
             duration: 3000,
           });
         })
         .catch(function(error) {
-          self.$store.commit('hideLoader');
+          _this.$store.commit('hideLoader');
 
           if (error.response) {
-            self.$store.commit('showSnackbar', {
+            _this.$store.commit('showSnackbar', {
               message: error.response.data.message,
               color: 'error',
               duration: 3000,
@@ -163,10 +155,10 @@ export default {
       cb();
     },
     loadOptions(cb) {
-      const self = this;
+      const _this = this;
       axios.get('/admin/gps/search/resources').then(function(response) {
-        self.options.chips = response.data.data.chips;
-        self.options.groups = response.data.data.groups;
+        _this.options.chips = response.data.data.chips;
+        _this.options.groups = response.data.data.groups;
         (cb || Function)();
       });
     },

@@ -127,7 +127,7 @@ class GpsController extends AdminController
             'payment_type' => $gp->payment_type,
             'gps_group_id' => $gp->gps_group_id,
             'gps_chip_id' => $gp->chip->sim ?? null,
-            'historical' => $gp->historical
+            'historical' => $gp->historical->map->only('invoice', 'invoice_date', 'amount', 'currency')
         ];
         return $this->sendResponseOk($data);
     }
@@ -164,6 +164,11 @@ class GpsController extends AdminController
         if ($validate->fails()) {
             return $this->sendResponseBadRequest($validate->errors()->first());
         }
+
+        if ($request->gps_chip_id) {
+            $request['cancellation_date'] = null;
+        }
+
         $updated = $gp->update($request->all());
 
         if (!$updated) {
@@ -243,7 +248,8 @@ class GpsController extends AdminController
      */
     public function destroy(Gps $gp)
     {
-        //
+        $gp->delete();
+        return $this->sendResponseDeleted();
     }
 
     public function stats()

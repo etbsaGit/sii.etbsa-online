@@ -26,7 +26,8 @@ class GpsChips extends Model
     public function gps()
     {
         // return $this->belongsTo(Gps::class, 'gps_id');
-        return $this->hasOne(Gps::class,'gps_chip_id');
+        // return $this->hasOne(Gps::class,'gps_chip_id');
+        return $this->hasOne(Gps::class, 'gps_chip_id', 'sim');
     }
 
     public function scopeOfSim($query, $sim)
@@ -67,7 +68,7 @@ class GpsChips extends Model
         if ($v === null || $v == false) {
             return false;
         }
-        
+
         return $q->has('gps');
     }
 

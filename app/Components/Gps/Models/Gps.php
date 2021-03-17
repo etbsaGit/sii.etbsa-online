@@ -82,6 +82,8 @@ class Gps extends Model
             });
         })->when($filters['canceled'] ?? null, function ($query) {
             return $query->whereNotNull('cancellation_date');
+        }, function ($query) {
+            return $query->whereNull('cancellation_date');
         })->when($filters['defeated'] ?? null, function ($query) {
             return $query->whereYear('renew_date', '<=', Carbon::now()->year);
         });
