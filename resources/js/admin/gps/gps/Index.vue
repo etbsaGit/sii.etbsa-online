@@ -26,14 +26,14 @@
             <v-spacer></v-spacer>
             <v-dialog
               ref="dialog"
-              v-model="modal"
-              :return-value.sync="date"
+              v-model="modal_date_install"
+              :return-value.sync="date_install"
               persistent
               width="354px"
             >
               <template v-slot:activator="{ on, attrs }">
                 <v-text-field
-                  v-model="dateRangeText"
+                  v-model="dateInstallRangeText"
                   label="Filtro Fechas de instalacion"
                   placeholder="Seleccione un Rango de Fechas"
                   prepend-icon="mdi-calendar"
@@ -44,22 +44,69 @@
                   outlined
                   readonly
                   dense
-                  @click:append-outer="(filters.dates = []), (date = [])"
+                  @click:append-outer="
+                    (filters.datesInstall = []), (date_install = [])
+                  "
                 ></v-text-field>
               </template>
-              <v-date-picker v-model="date" range>
+              <v-date-picker v-model="date_install" range>
                 <v-spacer></v-spacer>
                 <v-btn
                   text
                   color="primary"
-                  @click="(modal = false), (date = [])"
+                  @click="(modal_date_install = false), (date_install = [])"
                 >
                   Cancel
                 </v-btn>
                 <v-btn
                   text
                   color="primary"
-                  @click="$refs.dialog.save((filters.dates = date))"
+                  @click="
+                    $refs.dialog.save((filters.datesInstall = date_install))
+                  "
+                >
+                  OK
+                </v-btn>
+              </v-date-picker>
+            </v-dialog>
+            <v-dialog
+              ref="dialog"
+              v-model="modal_date_renew"
+              :return-value.sync="date_renew"
+              persistent
+              width="354px"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  v-model="dateRenewRangeText"
+                  label="Filtro Fechas de renovacion"
+                  placeholder="Seleccione un Rango de Fechas"
+                  prepend-icon="mdi-calendar"
+                  append-outer-icon="mdi-close"
+                  v-bind="attrs"
+                  v-on="on"
+                  hide-details
+                  outlined
+                  readonly
+                  dense
+                  @click:append-outer="
+                    (filters.datesRenew = []), (date_renew = [])
+                  "
+                ></v-text-field>
+              </template>
+              <v-date-picker v-model="date_renew" range>
+                <v-spacer></v-spacer>
+                <v-btn
+                  text
+                  color="primary"
+                  @click="(modal_date_renew = false), (date_renew = [])"
+                >
+                  Cancel
+                </v-btn>
+                <v-btn
+                  text
+                  color="primary"
+                  @click="$refs.dialog.save((filters.datesRenew = date_renew))"
                 >
                   OK
                 </v-btn>
@@ -363,8 +410,10 @@ export default {
   data() {
     return {
       drawer: null,
-      modal: false,
-      date: [],
+      modal_date_install: false,
+      date_install: [],
+      modal_date_renew: false,
+      date_renew: [],
       items: [],
       headers: [
         {
@@ -432,7 +481,8 @@ export default {
         customer: null,
         defeated: false,
         canceled: false,
-        dates: [],
+        datesInstall: [],
+        datesRenew: [],
       },
       options: {
         chips: [],
@@ -504,12 +554,20 @@ export default {
       return this.dialog.props;
       // }
     },
-    dateRangeText: {
+    dateInstallRangeText: {
       get: function() {
-        return this.filters.dates.join(',');
+        return this.filters.datesInstall.join(',');
       },
       set: function(newValue) {
-        newValue ? (this.filters.dates = newValue.split(' ')) : [];
+        newValue ? (this.filters.datesInstall = newValue.split(' ')) : [];
+      },
+    },
+    dateRenewRangeText: {
+      get: function() {
+        return this.filters.datesRenew.join(',');
+      },
+      set: function(newValue) {
+        newValue ? (this.filters.datesRenew = newValue.split(' ')) : [];
       },
     },
   },

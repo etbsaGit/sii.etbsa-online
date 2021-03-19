@@ -94,7 +94,7 @@ class Gps extends Model
         $query->whereNotNull('cancellation_date');
     }
 
-    public function scopeFilterByDateRange($query, $rangeDates)
+    public function scopeFilterByDateRangeInstall($query, $rangeDates)
     {
         $query->when($rangeDates ?? null, function ($query, $dates) {
             $query->where(function ($query) use ($dates) {
@@ -103,6 +103,20 @@ class Gps extends Model
                     $from = date($dates[0]);
                     $to = date($dates[1]);
                     $query->whereBetween('installation_date', [$from, $to]);
+                }
+            });
+        });
+    }
+
+    public function scopeFilterByDateRangeRenew($query, $rangeDates)
+    {
+        $query->when($rangeDates ?? null, function ($query, $dates) {
+            $query->where(function ($query) use ($dates) {
+                // $dates = Helpers::commasToArray($dates) ?? null;
+                if (count($dates) == 2) {
+                    $from = date($dates[0]);
+                    $to = date($dates[1]);
+                    $query->whereBetween('renew_date', [$from, $to]);
                 }
             });
         });
