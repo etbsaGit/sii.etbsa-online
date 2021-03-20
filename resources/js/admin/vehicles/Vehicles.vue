@@ -18,30 +18,30 @@
 export default {
   data() {
     return {
-      activeTab: "",
+      activeTab: '',
     };
   },
   computed: {
     Tabs() {
       return [
         {
-          title: "Flotilla",
-          icon: "mdi-car",
-          to: { name: "vehicle.list" },
+          title: 'Flotilla',
+          icon: 'mdi-car',
+          to: { name: 'vehicle.list' },
           // show: this.$gate.allow("updateUser", "user"),
           show: true,
         },
         {
-          title: "Dispersiones",
-          icon: "mdi-gas-station",
-          to: { name: "vehicle.dispersion.list" },
+          title: 'Dispersiones',
+          icon: 'mdi-gas-station',
+          to: { name: 'vehicle.dispersion.list' },
           show: true,
           // show: this.$gate.allow("assignSeller", "tracking"),
         },
         {
-          title: "Servicios",
-          icon: "mdi-settings",
-          to: { name: "vehicle.services.list" },
+          title: 'Servicios',
+          icon: 'mdi-settings',
+          to: { name: 'vehicle.services.list' },
           show: true,
         },
       ];

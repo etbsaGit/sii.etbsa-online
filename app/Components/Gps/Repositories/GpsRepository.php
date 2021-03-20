@@ -24,7 +24,8 @@ class GpsRepository extends BaseRepository
         return $this->get($params, ['gpsGroup', 'chip'], function ($query) use ($params) {
             $query->where(function ($query) use ($params) {
                 $query->filter($params)
-                    ->filterByDateRange($params['dates'] ?? null);
+                    ->filterByDateRangeInstall($params['datesInstall'] ?? null)
+                    ->filterByDateRangeInstall($params['datesRenew'] ?? null);
             });
 
             return $query;
@@ -33,7 +34,9 @@ class GpsRepository extends BaseRepository
 
     public function getStatsGps(Int $month, Int $year)
     {
-        $Total = $this->model->whereMonth('installation_date', $month)->count();
+        $Total = $this->model->whereMonth('installation_date', $month)
+            ->whereNull('cancellation_date')
+            ->count();
 
         $Nuevos = $this->model->where(function ($query) use ($month, $year) {
             $query->whereMonth('installation_date', $month)
@@ -45,7 +48,8 @@ class GpsRepository extends BaseRepository
         $Renovados = $this->model->where(function ($query) use ($month, $year) {
             $query->whereMonth('renew_date', $month)
                 ->whereYear('renew_date', '>', $year)
-                ->whereNull('cancellation_date');
+                ->whereNull('cancellation_date')
+                ->whereYear('installation_date', '<', $year);
         })->count();
 
         $PorRenovar = $this->model->where(function ($query) use ($month, $year) {
