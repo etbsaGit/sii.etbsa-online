@@ -52,7 +52,7 @@ class GpsController extends AdminController
     {
         $resources = [
             'groups_gps' => GpsGroup::all('id', 'name'),
-            'chips_gps' => GpsChips::whereNull('gps_id')->get('sim', 'costo'),
+            'chips_gps' => GpsChips::all('sim', 'costo'),
             'types' => ['CONTADO', 'CREDITO', 'CARGO']
         ];
 

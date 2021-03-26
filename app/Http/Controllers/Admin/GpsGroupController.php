@@ -4,10 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Components\Gps\Repositories\GpsGroupRepository;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class GpsGroupController extends AdminController
 {
-        /**
+    /**
      * @var GpsGroupRepository
      */
     private $gpsGroupRepository;
@@ -42,19 +43,22 @@ class GpsGroupController extends AdminController
      */
     public function store(Request $request)
     {
-        $validate = validator($request->all(),[
+        $validate = validator($request->all(), [
             'name' => 'required|string',
+            'phone' => 'required|unique:gps_groups,phone',
             // 'description' => 'required|string',
+        ], [
+            'name.required' => 'El campo nombre es obligatorio',
+            'phone.unique' => 'Error Telefono Duplicado, Ya se encuentra Registrado',
         ]);
 
-        if($validate->fails())
-        {
+        if ($validate->fails()) {
             return $this->sendResponseBadRequest($validate->errors()->first());
         }
 
         $file = $this->gpsGroupRepository->create($request->all());
 
-        if(!$file)  return $this->sendResponseBadRequest("Failed to create.");
+        if (!$file)  return $this->sendResponseBadRequest("Failed to create.");
 
         return $this->sendResponseCreated($file);
     }
@@ -69,7 +73,7 @@ class GpsGroupController extends AdminController
     {
         $file = $this->gpsGroupRepository->find($id);
 
-        if(!$file) return $this->sendResponseNotFound();
+        if (!$file) return $this->sendResponseNotFound();
 
         return $this->sendResponseOk($file);
     }
@@ -83,18 +87,18 @@ class GpsGroupController extends AdminController
      */
     public function update(Request $request, $id)
     {
-        $validate = validator($request->all(),[
+        $validate = validator($request->all(), [
             'name' => 'required|string',
             'description' => 'required|string',
         ]);
 
-        if($validate->fails()) return $this->sendResponseBadRequest($validate->errors()->first());
+        if ($validate->fails()) return $this->sendResponseBadRequest($validate->errors()->first());
 
-        $updated = $this->gpsGroupRepository->update($id,$request->all());
+        $updated = $this->gpsGroupRepository->update($id, $request->all());
 
-        if(!$updated) return $this->sendResponseBadRequest("Failed to update");
+        if (!$updated) return $this->sendResponseBadRequest("Failed to update");
 
-        return $this->sendResponseOk([],"Updated.");
+        return $this->sendResponseOk([], "Updated.");
     }
 
     /**
@@ -107,6 +111,6 @@ class GpsGroupController extends AdminController
     {
         $this->gpsGroupRepository->delete($id);
 
-        return $this->sendResponseOk([],"Deleted.");
+        return $this->sendResponseOk([], "Deleted.");
     }
 }

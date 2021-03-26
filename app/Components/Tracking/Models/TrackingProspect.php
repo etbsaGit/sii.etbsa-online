@@ -6,8 +6,6 @@ use App\Components\Common\Models\Estatus;
 use App\Components\User\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use App\Components\Core\Utilities\Helpers;
-use Auth;
-use Carbon\Carbon;
 
 class TrackingProspect extends Model
 {
@@ -73,7 +71,7 @@ class TrackingProspect extends Model
     {
         $query->when($filters['folio'] ?? null, function ($query, $folio) {
             $query->where(function ($query) use ($folio) {
-                $query->orWhere('id', 'like', '%' . $folio . '%');
+                $query->orWhere('id', 'like', $folio);
             });
         })->when($filters['title'] ?? null, function ($query, $title) {
             $query->where(function ($query) use ($title) {

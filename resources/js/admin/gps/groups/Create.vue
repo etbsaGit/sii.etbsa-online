@@ -5,7 +5,7 @@
         <v-container grid-list-md>
           <v-layout row wrap>
             <v-flex xs12>
-              <div class="body-2 white--text">Grupo GPS Detalle</div>
+              <div class="body-2 white--text">Registrar Cliente GPS</div>
             </v-flex>
             <v-flex xs9>
               <v-text-field
@@ -101,7 +101,7 @@ export default {
       self.isLoading = true;
 
       axios
-        .post("/admin/gpsCustomers/", payload)
+        .post("/admin/gpsCustomers", payload)
         .then(function(response) {
           self.$store.commit("showSnackbar", {
             message: response.data.message,

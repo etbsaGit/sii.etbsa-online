@@ -135,7 +135,7 @@
       :overlay="false"
     >
       <v-card>
-        <v-toolbar class="primary">
+        <v-toolbar class="accent">
           <v-btn
             icon
             @click.native="(dialogs.show = false), (editedIndex = -1)"
@@ -267,8 +267,8 @@ export default {
   computed: {
     formTitle() {
       return this.editedIndex === -1
-        ? 'Registrar Grupo GPS'
-        : 'Editar Grupo GPS';
+        ? 'Registrar Cliente GPS'
+        : 'Editar Cliente GPS';
     },
     formAdd() {
       return this.editedIndex === -1;
