@@ -6,54 +6,51 @@ export const vehicles = [
       {
         path: "list",
         name: "vehicle.list",
-        component: require("@admin/vehicles/vehicles/VehicleList").default,
+        component: require("@admin/vehicles/vehicles/Index").default,
       },
       {
         path: "create",
         name: "vehicle.create",
-        component: require("@admin/vehicles/vehicles/VehiclesFormCreate")
-          .default,
+        component: require("@admin/vehicles/vehicles/Create").default,
       },
       {
         path: "edit/:propVehicleId",
         name: "vehicle.edit",
-        component: require("@admin/vehicles/vehicles/VehiclesFormEdit").default,
+        component: require("@admin/vehicles/vehicles/Edit").default,
         props: true,
       },
       {
         path: "/dispersion/list",
-        name: "vehicle.dispersion.list",
-        component: require("@admin/vehicles/dispersals/DispersalList").default,
+        name: "vehicle.dispersal.list",
+        component: require("@admin/vehicles/dispersals/Index").default,
       },
       {
-        path: "/dispersion/create/:propsVehicleId?",
+        path: "/dispersion/create/:propVehicleId?",
         name: "vehicle.dispersal.create",
-        component: require("@admin/vehicles/dispersals/DispersalCreate")
-          .default,
+        component: require("@admin/vehicles/dispersals/Create").default,
         props: true,
       },
       {
         path: "/dispersion/edit/:propsVehicleDispersalId",
-        name: "vehicle.dispersion.edit",
-        component: require("@admin/vehicles/dispersals/DispersalShow").default,
+        name: "vehicle.dispersal.edit",
+        component: require("@admin/vehicles/dispersals/Edit").default,
         props: true,
       },
       {
         path: "/services/list",
         name: "vehicle.services.list",
-        component: require("@admin/vehicles/services/ServicesVehicleList")
-          .default,
+        component: require("@admin/vehicles/services/Index").default,
       },
       {
-        path: "/services/create/:propsVehicleId?",
+        path: "/services/create/:propVehicleId?",
         name: "vehicle.services.create",
-        component: require("@admin/vehicles/services/ServicesCreate").default,
+        component: require("@admin/vehicles/services/Create").default,
         props: true,
       },
       {
-        path: "/services/edit/:propsVehicleServiceId",
+        path: "/services/edit/:propServiceId",
         name: "vehicle.services.edit",
-        component: require("@admin/vehicles/services/ServicesShow").default,
+        component: require("@admin/vehicles/services/Edit").default,
         props: true,
       },
     ],

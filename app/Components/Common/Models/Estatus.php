@@ -12,9 +12,18 @@ class Estatus extends Model
     const ESTATUS_FINALIZADO = 'finalizado';
     const ESTATUS_FORMALIZADO = 'formalizado';
     const ESTATUS_AUTORIZADO = 'autorizado';
+    const ESTATUS_PENDIENTE = 'pendiente';
+    const ESTATUS_PAGADA = 'pagada';
+    const ESTATUS_RECIBIDA = 'recibida';
+    const ESTATUS_VERIFICADO = 'verificado';
+    const ESTATUS_FACTURADO = 'facturado';
+    const ESTATUS_DENGAR = 'denegar';
+    const ESTATUS_DISPERSADO = 'flotilla.dispersado';
+    const ESTATUS_EnSERVICIO = 'flotilla.enServicio';
+    const ESTATUS_SERVICIO_TERMINADO = 'flotilla.servicio.terminado';
 
 
-       /**
+    /**
      * The database table used by the model.
      *
      * @var string
@@ -26,7 +35,7 @@ class Estatus extends Model
      *
      * @var array
      */
-    protected $fillable = ['title','description','key'];
+    protected $fillable = ['title', 'description', 'key'];
 
     /**
      * the rules of the Group for validation before persisting
@@ -41,6 +50,6 @@ class Estatus extends Model
 
     public function tracking()
     {
-        return $this->hasMany(TrackingProspect::class,'id');
+        return $this->hasMany(TrackingProspect::class, 'id');
     }
 }

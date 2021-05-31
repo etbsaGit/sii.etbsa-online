@@ -21,28 +21,12 @@ class GpsChipsRepository extends BaseRepository
      */
     public function index($params)
     {
-        return $this->get($params, ['gps'], function ($q) use ($params) {
-            // $sim = Arr::get($params, 'sim', null);
-            $assigned = ($params['assigned'] ?? null);
-            $deallocated = ($params['deallocated'] ?? null);
-            $expired = ($params['expired'] ?? null);
+        return $this->get($params, ['gps'], function ($query) use ($params) {
 
-            // if ($sim) {
-            //     $q = $q->where('sim', 'like', "%{$sim}%");
-            // }
+            $query->search($params['search'] ?? '')
+                ->filter($params);
 
-            $q->ofSim($params['sim'] ?? '');
-            $q->ofImei($params['imei'] ?? '');
-            $q->ofMonth($params['month'] ?? '');
-            $q->ofYear($params['year'] ?? '');
-
-            if (!($assigned && $deallocated)) {
-                $q->ofAssigned($assigned);
-                $q->ofDeallocated($deallocated);
-                $q->ofExpired($expired);
-            }
-
-            return $q;
+            return $query;
         });
     }
 

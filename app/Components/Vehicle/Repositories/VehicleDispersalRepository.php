@@ -23,24 +23,9 @@ class VehicleDispersalRepository extends BaseRepository
      */
     function list($params)
     {
-        return $this->get($params, ['vehicle', 'user', 'cargoA', 'estatus'], function ($q) use ($params) {
-
-            $q->ofFolio($params['folio'] ?? '');
-            $q->ofEstatus(Helpers::commasToArray($params['estatus_keys'] ?? ''));
-            $q->ofAgency(Helpers::commasToArray($params['agencies_id'] ?? ''));
-
-            if (Auth::user()->hasPermission('flotilla.admin')) {
-                return $q;
-            }
-
-            if (Auth::user()->hasPermission('flotilla.dispersar')) {
-                $q->whereHas('estatus', function ($q) {
-                    return $q->whereIn('key', ['dispersal:autorizado', 'dispersal:dispersado']);
-                });
-                return $q;
-            }
-
-            $q->where('solicitante', Auth::user()->id);
+        return $this->get($params, [
+            'vehicle', 'agency:id,title', 'department:id,title'
+        ], function ($q) use ($params) {
 
             return $q;
         });

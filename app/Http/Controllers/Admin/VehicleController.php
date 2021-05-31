@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Components\Vehicle\Models\Vehicle;
 use App\Components\Vehicle\Repositories\VehicleRepository;
+use DB;
 use Illuminate\Http\Request;
 
 class VehicleController extends AdminController
@@ -40,8 +41,7 @@ class VehicleController extends AdminController
      */
     public function store(Request $request)
     {
-        $validate = validator($request->all(), [
-        ]);
+        $validate = validator($request->all(), []);
 
         if ($validate->fails()) {
             return $this->sendResponseBadRequest($validate->errors()->first());
@@ -64,12 +64,10 @@ class VehicleController extends AdminController
      */
     public function show($id)
     {
-        $vehicle = $this->vehicleRepository->find($id, ['user','agency']);
-
+        $vehicle = $this->vehicleRepository->find($id, ['dispersals.vehicle', 'services']);
         if (!$vehicle) {
             return $this->sendResponseNotFound();
         }
-
         return $this->sendResponseOk($vehicle);
     }
 
@@ -80,18 +78,51 @@ class VehicleController extends AdminController
      * @param  \App\Vehicle  $vehicle
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Vehicle $vehicle)
     {
         $validate = validator($request->all(), [
+            'matricula' => 'required',
+            'model' => 'required',
+            'brand' => 'required',
+            'serie' => 'required',
+            'year' => 'required',
+            'fuel' => 'required',
+
+            // 'actual_mileage',
+            // 'fuel_odometer',
+            // 'last_mileage',
+            // 'max_lts_fuel',
+            // 'mileage_last_service',
+            // 'mileage_range_service',
+            // 'ticket_card',
+            // 'agency_id',
+            // 'user_id',
         ]);
 
         if ($validate->fails()) {
             return $this->sendResponseBadRequest($validate->errors()->first());
         }
 
-        $payload = $request->all();
+        $updated = $vehicle->update($request->all());
 
-        $updated = $this->vehicleRepository->update($id, $payload);
+        if (!$updated) {
+            return $this->sendResponseBadRequest("Failed update");
+        }
+
+        return $this->sendResponseUpdated();
+    }
+
+    public function assignedUser(Request $request, Vehicle $vehicle)
+    {
+        $validate = validator($request->all(), [
+            'user_id' => 'required',
+        ]);
+
+        if ($validate->fails()) {
+            return $this->sendResponseBadRequest($validate->errors()->first());
+        }
+
+        $updated = $vehicle->update($request->all());
 
         if (!$updated) {
             return $this->sendResponseBadRequest("Failed update");
@@ -115,5 +146,15 @@ class VehicleController extends AdminController
         }
 
         return $this->sendResponseDeleted();
+    }
+
+    public function options()
+    {
+        $users = DB::table('users')->get(['id', 'name']);
+        $agencies = DB::table('agencies')->get(['id', 'code', 'title']);
+        return $this->sendResponseOk(compact(
+            'users',
+            'agencies'
+        ), "list Resources orders ok.");
     }
 }

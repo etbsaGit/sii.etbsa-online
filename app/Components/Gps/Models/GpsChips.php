@@ -16,7 +16,6 @@ class GpsChips extends Model
         'imei',
         'costo',
         'fecha_activacion',
-        'fecha_renovacion',
         'fecha_cancelacion',
         'descripcion',
     ];
@@ -25,68 +24,53 @@ class GpsChips extends Model
      */
     public function gps()
     {
-        // return $this->belongsTo(Gps::class, 'gps_id');
-        // return $this->hasOne(Gps::class,'gps_chip_id');
         return $this->hasOne(Gps::class, 'gps_chip_id', 'sim');
     }
 
-    public function scopeOfSim($query, $sim)
+    public function scopeSearch($query, String $search)
     {
-        if ($sim === null || $sim === '') {
-            return false;
-        }
-
-        return $query->where('sim', 'like', "%{$sim}%");
+        $query->when($search ?? null, function ($query, $search) {
+            $query->where(function ($query) use ($search) {
+                $query->orWhere('sim', 'like', "%{$search}%")
+                    ->orWhere('imei', 'like', "%{$search}%");
+            });
+        });
     }
-    public function scopeOfImei($query, $sim)
+    public function scopeFilter($query, array $filters)
     {
-        if ($sim === null || $sim === '') {
-            return false;
-        }
+        $query->when($filters['sim'] ?? null, function ($query, $sim) {
+            $query->where(function ($query) use ($sim) {
+                $query->orWhere('sim', 'like', "%{$sim}%");
+            });
+        })->when($filters['month'] ?? null, function ($query, $month) {
+            $query->where(function ($query) use ($month) {
+                $query->orWhereMonth('fecha_activacion', $month)
+                    ->orWhereMonth('fecha_cancelacion', $month);
+            });
+        })->when($filters['year'] ?? null, function ($query, $year) {
+            $query->where(function ($query) use ($year) {
+                $query->orWhereYear('fecha_activacion', $year)
+                    ->orWhereYear('fecha_cancelacion', $year);
+            });
+        });
 
-        return $query->where('imei', 'like', "%{$sim}%");
-    }
-
-    public function scopeOfMonth($query, $v)
-    {
-        if ($v === null || $v === '') {
-            return false;
-        }
-        return $query->whereMonth('fecha_activacion', $v);
-    }
-
-    public function scopeOfYear($query, $v)
-    {
-        if ($v === null || $v === '') {
-            return false;
-        }
-        return $query->whereYear('fecha_activacion', $v);
-    }
-
-    public function scopeOfAssigned($q, $v)
-    {
-        if ($v === null || $v == false) {
-            return false;
-        }
-
-        return $q->has('gps');
-    }
-
-    public function scopeOfDeallocated($q, $v)
-    {
-        if ($v === null || $v == false) {
-            return false;
-        }
-
-        return $q->doesntHave('gps');
-    }
-
-    public function scopeOfExpired($q, $v)
-    {
-        if ($v === null || $v == false) {
-            return false;
-        }
-
-        return $q->whereDate('fecha_renovacion', '<=', Carbon::now());
+        // ->when($filters['assigned'] ?? null, function ($query) {
+        //     // return $query->has('gps');
+        // });
+        // });
+        // ->when($filters['assigned'], function ($query) {
+        //     $query->where(function ($query) {
+        //         $query->has('gps');
+        //     });
+        // });
+        // ->when($filters['deallocated'] ?? null, function ($query, $deallocated) {
+        //     if ($deallocated)
+        //         $query->doesntHave('gps');
+        // });
+        // ->when(!!!$filters['canceled'], function ($query) {
+        //     $query->whereNull('fecha_cancelacion');
+        // }, function ($query) {
+        //     $query->whereNotNull('fecha_cancelacion');
+        // });
     }
 }

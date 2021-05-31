@@ -76,7 +76,7 @@ trait ResponseHelpers
      * @param array $headers
      * @return \Illuminate\Http\Response
      */
-    public function sendResponseCreated($data = [], string $message = "Regsitro Creado.", array $headers = [])
+    public function sendResponseCreated($data = [], string $message = "Registro Creado.", array $headers = [])
     {
         return $this->sendResponse($data, $message, 201, $headers);
     }

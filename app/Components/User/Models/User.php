@@ -30,7 +30,7 @@ class User extends Authenticatable
         'agency_id', 'departments_id', 'job_title', 'seller_key'
     ];
 
-    protected $with = ['agency'];
+    protected $with = ['agency', 'department'];
 
     /**
      * The attributes that should be hidden for arrays.

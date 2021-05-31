@@ -1,185 +1,5 @@
 <template>
-  <div class="component-wrap">
-    <!-- search -->
-    <v-expansion-panels>
-      <v-expansion-panel>
-        <v-expansion-panel-header
-          color="grey lighten-3"
-          class="titlle text-uppercase font-weight-bold"
-        >
-          <span> <v-icon>mdi-magnify</v-icon> Filtros </span>
-          <template v-slot:actions>
-            <v-icon> mdi-arrow-down </v-icon>
-          </template>
-        </v-expansion-panel-header>
-        <v-expansion-panel-content class="pa-0">
-          <v-form ref="formSearch">
-            <v-row class="mx-2 my-0">
-              <v-col cols="12" md="4">
-                <v-text-field
-                  append-icon="mdi-magnify"
-                  label="Buscar Folio:"
-                  v-model="filters.folio"
-                  outlined
-                  hide-details
-                  clearable
-                  dense
-                ></v-text-field>
-              </v-col>
-              <v-col cols="12" md="4">
-                <v-text-field
-                  append-icon="mdi-magnify"
-                  label="Fitrar por Titulo Seguimiento"
-                  v-model="filters.title"
-                  outlined
-                  hide-details
-                  clearable
-                  dense
-                ></v-text-field>
-              </v-col>
-              <v-col cols="12" md="4">
-                <v-select
-                  append-icon="mdi-magnify"
-                  v-model="filters.category"
-                  :items="options.categories"
-                  label="Categoria:"
-                  hide-details
-                  outlined
-                  dense
-                ></v-select>
-              </v-col>
-              <v-col cols="12" md="4">
-                <v-autocomplete
-                  v-model="filters.prospect"
-                  :items="options.prospects"
-                  item-text="full_name"
-                  item-value="id"
-                  label="Filtro Prospecto:"
-                  hide-details
-                  clearable
-                  multiple
-                  outlined
-                  dense
-                ></v-autocomplete>
-              </v-col>
-              <v-col cols="12" md="4">
-                <v-autocomplete
-                  v-model="filters.agencies"
-                  :items="options.agencies"
-                  item-text="title"
-                  item-value="id"
-                  label="Filtrar Agencia:"
-                  hide-details
-                  clearable
-                  multiple
-                  outlined
-                  dense
-                ></v-autocomplete>
-              </v-col>
-              <v-col cols="12" md="4">
-                <v-autocomplete
-                  v-model="filters.departments"
-                  :items="options.departments"
-                  item-text="title"
-                  item-value="id"
-                  label="Filtrar Depto."
-                  hide-details
-                  clearable
-                  multiple
-                  outlined
-                  dense
-                ></v-autocomplete>
-              </v-col>
-              <v-col cols="12" md="4">
-                <v-autocomplete
-                  v-model="filters.sellers"
-                  :items="options.sellers"
-                  item-text="name"
-                  item-value="id"
-                  label="Filtro Vendedor:"
-                  hide-details
-                  clearable
-                  multiple
-                  outlined
-                  dense
-                ></v-autocomplete>
-              </v-col>
-              <v-col cols="12" md="4">
-                <v-select
-                  v-model="filters.assertiveness"
-                  :items="options.assertiveness"
-                  label="Certeza:"
-                  dense
-                  outlined
-                  clearable
-                  hide-details
-                >
-                  <template v-slot:item="data">
-                    <v-list-item-content>
-                      <v-list-item-title
-                        class="overline"
-                        v-text="data.item.text"
-                      ></v-list-item-title>
-                    </v-list-item-content>
-                    <v-list-item-action>
-                      <v-btn :color="data.item.color" dark>
-                        {{ data.item.value | percent }}
-                      </v-btn>
-                    </v-list-item-action>
-                  </template>
-                </v-select>
-              </v-col>
-              <v-col cols="12" md="4">
-                <v-dialog
-                  ref="dialog"
-                  v-model="modal"
-                  :return-value.sync="date"
-                  persistent
-                  width="354px"
-                >
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-text-field
-                      v-model="dateRangeText"
-                      label="Rango de Fechas"
-                      placeholder="Seleccione un Rango de fechas"
-                      prepend-inner-icon="mdi-calendar"
-                      readonly
-                      outlined
-                      hide-details
-                      dense
-                      color="orange"
-                      v-bind="attrs"
-                      v-on="on"
-                      append-outer-icon="mdi-close"
-                      @click:append-outer="(filters.dates = []), (date = [])"
-                    ></v-text-field>
-                  </template>
-                  <v-date-picker v-model="date" range>
-                    <v-spacer></v-spacer>
-                    <v-btn
-                      text
-                      color="primary"
-                      @click="(modal = false), (date = [])"
-                    >
-                      Cancel
-                    </v-btn>
-                    <v-btn
-                      text
-                      color="primary"
-                      @click="$refs.dialog.save((filters.dates = date))"
-                    >
-                      OK
-                    </v-btn>
-                  </v-date-picker>
-                </v-dialog>
-              </v-col>
-            </v-row>
-          </v-form>
-        </v-expansion-panel-content>
-      </v-expansion-panel>
-    </v-expansion-panels>
-
-    <!-- data table -->
+  <v-container fluid>
     <v-data-table
       v-bind:headers="headers"
       :items="items"
@@ -188,85 +8,216 @@
       dense
       caption
       fixed-header
-      class="elevation-1 caption"
+      class="elevation-1"
     >
+      <!-- ToTable -->
       <template v-slot:top>
-        <v-row class="ma-2" align="center">
+        <search-panel
+          :rightDrawer="rightDrawer"
+          @cancelSearch="cancelSearch"
+          @resetFilter="resetFilter"
+        >
+          <v-form ref="form">
+            <v-row class="mr-2 offset-1 overline" dense>
+              <v-text-field
+                v-model="filters.folio"
+                label="Buscar Folio:"
+                prepend-icon="mdi-magnify"
+                hide-details
+                clearable
+              ></v-text-field>
+              <v-text-field
+                v-model="filters.title"
+                label="Fitrar por Titulo Seguimiento"
+                prepend-icon="mdi-magnify"
+                hide-details
+                clearable
+              ></v-text-field>
+              <v-select
+                v-model="filters.category"
+                :items="options.categories"
+                label="Categoria:"
+                prepend-icon="mdi-magnify"
+                hide-details
+                clearable
+                filled
+                dense
+              ></v-select>
+              <v-autocomplete
+                v-model="filters.prospect"
+                :items="options.prospects"
+                label="Filtro Prospecto:"
+                prepend-icon="mdi-filter-variant"
+                item-text="full_name"
+                item-value="id"
+                hide-details
+                clearable
+                multiple
+                filled
+                dense
+              ></v-autocomplete>
+              <v-autocomplete
+                v-model="filters.agencies"
+                :items="options.agencies"
+                item-text="title"
+                item-value="id"
+                label="Filtrar Agencia:"
+                prepend-icon="mdi-filter-variant"
+                hide-details
+                clearable
+                multiple
+                filled
+                dense
+              ></v-autocomplete>
+              <v-autocomplete
+                v-model="filters.departments"
+                :items="options.departments"
+                item-text="title"
+                item-value="id"
+                label="Filtrar Depto."
+                prepend-icon="mdi-filter-variant"
+                hide-details
+                clearable
+                multiple
+                filled
+                dense
+              ></v-autocomplete>
+              <v-autocomplete
+                v-model="filters.sellers"
+                :items="options.sellers"
+                item-text="name"
+                item-value="id"
+                label="Filtro Vendedor:"
+                prepend-icon="mdi-filter-variant"
+                hide-details
+                clearable
+                multiple
+                filled
+                dense
+              ></v-autocomplete>
+              <v-select
+                v-model="filters.assertiveness"
+                :items="options.assertiveness"
+                label="Certeza:"
+                prepend-icon="mdi-filter-variant"
+                clearable
+                hide-details
+                filled
+                dense
+              >
+                <template v-slot:item="data">
+                  <v-list-item-content>
+                    <v-list-item-title
+                      class="overline"
+                      v-text="data.item.text"
+                    ></v-list-item-title>
+                  </v-list-item-content>
+                  <v-list-item-action>
+                    <v-btn :color="data.item.color" dark>
+                      {{ data.item.value | percent }}
+                    </v-btn>
+                  </v-list-item-action>
+                </template>
+              </v-select>
+            </v-row>
+          </v-form>
+        </search-panel>
+        <v-card
+          class="d-flex justify-end align-center flex-wrap px-3"
+          dark
+          flat
+        >
+          <v-card
+            flat
+            class="d-flex d-flex justify-space-between align-center flex-wrap py-2"
+            :class="'flex-grow-1 flex-shrink-0'"
+          >
+            <v-select
+              v-model="filters.estatus"
+              :items="options.estatus"
+              label="Estatus"
+              class="ma-2"
+              outlined
+              filled
+              hide-details
+              dense
+            ></v-select>
+            <v-dialog
+              ref="dialog"
+              v-model="modal"
+              :return-value.sync="date"
+              persistent
+              width="354px"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  v-model="dateRangeText"
+                  label="Rango de Fechas"
+                  placeholder="Seleccione un Rango de fechas"
+                  prepend-inner-icon="mdi-calendar"
+                  readonly
+                  outlined
+                  hide-details
+                  dense
+                  color="orange"
+                  v-bind="attrs"
+                  v-on="on"
+                  append-outer-icon="mdi-filter-remove-outline"
+                  @click:append-outer="(filters.dates = []), (date = [])"
+                ></v-text-field>
+              </template>
+              <v-date-picker v-model="date" range>
+                <v-spacer></v-spacer>
+                <v-btn
+                  text
+                  color="primary"
+                  @click="(modal = false), (date = [])"
+                >
+                  Cancel
+                </v-btn>
+                <v-btn
+                  text
+                  color="primary"
+                  @click="$refs.dialog.save((filters.dates = date))"
+                >
+                  OK
+                </v-btn>
+              </v-date-picker>
+            </v-dialog>
+            <v-btn
+              @click="$router.push({ name: 'tracking.diary' })"
+              color="purple"
+              class="ma-2"
+              dark
+            >
+              Calendario
+              <v-icon small right>mdi-calendar-account</v-icon>
+            </v-btn>
+          </v-card>
+          <v-spacer></v-spacer>
+          <v-divider class="mx-2" inset vertical></v-divider>
+          <table-header-buttons
+            :updateSearchPanel="updateSearchPanel"
+            :reloadTable="refresh"
+            :exportTable="exportTable"
+          />
+        </v-card>
+        <v-toolbar flat>
+          <v-toolbar-title>Lista de Seguimiento a Prospectos</v-toolbar-title>
+          <v-divider class="mx-4" inset vertical></v-divider>
+          <v-spacer></v-spacer>
           <v-btn
             @click="$router.push({ name: 'tracking.create' })"
-            class="primary lighten-1"
-            small
+            color="primary"
+            class="ml-2"
             dark
           >
-            Levantar un Seguimiento
-            <v-icon small right>mdi-plus</v-icon>
+            Nuevo Seguimiento
+            <v-icon small right>mdi-plus-box</v-icon>
           </v-btn>
-          <v-btn
-            @click="$router.push({ name: 'tracking.diary' })"
-            class="accent lighten-1 ml-2"
-            small
-            dark
-          >
-            Calendario
-            <v-icon small right>mdi-calendar-account</v-icon>
-          </v-btn>
-          <v-spacer></v-spacer>
-          <v-radio-group v-model="filters.estatus" row dense>
-            <v-radio label="Activos" value="activo" />
-            <v-radio label="Finalizados" value="finalizado" />
-            <v-radio label="Fomalizados" value="formalizado" />
-            <v-radio label="Todos" value="todos" />
-          </v-radio-group>
-          <notification></notification>
-          <v-tooltip top>
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn
-                icon
-                color="green"
-                @click="exportTracking()"
-                v-bind="attrs"
-                v-on="on"
-              >
-                <v-icon>mdi-file-excel</v-icon>
-              </v-btn>
-            </template>
-            <span>Exportar</span>
-          </v-tooltip>
-          <v-tooltip top>
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn
-                icon
-                color="grey"
-                @click="
-                  loadTrackings(() => {
-                    $eventBus.$emit('NOTIFICATION');
-                  })
-                "
-                v-bind="attrs"
-                v-on="on"
-              >
-                <v-icon>mdi-refresh</v-icon>
-              </v-btn>
-            </template>
-            <span>Refrescar</span>
-          </v-tooltip>
-          <v-tooltip top>
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn
-                icon
-                color="error"
-                @click="reset()"
-                v-bind="attrs"
-                v-on="on"
-              >
-                <v-icon>mdi-filter-remove-outline</v-icon>
-              </v-btn>
-            </template>
-            <span>Reset Filtro</span>
-          </v-tooltip>
-        </v-row>
+        </v-toolbar>
       </template>
-
+      <!-- Body -->
       <template v-slot:[`item.action`]="{ item }">
         <v-menu offset-x>
           <template v-slot:activator="{ on, attrs }">
@@ -311,7 +262,7 @@
             <v-list-item-subtitle>
               <span
                 class="d-inline-block text-truncate text-capitalize caption"
-                style="max-width: 150px"
+                style="max-width: 150px;"
               >
                 {{ item.reference }}
               </span>
@@ -322,7 +273,7 @@
       <template v-slot:[`item.price`]="{ item }">
         <span
           class="d-inline-block text-truncate text-capitalize caption"
-          style="max-width: 150px"
+          style="max-width: 150px;"
         >
           {{ item.price | currency }}
         </span>
@@ -330,7 +281,7 @@
       <template v-slot:[`item.currency`]="{ item }">
         <span
           class="d-inline-block text-truncate text-capitalize caption"
-          style="max-width: 150px"
+          style="max-width: 150px;"
         >
           {{ item.currency }}
         </span>
@@ -342,7 +293,7 @@
             <v-list-item-subtitle v-if="item.prospect.is_moral">
               <span
                 class="d-inline-block text-truncate text-capitalize caption"
-                style="max-width: 200px"
+                style="max-width: 200px;"
               >
                 {{ item.prospect.company }}
               </span>
@@ -353,7 +304,7 @@
       <template v-slot:[`item.attended.name`]="{ item }">
         <span
           class="d-inline-block text-truncate text-capitalize caption"
-          style="max-width: 150px"
+          style="max-width: 150px;"
         >
           {{ item.attended.name }}
         </span>
@@ -387,8 +338,8 @@
           :color="getColorDays(item.date_next_tracking)"
         >
           {{
-            $appFormatters.formatTimeDiffNow(item.date_next_tracking, 'days') ||
-              '0'
+            $appFormatters.formatTimeDiffNow(item.date_next_tracking, "days") ||
+            "0"
           }}
           dias
         </v-chip>
@@ -413,7 +364,7 @@
         </v-tooltip>
       </template>
       <template v-slot:[`item.updated_at`]="{ item }">
-        {{ $appFormatters.formatDate(item.updated_at, 'L') }}
+        {{ $appFormatters.formatDate(item.updated_at, "L") }}
       </template>
     </v-data-table>
 
@@ -446,19 +397,28 @@
         ></tracking-prospect>
       </v-card>
     </v-dialog>
-  </div>
+  </v-container>
 </template>
 
 <script>
-import Categories from '@admin/tracking/tracking/resources/categories.json';
-import Assertiveness from '@admin/tracking/tracking/resources/assertiveness.json';
-import { mapState } from 'vuex';
-import TrackingProspect from './TrackingProspect.vue';
-import Notification from './components/Notification.vue';
+import Categories from "@admin/tracking/tracking/resources/categories.json";
+import Assertiveness from "@admin/tracking/tracking/resources/assertiveness.json";
+import { mapState } from "vuex";
+import TrackingProspect from "./TrackingProspect.vue";
+import Notification from "./components/Notification.vue";
+import SearchPanel from "@admin/components/shared/SearchPanel.vue";
+import TableHeaderButtons from "@admin/components/shared/TableHeaderButtons.vue";
+
 export default {
-  components: { TrackingProspect, Notification },
+  components: {
+    TrackingProspect,
+    Notification,
+    SearchPanel,
+    TableHeaderButtons,
+  },
   data() {
     return {
+      showSearchPanel: false,
       dialogs: {
         show: false,
         id: null,
@@ -467,96 +427,86 @@ export default {
       modal: false,
       headers: [
         {
-          text: '',
-          value: 'action',
-          align: 'center',
-          width: 25,
+          text: "",
+          value: "action",
+          align: "center",
           sortable: false,
-          class: 'blue-grey lighten-5',
         },
         {
-          text: 'Folio',
-          value: 'id',
-          align: 'left',
+          text: "Folio",
+          value: "id",
+          align: "left",
           sortable: false,
-          class: 'blue-grey lighten-5',
+          class: "blue-grey darken-5 white--text overline text-truncate",
         },
         {
-          text: 'Titulo / Referencia',
-          value: 'title',
-          align: 'left',
-          width: '150',
+          text: "Titulo / Referencia",
+          value: "title",
+          align: "left",
           sortable: false,
-          class: 'blue-grey lighten-5',
+          class: "blue-grey darken-5 white--text overline text-truncate",
         },
         {
-          text: 'Precio',
-          value: 'price',
-          align: 'right',
+          text: "Precio",
+          value: "price",
+          align: "right",
           sortable: true,
-          class: 'blue-grey lighten-5',
+          class: "blue-grey darken-5 white--text overline text-truncate",
         },
         {
-          text: 'Moneda',
-          value: 'currency',
-          align: 'center',
-          width: '100',
+          text: "Moneda",
+          value: "currency",
+          align: "center",
           sortable: true,
-          class: 'blue-grey lighten-5',
+          class: "blue-grey darken-5 white--text overline text-truncate",
         },
         {
-          text: 'Prospecto:',
-          value: 'prospect.full_name',
-          align: 'left',
-          width: '150',
+          text: "Prospecto:",
+          value: "prospect.full_name",
+          align: "left",
           sortable: false,
-          class: 'blue-grey lighten-5',
+          class: "blue-grey darken-5 white--text overline text-truncate",
         },
         {
-          text: 'Atendido por:',
-          value: 'attended.name',
-          align: 'left',
+          text: "Atendido por:",
+          value: "attended.name",
+          align: "left",
           sortable: false,
-          class: 'blue-grey lighten-5',
+          class: "blue-grey darken-5 white--text overline text-truncate",
         },
         {
-          text: 'Agencia / Departamento',
-          value: 'agency-depto',
-          width: 150,
+          text: "Agencia / Departamento",
+          value: "agency-depto",
           sortable: false,
-          class: 'blue-grey lighten-5',
+          class: "blue-grey darken-5 white--text overline text-truncate",
         },
         {
-          text: 'Estatus',
-          value: 'estatus.title',
-          align: 'center',
-          width: 100,
+          text: "Estatus",
+          value: "estatus.title",
+          align: "center",
           sortable: false,
-          class: 'blue-grey lighten-5',
+          class: "blue-grey darken-5 white--text overline text-truncate",
         },
         {
-          text: 'Sig. Seg.',
-          value: 'date_next_tracking',
-          align: 'center',
-          width: 150,
+          text: "Sig. Seg.",
+          value: "date_next_tracking",
+          align: "center",
           sortable: true,
-          class: 'blue-grey lighten-5',
+          class: "blue-grey darken-5 white--text overline text-truncate",
         },
         {
-          text: 'Certeza',
-          value: 'assertiveness',
-          align: 'center',
-          width: 150,
+          text: "Certeza",
+          value: "assertiveness",
+          align: "center",
           sortable: true,
-          class: 'blue-grey lighten-5',
+          class: "blue-grey darken-5 white--text overline text-truncate",
         },
         {
-          text: 'Ultimo Cambio',
-          value: 'updated_at',
-          align: 'center',
-          width: 100,
+          text: "Ultimo Cambio",
+          value: "updated_at",
+          align: "center",
           sortable: true,
-          class: 'blue-grey lighten-5',
+          class: "blue-grey darken-5 white--text overline text-truncate",
         },
       ],
       items: [],
@@ -571,11 +521,11 @@ export default {
         category: null,
         assertiveness: null,
         prospect: [],
-        estatus: 'activo',
         agencies: [],
         departments: [],
         sellers: [],
         dates: [],
+        estatus: "todos",
       },
 
       options: {
@@ -585,155 +535,189 @@ export default {
         sellers: [],
         categories: Categories,
         assertiveness: Assertiveness,
+        estatus: [
+          { text: "Activos", value: "activo" },
+          { text: "Finalizados", value: "finalizado" },
+          { text: "Formalizados", value: "formalizado" },
+          { text: "Todos", value: "todos" },
+        ],
       },
     };
   },
   mounted() {
     const self = this;
 
-    self.$store.commit('setBreadcrumbs', [{ label: 'Seguimientos', name: '' }]);
+    self.$store.commit("setBreadcrumbs", [{ label: "Seguimientos", name: "" }]);
     self.loadResources(() => {});
   },
   computed: {
-    ...mapState(['Assertiveness']),
+    ...mapState(["Assertiveness"]),
     dateRangeText: {
-      get: function() {
-        return this.filters.dates.join(',');
+      get: function () {
+        return this.filters.dates.join(",");
       },
-      set: function(newValue) {
-        newValue ? (this.filters.dates = newValue.split(' ')) : [];
+      set: function (newValue) {
+        newValue ? (this.filters.dates = newValue.split(" ")) : [];
+      },
+    },
+    rightDrawer: {
+      get() {
+        return this.showSearchPanel;
+      },
+      set(_showSearchPanel) {
+        this.showSearchPanel = _showSearchPanel;
       },
     },
   },
   watch: {
     pagination: {
-      handler: _.debounce(function(v) {
+      handler: _.debounce(function (v) {
         this.loadTrackings(() => {});
       }, 700),
       deep: true,
     },
     filters: {
-      handler: _.debounce(function(v) {
+      handler: _.debounce(function (v) {
         this.loadTrackings(() => {});
       }, 700),
       deep: true,
     },
   },
   methods: {
+    updateSearchPanel() {
+      this.rightDrawer = !this.rightDrawer;
+    },
+    cancelSearch() {
+      this.showSearchPanel = false;
+    },
+    resetFilter() {
+      const _this = this;
+      _this.$refs.form.reset();
+      _this.pagination.itemsPerPage = 10;
+      _this.pagination.page = 1;
+    },
+    refresh() {
+      const self = this;
+      self.loadTrackings(() => {});
+    },
     loadTrackings(cb) {
       const self = this;
 
       let params = {
         ...self.filters,
-        sellers: self.filters.sellers.join(','),
-        prospect: self.filters.prospect.join(','),
-        agencies: self.filters.agencies.join(','),
-        departments: self.filters.departments.join(','),
+        sellers: self.filters.sellers.join(","),
+        prospect: self.filters.prospect.join(","),
+        agencies: self.filters.agencies.join(","),
+        departments: self.filters.departments.join(","),
         dates: self.dateRangeText,
-        order_sort: self.pagination.sortDesc[0] ? 'desc' : 'asc',
-        order_by: self.pagination.sortBy[0] || 'id',
+        order_sort: self.pagination.sortDesc[0] ? "desc" : "asc",
+        order_by: self.pagination.sortBy[0] || "id",
         page: self.pagination.page,
         per_page: self.pagination.itemsPerPage,
       };
 
-      axios.get('/admin/tracking', { params: params }).then(function(response) {
-        self.items = response.data.data.data;
-        self.totalItems = response.data.data.total;
-        self.pagination.totalItems = response.data.data.total;
-        (cb || Function)();
-      });
+      axios
+        .get("/admin/tracking", { params: params })
+        .then(function (response) {
+          self.items = response.data.data.data;
+          self.totalItems = response.data.data.total;
+          self.pagination.totalItems = response.data.data.total;
+          (cb || Function)();
+        });
     },
     loadResources(cb) {
       const self = this;
 
       let params = {
-        paginate: 'no',
+        paginate: "no",
       };
       axios
-        .get('/admin/tracking/sales_history/resources')
-        .then(function(response) {
+        .get("/admin/tracking/sales_history/resources")
+        .then(function (response) {
           let Data = response.data.data;
           self.options.agencies = Data.agencies;
           self.options.departments = Data.departments;
           self.options.prospects = Data.prospects;
         });
 
-      axios.get('/admin/sellers', { params: params }).then(function(response) {
+      axios.get("/admin/sellers", { params: params }).then(function (response) {
         self.options.sellers = response.data.data;
         (cb || Function)();
       });
     },
     getColor(value) {
-      if (value == 'finalizado') return 'red';
-      else if (value == 'formalizado') return 'blue';
-      else return 'primary';
+      if (value == "finalizado") return "red";
+      else if (value == "formalizado") return "blue";
+      else return "primary";
     },
     getColorDays(value) {
-      let days = this.$appFormatters.formatTimeDiffNow(value, 'days');
-      if (days < 0) return 'red';
-      else return 'primary';
+      let days = this.$appFormatters.formatTimeDiffNow(value, "days");
+      if (days < 0) return "red";
+      else return "primary";
     },
     getAssertiveness(value) {
       return this.Assertiveness.find((item) => {
         return item.value == value;
       });
     },
-    exportTracking() {
+    exportTable() {
       const self = this;
       let params = {
         ...self.filters,
-        sellers: self.filters.sellers.join(','),
-        prospect: self.filters.prospect.join(','),
-        agencies: self.filters.agencies.join(','),
-        departments: self.filters.departments.join(','),
+        sellers: self.filters.sellers.join(","),
+        prospect: self.filters.prospect.join(","),
+        agencies: self.filters.agencies.join(","),
+        departments: self.filters.departments.join(","),
         dates: self.dateRangeText,
         page: self.pagination.page,
         per_page: self.pagination.itemsPerPage,
-        paginate: 'no',
+        paginate: "no",
       };
       axios
-        .get('/admin/tracking-export', {
+        .get("/admin/tracking-export", {
           params: params,
-          responseType: 'blob',
+          responseType: "blob",
         })
         .then((res) => {
           const url = window.URL.createObjectURL(new Blob([res.data]));
-          const link = document.createElement('a');
+          const link = document.createElement("a");
           link.href = url;
-          link.setAttribute('download', 'tracking.xlsx'); //or any other extension
+          link.setAttribute("download", "tracking.xlsx"); //or any other extension
           document.body.appendChild(link);
           link.click();
         })
-        .catch(function(error) {
+        .catch(function (error) {
           if (error.response) {
-            self.$store.commit('showSnackbar', {
+            self.$store.commit("showSnackbar", {
               message: error.response.data.message,
-              color: 'error',
+              color: "error",
               duration: 3000,
             });
           } else if (error.request) {
             console.log(error.request);
           } else {
-            console.log('Error', error.message);
+            console.log("Error", error.message);
           }
         });
     },
     reset() {
-      this.$eventBus.$emit('NOTIFICATION');
+      this.$eventBus.$emit("NOTIFICATION");
       this.filters.dates = [];
       this.$refs.formSearch.reset();
     },
     resetToActive(id) {
       const self = this;
-      axios.put('/admin/tracking/resetToActive/' + id).then(function(response) {
-        self.$store.commit('showSnackbar', {
-          message: response.data.message,
-          color: 'success',
-          duration: 3000,
+      axios
+        .put("/admin/tracking/resetToActive/" + id)
+        .then(function (response) {
+          self.$store.commit("showSnackbar", {
+            message: response.data.message,
+            color: "success",
+            duration: 3000,
+          });
+          self.loadTrackings(() => {});
+          cb();
         });
-        self.loadTrackings(() => {});
-        cb();
-      });
     },
   },
 };

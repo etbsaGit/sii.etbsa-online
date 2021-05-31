@@ -1,7 +1,7 @@
 <template>
   <v-layout align-center justify-center row fill-height>
-    <v-img src="../img/etbsa-logo-agricola.png" class="swiss"></v-img>
-    <v-img src="../img/etbsa-logo-construccion.png" class="swiss"></v-img>
+    <v-img src="../img/etbsa-logo-agricola.png" class="swiss ma-4"></v-img>
+    <v-img src="../img/etbsa-logo-construccion.png" class="swiss ma-4"></v-img>
   </v-layout>
 </template>
 

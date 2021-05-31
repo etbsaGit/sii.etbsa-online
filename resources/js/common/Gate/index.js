@@ -1,7 +1,8 @@
-import UserPolicy from '~/common/Gate/Policies/UserPolicy';
-import GpsPolicy from '~/common/Gate/Policies/GpsPolicy';
-import TrackingPolicy from '~/common/Gate/Policies/TrackingPolicy';
-import VehiclesPolicy from '~/common/Gate/Policies/VehiclesPolicy';
+import UserPolicy from "~/common/Gate/Policies/UserPolicy";
+import GpsPolicy from "~/common/Gate/Policies/GpsPolicy";
+import TrackingPolicy from "~/common/Gate/Policies/TrackingPolicy";
+import VehiclesPolicy from "~/common/Gate/Policies/VehiclesPolicy";
+import PurchasePolicy from "~/common/Gate/Policies/PurchasePolicy";
 
 export default class Gate {
   constructor(user) {
@@ -12,6 +13,7 @@ export default class Gate {
       gps: GpsPolicy,
       tracking: TrackingPolicy,
       vehicles: VehiclesPolicy,
+      compras: PurchasePolicy,
     };
 
     // this.groups = {
@@ -25,7 +27,7 @@ export default class Gate {
   }
 
   before() {
-    return this.user.all_permissions['superuser'] === 1;
+    return this.user.all_permissions["superuser"] === 1;
   }
 
   allow(action, type, model = null) {

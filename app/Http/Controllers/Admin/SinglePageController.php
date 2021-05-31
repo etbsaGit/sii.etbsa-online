@@ -26,13 +26,13 @@ class SinglePageController extends AdminController
         $menuManager->addMenus([
             new MenuItem([
                 'group_requirements' => [],
-                'permission_requirements' => ['superuser'],
+                'permission_requirements' => [],
                 'label' => 'Dashboard',
                 'nav_type' => MenuItem::$NAV_TYPE_NAV,
-                'icon' => 'mdi-view-dashboard-variant',
                 'route_type' => 'vue',
                 'route_name' => 'dashboard',
-                'visible' => true,
+                'icon' => 'mdi-view-dashboard-variant',
+                'visible' => true
             ]),
             new MenuItem([
                 'group_requirements' => [],
@@ -51,7 +51,7 @@ class SinglePageController extends AdminController
                 'nav_type' => MenuItem::$NAV_TYPE_NAV,
                 'icon' => 'mdi-crosshairs-gps',
                 'route_type' => 'vue',
-                'route_name' => 'gps',
+                'route_name' => 'gps.list',
                 'visible' => true,
             ]),
             new MenuItem([
@@ -75,9 +75,9 @@ class SinglePageController extends AdminController
                 'visible' => false,
             ]),
             new MenuItem([
-                'group_requirements' => ['FLOTILLA', 'Super User'],
-                'permission_requirements' => ['flotilla.menu'],
-                'label' => 'Flotilla de Unidades',
+                'group_requirements' => [],
+                'permission_requirements' => [],
+                'label' => 'Flotilla',
                 'nav_type' => MenuItem::$NAV_TYPE_NAV,
                 'icon' => 'mdi-car',
                 'route_type' => 'vue',
@@ -105,22 +105,103 @@ class SinglePageController extends AdminController
                 'visible' => true,
             ]),
             new MenuItem([
-                'group_requirements' => [],
-                'permission_requirements' => ['superuser'],
-                'label' => 'Configuracion',
+                'group_requirements' => ['Compras', 'Super User'],
+                'permission_requirements' => [],
+                'label' => 'Compras',
                 'nav_type' => MenuItem::$NAV_TYPE_NAV,
-                'icon' => 'mdi-settings',
-                'route_type' => 'vue',
-                'route_name' => 'settings',
-                'visible' => false,
+                'icon' => 'mdi-animation',
+                'visible' => true,
+                'children' => [
+                    new MenuItem([
+                        'group_requirements' => ['Compras', 'Super User'],
+                        'permission_requirements' => [],
+                        'label' => 'Ordenes de Compra',
+                        'nav_type' => MenuItem::$NAV_TYPE_NAV,
+                        'icon' => 'mdi-animation',
+                        'route_type' => 'vue',
+                        'route_name' => 'purchase.list',
+                        'visible' => true,
+                    ]),
+                    new MenuItem([
+                        'group_requirements' => ['Compras', 'Super User'],
+                        'permission_requirements' => [],
+                        'label' => 'Proveedores',
+                        'nav_type' => MenuItem::$NAV_TYPE_NAV,
+                        'icon' => 'mdi-account-box-multiple-outline',
+                        'route_type' => 'vue',
+                        'route_name' => 'suppliers.list',
+                        'visible' => true,
+                    ]),
+                ]
             ]),
+            new MenuItem([
+                'group_requirements' => ['Super User'],
+                'permission_requirements' => [],
+                'label' => 'Clientes',
+                'nav_type' => MenuItem::$NAV_TYPE_NAV,
+                'icon' => 'mdi-account-group',
+                'visible' => true,
+                'children' => [
+                    new MenuItem([
+                        'group_requirements' => ['Super User'],
+                        'permission_requirements' => [],
+                        'label' => 'Expedientes',
+                        'nav_type' => MenuItem::$NAV_TYPE_NAV,
+                        'icon' => 'mdi-folder-multiple',
+                        'route_type' => 'vue',
+                        'route_name' => 'dashboard',
+                        'visible' => true,
+                    ]),
+                    new MenuItem([
+                        'group_requirements' => ['Super User'],
+                        'permission_requirements' => [],
+                        'label' => 'Plantilla',
+                        'nav_type' => MenuItem::$NAV_TYPE_NAV,
+                        'icon' => 'mdi-file-compare',
+                        'route_type' => 'vue',
+                        'route_name' => 'dashboard',
+                        'visible' => true,
+                    ]),
+                    new MenuItem([
+                        'group_requirements' => ['Super User'],
+                        'permission_requirements' => [],
+                        'label' => 'Requisitos',
+                        'nav_type' => MenuItem::$NAV_TYPE_NAV,
+                        'icon' => 'mdi-file-document',
+                        'route_type' => 'vue',
+                        'route_name' => 'dashboard',
+                        'visible' => true,
+                    ]),
+                ]
+            ]),
+
+            new MenuItem([
+                'group_requirements' => ['Super User'],
+                'permission_requirements' => [],
+                'label' => 'Sistemas',
+                'nav_type' => MenuItem::$NAV_TYPE_NAV,
+                'icon' => 'mdi-desktop-tower-monitor',
+                'route_type' => 'vue',
+                'route_name' => 'system.list',
+                'visible' => true,
+            ]),
+            // new MenuItem([
+            //     'group_requirements' => [],
+            //     'permission_requirements' => ['superuser'],
+            //     'label' => 'Configuracion',
+            //     'nav_type' => MenuItem::$NAV_TYPE_NAV,
+            //     'icon' => 'mdi-settings',
+            //     'route_type' => 'vue',
+            //     'route_name' => 'settings',
+            //     'visible' => false,
+            // ]),
             new MenuItem([
                 'nav_type' => MenuItem::$NAV_TYPE_DIVIDER,
             ])
         ]);
 
         $menus = $menuManager->getFiltered();
-
+        // return dd($menus);
         view()->share('nav', $menus);
 
         return view('layouts.admin');

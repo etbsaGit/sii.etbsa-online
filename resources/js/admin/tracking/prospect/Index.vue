@@ -1,5 +1,5 @@
 <template>
-  <div class="component-wrap">
+  <v-container fluid>
     <!-- search -->
     <v-card flat class="py-4 px-2 d-flex flex-row align-center">
       <v-text-field
@@ -87,7 +87,7 @@
         </v-list-item>
       </template>
     </v-data-table>
-  </div>
+  </v-container>
 </template>
 
 <script>
@@ -95,24 +95,24 @@ export default {
   data() {
     return {
       headers: [
-        { text: 'Action', value: 'action', align: 'left', sortable: false },
+        { text: "Action", value: "action", align: "left", sortable: false },
         {
-          text: 'Dirigido a / Razon Social',
-          value: 'full_name',
-          align: 'left',
+          text: "Dirigido a / Razon Social",
+          value: "full_name",
+          align: "left",
           sortable: false,
         },
-        { text: 'Telefono', value: 'phone', align: 'left', sortable: false },
+        { text: "Telefono", value: "phone", align: "left", sortable: false },
         {
-          text: 'Seguimientos Activos:',
-          value: 'tracking_count',
-          align: 'center',
+          text: "Seguimientos Activos:",
+          value: "tracking_count",
+          align: "center",
           sortable: false,
         },
         {
-          text: 'Proviene:',
-          value: 'town',
-          align: 'left',
+          text: "Proviene:",
+          value: "town",
+          align: "left",
           sortable: false,
         },
       ],
@@ -123,22 +123,22 @@ export default {
       },
 
       filters: {
-        full_name: '',
+        full_name: "",
       },
     };
   },
   mounted() {
     const self = this;
-    self.$store.commit('setBreadcrumbs', [{ label: 'Prospectos', name: '' }]);
+    self.$store.commit("setBreadcrumbs", [{ label: "Prospectos", name: "" }]);
   },
   watch: {
-    'pagination.page': function() {
+    "pagination.page": function () {
       this.loadProspects(() => {});
     },
-    'pagination.rowsPerPage': function() {
+    "pagination.rowsPerPage": function () {
       this.loadProspects(() => {});
     },
-    'filters.full_name': _.debounce(function() {
+    "filters.full_name": _.debounce(function () {
       const self = this;
       self.loadProspects(() => {});
     }, 700),
@@ -147,40 +147,40 @@ export default {
     trash(seller) {
       const self = this;
 
-      self.$store.commit('showDialog', {
-        type: 'confirm',
-        full_name: 'Confirm Deletion',
-        message: 'Are you sure you want to delete this seller?',
+      self.$store.commit("showDialog", {
+        type: "confirm",
+        full_name: "Confirm Deletion",
+        message: "Are you sure you want to delete this seller?",
         okCb: () => {
           axios
-            .delete('/admin/sellers/' + seller.id)
-            .then(function(response) {
-              self.$store.commit('showSnackbar', {
+            .delete("/admin/sellers/" + seller.id)
+            .then(function (response) {
+              self.$store.commit("showSnackbar", {
                 message: response.data.message,
-                color: 'success',
+                color: "success",
                 duration: 3000,
               });
 
               self.loadProspects(() => {});
             })
-            .catch(function(error) {
-              self.$store.commit('hideLoader');
+            .catch(function (error) {
+              self.$store.commit("hideLoader");
 
               if (error.response) {
-                self.$store.commit('showSnackbar', {
+                self.$store.commit("showSnackbar", {
                   message: error.response.data.message,
-                  color: 'error',
+                  color: "error",
                   duration: 3000,
                 });
               } else if (error.request) {
                 console.log(error.request);
               } else {
-                console.log('Error', error.message);
+                console.log("Error", error.message);
               }
             });
         },
         cancelCb: () => {
-          console.log('CANCEL');
+          console.log("CANCEL");
         },
       });
     },
@@ -193,7 +193,7 @@ export default {
         per_page: self.pagination.rowsPerPage,
       };
 
-      axios.get('/admin/prospects', { params: filters }).then((response) => {
+      axios.get("/admin/prospects", { params: filters }).then((response) => {
         self.items = response.data.data.data;
         self.totalItems = response.data.data.total;
         self.pagination.totalItems = response.data.data.total;

@@ -1,23 +1,20 @@
 <template>
   <v-card flat>
-    <v-toolbar flat>
-      <v-toolbar-title>
-        <v-icon>mdi-crosshairs</v-icon> Detalle del GPS
-      </v-toolbar-title>
+    <v-app-bar dark>
+      <v-icon class="mr-2">mdi-crosshairs</v-icon> Detalle del GPS
       <v-spacer> </v-spacer>
       <v-btn :disabled="!valid" color="success" class="mr-4" @click="save">
         Editar
         <v-icon right>mdi-pencil</v-icon>
       </v-btn>
-    </v-toolbar>
+    </v-app-bar>
     <v-divider class="mb-3"></v-divider>
-    <v-card-text>
+    <v-card-text class="overflow-y-auto">
       <v-form ref="form" v-model="valid" lazy-validation>
         <gps-form :form.sync="form" :options="options" editing></gps-form>
       </v-form>
-    </v-card-text>
-    <v-card-text>
       <v-simple-table
+        v-show="historical.length > 0"
         max-height="300"
         fixed-header
         dense
@@ -56,7 +53,7 @@
 </template>
 
 <script>
-import GpsForm from '../forms/GpsForm.vue';
+import GpsForm from "../forms/GpsForm.vue";
 export default {
   components: { GpsForm },
   props: {
@@ -74,13 +71,22 @@ export default {
       options: {
         groups: [],
         chips: [],
-        types: ['CONTADO', 'CREDITO', 'CARGO'],
+        types: ["CONTADO", "CREDITO", "CARGO"],
       },
     };
   },
   mounted() {
+    console.log("mounted");
     this.loadGps(() => {});
     this.loadOptions(() => {});
+    this.$store.commit("setBreadcrumbs", [
+      { label: "GPS", to: { name: "gps.list" } },
+      { label: "Detalle" },
+    ]);
+  },
+  destroyed() {
+    console.log("destroy");
+    this.$destroy();
   },
   methods: {
     save() {
@@ -89,34 +95,34 @@ export default {
 
       axios
         .put(`/admin/gps/${_this.propGpsId}`, _this.form)
-        .then(function(response) {
-          _this.$store.commit('showSnackbar', {
+        .then(function (response) {
+          _this.$store.commit("showSnackbar", {
             message: response.data.message,
-            color: 'success',
+            color: "success",
             duration: 3000,
           });
 
-          _this.$eventBus.$emit('GPS_REFRESH');
+          _this.$eventBus.$emit("GPS_REFRESH");
         })
-        .catch(function(error) {
+        .catch(function (error) {
           if (error.response) {
-            _this.$store.commit('showSnackbar', {
+            _this.$store.commit("showSnackbar", {
               message: error.response.data.message,
-              color: 'error',
+              color: "error",
               duration: 3000,
             });
           } else if (error.request) {
             console.log(error.request);
           } else {
-            console.log('Error', error.message);
+            console.log("Error", error.message);
           }
         });
     },
     loadGps(cb) {
       const _this = this;
       axios
-        .get('/admin/gps/' + _this.propGpsId + '/edit')
-        .then(function(response) {
+        .get("/admin/gps/" + _this.propGpsId + "/edit")
+        .then(function (response) {
           let Gps = response.data.data;
           _this.form = {
             ...Gps,
@@ -125,38 +131,31 @@ export default {
             ),
             renew_date: _this.$appFormatters.formatDate(Gps.renew_date),
             invoice_date: Gps.invoice_date
-              ? _this.$appFormatters.formatDate(Gps.invoice_date || '')
+              ? _this.$appFormatters.formatDate(Gps.invoice_date || "")
               : null,
           };
-
           _this.historical = Gps.historical;
-
-          _this.$store.commit('showSnackbar', {
-            message: response.data.message,
-            color: 'success',
-            duration: 3000,
-          });
         })
-        .catch(function(error) {
-          _this.$store.commit('hideLoader');
+        .catch(function (error) {
+          _this.$store.commit("hideLoader");
 
           if (error.response) {
-            _this.$store.commit('showSnackbar', {
+            _this.$store.commit("showSnackbar", {
               message: error.response.data.message,
-              color: 'error',
+              color: "error",
               duration: 3000,
             });
           } else if (error.request) {
             console.log(error.request);
           } else {
-            console.log('Error', error.message);
+            console.log("Error", error.message);
           }
         });
       cb();
     },
     loadOptions(cb) {
       const _this = this;
-      axios.get('/admin/gps/search/resources').then(function(response) {
+      axios.get("/admin/gps/search/resources").then(function (response) {
         _this.options.chips = response.data.data.chips;
         _this.options.groups = response.data.data.groups;
         (cb || Function)();

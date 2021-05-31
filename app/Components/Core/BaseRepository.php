@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: darryldecode
@@ -38,11 +39,11 @@ abstract class BaseRepository
     {
         $q = $this->model->with($with);
 
-        $q->orderBy($params['order_by'] ?? 'id', $params['order_sort'] ?? 'asc');
+        $q->orderBy($params['order_by'] ?? 'id', $params['order_sort'] ?? 'desc');
 
         // call the function if provided
         if (!is_null($callable)) {
-            $q = call_user_func_array($callable, [ & $q]);
+            $q = call_user_func_array($callable, [&$q]);
         }
 
         // if per page is -1, we don't need to paginate at all, but we still return the paginated

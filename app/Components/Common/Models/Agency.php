@@ -7,7 +7,7 @@ use App\Components\User\Models\User;
 
 class Agency extends Model
 {
-   /**
+    /**
      * The database table used by the model.
      *
      * @var string
@@ -19,7 +19,7 @@ class Agency extends Model
      *
      * @var array
      */
-    protected $fillable = ['code','title','line_id'];
+    protected $fillable = ['code', 'title', 'line_id', 'address'];
 
     public function users()
     {
@@ -30,5 +30,4 @@ class Agency extends Model
     {
         return $this->hasMany('App\Components\Tracking\Models\TrackingProspect');
     }
-
 }

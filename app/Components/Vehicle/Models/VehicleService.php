@@ -3,6 +3,7 @@
 namespace App\Components\Vehicle\Models;
 
 use App\Components\Common\Models\Agency;
+use App\Components\Common\Models\Department;
 use App\Components\Common\Models\Estatus;
 use App\Components\User\Models\User;
 use Illuminate\Database\Eloquent\Model;
@@ -13,6 +14,25 @@ class VehicleService extends Model
 
     protected $guarded = ['id'];
 
+    protected $fillable = [
+        'mileage',
+        'invoice',
+        'cost',
+        'reason',
+        'reason_description',
+        'created_by',
+        'estatus_id',
+        'vehicle_id',
+        'agency_id',
+        'department_id',
+    ];
+
+    protected $with = [
+        'estatus:id,title,key', 'user:id,name',
+        'agency:id,title', 'department:id,title'
+    ];
+
+
     public function vehicle()
     {
         return $this->belongsTo(Vehicle::class, 'vehicle_id');
@@ -20,7 +40,7 @@ class VehicleService extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'solicitante');
+        return $this->belongsTo(User::class, 'created_by');
     }
 
     public function estatus()
@@ -28,42 +48,13 @@ class VehicleService extends Model
         return $this->belongsTo(Estatus::class, 'estatus_id');
     }
 
-    public function cargoA()
+    public function agency()
     {
-        return $this->belongsTo(Agency::class, 'suc_cargo');
+        return $this->belongsTo(Agency::class, 'agency_id');
     }
 
-    // Filters Scope
-
-    public function scopeOfFolio($query, $name)
+    public function department()
     {
-        if ($name === null || $name === '') {
-            return false;
-        }
-
-        return $query->where('title', 'like', "%{$name}%")
-            ->orWhere('id', 'like', "%{$name}");
-    }
-
-    public function scopeOfEstatus($q, $v)
-    {
-        if ($v === false || $v === '' || count($v) == 0 || $v[0] == '') {
-            return $q;
-        }
-
-        return $q->whereHas('estatus', function ($q) use ($v) {
-            return $q->whereIn('key', $v);
-        });
-    }
-
-    public function scopeOfAgency($q, $v)
-    {
-        if ($v === false || $v === '' || count($v) == 0 || $v[0] == '') {
-            return $q;
-        }
-
-        return $q->whereHas('agency', function ($q) use ($v) {
-            return $q->whereIn('id', $v);
-        });
+        return $this->belongsTo(Department::class, 'department_id');
     }
 }

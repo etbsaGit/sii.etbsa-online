@@ -1,75 +1,21 @@
 <template>
-  <div class="component-wrap">
-    <v-card>
-      <v-form v-model="valid" ref="gpsChipFormEdit" lazy-validation>
-        <v-container grid-list-md>
-          <v-row>
-            <v-col cols="12" md="4">
-              <v-text-field
-                v-model="sim"
-                label="SIM"
-                :rules="rules"
-              ></v-text-field>
-            </v-col>
-            <v-col cols="12" md="4">
-              <v-text-field v-model="imei" label="IMEI" counter></v-text-field>
-            </v-col>
-            <v-col cols="12" md="4">
-              <v-text-field
-                v-model="cuenta"
-                label="Cuenta"
-                counter
-              ></v-text-field>
-            </v-col>
-            <v-col cols="12" md="4">
-              <v-text-field
-                v-model="costo"
-                label="Costo:"
-                :rules="rules"
-                type="Numeric"
-                prefix="$"
-                suffix="MXN"
-              ></v-text-field>
-            </v-col>
-
-            <v-col cols="6" md="4">
-              <v-text-field
-                label="Fecha Activacion"
-                v-model="fecha_activacion"
-                type="date"
-                :rules="rules"
-              ></v-text-field>
-            </v-col>
-            <v-col cols="6" md="4">
-              <v-text-field
-                label="Fecha Renovacion"
-                v-model="fecha_renovacion"
-                type="date"
-                :rules="rules"
-              ></v-text-field>
-            </v-col>
-            <v-col cols="12">
-              <v-textarea
-                label="Descripcion:"
-                v-model="description"
-                outlined
-              ></v-textarea>
-            </v-col>
-
-            <v-col cols="12">
-              <v-btn block @click="save()" :disabled="!valid" color="primary"
-                >Guardar Nuevo</v-btn
-              >
-            </v-col>
-          </v-row>
-        </v-container>
-      </v-form>
-    </v-card>
-  </div>
+  <v-card>
+    <v-card-text>
+      <chip-form :value="valid" :form.sync="form" ref="ChipForm"></chip-form>
+    </v-card-text>
+    <v-card-actions>
+      <v-btn block @click="update()" :disabled="!valid" color="primary">
+        Guardar Nuevo
+      </v-btn>
+    </v-card-actions>
+  </v-card>
 </template>
 
 <script>
+import ChipForm from "./ChipForm.vue";
+
 export default {
+  components: { ChipForm },
   props: {
     propGpsChipId: {
       required: true,
@@ -77,87 +23,85 @@ export default {
   },
   data() {
     return {
-      valid: false,
-      sim: '',
-      imei: '',
-      costo: '',
-      cuenta: '',
-      fecha_activacion: null,
-      fecha_renovacion: null,
-      descripcion: '',
-      rules: [(v) => !!v || 'Campo Requerido'],
+      valid: true,
+      form: {
+        sim: "",
+        imei: "",
+        costo: "",
+        cuenta: "",
+        fecha_activacion: null,
+        fecha_cancelacion: null,
+        descripcion: "",
+      },
+      rules: [(v) => !!v || "Campo Requerido"],
     };
   },
   mounted() {
-    const self = this;
-    self.loadGpsChip(() => {});
+    const _this = this;
+    _this.loadGpsChip(() => {});
   },
   methods: {
-    save() {
-      const self = this;
-      if (self.$refs.gpsChipFormEdit.validate()) {
-        let payload = {
-          sim: self.sim,
-          imei: self.imei,
-          cuenta: self.cuenta,
-          costo: self.costo,
-          fecha_activacion: self.fecha_activacion,
-          fecha_renovacion: self.fecha_renovacion,
-          descripcion: self.descripcion,
-        };
+    update() {
+      const _this = this;
+      if (!_this.$refs.ChipForm.$refs.form.validate()) return;
+      _this.isLoading = true;
+      axios
+        .put("/admin/chips/" + _this.propGpsChipId, _this.form)
+        .then(function (response) {
+          _this.$store.commit("showSnackbar", {
+            message: response.data.message,
+            color: "success",
+            duration: 3000,
+          });
 
-        self.isLoading = true;
-
-        axios
-          .put('/admin/chips/' + self.propGpsChipId, payload)
-          .then(function(response) {
-            self.$store.commit('showSnackbar', {
-              message: response.data.message,
-              color: 'success',
+          _this.$eventBus.$emit("GPS_CHIP_UPDATED");
+        })
+        .catch(function (error) {
+          if (error.response) {
+            _this.$store.commit("showSnackbar", {
+              message: error.response.data.message,
+              color: "error",
               duration: 3000,
             });
-
-            self.$eventBus.$emit('GPS_CHIP_UPDATED');
-          })
-          .catch(function(error) {
-            if (error.response) {
-              self.$store.commit('showSnackbar', {
-                message: error.response.data.message,
-                color: 'error',
-                duration: 3000,
-              });
-            } else if (error.request) {
-              console.log(error.request);
-            } else {
-              console.log('Error', error.message);
-            }
-          })
-          .finally(function() {
-            self.isLoading = false;
-          });
-      }
+          } else if (error.request) {
+            console.log(error.request);
+          } else {
+            console.log("Error", error.message);
+          }
+        })
+        .finally(function () {
+          _this.isLoading = false;
+        });
     },
-    loadGpsChip(cb) {
-      const self = this;
+    async loadGpsChip(cb) {
+      const _this = this;
 
-      axios.get('/admin/chips/' + self.propGpsChipId).then(function(response) {
-        let Chip = response.data.data;
+      await axios
+        .get("/admin/chips/" + _this.propGpsChipId)
+        .then(function (response) {
+          let Chip = response.data.data;
 
-        self.sim = Chip.sim;
-        self.imei = Chip.imei;
-        self.cuenta = Chip.cuenta;
-        self.costo = Chip.costo;
-        self.fecha_activacion = self.$appFormatters.formatDate(
-          Chip.fecha_activacion,
-          'yyyy-MM-DD'
-        );
-        self.fecha_renovacion = self.$appFormatters.formatDate(
-          Chip.fecha_renovacion,
-          'yyyy-MM-DD'
-        );
-        self.descripcion = Chip.descripcion;
-        cb();
-      });
+          _this.form.sim = Chip.sim;
+          _this.form.imei = Chip.imei;
+          _this.form.cuenta = Chip.cuenta;
+          _this.form.costo = Chip.costo;
+          _this.form.fecha_activacion = _this.$appFormatters.formatDate(
+            Chip.fecha_activacion,
+            "yyyy-MM-DD"
+          );
+          _this.form.fecha_renovacion = _this.$appFormatters.formatDate(
+            Chip.fecha_renovacion,
+            "yyyy-MM-DD"
+          );
+          _this.form.fecha_cancelacion = Chip.fecha_cancelacion
+            ? _this.$appFormatters.formatDate(
+                Chip.fecha_cancelacion,
+                "yyyy-MM-DD"
+              )
+            : null;
+          _this.form.descripcion = Chip.descripcion;
+          (cb || Function)();
+        });
     },
   },
 };

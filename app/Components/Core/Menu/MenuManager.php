@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: darryldecode
@@ -54,8 +55,7 @@ class MenuManager
      */
     public function addMenus(array $menus)
     {
-        foreach ($menus as $menu)
-        {
+        foreach ($menus as $menu) {
             $this->addMenu($menu);
         }
     }
@@ -65,42 +65,38 @@ class MenuManager
      *
      * @return \Illuminate\Support\Collection|static
      */
-    protected function filter()
+    protected function filter(array $children = null)
     {
-        $menus = collect($this->menuItems);
+        $menus = collect(is_null($children) ? $this->menuItems : $children);
 
-        $menus = $menus->filter(function(MenuItem $menu)
-        {
-            if($menu->isDivider()) return true;
+        $menus = $menus->filter(function (MenuItem $menu) {
+            if ($menu->isDivider()) return true;
+            if (!is_null($menu->children)) return $menu->children = $this->filter($menu->children)->toArray();
 
             // set all first to true
             $groupRequirementsPassed = true;
             $permissionRequirementsPassed = true;
 
             // check group requirements
-            if($menu->hasGroupRequirements())
-            {
+            if ($menu->hasGroupRequirements()) {
                 $groupRequirementsPassed = false;
 
-                foreach ($menu->groupRequirements as $groupName)
-                {
+                foreach ($menu->groupRequirements as $groupName) {
                     $groupRequirementsPassed = $this->user->inGroup($groupName);
 
-                    if($groupRequirementsPassed) break;
+                    if ($groupRequirementsPassed) break;
                 }
             }
 
             // check user requirements
-            if($menu->hasPermissionRequirements())
-            {
+            if ($menu->hasPermissionRequirements()) {
                 $permissionRequirementsPassed = false;
 
                 $permissionRequirementsPassed = $this->user->hasAnyPermission($menu->permissionRequirements);
             }
 
             return $groupRequirementsPassed && $permissionRequirementsPassed;
-        });
-
+        })->values();
         return $menus;
     }
 
@@ -135,9 +131,8 @@ class MenuManager
         $found = false;
         $menus = $this->filter();
 
-        $menus->each(function(MenuItem $menuItem) use (&$found,$menuLabel)
-        {
-            if($menuItem->label === $menuLabel) $found = true;
+        $menus->each(function (MenuItem $menuItem) use (&$found, $menuLabel) {
+            if ($menuItem->label === $menuLabel) $found = true;
         });
 
         return $found;

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: darryldecode
@@ -88,6 +89,7 @@ class MenuItem
      * @var bool
      */
     public $visible = true;
+    public $children = null;
 
     /**
      * MenuItem constructor.
@@ -95,21 +97,18 @@ class MenuItem
      */
     public function __construct(array $menuData = [])
     {
-        if(!empty($menuData))
-        {
-            if($menuData['nav_type'] === self::$NAV_TYPE_NAV)
-            {
+        if (!empty($menuData)) {
+            if ($menuData['nav_type'] === self::$NAV_TYPE_NAV) {
                 $this->groupRequirements = $menuData['group_requirements'];
                 $this->permissionRequirements = $menuData['permission_requirements'];
                 $this->label = $menuData['label'];
                 $this->navType = $menuData['nav_type'];
                 $this->icon = $menuData['icon'];
-                $this->routeType = $menuData['route_type'];
-                $this->routeName = $menuData['route_name'];
+                $this->routeType = $menuData['route_type'] ?? '';
+                $this->routeName = $menuData['route_name'] ?? '';
                 $this->visible = $menuData['visible'] ?? true;
-            }
-            else
-            {
+                $this->children = $menuData['children'] ?? null;
+            } else {
                 $this->navType = self::$NAV_TYPE_DIVIDER;
             }
         }
@@ -121,9 +120,9 @@ class MenuItem
      * @param string $groupName
      * @return bool
      */
-    public function groupRequirementsHas(string $groupName):bool
+    public function groupRequirementsHas(string $groupName): bool
     {
-        return Arr::get($this->groupRequirements,$groupName);
+        return Arr::get($this->groupRequirements, $groupName);
     }
 
     /**
@@ -132,9 +131,9 @@ class MenuItem
      * @param string $permissionKey
      * @return bool
      */
-    public function permissionRequirementsHas(string $permissionKey):bool
+    public function permissionRequirementsHas(string $permissionKey): bool
     {
-        return Arr::get($this->permissionRequirements,$permissionKey);
+        return Arr::get($this->permissionRequirements, $permissionKey);
     }
 
     /**
@@ -142,7 +141,7 @@ class MenuItem
      *
      * @return bool
      */
-    public function isDivider():bool
+    public function isDivider(): bool
     {
         return $this->navType === self::$NAV_TYPE_DIVIDER;
     }

@@ -14,13 +14,17 @@ import Vue from "vue";
 import Vuetify from "vuetify";
 import es from "vuetify/es5/locale/es";
 import VueProgressBar from "vue-progressbar";
+import PortalVue from "portal-vue";
 import Gate from "~/common/Gate";
+import { VueMaskDirective } from "v-mask";
 import "~/plugins";
 
 // this is the vuetify theming options
 // you can change colors here based on your needs
 // and please dont forget to recompile scripts
 Vue.use(Vuetify);
+Vue.use(PortalVue);
+Vue.directive("mask", VueMaskDirective);
 
 // Gate
 Vue.prototype.$gate = new Gate(window.LSK_APP.AUTH_USER);
@@ -43,6 +47,18 @@ Vue.use(VueProgressBar, {
 
 // global component registrations here
 Vue.component("moon-loader", require("vue-spinner/src/MoonLoader.vue").default);
+Vue.component(
+  "gauge",
+  require("@chrisheanan/vue-gauge/src/components/Gauge.vue").default
+);
+Vue.component(
+  "notification",
+  require("@admin/components/shared/Notification.vue").default
+);
+Vue.component(
+  "TheLayoutDrawer",
+  require("@admin/components/Layout/TheLayoutDrawer.vue").default
+);
 
 // app
 import router from "@admin/router/";
@@ -130,7 +146,7 @@ const admin = new Vue({
   router,
   store,
   data: () => ({
-    drawer: false,
+    drawer: true,
   }),
   mounted() {
     const self = this;

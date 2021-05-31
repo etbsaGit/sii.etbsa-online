@@ -2,15 +2,17 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Components\Gps\Repositories\GpsChipsRepository;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
 use App\Components\Gps\Repositories\GpsRepository;
 use App\Components\Marketing\Repositories\MarketingRepository;
 use App\Components\Tracking\Repositories\TrackingRepository;
+use App\Components\Gps\Repositories\GpsChipsRepository;
+use App\Components\Gps\Repositories\GpsGroupRepository;
 use App\Exports\GpsChipExport;
 use App\Exports\GpsExport;
+use App\Exports\GpsGroupExport;
 use App\Exports\MarketingExport;
 use App\Exports\TrackingExport;
 
@@ -21,6 +23,7 @@ class ExportController extends AdminController
      */
     private $gpsRepository;
     private $gpsChipsRepository;
+    private $gpsGroupRepository;
     private $marketingRepository;
     private $trackingRepository;
 
@@ -32,11 +35,13 @@ class ExportController extends AdminController
         GpsRepository $gpsRepository,
         MarketingRepository $marketingRepository,
         TrackingRepository $trackingRepository,
-        GpsChipsRepository $gpsChipsRepository
+        GpsChipsRepository $gpsChipsRepository,
+        GpsGroupRepository $gpsGroupRepository
 
     ) {
         $this->gpsRepository = $gpsRepository;
         $this->gpsChipsRepository = $gpsChipsRepository;
+        $this->gpsGroupRepository = $gpsGroupRepository;
         $this->marketingRepository = $marketingRepository;
         $this->trackingRepository = $trackingRepository;
     }
@@ -58,6 +63,12 @@ class ExportController extends AdminController
         $data = $this->gpsChipsRepository->index($request->all());
 
         return Excel::download(new GpsChipExport($data), 'gps-chips.xlsx');
+    }
+    public function exportGpsGroups(Request $request)
+    {
+        $data = $this->gpsGroupRepository->index($request->all());
+
+        return Excel::download(new GpsGroupExport($data), 'gps-chips.xlsx');
     }
 
     public function exportMarketing(Request $request)

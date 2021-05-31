@@ -51,7 +51,7 @@ export const users = [
         component: require("@admin/users/components/PermissionFormEdit")
           .default,
         props: (route) => ({ propPermissionId: route.params.id }),
-      }
+      },
     ],
   },
 ];

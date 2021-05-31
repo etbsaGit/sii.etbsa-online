@@ -18,8 +18,9 @@ Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function
     // Route::get('gps-update','GpsController@update_dates')->name('update-dates');
 
     // EXPOR/IMPORT
-    // Route::get('gps-export', 'ExportController@exportGps')->name('gps.export');
-    // Route::get('gps-chips-export', 'ExportController@exportGpsChips')->name('gps.chips.export');
+    Route::get('gps-export', 'ExportController@exportGps')->name('gps.export');
+    Route::get('gps-chips-export', 'ExportController@exportGpsChips')->name('gps.chips.export');
+    Route::get('gps-groups-export', 'ExportController@exportGpsGroups')->name('gps.groups.export');
     // Route::post('gps/import', 'GpsImportController@importGps')->name('gps-import');
     // Route::post('matching-chips-gps/import', 'GpsImportController@matchingChipsInGps')->name('matching-chip-gps');
     // Route::post('chips/import', 'GpsImportController@importChips')->name('chips-import');

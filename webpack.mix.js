@@ -1,4 +1,4 @@
-let mix = require("laravel-mix");
+const mix = require("laravel-mix");
 
 /*
  |--------------------------------------------------------------------------
@@ -6,28 +6,18 @@ let mix = require("laravel-mix");
  |--------------------------------------------------------------------------
  |
  | Mix provides a clean, fluent API for defining some Webpack build steps
- | for your Laravel application. By default, we are compiling the Sass
+ | for your Laravel applications. By default, we are compiling the CSS
  | file for the application as well as bundling up all the JS files.
  |
  */
 
-mix.disableSuccessNotifications();
-
-mix.webpackConfig({
-  resolve: {
-    extensions: [".js", ".json", ".vue"],
-    alias: {
-      "~": path.join(__dirname, "./resources/js"),
-      "@admin": path.join(__dirname, "./resources/js/admin"),
-    },
-  },
-});
-
 mix
-  .copyDirectory("resources/img", "public/img")
+  .vue()
   .js("resources/js/admin/admin.js", "public/js")
   .sass("resources/sass/admin.scss", "public/css")
   .sass("resources/sass/front.scss", "public/css")
+  .copyDirectory("resources/img", "public/img")
+  .webpackConfig(require("./webpack.config"))
   .extract([
     "vue",
     "vue-router",
@@ -36,4 +26,9 @@ mix
     "lodash",
     "dropzone",
     "vuetify",
+    "portal-vue",
   ]);
+
+if (mix.inProduction()) {
+  mix.version();
+}

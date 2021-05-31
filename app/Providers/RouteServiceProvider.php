@@ -62,6 +62,7 @@ class RouteServiceProvider extends ServiceProvider
                 require base_path('routes/web/gps.php');
                 require base_path('routes/web/vehicle.php');
                 require base_path('routes/web/resources_share.php');
+                require base_path('routes/web/purchases.php');
             });
     }
 

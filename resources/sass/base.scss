@@ -1,8 +1,8 @@
 @import "variables";
-@import "dropzone";
+// @import "dropzone";
 @import "~vuetify/dist/vuetify.min.css";
 @import "~@mdi/font/css/materialdesignicons.css";
-// @import 'material-fonts-base64';
+// @import "material-fonts-base64";
 
 /* general */
 a {
@@ -27,15 +27,17 @@ a {
 .permissions_container {
   padding: 10px;
 }
-.fade-enter-active, .fade-leave-active {
+.fade-enter-active,
+.fade-leave-active {
   transition-property: opacity;
-  transition-duration: .25s;
+  transition-duration: 0.25s;
 }
 .fade-enter-active {
-  transition-delay: .25s;
+  transition-delay: 0.25s;
 }
-.fade-enter, .fade-leave-active {
-  opacity: 0
+.fade-enter,
+.fade-leave-active {
+  opacity: 0;
 }
 .breadcrumbs li a {
   text-decoration: none;

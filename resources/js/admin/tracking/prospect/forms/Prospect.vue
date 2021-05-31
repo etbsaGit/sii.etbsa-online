@@ -1,16 +1,19 @@
 <template>
-  <v-form ref="formProspect" v-model="valid" lazy-validation @submit.prevent="submit()">
-    <v-container
-      class="d-flex flex-wrap align-content-space-around justify-space-around"
-    >
-      <v-row>
+  <v-form
+    ref="formProspect"
+    v-model="valid"
+    lazy-validation
+    @submit.prevent="submit()"
+  >
+    <v-container fluid>
+      <!-- class="d-flex flex-wrap align-content-space-around justify-space-around" -->
+      <v-row align="start" align-content="start">
         <v-col cols="12" md="2">
-          <v-switch
-            v-model="form.is_moral"
-            flat
-            :label="`Persona: ${form.is_moral ? 'Moral' : 'Fisica'}`"
-          ></v-switch
-        ></v-col>
+          <v-radio-group v-model="form.is_moral" column dense class="mt-0">
+            <v-radio label="Persona Fisica" :value="0"></v-radio>
+            <v-radio label="Persona Moral" :value="1"></v-radio>
+          </v-radio-group>
+        </v-col>
         <v-col cols="12" md="10">
           <v-text-field
             v-model="form.full_name"
@@ -97,7 +100,7 @@
 </template>
 
 <script>
-import { mixinEstates } from '~/common/mixin/estate_township.js';
+import { mixinEstates } from "~/common/mixin/estate_township.js";
 export default {
   mixins: [mixinEstates],
   props: {
@@ -108,13 +111,13 @@ export default {
     textBtn: {
       required: false,
       type: String,
-      default: 'Guardar',
+      default: "Guardar",
     },
   },
   data() {
     return {
       valid: true,
-      rules: [(v) => !!v || 'campo requerido.'],
+      rules: [(v) => !!v || "campo requerido."],
     };
   },
   created() {
@@ -126,7 +129,7 @@ export default {
   methods: {
     submit() {
       if (!this.$refs.formProspect.validate()) return;
-      this.$emit('submit');
+      this.$emit("submit");
     },
   },
 };

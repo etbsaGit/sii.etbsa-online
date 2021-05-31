@@ -7,6 +7,7 @@ import { admin } from "@admin/router/admin";
 Vue.use(Router);
 
 const router = new Router({
+  scrollBehavior: () => ({ y: 0 }),
   routes: [
     {
       path: "/",
@@ -36,6 +37,11 @@ const router = new Router({
       name: "settings",
       path: "/settings",
       component: require("@admin/settings/Settings").default,
+    },
+    {
+      name: "notification.list",
+      path: "/notification",
+      component: require("@admin/components/NotificationList").default,
     },
     ...admin,
   ],

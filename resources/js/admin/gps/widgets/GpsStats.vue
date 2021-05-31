@@ -1,17 +1,19 @@
 <template>
   <v-slide-group
     v-model="model"
-    class="pa-4"
+    class="py-2"
     show-arrows
     mandatory
     center-active
+    active-class="accent white--text"
+    @change="changeMonth"
   >
     <v-slide-item
       v-for="stat in stats"
       :key="stat.Month"
       v-slot:default="{ toggle }"
     >
-      <v-card flat class="mx-2" @click="toggle">
+      <v-card class="ma-2" @click="toggle">
         <div class="text-center overline">
           Mes {{ months[stat.Month - 1] }} {{ year }}
         </div>
@@ -107,18 +109,18 @@
 </template>
 
 <script>
-import { months } from '~/api/dates';
+import { months } from "~/api/dates";
 
 export default {
   data: () => ({
     model: null,
     months: months,
-    year: '',
+    year: "",
     stats: [],
   }),
   created() {
     const _this = this;
-    _this.$eventBus.$on(['GPS_ADDED', 'GPS_UPDATED', 'GPS_DELETED'], () => {
+    _this.$eventBus.$on(["GPS_ADDED", "GPS_UPDATED", "GPS_DELETED"], () => {
       _this.fetchGps(() => {});
     });
     _this.fetchGps(() => {});
@@ -128,13 +130,16 @@ export default {
   methods: {
     fetchGps(cb) {
       const _this = this;
-      axios.get('/admin/gps/stats/allYear').then(function(response) {
+      axios.get("/admin/gps/stats/allYear").then(function (response) {
         _this.stats = response.data.data;
       });
     },
     emitQuery(month, stat_query) {
       const _this = this;
-      _this.$eventBus.$emit('STAT_QUERY', { month, stat_query });
+      _this.$eventBus.$emit("STAT_QUERY", { month, stat_query });
+    },
+    changeMonth(value) {
+      console.log(this.months[value]);
     },
   },
 };
