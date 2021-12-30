@@ -91,7 +91,6 @@
               :loading="isLoading"
               :disabled="!valid || isLoading"
               color="primary"
-              dark
               block
             >
               Guardar

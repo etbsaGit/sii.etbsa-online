@@ -49,7 +49,7 @@
       <v-col cols="12" md="8">
         <v-textarea
           label="Descripcion:"
-          v-model="form.description"
+          v-model="form.descripcion"
           outlined
         ></v-textarea> </v-col
     ></v-row>

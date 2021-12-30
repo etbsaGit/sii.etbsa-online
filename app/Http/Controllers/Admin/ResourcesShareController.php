@@ -34,7 +34,6 @@ class ResourcesShareController extends AdminController
     {
         $departments = DB::table('departments')->get(['id', 'title']);
         return $this->sendResponseOk(compact('departments'));
-
     }
 
     public function getProspect()
@@ -43,4 +42,12 @@ class ResourcesShareController extends AdminController
         return $this->sendResponseOk(compact('prospects'));
     }
 
+    public function getOptions()
+    {
+        $agencies = DB::table('agencies')->get(['id', 'code', 'title']);
+        $departments = DB::table('departments')->get(['id', 'title']);
+        $estates = DB::table('estates')->get(['id', 'name']);
+
+        return $this->sendResponseOk(compact('estates', 'agencies', 'departments'));
+    }
 }

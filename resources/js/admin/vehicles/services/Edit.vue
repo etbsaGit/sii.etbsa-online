@@ -5,7 +5,7 @@
       <!-- <v-form v-model="valid" ref="dispersalForm" lazy-validation> -->
       <!-- <v-row class="align-center"> -->
       <v-col cols="12">
-        <v-card class="mx-auto" dark>
+        <v-card class="mx-auto">
           <v-list-item two-line>
             <v-list-item-content>
               <v-list-item-title class="headline">

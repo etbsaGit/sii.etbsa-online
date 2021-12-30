@@ -6,25 +6,22 @@
     :fullscreen="fullscreen"
     @close="close"
   >
-    <div>
-      <v-toolbar dense dark>
-        <v-btn small icon @click="close()">
-          <v-icon>mdi-arrow-left</v-icon>
+    <v-card flat>
+      <v-toolbar color="primary" flat dense>
+        <v-btn icon dark @click="close()">
+          <v-icon>mdi-close</v-icon>
         </v-btn>
-
-        <v-toolbar-title v-text="title" class="overline" />
-
+        <v-toolbar-title v-text="title" class="white--text title" />
         <v-spacer></v-spacer>
-        <slot name="actions"></slot>
+        <v-toolbar-items class="align-center">
+          <slot name="actions"></slot>
+        </v-toolbar-items>
       </v-toolbar>
-      <v-sheet
-        id="scrolling-techniques-3"
-        class="overflow-y-auto"
-        :max-height="maxHeight"
-      >
+      <v-card-text class="pt-4">
         <slot></slot>
-      </v-sheet>
-    </div>
+      </v-card-text>
+      <div style="flex: 1 1 auto;"></div>
+    </v-card>
   </modal>
 </template>
 

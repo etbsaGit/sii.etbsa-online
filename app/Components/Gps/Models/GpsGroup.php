@@ -27,7 +27,10 @@ class GpsGroup extends Model
      */
     public function getGpsCountAttribute()
     {
-        return $this->gps()->count();
+        // return $this->gps()->count();
+        return $this->gps->filter(function ($v, $k) {
+            return $v->renew_date;
+        })->count();
     }
     /**
      * the gps on this group
@@ -54,7 +57,6 @@ class GpsGroup extends Model
             return false;
         }
         return $q->where('agency', $v);
-
     }
     public function scopeOfDepartment($q, $v)
     {
@@ -62,6 +64,5 @@ class GpsGroup extends Model
             return false;
         }
         return $q->where('department', $v);
-
     }
 }

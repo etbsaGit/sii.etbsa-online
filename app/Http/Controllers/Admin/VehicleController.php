@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Components\RRHH\Models\Employee;
+use App\Components\User\Models\User;
 use App\Components\Vehicle\Models\Vehicle;
+use App\Components\Vehicle\Models\VehicleTicketCard;
 use App\Components\Vehicle\Repositories\VehicleRepository;
 use DB;
 use Illuminate\Http\Request;
@@ -82,11 +85,7 @@ class VehicleController extends AdminController
     {
         $validate = validator($request->all(), [
             'matricula' => 'required',
-            'model' => 'required',
-            'brand' => 'required',
-            'serie' => 'required',
-            'year' => 'required',
-            'fuel' => 'required',
+
 
             // 'actual_mileage',
             // 'fuel_odometer',
@@ -150,11 +149,21 @@ class VehicleController extends AdminController
 
     public function options()
     {
-        $users = DB::table('users')->get(['id', 'name']);
+        $users = User::whereHasMorph(
+            'profiable',
+            [Employee::class]
+        )->get();
+        // $employees = Employee::with('user')->whereHas('user')->get();
+        $employees = User::all('id', 'name');
         $agencies = DB::table('agencies')->get(['id', 'code', 'title']);
+        $combustible = DB::table('vehicle_fuels')->get(['id', 'name']);
+        $tickets = VehicleTicketCard::all('ticket_card');
         return $this->sendResponseOk(compact(
             'users',
-            'agencies'
+            'agencies',
+            'combustible',
+            'tickets',
+            'employees'
         ), "list Resources orders ok.");
     }
 }

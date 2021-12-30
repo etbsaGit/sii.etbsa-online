@@ -40,7 +40,7 @@
           <div class="overline">
             Muestra de Encabezados en el Excel iniciando en (A1)
           </div>
-          <v-simple-table class="mb-2" dense fixed-header dark>
+          <v-simple-table class="mb-2" dense fixed-header>
             <template v-slot:default>
               <thead>
                 <tr>
@@ -75,7 +75,7 @@
           <div class="overline">
             Muestra de Encabezados en el Excel iniciando en (A1)
           </div>
-          <v-simple-table class="mb-2" dense fixed-header dark>
+          <v-simple-table class="mb-2" dense fixed-header>
             <template v-slot:default>
               <thead>
                 <tr>
@@ -109,7 +109,7 @@
           <div class="overline">
             Muestra de Encabezados en el Excel iniciando en (A1)
           </div>
-          <v-simple-table class="mb-2" dense fixed-header dark>
+          <v-simple-table class="mb-2" dense fixed-header>
             <template v-slot:default>
               <thead>
                 <tr>
@@ -163,7 +163,7 @@ export default {
       steps: 4,
       files: {},
       accept:
-        ".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        ".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     };
   },
   methods: {
@@ -199,19 +199,19 @@ export default {
       formData.append("file_clientes_gps", self.files["file_clientes_gps"]);
       return axios
         .post("admin/clientes-gps/import", formData)
-        .then(response => {
+        .then((response) => {
           self.$store.commit("showSnackbar", {
             message: response.data.message,
             color: "success",
-            duration: 3000
+            duration: 3000,
           });
 
           return response.data;
         })
-        .catch(error => {
+        .catch((error) => {
           return error;
         })
-        .finally(function() {
+        .finally(function () {
           self.$store.commit("hideLoader");
         });
     },
@@ -221,19 +221,19 @@ export default {
       formData.append("file_gps", self.files["file_gps"]);
       return axios
         .post("admin/gps/import", formData)
-        .then(response => {
+        .then((response) => {
           self.$store.commit("showSnackbar", {
             message: response.data.message,
             color: "success",
-            duration: 3000
+            duration: 3000,
           });
 
           return response.data;
         })
-        .catch(error => {
+        .catch((error) => {
           return error;
         })
-        .finally(function() {
+        .finally(function () {
           self.$store.commit("hideLoader");
         });
     },
@@ -243,16 +243,16 @@ export default {
       formData.append("file_gps_chips", self.files["file_gps_chips"]);
       return axios
         .post("admin/chips/import", formData)
-        .then(response => {
+        .then((response) => {
           self.$store.commit("showSnackbar", {
             message: response.data.message,
             color: "success",
-            duration: 3000
+            duration: 3000,
           });
 
           return response.data;
         })
-        .finally(function() {
+        .finally(function () {
           self.$store.commit("hideLoader");
         });
     },
@@ -261,19 +261,19 @@ export default {
 
       return axios
         .post("admin/matching-chips-gps/import")
-        .then(response => {
+        .then((response) => {
           self.$store.commit("showSnackbar", {
             message: response.data.message,
             color: "success",
-            duration: 3000
+            duration: 3000,
           });
 
           return response.data;
         })
-        .finally(function() {
+        .finally(function () {
           self.$store.commit("hideLoader");
         });
-    }
-  }
+    },
+  },
 };
 </script>

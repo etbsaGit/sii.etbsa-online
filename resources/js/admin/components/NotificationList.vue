@@ -3,13 +3,13 @@
     <v-row>
       <v-col cols="12" md="6">
         <v-card class="mx-auto">
-          <v-toolbar color="light-blue" dark>
+          <v-toolbar color="light-blue">
             <v-toolbar-title>No Leidas</v-toolbar-title>
           </v-toolbar>
           <v-list subheader two-line>
             <v-list-item v-for="item in unReadNotifications" :key="item.id">
               <v-list-item-avatar>
-                <v-icon class="blue lighten-1" dark>
+                <v-icon class="blue lighten-1">
                   mdi-message
                 </v-icon>
               </v-list-item-avatar>
@@ -39,13 +39,13 @@
       <!-- unreaded -->
       <v-col cols="12" md="6">
         <v-card class="mx-auto">
-          <v-toolbar color="light-blue" dark>
+          <v-toolbar color="light-blue">
             <v-toolbar-title>Leidas</v-toolbar-title>
           </v-toolbar>
           <v-list subheader two-line>
             <v-list-item v-for="item in readNotifications" :key="item.id">
               <v-list-item-avatar>
-                <v-icon class="blue lighten-1" dark>
+                <v-icon class="blue lighten-1">
                   mdi-message
                 </v-icon>
               </v-list-item-avatar>

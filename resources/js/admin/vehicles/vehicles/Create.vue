@@ -19,7 +19,6 @@
         :disabled="!valid || isLoading"
         color="primary"
         block
-        dark
       >
         Guardar
       </v-btn>
@@ -36,18 +35,23 @@ export default {
       valid: true,
       isLoading: false,
       form: {
-        matricula: "",
-        modelo: "",
-        marca: "",
-        serie: "",
-        ticket_card: "",
-        tipo_combustible: "",
-        ultimo_kilometraje: 0,
-        ultimo_kilometraje_servicio: 0,
-        rango_kilometros_servicio: 0,
-        capacidad_tanque: 0,
-        sucursal: null,
-        responsable: null,
+        actual_mileage: null,
+        agency_id: null,
+        brand: null,
+        fuel: "MAGNA",
+        fue_id: null,
+        fuel_odometer: null,
+        last_mileage: null,
+        matricula: null,
+        max_lts_fuel: null,
+        mileage_last_service: null,
+        mileage_range_service: null,
+        model: null,
+        serie: null,
+        ticket_card: null,
+        user_id: null,
+        year: null,
+        bidon_fuel: false,
       },
     };
   },

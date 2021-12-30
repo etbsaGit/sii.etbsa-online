@@ -19,7 +19,6 @@
         :disabled="!valid"
         @click="updateSupplier"
         block
-        dark
       >
         Guardar
       </v-btn>
@@ -49,7 +48,10 @@ export default {
         email: null,
         phone: null,
         contact: null,
+        addresses: null,
         billing_data: [],
+        estate_id: "",
+        township_id: "",
       },
     };
   },
@@ -97,7 +99,8 @@ export default {
       this.supplier = await axios
         .get(`/admin/suppliers/${this.supplierId}/edit`)
         .then((response) => {
-          return { ...response.data.data };
+          let Supplier = response.data.data;
+          return { ...Supplier };
         });
       (cb || Function)();
     },

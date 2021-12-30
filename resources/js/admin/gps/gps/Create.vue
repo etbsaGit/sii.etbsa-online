@@ -38,6 +38,7 @@ export default {
     return {
       valid: true,
       form: {
+        clave: null,
         name: null,
         gps_group_id: null,
         gps_chip_id: null,

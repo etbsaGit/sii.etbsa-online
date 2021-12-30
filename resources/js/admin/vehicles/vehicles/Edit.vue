@@ -10,8 +10,9 @@
             </v-container>
           </v-col>
           <v-col cols="12" md="4">
-            <v-container class="elevation-2 text-center">
+            <v-container class="elevation-2 text-center mb-4">
               <gauge
+                v-if="!form.bidon_fuel"
                 heading="ODOMETRO DE COMBUSTIBLE"
                 :value="form.fuel_odometer"
                 :min="0"
@@ -32,6 +33,7 @@
                 :unit="'%'"
                 :unitOnArc="false"
               />
+              <v-icon v-else size="200" color="red">mdi-fuel</v-icon>
             </v-container>
           </v-col>
         </v-row>
@@ -41,7 +43,6 @@
             :loading="isLoading"
             :disabled="!valid || isLoading"
             color="primary"
-            dark
             block
           >
             Editar
@@ -56,12 +57,11 @@
             icon-title="mdi-gas-station"
             title="Disperciones"
             padding-hide
-            dark
           >
             <dispersal-table slot="widget-content" :items="form.dispersals" />
           </app-widget>
         </v-col>
-        <v-col lg="6" sm="12" cols="12">
+        <v-col lg="6" sm="12" cols="12" v-if="!form.bidon_fuel">
           <app-widget
             icon-title="mdi-tools"
             title="Servicios en Taller"
@@ -164,7 +164,10 @@ export default {
         .get(`/admin/vehicles/${_this.vehicleId}`)
         .then(function (response) {
           let Vehicle = response.data.data;
-          _this.form = { ...Vehicle };
+          _this.form = {
+            ...Vehicle,
+            ticket_card: parseInt(Vehicle.ticket_card),
+          };
           (cb || Function)();
         });
     },

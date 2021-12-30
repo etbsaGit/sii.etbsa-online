@@ -11,9 +11,15 @@
 |
  */
 
+use Barryvdh\Reflection\DocBlock\Tag\ReturnTag;
+use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\DB;
+
 Route::get('/', 'Front\\HomeController@index')->name('front.home');
 Route::get('files/{id}/preview', 'Front\\FileController@filePreview')->name('front.file.preview');
 Route::get('files/{id}/download', 'Front\\FileController@fileDownload')->name('front.file.download');
+
+Route::get('/proveedores', 'Supplier\\HomeController@index')->name('proveedores.home');
 
 Auth::routes();
 
@@ -36,15 +42,6 @@ Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function
     Route::resource('file-groups', 'FileGroupController');
 
     Route::resource('prospects', 'ProspectController');
-    Route::resource('tracking', 'TrackingProspectController');
-    Route::get('tracking/sales_history/resources', 'TrackingProspectController@resources')->name('trackingResources');
-    // Route::put('tracking/assignSeller/{id}', 'TrackingProspectController@assignSeller')->name('trackingAssignSeller');
-    Route::put('tracking/historical/{id}', 'TrackingProspectController@addHistoricalTracking')->name('tracking.addHistoricalTracking');
-    Route::put('tracking/resetToActive/{id}', 'TrackingProspectController@resetToActive')->name('tracking.resetToActive');
-    Route::get('tracking/historical/diary', 'TrackingProspectController@diaryTrackings')->name('tracking.diary');
-    Route::get('tracking-export', 'ExportController@exportTracking')->name('trackingExport');
-    Route::post('tracking/message', 'MessageTrackingController@store')->name('message.tracking.store');
-    Route::get('tracking/messages/{tracking}', 'MessageTrackingController@getMessagesTracking')->name('message.tracking.getMessagesTracking');
 
     //Notification
     Route::get('notification', 'NotificationController@index')->name('notification.index');
@@ -58,9 +55,174 @@ Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function
     // ResourcesController
     Route::get('resource/agencies', 'ResourcesShareController@getAgencies')->name('resources.agencies');
     Route::get('resource/users', 'ResourcesShareController@getUser')->name('resources.users');
+    Route::get('resource/options', 'ResourcesShareController@getOptions')->name('resources.options');
+
+    // Resources Grafics Metas
+    Route::get('metas_sucursal', function () {
+        $metas = DB::table('metas_sucursales')->orderBy('sucursal')->get();
+
+        $unicos = $metas->map(function ($item) {
+            return $item->sucursal;
+        })->unique();
+
+        foreach ($unicos as $key => $value) {
+            $meta = $metas->filter(function ($item) use ($value) {
+                return $item->sucursal == $value;
+            })->map(function ($item, $key) {
+                if ($item->meta_mes_actual > 0) {
+                    $venta_meta_mes = ($item->venta_mes_actual * 100) /  $item->meta_mes_actual;
+                }
+                // if ($item->meta_anual > 0) {
+                //     $venta_meta_anual = ($item->venta_enero_mes_actual * 100) /  $item->meta_anual;
+                // }
+                // if ($item->meta_enero_mes_actual > 0) {
+                //     $venta_meta_mes_actual = ($item->venta_enero_mes_actual * 100) /  $item->meta_enero_mes_actual;
+                // }
+                return [
+                    'departamento' => $item->departamento,
+                    'meta_mes_actual' => $item->meta_mes_actual,
+                    'venta_mes_actual' => ceil($venta_meta_mes ?? 0),
+                    'venta_mes' => $item->venta_mes_actual ?? 0,
+                ];
+            });
+            // sucursal,departamento,clave_vendedor,nombre_vendedor,venta_total,margen_total,gasto
+
+            $dpto = $meta->pluck('departamento');
+            $metaActual = $meta->pluck('meta_mes_actual');
+            $ventaActual = $meta->pluck('venta_mes_actual');
+            $ventaMes = $meta->pluck('venta_mes');
+            $dataset[] = [
+                'name' => $value,
+                'title' => ['text' => "Meta $ " . ceil($metaActual[0])],
+                'tooltip' => [
+                    'trigger' => "axis",
+                    'axisPointer' => [
+                        'type' => "shadow",
+                    ],
+                    'formatter' => '{b}: $ ' . $ventaMes[0]
+                ],
+                'yAxis' => [
+                    'type' => 'category',
+                    'data' =>  $dpto->all()
+                ],
+                'series' => [
+                    // [
+                    //     'name' => 'meta',
+                    //     'type' => 'bar',
+                    //     'label' => [
+                    //         'show' => true,
+                    //         'position' => 'right'
+                    //     ],
+                    //     'data' => $metaActual->all()
+                    // ],
+                    [
+                        'name' => 'venta',
+                        'type' => 'bar',
+                        'label' => [
+                            'show' => true,
+                            'position' => 'inside',
+                            'fontWeight' => 'bold',
+                            'fontSize' => 32,
+                            'formatter' => '{c}%'
+                        ],
+                        'data' => $ventaActual->all()
+                    ],
+                ],
+            ];
+        };
+        return Response($dataset);
+    });
+
+    Route::get('metas_sucursal/{sucursal}', function ($sucursal) {
+        $metas = DB::table('metas_sucursales')->where('sucursal', $sucursal)->get();
+        // "sucursal": "Celaya",
+        // "departamento": "Ventas Agricola",
+        // "venta_mes_actual": 22137826.4,
+        // "venta_mes_año_pasado": 16898860.48,
+        // "meta_mes_actual": 17050000,
+        // "meta_anual": 155000000,
+        // "meta_enero_mes_actual": 137950000,
+        // "venta_enero_mes_actual": 153883924.3,
+        // "meta_enero_mes_actual_año_pasado": 161316395.1
+
+        $data = $metas->map(function ($item, $key) {
+            if ($item->meta_mes_actual > 0) {
+                $venta_meta_mes = ($item->venta_mes_actual * 100) /  $item->meta_mes_actual;
+            }
+            if ($item->meta_anual > 0) {
+                $venta_meta_anual = ($item->venta_enero_mes_actual * 100) /  $item->meta_anual;
+            }
+            if ($item->meta_enero_mes_actual > 0) {
+                $venta_meta_mes_actual = ($item->venta_enero_mes_actual * 100) /  $item->meta_enero_mes_actual;
+            }
+            return [
+                'Sucursal' => $item->sucursal,
+                'Departamento' => $item->departamento,
+                'Meta Mes' => $item->meta_mes_actual,
+                'Venta' => $item->venta_mes_actual,
+                'Venta vs Meta Mes' => $venta_meta_mes ?? 0,
+                'Venta vs Meta Anual' => $venta_meta_anual ?? 0,
+                'Venta vs Meta Ene Mes Actual' => $venta_meta_mes_actual ?? 0
+            ];
+        });
+
+        return Response($data);
+    });
+
+    Route::get('ventas_vendedores', function () {
+        $vendedores = DB::table('chart_ventas_vendedores')->get();
+
+        foreach ($vendedores as $key => $value) {
+            $venta = $value->venta_total;
+            $margen = $value->margen_total;
+            $gasto = $value->gasto;
+
+            $dataset[] = [
+                'sucursal' => $value->sucursal,
+                'depatamento' => $value->departamento,
+                'vendedor' => $value->nombre_vendedor,
+                'title' => [
+                    'text' => "Venta Total $ " . $venta,
+                ],
+                'series' => [
+                    'type' => 'bar',
+
+                    'data' => [
+                        $gasto,
+                        [
+                            'value' => $margen,
+                            'itemStyle' => [
+                                'color' => '#40C4FF'
+                            ]
+                        ],
+                        [
+                            'value' => $venta,
+                            'itemStyle' => [
+                                'color' => '#66BB6A',
+
+                            ]
+                        ]
+                    ],
+                    'coordinateSystem' => 'polar',
+                    // 'roundCap' => true,
+                    'itemStyle' => [
+                        'borderColor' => 'green',
+                        'opacity' => 0.8,
+                        'borderWidth' => 1.5
+                    ],
+                    'label' => [
+                        'show' => false,
+                        'position' => 'middle',
+                    ],
+
+                ]
+            ];
+        }
+        return Response($dataset);
+    });
 });
 
-//Clear Cache facade value:
+//Clear Cache facade value:sucursal
 Route::get('/clear-cache', function () {
     $exitCode = Artisan::call('cache:clear');
     return '<h1>Cache facade value cleared</h1>';

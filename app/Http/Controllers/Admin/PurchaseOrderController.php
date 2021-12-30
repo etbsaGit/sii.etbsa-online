@@ -13,6 +13,8 @@ use App\Components\Purchase\Models\Supplier;
 use App\Components\Common\Models\Estatus;
 use App\Notifications\PurchaseOrderCreatedNotification;
 use App\Notifications\PurchaseOrderUpdatedNotification;
+// use App\Notifications\PurchaseOrderCreatedNotification;
+use Barryvdh\DomPDF\PDF;
 
 class PurchaseOrderController extends AdminController
 {
@@ -39,8 +41,6 @@ class PurchaseOrderController extends AdminController
         $data = $this->purchaseOrderRepository->list(request()->all());
         return $this->sendResponseOk($data, "list purchases orders ok.");
     }
-
-
 
     public function resources()
     {
@@ -74,17 +74,19 @@ class PurchaseOrderController extends AdminController
         $request['created_by'] = Auth::user()->id;
         $validate = validator($request->all(), [
             'created_by' => 'required',
+            'estatus_id' => 'required',
+            'supplier_id' => 'required',
             'subtotal' => 'required',
             'tax' => 'required',
             'total' => 'required',
             'concepts' => 'required|Array',
-            'supplier_id' => 'required',
-            'agency_id' => 'required',
-            'estatus_id' => 'required',
+            'charges' => 'required|Array',
+            'payment_condition' => 'required',
             'reason' => 'required',
-            'uso_cfdi_id' => 'required',
-            'metodo_pago_id' => 'required',
-            'forma_pago_id' => 'required',
+            'observation' => 'required',
+            'uso_cfdi' => 'required',
+            'metodo_pago' => 'required',
+            'forma_pago' => 'required',
         ], []);
 
         if ($validate->fails()) {
@@ -99,7 +101,7 @@ class PurchaseOrderController extends AdminController
 
         $purchasesOrder->estatus()->associate($estatus);
         $purchasesOrder->save();
-        $purchasesOrder->elaborated->notify(new PurchaseOrderCreatedNotification($purchasesOrder));
+        $purchasesOrder->elaborated->notify(new PurchaseOrderCreatedNotification($purchasesOrder->refresh()));
 
         return $this->sendResponseCreated($purchasesOrder);
     }
@@ -117,7 +119,37 @@ class PurchaseOrderController extends AdminController
 
     public function edit(PurchaseOrder $purchase_order)
     {
-        return $this->sendResponseOk($purchase_order, "Edit Purchase Order.");
+        $data = [
+            'created_by' => $purchase_order->created_by,
+            'supplier' => $purchase_order->supplier,
+            'concepts' => $purchase_order->concepts,
+            'charges' => $purchase_order->charges,
+            "invoice" => [
+                'metodo_pago' => $purchase_order->metodopago,
+                'uso_cfdi' => $purchase_order->usocfdi,
+                'forma_pago' => $purchase_order->formapago,
+            ],
+            'amounts' => [
+                "subtotal" => $purchase_order->subtotal,
+                "tax" => $purchase_order->tax,
+                "total" => $purchase_order->total,
+            ],
+            "reason" => $purchase_order->reason,
+            "agency_id" => $purchase_order->ship->id,
+            "observation" => $purchase_order->observation,
+            "payment_condition" => $purchase_order->payment_condition,
+            "estatus" => $purchase_order->estatus,
+            "invoice_info" => [
+                'id' => $purchase_order->invoice->id ?? null,
+                'folio_fiscal' => $purchase_order->invoice->folio_fiscal ?? '',
+                'folio' => $purchase_order->invoice->folio ?? '',
+                'invoice_date' => $purchase_order->invoice->invoice_date ?? '',
+                'date_to_payment' => $purchase_order->invoice->date_to_payment ?? '',
+                'payment_date' => $purchase_order->invoice->payment_date ?? '',
+                'amount' => $purchase_order->invoice->amount ?? 0,
+            ]
+        ];
+        return $this->sendResponseOk($data, "Edit Purchase Order.");
     }
     /**
      * Update the specified resource in storage.
@@ -126,7 +158,7 @@ class PurchaseOrderController extends AdminController
      * @param  \App\PurchaseOrder  $purchaseOrder
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, PurchaseOrder $purchaseOrder)
+    public function update(Request $request, PurchaseOrder $purchase_order)
     {
         $request['updated_by'] = Auth::user()->id;
         $validate = validator($request->all(), [
@@ -138,17 +170,10 @@ class PurchaseOrderController extends AdminController
             return $this->sendResponseBadRequest($validate->errors()->first());
         }
 
-        $estatus = Estatus::where('key', $request['estatus_key'])->first();
-        $request['estatus_id'] = $estatus->id;
-        if ($request['estatus_key'] == 'verificado')
-            $request['authorization_token'] = $this->purchaseOrderRepository->generateAutorizationToken($purchaseOrder);
-        $updated = $purchaseOrder->update($request->all());
+        $updated = $purchase_order->update($request->all());
         if (!$updated) {
             return $this->sendResponseBadRequest("Error en la Actualizacion");
         }
-        $purchaseOrder->estatus()->associate($estatus);
-        $purchaseOrder->save();
-        $purchaseOrder->elaborated->notify(new PurchaseOrderUpdatedNotification($purchaseOrder->refresh()));
 
         return $this->sendResponseUpdated();
     }
@@ -176,5 +201,83 @@ class PurchaseOrderController extends AdminController
         return $pdf->stream();
 
         // return view('pdf.purchase', compact('purchaseOrder'));
+    }
+
+    public function updateEstatus(Request $request, PurchaseOrder $purchase_order)
+    {
+        $request['updated_by'] = Auth::user()->id;
+        $validate = validator($request->all(), [
+            'estatus_key' => 'string|required',
+            'updated_by' => 'required'
+        ], []);
+
+        if ($validate->fails()) {
+            return $this->sendResponseBadRequest($validate->errors()->first());
+        }
+        $estatus = Estatus::where('key', $request['estatus_key'])->first();
+        $request['estatus_id'] = $estatus->id;
+        // if ($request['estatus_key'] == 'verificado')
+        //     $request['authorization_token'] = $this->purchaseOrderRepository->generateAutorizationToken($purchaseOrder);
+        $updated = $purchase_order->update($request->all());
+        if (!$updated) {
+            return $this->sendResponseBadRequest("Error en la Actualizacion");
+        }
+        $purchase_order->estatus()->associate($estatus);
+        $purchase_order->save();
+        $purchase_order->elaborated->notify(new PurchaseOrderUpdatedNotification($purchase_order->refresh()));
+        return $this->sendResponseUpdated([], 'Estatus Actualizado');
+    }
+
+    public function storeInvoicePurchase(Request $request, PurchaseOrder $purchase_order)
+    {
+        $request['updated_by'] = Auth::user()->id;
+        $validate = validator($request->all(), [
+            'updated_by' => 'required',
+            'folio_fiscal' => ['required_without_all:date_to_payment,payment_date|max:36'],
+            'folio' => 'required_without_all:date_to_payment,payment_date',
+            'amount' => 'required_without_all:date_to_payment,payment_date',
+            'invoice_date' => 'required_without_all:date_to_payment,payment_date',
+            'date_to_payment' => 'required_without_all:folio_fiscal,folio,amount,invoice_date,payment_date',
+            'payment_date' => 'required_without_all:folio_fiscal,folio,amount,invoice_date,date_to_payment'
+        ], []);
+
+        if ($validate->fails()) {
+            return $this->sendResponseBadRequest($validate->errors()->first());
+        }
+        $message = '';
+
+        if ($request['payment_date'] != null) {
+            $estatus = Estatus::where('key', Estatus::ESTATUS_PAGADA)->first();
+            $invoice_purchase = $purchase_order->invoice()->update([
+                'payment_date' => $request->payment_date,
+            ]);
+            $message = 'Factura Pagada con exito!';
+        } elseif ($request['date_to_payment'] != null) {
+            $estatus = Estatus::where('key', Estatus::ESTATUS_POR_PAGAR)->first();
+            $invoice_purchase = $purchase_order->invoice()->update([
+                'date_to_payment' => $request->date_to_payment,
+            ]);
+            $message = 'Factura Programada a Pago con exito!';
+        } elseif ($request['id'] != null) {
+            $estatus = Estatus::where('key', Estatus::ESTATUS_FACTURADO)->first();
+            $invoice_purchase = $purchase_order->invoice()->update([
+                'folio_fiscal' => $request->folio_fiscal,
+                'folio' => $request->folio,
+                'amount' => $request->amount,
+                'invoice_date' => $request->invoice_date,
+                'date_to_payment' => null,
+                'payment_date' => null,
+            ]);
+            $message = 'Factura Actualizada con exito!';
+        } else {
+            $estatus = Estatus::where('key', Estatus::ESTATUS_FACTURADO)->first();
+            $invoice_purchase = $purchase_order->invoice()->create($request->all());
+            $message = 'Factura Registrada con Exito!';
+        }
+        $purchase_order->updated_by = $request->updated_by;
+        $purchase_order->estatus()->associate($estatus);
+        $purchase_order->save();
+
+        return $this->sendResponseUpdated(compact('invoice_purchase'), $message);
     }
 }

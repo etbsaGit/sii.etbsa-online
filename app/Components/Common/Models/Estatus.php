@@ -13,12 +13,15 @@ class Estatus extends Model
     const ESTATUS_FORMALIZADO = 'formalizado';
     const ESTATUS_AUTORIZADO = 'autorizado';
     const ESTATUS_PENDIENTE = 'pendiente';
-    const ESTATUS_PAGADA = 'pagada';
-    const ESTATUS_RECIBIDA = 'recibida';
+    const ESTATUS_RECIBIDO = 'recibido';
+    const ESTATUS_ENVIADA = 'enviada';
     const ESTATUS_VERIFICADO = 'verificado';
     const ESTATUS_FACTURADO = 'facturado';
+    const ESTATUS_POR_PAGAR = 'por_pagar';
+    const ESTATUS_PAGADA = 'pagada';
     const ESTATUS_DENGAR = 'denegar';
     const ESTATUS_DISPERSADO = 'flotilla.dispersado';
+    const ESTATUS_DESPACHADO = 'flotilla.despachado';
     const ESTATUS_EnSERVICIO = 'flotilla.enServicio';
     const ESTATUS_SERVICIO_TERMINADO = 'flotilla.servicio.terminado';
 

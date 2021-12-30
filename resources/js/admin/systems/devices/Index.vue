@@ -1,3 +1,3 @@
 <template>
-  <v-skeleton-loader class="mx-auto" type="table" dark></v-skeleton-loader>
+  <v-skeleton-loader class="mx-auto" type="table"></v-skeleton-loader>
 </template>

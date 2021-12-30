@@ -10,7 +10,6 @@ use App\Components\Common\Models\Agency;
 use App\Components\Common\Models\CatFormaPago;
 use App\Components\Common\Models\CatMetodoPago;
 use App\Components\Common\Models\CatUsoCfdi;
-use App\Components\Common\Models\Department;
 use App\Components\Common\Models\Document;
 use App\Components\Common\Models\Message;
 use App\Components\Core\Utilities\Helpers;
@@ -20,10 +19,9 @@ class PurchaseOrder extends Model
     protected $table = 'purchase_orders';
     protected $guarded = ['id'];
 
-    protected $with = [
-        'estatus', 'elaborated', 'updated_user', 'uso_cfdi',
-        'metodo_pago', 'forma_pago', 'sucursal', 'departamento'
-    ];
+    // protected $with = [
+    //     'estatus', 'elaborated', 'supplier:id,business_name,rfc'
+    // ];
 
     public function estatus()
     {
@@ -34,7 +32,7 @@ class PurchaseOrder extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
-    public function updated_user()
+    public function updated_by()
     {
         return $this->belongsTo(User::class, 'updated_by');
     }
@@ -44,28 +42,17 @@ class PurchaseOrder extends Model
         return $this->belongsTo(Supplier::class, 'supplier_id');
     }
 
-    public function uso_cfdi()
+    public function usocfdi()
     {
-        return $this->belongsTo(CatUsoCfdi::class, 'uso_cfdi_id', 'clave');
+        return $this->belongsTo(CatUsoCfdi::class, 'uso_cfdi', 'clave');
     }
-    public function metodo_pago()
+    public function metodopago()
     {
-        return $this->belongsTo(CatMetodoPago::class, 'metodo_pago_id', 'clave');
+        return $this->belongsTo(CatMetodoPago::class, 'metodo_pago', 'clave');
     }
-
-    public function forma_pago()
+    public function formapago()
     {
-        return $this->belongsTo(CatFormaPago::class, 'forma_pago_id', 'clave');
-    }
-
-    public function sucursal()
-    {
-        return $this->belongsTo(Agency::class, 'agency_id');
-    }
-
-    public function departamento()
-    {
-        return $this->belongsTo(Department::class, 'department_id');
+        return $this->belongsTo(CatFormaPago::class, 'forma_pago', 'clave');
     }
 
     public function messages()
@@ -78,6 +65,15 @@ class PurchaseOrder extends Model
         return $this->morphMany(Document::class, 'documentable');
     }
 
+    public function invoice()
+    {
+        return $this->morphOne(Invoice::class, 'invoiceable');
+    }
+    public function ship()
+    {
+        return $this->belongsTo(Agency::class, 'agency_id');
+    }
+
     /**
      * serializes concept attribute on the fly before saving to database
      *
@@ -86,6 +82,10 @@ class PurchaseOrder extends Model
     public function setConceptsAttribute($concepts)
     {
         $this->attributes['concepts'] = serialize($concepts);
+    }
+    public function setChargesAttribute($charges)
+    {
+        $this->attributes['charges'] = serialize($charges);
     }
 
     /**
@@ -101,16 +101,26 @@ class PurchaseOrder extends Model
 
         return unserialize($this->attributes['concepts']);
     }
+    public function getChargesAttribute()
+    {
+        if (empty($this->attributes['charges']) || is_null($this->attributes['charges'])) {
+            return [];
+        }
+
+        return unserialize($this->attributes['charges']);
+    }
 
     public function scopeSearch($query, String $search)
     {
         $query->when($search ?? null, function ($query, $search) {
-            $query->where(function ($query) use ($search) {
+            $query->orWhere(function ($query) use ($search) {
                 $query->orWhere('id', 'like', $search)
-                    ->orWhere('authorization_token', 'like', "%{$search}%")
-                    ->orWhereHas('sucursal', function ($query) use ($search) {
-                        return $query->where('agencies.title', 'like', "%{$search}%");
-                    })
+                    // ->orWhere('authorization_token', 'like', "%{$search}%")
+                    // ->orWhereHas('sucursal', function ($query) use ($search) {
+                    //     return $query->where('agencies.title', 'like', "%{$search}%");
+                    // })
+                    ->orWhere('charges', 'like', "%{$search}%")
+                    ->orWhere('reason', 'like', "%{$search}%")
                     ->orWhereHas('supplier', function ($query) use ($search) {
                         return $query->where('suppliers.business_name', 'like', "%{$search}%");
                     })->orWhereHas('elaborated', function ($query) use ($search) {
@@ -162,7 +172,10 @@ class PurchaseOrder extends Model
     public function scopeFilterPermission($query, User $user)
     {
         $query->when(
-            ($user->inGroup('Gerente') && $user->hasPermission('compras.admin')) || $user->hasPermission('compras.all.list') || $user->isSuperUser(),
+            (($user->inGroup('Gerente') || $user->inGroup('Compras')) &&
+                $user->hasPermission('compras.admin')) ||
+                $user->hasPermission('compras.all.list') ||
+                $user->isSuperUser(),
             function ($query) {
                 return $query;
             },

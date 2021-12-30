@@ -1,14 +1,5 @@
 <template>
   <v-card flat>
-    <v-app-bar dark>
-      <v-icon class="mr-2">mdi-crosshairs</v-icon> Detalle del GPS
-      <v-spacer> </v-spacer>
-      <v-btn :disabled="!valid" color="success" class="mr-4" @click="save">
-        Editar
-        <v-icon right>mdi-pencil</v-icon>
-      </v-btn>
-    </v-app-bar>
-    <v-divider class="mb-3"></v-divider>
     <v-card-text class="overflow-y-auto">
       <v-form ref="form" v-model="valid" lazy-validation>
         <gps-form :form.sync="form" :options="options" editing></gps-form>
@@ -18,7 +9,6 @@
         max-height="300"
         fixed-header
         dense
-        dark
         class="caption text-uppercase"
       >
         <template v-slot:default>
@@ -49,6 +39,12 @@
         </template>
       </v-simple-table>
     </v-card-text>
+    <v-card-actions>
+      <v-btn :disabled="!valid" color="success" @click="save" block>
+        Editar
+        <v-icon right>mdi-pencil</v-icon>
+      </v-btn>
+    </v-card-actions>
   </v-card>
 </template>
 
@@ -132,6 +128,9 @@ export default {
             renew_date: _this.$appFormatters.formatDate(Gps.renew_date),
             invoice_date: Gps.invoice_date
               ? _this.$appFormatters.formatDate(Gps.invoice_date || "")
+              : null,
+            cancellation_date: Gps.cancellation_date
+              ? _this.$appFormatters.formatDate(Gps.cancellation_date || "")
               : null,
           };
           _this.historical = Gps.historical;

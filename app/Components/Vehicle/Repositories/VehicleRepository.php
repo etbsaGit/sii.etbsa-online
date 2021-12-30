@@ -20,7 +20,9 @@ class VehicleRepository extends BaseRepository
      */
     public function list($params)
     {
-        return $this->get($params, [], function ($query) use ($params) {
+        return $this->get($params, [
+            'responsable.profiable:id,name,last_name,agency_id'
+        ], function ($query) use ($params) {
             $query->where(function ($query) use ($params) {
                 $query->search($params['search'] ?? '')
                     ->filter($params)

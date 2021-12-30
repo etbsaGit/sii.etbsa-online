@@ -15,13 +15,27 @@ class Vehicle extends Model
     // protected $guarded = ['id'];
 
     protected $fillable = [
-        'actual_mileage', 'agency_id', 'brand', 'fuel', 'fuel_odometer',
-        'last_mileage', 'matricula', 'max_lts_fuel', 'mileage_last_service',
-        'mileage_range_service', 'model', 'serie', 'ticket_card', 'user_id', 'year',
+        'agency_id', 'brand', 'fuel', 'fuel_id', 'fuel_odometer',
+        'mileage_last', 'mileage_actual', 'performance_fuel', 'matricula', 'liters_max_fuel', 'liters_per_week',
+        'mileage_last_service', 'mileage_range_service', 'model', 'serie',
+        'ticket_card', 'user_id', 'year', 'bidon_fuel'
     ];
 
-    protected $with = ['responsable:id,name', 'sucursal:id,title'];
+    protected $with = [
+        'responsable',
+        'sucursal:id,title',
+        'combustible:id,name,cost_lt',
+        'ticket'
+    ];
 
+
+    /**
+     * Get the chip record associated with the g.
+     */
+    public function ticket()
+    {
+        return $this->belongsTo(VehicleTicketCard::class, 'ticket_card');
+    }
 
     public function sucursal()
     {
@@ -31,6 +45,11 @@ class Vehicle extends Model
     public function responsable()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function combustible()
+    {
+        return $this->belongsTo(VehicleFuel::class, 'fuel_id');
     }
 
     public function dispersals()
@@ -43,6 +62,11 @@ class Vehicle extends Model
         return $this->hasMany(VehicleService::class, 'vehicle_id');
     }
 
+    public function fuel()
+    {
+        return $this->belongsTo(VehicleFuel::class, 'fuel_id');
+    }
+
     // Attributes
     protected $appends = ['can_dispersal', 'can_service'];
 
@@ -52,7 +76,7 @@ class Vehicle extends Model
         if (is_null($estatus)) {
             return true;
         }
-        return $estatus == Estatus::ESTATUS_DISPERSADO;
+        return $estatus == Estatus::ESTATUS_DESPACHADO;
     }
     public function canServices()
     {
@@ -80,6 +104,7 @@ class Vehicle extends Model
             $query->where(function ($query) use ($search) {
                 $query->orWhere('id', 'like', $search)
                     ->orWhere('matricula', 'like', "%{$search}%")
+                    ->orWhere('serie', 'like', "%{$search}%")
                     ->orWhere('model', 'like', "%{$search}%")
                     ->orWhere('year', 'like', "%{$search}%")
                     ->orWhereHas('sucursal', function ($query) use ($search) {
@@ -93,7 +118,20 @@ class Vehicle extends Model
 
     public function scopeFilter($query, array $filters)
     {
-        $query->when($filters['responsable'] ?? null, function ($query, $responsable) {
+
+        $query->when($filters['matricula'] ?? null, function ($query, $matricula) {
+            $query->where(function ($query) use ($matricula) {
+                $query->orWhere('matricula', 'like', "%{$matricula}%");
+            });
+        })->when($filters['serie'] ?? null, function ($query, $serie) {
+            $query->where(function ($query) use ($serie) {
+                $query->orWhere('serie', 'like', "%{$serie}%");
+            });
+        })->when($filters['ticket_card'] ?? null, function ($query, $ticket_card) {
+            $query->where(function ($query) use ($ticket_card) {
+                $query->orWhere('ticket_card', 'like', "%{$ticket_card}%");
+            });
+        })->when($filters['responsable'] ?? null, function ($query, $responsable) {
             $query->whereHas('responsable', function ($query) use ($responsable) {
                 return $query->where('id', $responsable);
             });

@@ -3,10 +3,9 @@
 namespace App\Notifications;
 
 use App\Components\Purchase\Models\PurchaseOrder;
-use App\Components\User\Models\Group;
 use App\Components\User\Models\User;
+use Auth;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -14,16 +13,16 @@ class PurchaseOrderUpdatedNotification extends Notification
 {
     use Queueable;
 
-    private $purchaseOrder;
+    private $purchase_order;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct(PurchaseOrder $purchaseOrder)
+    public function __construct(PurchaseOrder $purchase_order)
     {
-        $this->purchaseOrder = $purchaseOrder;
+        $this->purchase_order = $purchase_order;
     }
 
     /**
@@ -54,12 +53,12 @@ class PurchaseOrderUpdatedNotification extends Notification
 
         $uri = url('/admin#/purchases/list');
         return (new MailMessage)
-            ->subject('Actualizacion en Orden de Compra - #' . $this->purchaseOrder->id)
+            ->subject('Actualizacion en Orden de Compra - #' . $this->purchase_order->id)
             ->cc($ccUsers)
             ->greeting('Buen dia, Se Actualizo el Estatus en su Orden de Compra')
-            ->line('Folio Orden de Compra: #' . $this->purchaseOrder->id)
-            ->line('ESTATUS Actual: ' . $this->purchaseOrder->estatus->title)
-            ->line('Usuario quien Actualizo: ' . $this->purchaseOrder->updated_user->name)
+            ->line('Folio Orden de Compra: #' . $this->purchase_order->id)
+            ->line('ESTATUS Actual: ' . $this->purchase_order->estatus->title)
+            ->line('Usuario quien Actualizo: ' . Auth::user()->name)
             ->action('Ir a Ordenes de Compra', $uri)
             ->line('Gracias por usar nuestra Aplicacion.');
     }

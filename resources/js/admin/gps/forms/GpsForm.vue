@@ -4,7 +4,16 @@
     flat
     tile
   >
-    <v-col cols="12" class="py-0">
+    <v-col cols="4" class="py-0">
+      <v-text-field
+        v-model="form.clave"
+        label="CLAVE GPS"
+        placeholder="indentificador"
+        outlined
+        filled
+        dense
+    /></v-col>
+    <v-col cols="8" class="py-0">
       <v-text-field
         v-model="form.name"
         label="Nombre GPS"
@@ -54,7 +63,19 @@
       />
     </v-col>
 
-    <v-col cols="12" md="8" class="pa-0">
+    <template v-if="form.cancellation_date">
+      <v-text-field
+        v-model="form.installation_date"
+        label="Fecha Cancelacion"
+        class="mx-2"
+        type="date"
+        outlined
+        filled
+        dense
+        readonly
+      />
+    </template>
+    <v-col v-else cols="12" md="8" class="pa-0">
       <v-row no-gutters align="center">
         <v-col cols="12" md="6" class="pa-0">
           <v-text-field
@@ -82,69 +103,77 @@
         </v-col>
       </v-row>
       <v-row no-gutters>
-        <p class="subtitle text-center mx-2">
-          Datos de Facturacion (Opcionales):
-        </p>
-        <v-text-field
-          v-model="form.invoice"
-          label="Factura:"
-          placeholder="Folio"
-          class="mx-2"
-          :readonly="editing"
-          outlined
-          dense
-        />
-        <v-text-field
-          v-model="form.invoice_date"
-          label="Fecha Factura"
-          class="mx-2"
-          type="date"
-          outlined
-          dense
-        />
-        <v-text-field
-          v-model="form.amount"
-          label="Importe Factura:"
-          placeholder="0.00"
-          type="Number"
-          class="mx-2 title"
-          prepend-inner-icon="mdi-currency-usd"
-          :readonly="editing"
-          outlined
-          filled
-          dense
-        >
-          <template v-slot:append>
-            <v-btn
-              :disabled="editing"
-              outlined
-              small
-              @click="
-                form.currency == 'MXN'
-                  ? (form.currency = 'USD')
-                  : (form.currency = 'MXN'),
-                  (form.exchange_rate = 1)
-              "
-            >
-              {{ form.currency }}
-            </v-btn>
-          </template>
-        </v-text-field>
-        <template v-if="form.currency == 'USD'">
+        <v-col cols="12">
+          <p class="subtitle text-center mx-2">
+            Datos de Facturacion (Opcionales):
+          </p>
+        </v-col>
+        <v-col cols="12" md="4">
           <v-text-field
-            v-model="form.exchange_rate"
-            label="Tipo Cambio:"
-            class="title"
-            type="Number"
-            :rules="rules"
+            v-model="form.invoice"
+            label="Factura:"
+            placeholder="Folio"
+            class="mx-2"
             :readonly="editing"
-            hide-details
-            reverse
+            outlined
+            dense
+          />
+        </v-col>
+        <v-col cols="12" md="4">
+          <v-text-field
+            v-model="form.invoice_date"
+            label="Fecha Factura"
+            class="mx-2"
+            type="date"
+            outlined
+            dense
+          />
+        </v-col>
+        <v-col cols="12" md="4">
+          <v-text-field
+            v-model="form.amount"
+            label="Importe Factura:"
+            placeholder="0.00"
+            type="Number"
+            class="mx-2 title"
+            prepend-inner-icon="mdi-currency-usd"
+            :readonly="editing"
             outlined
             filled
             dense
-          />
-        </template>
+          >
+            <template v-slot:append>
+              <v-btn
+                :disabled="editing"
+                outlined
+                small
+                @click="
+                  form.currency == 'MXN'
+                    ? (form.currency = 'USD')
+                    : (form.currency = 'MXN'),
+                    (form.exchange_rate = 1)
+                "
+              >
+                {{ form.currency }}
+              </v-btn>
+            </template>
+          </v-text-field>
+          <template v-if="form.currency == 'USD'">
+            <v-text-field
+              v-model="form.exchange_rate"
+              label="Tipo Cambio:"
+              class="title"
+              type="Number"
+              :rules="rules"
+              :readonly="editing"
+              hide-details
+              reverse
+              outlined
+              filled
+              dense
+            />
+          </template>
+        </v-col>
       </v-row>
     </v-col>
     <v-col cols="12" md="4" class="py-0">
@@ -164,7 +193,7 @@
 
 <script>
 export default {
-  name: 'GpsForm',
+  name: "GpsForm",
   props: {
     form: {
       required: true,
@@ -185,7 +214,7 @@ export default {
   },
   data() {
     return {
-      rules: [(v) => !!v || 'Campo Requerido'],
+      rules: [(v) => !!v || "Campo Requerido"],
     };
   },
 };

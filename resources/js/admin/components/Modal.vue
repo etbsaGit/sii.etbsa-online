@@ -1,16 +1,14 @@
 <template>
   <Portal to="modal">
     <v-dialog
-      transition="dialog-bottom-transition"
       v-model="show"
       :width="maxWidth"
       :fullscreen="fullscreen"
       :persistent="!closeable"
+      transition="dialog-bottom-transition"
       scrollable
     >
-      <!-- <div v-show="show"> -->
-      <slot v-if="show"></slot>
-      <!-- </div> -->
+      <slot></slot>
     </v-dialog>
   </Portal>
 </template>

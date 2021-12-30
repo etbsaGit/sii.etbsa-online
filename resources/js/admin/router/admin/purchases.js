@@ -35,6 +35,11 @@ export const purchases = [
         component: require("@admin/purchases/suppliers/Edit").default,
         props: true,
       },
+      {
+        path: "purchase-invoices",
+        name: "purchase.invoice.list",
+        component: require("@admin/purchases/invoices/Index").default,
+      },
     ],
   },
 ];

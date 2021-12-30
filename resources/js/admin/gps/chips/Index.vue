@@ -55,11 +55,7 @@
             />
           </v-form>
         </search-panel>
-        <v-card
-          class="d-flex justify-end align-center flex-wrap px-3"
-          dark
-          flat
-        >
+        <v-card class="d-flex justify-end align-center flex-wrap px-3" flat>
           <v-card
             flat
             class="d-flex d-flex justify-space-between align-center flex-wrap py-2"
@@ -87,7 +83,7 @@
           <v-toolbar-title>Lista de Chips GPS</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
           <v-spacer></v-spacer>
-          <v-btn color="primary" dark class="mb-2" @click="dialogs.show = true">
+          <v-btn color="primary" class="mb-2" @click="dialogs.show = true">
             Registrar Chip de GPS
           </v-btn>
         </v-toolbar>
@@ -194,49 +190,42 @@ export default {
           divider: true,
           width: 10,
           sortable: false,
-          class: "blue-grey darken-5",
         },
         {
           text: "SIM",
           value: "sim",
           align: "left",
           sortable: true,
-          class: "blue-grey darken-5 white--text overline text-truncate",
         },
         {
           text: "IMEI",
           value: "imei",
           align: "left",
           sortable: true,
-          class: "blue-grey darken-5 white--text overline text-truncate",
         },
         {
           text: "Costo",
           value: "costo",
           align: "left",
           sortable: false,
-          class: "blue-grey darken-5 white--text overline text-truncate",
         },
         {
           text: "Fecha Activacion",
           value: "fecha_activacion",
           align: "center",
           sortable: true,
-          class: "blue-grey darken-5 white--text overline text-truncate",
         },
         {
           text: "Fecha Cancelacion",
           value: "fecha_cancelacion",
           align: "center",
           sortable: true,
-          class: "blue-grey darken-5 white--text overline text-truncate",
         },
         {
           text: "Asignado",
           value: "gps.id",
           align: "center",
           sortable: false,
-          class: "blue-grey darken-5 white--text overline text-truncate",
         },
       ],
       items: [],

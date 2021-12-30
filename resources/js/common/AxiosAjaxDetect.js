@@ -15,7 +15,18 @@ class AxiosAjaxDetect {
 
         return config;
       },
-      function(error) {
+      function (error) {
+         if (error.response) {
+          store.commit("showSnackbar", {
+            message: error.response.data.message,
+            color: "error",
+            duration: 5000,
+          });
+        } else if (error.request) {
+          console.log(error.request);
+        } else {
+          console.log("Error", error.message);
+        }
         return Promise.reject(error);
       }
     );

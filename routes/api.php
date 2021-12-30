@@ -24,4 +24,6 @@ Route::post('mailable', function (Request $request) {
     Mail::to($data->email)->cc($email)->send(new FundingRequest($pdf));
     return response()->json($data);
 });
-
+Route::get('test', function (Request $request) {
+    return response()->json(['hello']);
+});

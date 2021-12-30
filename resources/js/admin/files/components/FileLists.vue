@@ -14,7 +14,11 @@
           Show Only:
         </div>
         <div class="d-flex flex-xs-row flex-wrap align-center">
-          <span v-for="(group, i) in filters.fileGroupsHolder" :key="i" class="px-2">
+          <span
+            v-for="(group, i) in filters.fileGroupsHolder"
+            :key="i"
+            class="px-2"
+          >
             <v-checkbox
               v-bind:label="group.name"
               v-model="filters.fileGroupId[group.id]"
@@ -70,7 +74,7 @@
     >
       <v-card>
         <v-toolbar class="primary">
-          <v-btn icon @click.native="dialogs.view.show = false" dark>
+          <v-btn icon @click.native="dialogs.view.show = false">
             <v-icon>close</v-icon>
           </v-btn>
           <v-toolbar-title class="white--text">{{
@@ -78,15 +82,15 @@
           }}</v-toolbar-title>
           <v-spacer></v-spacer>
           <v-toolbar-items>
-            <v-btn dark text @click.native="downloadFile(dialogs.view.file)">
+            <v-btn text @click.native="downloadFile(dialogs.view.file)">
               Download
-              <v-icon right dark>file_download</v-icon></v-btn
+              <v-icon right>file_download</v-icon></v-btn
             >
           </v-toolbar-items>
           <v-toolbar-items>
-            <v-btn dark text @click.native="trash(dialogs.view.file)">
+            <v-btn text @click.native="trash(dialogs.view.file)">
               Delete
-              <v-icon right dark>delete</v-icon></v-btn
+              <v-icon right>delete</v-icon></v-btn
             >
           </v-toolbar-items>
         </v-toolbar>
@@ -122,28 +126,28 @@ export default {
           text: "Date Created",
           value: "created_at",
           align: "left",
-          sortable: false
-        }
+          sortable: false,
+        },
       ],
       items: [],
       totalItems: 0,
       pagination: {
-        rowsPerPage: 10
+        rowsPerPage: 10,
       },
 
       filters: {
         name: "",
         selectedGroupIds: "",
         fileGroupId: [],
-        fileGroupsHolder: []
+        fileGroupsHolder: [],
       },
 
       dialogs: {
         view: {
           file: {},
-          show: false
-        }
-      }
+          show: false,
+        },
+      },
     };
   },
   mounted() {
@@ -151,13 +155,13 @@ export default {
 
     const self = this;
 
-    self.$eventBus.$on(["FILE_DELETED", "FILE_UPLOADED"], function() {
+    self.$eventBus.$on(["FILE_DELETED", "FILE_UPLOADED"], function () {
       self.loadFiles(() => {});
     });
     self.loadFileGroups(() => {});
   },
   watch: {
-    "filters.fileGroupId": _.debounce(function(v) {
+    "filters.fileGroupId": _.debounce(function (v) {
       let selected = [];
 
       _.each(v, (v, k) => {
@@ -169,15 +173,15 @@ export default {
     "filters.selectedGroupIds"(v) {
       this.loadFiles(() => {});
     },
-    "filters.name": _.debounce(function(v) {
+    "filters.name": _.debounce(function (v) {
       this.loadFiles(() => {});
     }, 500),
-    "pagination.page": function() {
+    "pagination.page": function () {
       this.loadFiles(() => {});
     },
-    "pagination.rowsPerPage": function() {
+    "pagination.rowsPerPage": function () {
       this.loadFiles(() => {});
-    }
+    },
   },
   methods: {
     getFullUrl(file, width, action) {
@@ -225,11 +229,11 @@ export default {
         okCb: () => {
           axios
             .delete("/admin/files/" + file.id)
-            .then(function(response) {
+            .then(function (response) {
               self.$store.commit("showSnackbar", {
                 message: response.data.message,
                 color: "success",
-                duration: 3000
+                duration: 3000,
               });
 
               self.$eventBus.$emit("FILE_DELETED");
@@ -238,12 +242,12 @@ export default {
               // lets close it.
               self.dialogs.view.show = false;
             })
-            .catch(function(error) {
+            .catch(function (error) {
               if (error.response) {
                 self.$store.commit("showSnackbar", {
                   message: error.response.data.message,
                   color: "error",
-                  duration: 3000
+                  duration: 3000,
                 });
               } else if (error.request) {
                 console.log(error.request);
@@ -254,19 +258,19 @@ export default {
         },
         cancelCb: () => {
           console.log("CANCEL");
-        }
+        },
       });
     },
     loadFileGroups(cb) {
       const self = this;
 
       let params = {
-        paginate: "no"
+        paginate: "no",
       };
 
       axios
         .get("/admin/file-groups", { params: params })
-        .then(function(response) {
+        .then(function (response) {
           self.filters.fileGroupsHolder = response.data.data;
           cb();
         });
@@ -278,17 +282,17 @@ export default {
         name: self.filters.name,
         file_group_id: self.filters.selectedGroupIds,
         page: self.pagination.page,
-        per_page: self.pagination.rowsPerPage
+        per_page: self.pagination.rowsPerPage,
       };
 
-      axios.get("/admin/files", { params: params }).then(function(response) {
+      axios.get("/admin/files", { params: params }).then(function (response) {
         self.items = response.data.data.data;
         self.totalItems = response.data.data.total;
         self.pagination.totalItems = response.data.data.total;
         (cb || Function)();
       });
-    }
-  }
+    },
+  },
 };
 </script>
 

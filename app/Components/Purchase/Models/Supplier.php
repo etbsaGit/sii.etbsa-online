@@ -2,12 +2,23 @@
 
 namespace App\Components\Purchase\Models;
 
+use App\Components\Common\Models\Township;
 use Illuminate\Database\Eloquent\Model;
 
 class Supplier extends Model
 {
     protected $table = 'suppliers';
     protected $guarded = ['id'];
+
+    protected $with = [
+        'township'
+    ];
+
+
+    public function township()
+    {
+        return $this->belongsTo(Township::class, 'township_id');
+    }
 
     /**
      * serializes concept attribute on the fly before saving to database
@@ -31,6 +42,61 @@ class Supplier extends Model
         }
 
         return unserialize($this->attributes['billing_data']);
+    }
+
+    public function setContactsAttribute($contacts)
+    {
+        $this->attributes['contacts'] = serialize($contacts);
+    }
+
+    /**
+     * unserializes contacts attribute before spitting out from database
+     *
+     * @return mixed
+     */
+    public function getContactsAttribute()
+    {
+        if (empty($this->attributes['contacts']) || is_null($this->attributes['contacts'])) {
+            return [];
+        }
+
+        return unserialize($this->attributes['contacts']);
+    }
+    public function setAddressesAttribute($address)
+    {
+        $this->attributes['addresses'] = serialize($address);
+    }
+
+    /**
+     * unserializes address attribute before spitting out from database
+     *
+     * @return mixed
+     */
+    public function getAddressesAttribute()
+    {
+        if (empty($this->attributes['addresses']) || is_null($this->attributes['addresses'])) {
+            return [];
+        }
+
+        return unserialize($this->attributes['addresses']);
+    }
+    public function setGiroAttribute($giro)
+    {
+        $this->attributes['giro'] = serialize($giro);
+    }
+
+    /**
+     * unserializes Giro attribute before spitting out from database
+     *
+     * @return mixed
+     */
+    public function getGiroAttribute()
+    {
+        if (empty($this->attributes['giro']) || is_null($this->attributes['giro'])) {
+            return [];
+        }
+
+        return unserialize($this->attributes['giro']);
     }
 
     public function scopeSearch($query, String $search)

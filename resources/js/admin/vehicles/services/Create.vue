@@ -21,7 +21,6 @@
         :disabled="!valid || isLoading"
         color="primary"
         block
-        dark
       >
         Guardar
       </v-btn>

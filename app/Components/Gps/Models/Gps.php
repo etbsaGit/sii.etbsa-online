@@ -13,6 +13,7 @@ class Gps extends Model
     protected $table = 'gps';
 
     protected $fillable = [
+        'clave',
         'name',
         'uploaded_by',
         'gps_group_id',
@@ -80,6 +81,10 @@ class Gps extends Model
             $query->whereHas('gpsGroup', function ($query) use ($deparment) {
                 return $query->where('department', $deparment);
             });
+        })->when($filters['datesRenew'] ?? null, function ($query, $dates) {
+            return $query->whereBetween('renew_date', [$dates[0], $dates[1]]);
+        })->when($filters['datesInstall'] ?? null, function ($query, $dates) {
+            return $query->whereBetween('installation_date', [$dates[0], $dates[1]]);
         })->when($filters['canceled'] ?? null, function ($query) {
             return $query->whereNotNull('cancellation_date');
         }, function ($query) {
@@ -89,36 +94,36 @@ class Gps extends Model
         });
     }
 
-    public function scopeFilterCanceled($query)
-    {
-        $query->whereNotNull('cancellation_date');
-    }
+    // public function scopeFilterCanceled($query)
+    // {
+    //     $query->whereNotNull('cancellation_date');
+    // }
 
-    public function scopeFilterByDateRangeInstall($query, $rangeDates)
-    {
-        $query->when($rangeDates ?? null, function ($query, $dates) {
-            $query->where(function ($query) use ($dates) {
-                // $dates = Helpers::commasToArray($dates) ?? null;
-                if (count($dates) == 2) {
-                    $from = date($dates[0]);
-                    $to = date($dates[1]);
-                    $query->whereBetween('installation_date', [$from, $to]);
-                }
-            });
-        });
-    }
+    // public function scopeFilterByDateRangeInstall($query, $rangeDates)
+    // {
+    //     $query->when($rangeDates ?? null, function ($query, $dates) {
+    //         $query->where(function ($query) use ($dates) {
+    //             // $dates = Helpers::commasToArray($dates) ?? null;
+    //             if (count($dates) == 2) {
+    //                 $from = date($dates[0]);
+    //                 $to = date($dates[1]);
+    //                 $query->whereBetween('installation_date', [$from, $to]);
+    //             }
+    //         });
+    //     });
+    // }
 
-    public function scopeFilterByDateRangeRenew($query, $rangeDates)
-    {
-        $query->when($rangeDates ?? null, function ($query, $dates) {
-            $query->where(function ($query) use ($dates) {
-                // $dates = Helpers::commasToArray($dates) ?? null;
-                if (count($dates) == 2) {
-                    $from = date($dates[0]);
-                    $to = date($dates[1]);
-                    $query->whereBetween('renew_date', [$from, $to]);
-                }
-            });
-        });
-    }
+    // public function scopeFilterByDateRangeRenew($query, $rangeDates)
+    // {
+    //     $query->when($rangeDates ?? null, function ($query, $dates) {
+    //         $query->where(function ($query) use ($dates) {
+    //             // $dates = Helpers::commasToArray($dates) ?? null;
+    //             if (count($dates) == 2) {
+    //                 $from = date($dates[0]);
+    //                 $to = date($dates[1]);
+    //                 $query->whereBetween('renew_date', [$from, $to]);
+    //             }
+    //         });
+    //     });
+    // }
 }

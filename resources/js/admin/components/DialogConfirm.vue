@@ -23,7 +23,7 @@
         <v-btn color="red darken-1" text @click="close">
           {{ textCancel }}
         </v-btn>
-        <v-btn color="primary darken-1" dark @click="agree">
+        <v-btn color="primary darken-1" @click="agree">
           {{ textOK }}
         </v-btn>
       </v-card-actions>

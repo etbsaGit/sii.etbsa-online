@@ -9,7 +9,7 @@
       dense
       fixed-header
       caption
-      class="elevation-4"
+      class="elevation-0"
     >
       <template v-slot:top>
         <search-panel
@@ -111,107 +111,78 @@
             class="offset-1"
           />
         </search-panel>
-        <v-card
-          class="d-flex justify-end align-center flex-wrap px-3"
-          dark
-          flat
-        >
-          <v-card
-            flat
-            class="d-flex d-flex justify-space-between align-center flex-wrap py-2"
-            :class="'flex-grow-1 flex-shrink-0'"
+        <v-card class="d-flex justify-end align-center flex-wrap px-3" flat>
+          <v-dialog
+            ref="dialogRenew"
+            v-model="modal_date_renew"
+            :return-value.sync="filters.datesRenew"
+            persistent
+            width="400px"
           >
-            <v-dialog
-              ref="dialog"
-              v-model="modal_date_install"
-              :return-value.sync="date_install"
-              persistent
-              width="354px"
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <v-text-field
-                  v-model="dateInstallRangeText"
-                  label="Filtro Fechas de instalacion"
-                  placeholder="Seleccione un Rango de Fechas"
-                  prepend-icon="mdi-calendar"
-                  append-outer-icon="mdi-close"
-                  v-bind="attrs"
-                  v-on="on"
-                  hide-details
-                  outlined
-                  readonly
-                  dense
-                  @click:append-outer="
-                    (filters.datesInstall = []), (date_install = [])
-                  "
-                ></v-text-field>
-              </template>
-              <v-date-picker v-model="date_install" range>
-                <v-spacer></v-spacer>
-                <v-btn
-                  text
-                  color="primary"
-                  @click="(modal_date_install = false), (date_install = [])"
-                >
-                  Cancel
-                </v-btn>
-                <v-btn
-                  text
-                  color="primary"
-                  @click="
-                    $refs.dialog.save((filters.datesInstall = date_install))
-                  "
-                >
-                  OK
-                </v-btn>
-              </v-date-picker>
-            </v-dialog>
-            <v-dialog
-              ref="dialog"
-              v-model="modal_date_renew"
-              :return-value.sync="date_renew"
-              persistent
-              width="354px"
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <v-text-field
-                  v-model="dateRenewRangeText"
-                  label="Filtro Fechas de renovacion"
-                  placeholder="Seleccione un Rango de Fechas"
-                  prepend-icon="mdi-calendar"
-                  append-outer-icon="mdi-close"
-                  v-bind="attrs"
-                  v-on="on"
-                  hide-details
-                  outlined
-                  readonly
-                  dense
-                  @click:append-outer="
-                    (filters.datesRenew = []), (date_renew = [])
-                  "
-                ></v-text-field>
-              </template>
-              <v-date-picker v-model="date_renew" range>
-                <v-spacer></v-spacer>
-                <v-btn
-                  text
-                  color="primary"
-                  @click="(modal_date_renew = false), (date_renew = [])"
-                >
-                  Cancel
-                </v-btn>
-                <v-btn
-                  text
-                  color="primary"
-                  @click="$refs.dialog.save((filters.datesRenew = date_renew))"
-                >
-                  OK
-                </v-btn>
-              </v-date-picker>
-            </v-dialog>
-          </v-card>
+            <template v-slot:activator="{ on, attrs }">
+              <v-text-field
+                v-model="filters.datesRenew"
+                label="Fecha de Renovacion"
+                prepend-icon="mdi-calendar"
+                readonly
+                v-bind="attrs"
+                v-on="on"
+                clearable
+                outlined
+                hide-details
+                dense
+              ></v-text-field>
+            </template>
+            <v-date-picker v-model="dates_renew" range scrollable>
+              <v-spacer></v-spacer>
+              <v-btn text color="primary" @click="modal_date_renew = false">
+                Cancel
+              </v-btn>
+              <v-btn
+                text
+                color="primary"
+                @click="$refs.dialogRenew.save(dates_renew)"
+              >
+                OK
+              </v-btn>
+            </v-date-picker>
+          </v-dialog>
+          <v-dialog
+            ref="dialogInstall"
+            v-model="modal_date_install"
+            :return-value.sync="filters.datesInstall"
+            persistent
+            width="400px"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-text-field
+                v-model="filters.datesInstall"
+                label="Fecha de Instalacion"
+                prepend-icon="mdi-calendar"
+                readonly
+                v-bind="attrs"
+                v-on="on"
+                clearable
+                outlined
+                hide-details
+                dense
+              ></v-text-field>
+            </template>
+            <v-date-picker v-model="date_install" range scrollable>
+              <v-spacer></v-spacer>
+              <v-btn text color="primary" @click="modal_date_install = false">
+                Cancel
+              </v-btn>
+              <v-btn
+                text
+                color="primary"
+                @click="$refs.dialogInstall.save(date_install)"
+              >
+                OK
+              </v-btn>
+            </v-date-picker>
+          </v-dialog>
           <v-spacer></v-spacer>
-          <v-divider class="mx-2" inset vertical></v-divider>
           <table-header-buttons
             :updateSearchPanel="updateSearchPanel"
             :reloadTable="reloadTable"
@@ -225,7 +196,6 @@
           <v-spacer></v-spacer>
           <v-btn
             color="primary"
-            dark
             class="mb-2"
             @click="$router.push({ name: 'gps.create' })"
           >
@@ -261,10 +231,8 @@
                   <v-list-item-title>Facturar GPS</v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
-              <v-list-item
-                v-if="invoiced(item.renew_date) && !item.cancellation_date"
-                @click="dialogCancel(item.id)"
-              >
+              <!-- v-if="invoiced(item.renew_date) && !item.cancellation_date" -->
+              <v-list-item @click="dialogCancel(item.id)">
                 <v-list-item-icon>
                   <v-icon class="red--text">mdi-cancel</v-icon>
                 </v-list-item-icon>
@@ -278,26 +246,21 @@
       </template>
       <template #[`item.name`]="{ item }">
         <v-list-item dense>
-          <v-list-item-content class="py-0">
-            <v-list-item-title
-              class="caption font-weight-bold text-no-wrap text-uppercase"
+          <div class="d-flex flex-column">
+            <span
+              class="d-block font-weight-semibold text--primary text-truncate"
             >
               {{ item.name }}
-            </v-list-item-title>
-            <v-list-item-subtitle
-              v-if="item.gps_group"
-              class="caption text-no-wrap text-uppercase"
-            >
-              {{ item.gps_group.name }}
-            </v-list-item-subtitle>
-          </v-list-item-content>
+            </span>
+            <small v-if="item.gps_group">{{ item.gps_group.name }}</small>
+          </div>
         </v-list-item>
       </template>
       <template #[`item.chip.sim`]="{ value }">
-        <span class="caption text-no-wrap" v-text="value" />
+        <span class="caption text-no-wrap text--primary" v-text="value" />
       </template>
       <template #[`item.chip.costo`]="{ value }">
-        <span class="caption text-no-wrap">
+        <span class="caption text-no-wrap text--primary">
           {{ value | currency }}
         </span>
       </template>
@@ -330,10 +293,10 @@
           v-if="!invoiced(item.renew_date)"
           class="caption font-weight-black text-no-wrap"
         >
-          {{ item.amount | currency }} {{ item.currency }}
+          {{ item.amount | money }} {{ item.currency }}
         </span>
         <span v-else class="caption font-weight-black text-no-wrap">
-          {{ 0 | currency }} {{ item.currency }}
+          {{ 0 | money }} {{ item.currency }}
         </span>
       </template>
       <template #[`item.installation_date`]="{ value }">
@@ -350,56 +313,46 @@
         <v-chip
           :color="colorDay(item.renew_date)"
           class="caption text-no-wrap"
-          dark
           label
+          dark
         >
           {{ $appFormatters.formatTimeDiffNow(item.renew_date, "days") }} Dias
         </v-chip>
       </template>
     </v-data-table>
 
-    <v-dialog
-      v-if="dialog.show"
-      v-model="dialog.show"
-      transition="dialog-bottom-transition"
-      :fullscreen="dialog.fullscreen"
-      max-width="600"
-      persistent
+    <dialog-component
+      :show="dialog.show"
+      @close="dialog.show = false"
+      max-width="1024"
+      :fullscreen="$vuetify.breakpoint.mobile && dialog.fullscreen"
+      closeable
+      :title="dialog.title"
     >
-      <v-card>
-        <v-toolbar class="secondary">
-          <v-btn icon @click.native="dialog.show = false">
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-          <v-toolbar-title class="white--text">
-            {{ dialog.title }}
-          </v-toolbar-title>
-          <v-spacer></v-spacer>
-          <v-toolbar-items>
-            <v-btn text @click.native="dialog.show = false">
-              Done
-            </v-btn>
-          </v-toolbar-items>
-        </v-toolbar>
-        <v-container>
-          <component :is="dialog.component" v-bind="currentProperties" />
-        </v-container>
-      </v-card>
-    </v-dialog>
+      <v-btn icon @click="dialog.show = false" slot="actions">
+        <v-icon>mdi-crosshairs</v-icon>
+      </v-btn>
+      <component
+        v-if="dialog.show"
+        :is="dialog.component"
+        v-bind="currentProperties"
+      />
+    </dialog-component>
   </v-container>
 </template>
 
 <script>
-import BaseTooltip from "../../components/Base/BaseTooltip.vue";
-import DrawerRigthFilter from "../../components/shared/DrawerRigthFilter.vue";
+import BaseTooltip from "@admin/components/Base/BaseTooltip.vue";
+import DrawerRigthFilter from "@admin/components/shared/DrawerRigthFilter.vue";
 import GpsWidgetStats from "@admin/gps/widgets/GpsStats.vue";
 import Agencies from "~/api/agencies.json";
 import Departments from "~/api/departments.json";
 import EditGps from "./Edit";
 import InvoiceGps from "./Invoice";
 import CancelGps from "./Cancel";
-import SearchPanel from "../../components/shared/SearchPanel.vue";
-import TableHeaderButtons from "../../components/shared/TableHeaderButtons.vue";
+import SearchPanel from "@admin/components/shared/SearchPanel.vue";
+import TableHeaderButtons from "@admin/components/shared/TableHeaderButtons.vue";
+import DialogComponent from "@admin/components/DialogComponent.vue";
 
 export default {
   components: {
@@ -411,30 +364,29 @@ export default {
     CancelGps,
     SearchPanel,
     TableHeaderButtons,
+    DialogComponent,
   },
   data() {
     return {
       showSearchPanel: false,
       modal_date_install: false,
-      date_install: [],
       modal_date_renew: false,
-      date_renew: [],
+      dates_renew: [],
+      date_install: [],
       items: [],
       headers: [
         {
           value: "action",
           align: "left",
+          width: 50,
           divider: true,
           sortable: false,
-          cellclass: "blue",
-          class: "blue-grey darken-5",
         },
         {
           text: "Nombre GPS / Cliente",
           value: "name",
           align: "left",
           sortable: false,
-          class: "blue-grey darken-5 white--text overline text-truncate",
         },
         {
           text: "SIM / CHIP",
@@ -442,49 +394,42 @@ export default {
           align: "right",
           divider: true,
           sortable: false,
-          class: "blue-grey darken-5 white--text overline text-truncate",
         },
         {
           text: "Costo:",
           value: "chip.costo",
           align: "left",
           sortable: false,
-          class: "blue-grey darken-5 white--text overline text-truncate",
         },
         {
           text: "Factura:",
           value: "invoice",
           align: "center",
           sortable: true,
-          class: "blue-grey darken-5 white--text overline text-truncate",
         },
         {
           text: "Monto:",
           value: "amount",
           align: "right",
           sortable: true,
-          class: "blue-grey darken-5 white--text overline text-truncate",
         },
         {
           text: "Instalado:",
           value: "installation_date",
           align: "center",
           sortable: true,
-          class: "blue-grey darken-5 white--text overline text-truncate",
         },
         {
           text: "Renueva:",
           value: "renew_date",
           align: "center",
           sortable: true,
-          class: "blue-grey darken-5 white--text overline text-truncate",
         },
         {
           text: "Vence en:",
           value: "renew_date_day",
           align: "center",
           sortable: false,
-          class: "blue-grey darken-5 white--text overline text-truncate",
         },
       ],
       filters: {
@@ -581,25 +526,25 @@ export default {
       return this.dialog.props;
       // }
     },
-    dateInstallRangeText: {
-      get: function () {
-        return this.filters.datesInstall.join(",");
-      },
-      set: function (newValue) {
-        newValue ? (this.filters.datesInstall = newValue.split(" ")) : [];
-      },
-    },
-    dateRenewRangeText: {
-      get: function () {
-        return this.filters.datesRenew.join(",");
-      },
-      set: function (newValue) {
-        newValue ? (this.filters.datesRenew = newValue.split(" ")) : [];
-      },
-    },
+    // dateInstallRangeText: {
+    //   get: function () {
+    //     return this.filters.datesInstall.join(",");
+    //   },
+    //   set: function (newValue) {
+    //     newValue ? (this.filters.datesInstall = newValue.split(" ")) : [];
+    //   },
+    // },
+    // dateRenewRangeText: {
+    //   get: function () {
+    //     return this.filters.datesRenew.join(",");
+    //   },
+    //   set: function (newValue) {
+    //     newValue ? (this.filters.datesRenew = newValue.split(" ")) : [];
+    //   },
+    // },
   },
   methods: {
-    loadGps(cb) {
+    async loadGps(cb) {
       const self = this;
       let params = {
         ...self.filters,
@@ -610,13 +555,15 @@ export default {
         page: self.pagination.page,
         per_page: self.pagination.itemsPerPage,
       };
-      axios.get("/admin/gps", { params: params }).then(function (response) {
-        let Response = response.data.data;
-        self.items = Response.gps.data;
-        self.totalItems = Response.gps.total;
-        self.pagination.totalItems = Response.gps.total;
-        (cb || Function)();
-      });
+      await axios
+        .get("/admin/gps", { params: params })
+        .then(function (response) {
+          let Response = response.data.data;
+          self.items = Response.gps.data;
+          self.totalItems = Response.gps.total;
+          self.pagination.totalItems = Response.gps.total;
+          (cb || Function)();
+        });
     },
     loadSearchOptions(cb) {
       const self = this;
@@ -681,7 +628,7 @@ export default {
     reloadTable() {
       this.loadGps(() => {});
     },
-    exportTable() {
+    async exportTable() {
       const self = this;
 
       let params = {
@@ -693,7 +640,7 @@ export default {
         paginate: "no",
       };
 
-      axios
+      await axios
         .get("/admin/gps-export", {
           params: params,
           responseType: "blob",
