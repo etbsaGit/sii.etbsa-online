@@ -1,5 +1,5 @@
 <template>
-  <v-card class="mx-auto" flat dark>
+  <v-card class="mx-auto" flat>
     <v-sheet
       id="scrolling-techniques-3"
       class="overflow-y-auto"

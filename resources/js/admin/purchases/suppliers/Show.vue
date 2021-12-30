@@ -79,7 +79,9 @@
               v-text="supplier.address"
               class="text-uppercase"
             />
-            <v-list-item-subtitle>Estado y Municipio</v-list-item-subtitle>
+            <v-list-item-subtitle v-if="supplier.township">{{
+              ` ${supplier.township.name}, ${supplier.township.estate.name}`
+            }}</v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
         <v-divider inset></v-divider>

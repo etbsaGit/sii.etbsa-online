@@ -1,67 +1,70 @@
 <template>
-  <v-form v-model="valid" lazy-validation ref="formPurchase">
-    <v-row dense class="caption text-uppercase">
-      <v-col cols="12" md="3">
-        <v-autocomplete
-          v-model="form.supplier_id"
-          :items="options.suppliers"
-          item-text="business_name"
-          item-value="id"
-          label="Proveedor:"
-          :rules="[(v) => !!v || 'Es Requerido']"
-          outlined
-          dense
-        >
-          <template v-slot:item="data">
-            <v-list-item-content>
-              <v-list-item-title v-text="data.item.business_name" />
-              <v-list-item-subtitle v-text="data.item.rfc" />
-              <v-list-item-subtitle v-text="`Tel:${data.item.phone}`" />
-            </v-list-item-content>
-          </template>
-        </v-autocomplete>
-        <v-row>
-          <v-col cols="6">
-            <v-menu
-              v-model="menu"
-              close-on-content-click
-              transition="scale-transition"
-              offset-y
-              min-width="auto"
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <v-text-field
+  <v-card flat>
+    <v-form v-model="valid" lazy-validation ref="formPurchase">
+      <v-row class="caption text-uppercase">
+        <v-col cols="12" md="4">
+          <v-row dense>
+            <v-col cols="12">
+              <v-autocomplete
+                v-model="form.supplier_id"
+                :items="options.suppliers"
+                item-text="business_name"
+                item-value="id"
+                label="Proveedor:"
+                placeholder="Buscar por Nombre | RFC | Email"
+                persistent-placeholder
+                :filter="customFilter"
+                :rules="[(v) => !!v || 'Es Requerido']"
+                outlined
+                dense
+              >
+                <template v-slot:item="data">
+                  <v-list-item-content>
+                    <v-list-item-title v-text="data.item.business_name" />
+                    <v-list-item-subtitle v-text="data.item.rfc" />
+                    <v-list-item-subtitle v-text="`Email:${data.item.email}`" />
+                  </v-list-item-content>
+                </template>
+              </v-autocomplete>
+            </v-col>
+            <v-col cols="12" md="6">
+              <v-menu
+                v-model="menu"
+                close-on-content-click
+                transition="scale-transition"
+                offset-y
+                min-width="auto"
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field
+                    v-model="form.deliver_date"
+                    label="Fecha Entrega:"
+                    prepend-icon="mdi-calendar"
+                    readonly
+                    outlined
+                    dense
+                    v-bind="attrs"
+                    v-on="on"
+                  ></v-text-field>
+                </template>
+                <v-date-picker
                   v-model="form.deliver_date"
-                  label="Fecha Entrega:"
-                  prepend-icon="mdi-calendar"
-                  readonly
-                  outlined
-                  dense
-                  v-bind="attrs"
-                  v-on="on"
-                ></v-text-field>
-              </template>
-              <v-date-picker
-                v-model="form.deliver_date"
-                @input="menu = false"
-              ></v-date-picker>
-            </v-menu>
-          </v-col>
-          <v-col cols="6">
-            <v-text-field
-              v-model="form.payment_condition"
-              label="condicion de pago:"
-              outlined
-              :rules="[(v) => !!v || 'Es Requerido']"
-              dense
-            ></v-text-field>
-          </v-col>
-        </v-row>
-        <v-list-item two-line dense class="px-0">
-          <v-list-item-content class="pa-0">
-            <v-list-item-title>Tipo Factura:</v-list-item-title>
-            <v-row class="mt-3">
-              <v-col cols="6" class="py-0">
+                  @input="menu = false"
+                ></v-date-picker>
+              </v-menu>
+            </v-col>
+            <v-col cols="12" md="6">
+              <v-text-field
+                v-model="form.payment_condition"
+                label="condicion de pago:"
+                outlined
+                :rules="[(v) => !!v || 'Es Requerido']"
+                dense
+              ></v-text-field>
+            </v-col>
+            <v-subheader>Datos Facturacion</v-subheader>
+            <v-row dense>
+              <v-col cols="12" md="6">
                 <v-select
                   v-model="form.metodo_pago"
                   :items="options.metodoPago"
@@ -76,9 +79,16 @@
                   outlined
                   :rules="[(v) => !!v || 'Es Requerido']"
                   dense
-                ></v-select>
+                >
+                  <template v-slot:item="data">
+                    <v-list-item-content>
+                      <v-list-item-title v-text="data.item.clave" />
+                      <v-list-item-subtitle v-text="data.item.description" />
+                    </v-list-item-content>
+                  </template>
+                </v-select>
               </v-col>
-              <v-col cols="6" class="py-0">
+              <v-col cols="12" md="6">
                 <v-select
                   v-model="form.uso_cfdi"
                   :items="options.usoCFDI"
@@ -91,9 +101,16 @@
                   outlined
                   :rules="[(v) => !!v || 'Es Requerido']"
                   dense
-                ></v-select>
+                >
+                  <template v-slot:item="data">
+                    <v-list-item-content>
+                      <v-list-item-title v-text="data.item.clave" />
+                      <v-list-item-subtitle v-text="data.item.description" />
+                    </v-list-item-content>
+                  </template>
+                </v-select>
               </v-col>
-              <v-col cols="12" class="py-0">
+              <v-col cols="12">
                 <v-select
                   v-model="form.forma_pago"
                   :items="options.formaPago"
@@ -113,192 +130,232 @@
                   ]"
                   dense
                   :readonly="isPPD"
+                >
+                  <template v-slot:item="data">
+                    <v-list-item-content>
+                      <v-list-item-title v-text="data.item.clave" />
+                      <v-list-item-subtitle v-text="data.item.description" />
+                    </v-list-item-content>
+                  </template>
+                </v-select>
+              </v-col>
+            </v-row>
+            <v-subheader>Asignar Cargos</v-subheader>
+            <v-row dense>
+              <v-col cols="12">
+                <v-select
+                  v-model="form.agency_id"
+                  :items="options.agencies"
+                  item-text="title"
+                  item-value="id"
+                  label="Sucursal"
+                  outlined
+                  class="mt-3"
+                  :rules="[(v) => !!v || 'Es Requerido']"
+                  dense
+                ></v-select>
+              </v-col>
+              <v-col cols="12">
+                <v-select
+                  v-model="form.department_id"
+                  :items="options.departments"
+                  item-text="title"
+                  item-value="id"
+                  label="Departamento:(opcional)"
+                  outlined
+                  clearable
+                  dense
                 ></v-select>
               </v-col>
             </v-row>
-          </v-list-item-content>
-        </v-list-item>
-        <v-list-item two-line dense class="px-0">
-          <v-list-item-content>
-            <v-list-item-title>Con Cargo a:</v-list-item-title>
-            <v-select
-              v-model="form.agency_id"
-              :items="options.agencies"
-              item-text="title"
-              item-value="id"
-              label="Sucursal"
-              outlined
-              class="mt-3"
-              :rules="[(v) => !!v || 'Es Requerido']"
-              dense
-            ></v-select>
-            <v-select
-              v-model="form.department_id"
-              :items="options.departments"
-              item-text="title"
-              item-value="id"
-              label="Departamento:(opcional)"
-              outlined
-              clearable
-              dense
-            ></v-select>
-          </v-list-item-content>
-        </v-list-item>
-        <v-textarea
-          v-model="form.reason"
-          label="Motivo de Solicitud:"
-          outlined
-          :rules="[(v) => !!v || 'Es Requerido']"
-          dense
-        ></v-textarea>
-      </v-col>
-      <v-col cols="12" md="9">
-        <v-tabs
-          v-model="tab"
-          background-color="deep-purple accent-4"
-          icons-and-text
-          fixed-tabs
-          dark
-        >
-          <v-tabs-slider></v-tabs-slider>
-          <v-tab href="#concepts">
-            Conceptos
-            <v-icon>mdi-format-columns</v-icon>
-          </v-tab>
-          <v-tab
-            href="#invoice"
-            v-if="checkEstatus('verificado') || checkEstatus('facturado')"
+            <v-subheader>Concepto y Motivo</v-subheader>
+            <v-divider></v-divider>
+            <v-row dense>
+              <v-col cols="12">
+                <v-combobox
+                  label="Concepto"
+                  :items="[
+                    'COMPRA DE MAQUINARIA DIVERSA',
+                    'PAPELERIA',
+                    'LIMPIEZA',
+                    'COMPRA DE LLANTAS PARA VENTA',
+                    'PUBLICIDAD',
+                    'IMPRENTA',
+                    'SERVICIO DE MANTENIMIENTO',
+                    'REFACCIONES',
+                    'RIEGO',
+                    'COMPRA DE LLANTAS PARA UNIDADES',
+                    'SANITIZACION',
+                    'SEGUROS',
+                    'STOCK',
+                    'VARIOS',
+                    'OTRO',
+                  ]"
+                  dense
+                  filled
+                  outlined
+                ></v-combobox>
+              </v-col>
+              <v-col cols="12">
+                <v-textarea
+                  v-model="form.reason"
+                  label="Motivo de Solicitud:"
+                  outlined
+                  :rules="[(v) => !!v || 'Es Requerido']"
+                  dense
+                ></v-textarea>
+              </v-col>
+            </v-row>
+          </v-row>
+        </v-col>
+        <v-col cols="12" md="8">
+          <v-tabs
+            v-model="tab"
+            background-color="deep-purple accent-4"
+            icons-and-text
+            fixed-tabs
           >
-            Factura
-            <v-icon>mdi-file-document</v-icon>
-          </v-tab>
-          <v-tab href="#messages" v-if="form.id">
-            Mensajes
-            <v-icon>mdi-message</v-icon>
-          </v-tab>
-        </v-tabs>
-        <v-tabs-items v-model="tab" touchless>
-          <v-tab-item value="concepts">
-            <purchase-concepts :concepts.sync="form.concepts">
-            </purchase-concepts>
-            <v-list class="overline" color="grey lighten-3" elevation="1" dense>
-              <v-subheader>Importes</v-subheader>
-              <v-list-item dense>
-                <v-list-item-content class="pa-0">
-                  Subtotal:
-                </v-list-item-content>
-                <v-list-item-action-text class="text-h6">
-                  {{ Subtotal | currency }}
-                </v-list-item-action-text>
-              </v-list-item>
-              <v-list-item dense>
-                <v-list-item-content class="pa-0">
-                  IVA:
-                </v-list-item-content>
-                <v-list-item-action-text class="text-h6">
-                  <!-- <div class="d-flex flex-row align-center"> -->
-                  <!-- <v-checkbox v-model="form.check_tax"></v-checkbox> -->
-                  {{ Tax | currency }}
-                  <!-- </div> -->
-                </v-list-item-action-text>
-              </v-list-item>
-              <v-list-item dense>
-                <v-list-item-content class="pa-0">
-                  Total:
-                </v-list-item-content>
-                <v-list-item-action-text class="blue--text text-h5">
-                  {{ Total | currency }}
-                </v-list-item-action-text>
-              </v-list-item>
-              <v-list-item dense>
-                <v-list-item-content class="pa-0">
-                  Estatus Actual:
-                </v-list-item-content>
-                <v-list-item-action-text class="text-h5 green--text">
-                  <div class="d-flex align-center">
-                    {{ form.estatus ? form.estatus.title : "Sin Estatus" }}
-                  </div>
-                </v-list-item-action-text>
-              </v-list-item>
-              <v-list-item dense>
-                <v-list-item-content class="pa-0">
-                  Acciones:
-                </v-list-item-content>
-                <v-list-item-action-text>
-                  <div
-                    class="d-flex flex-wrap-reverse align-center justify-end"
-                  >
-                    <v-btn
-                      v-show="Owner"
-                      small
-                      color="green"
-                      dark
-                      class="ml-4"
-                      @click="save"
-                      :disabled="!valid"
+            <v-tabs-slider></v-tabs-slider>
+            <v-tab href="#concepts">
+              Conceptos
+              <v-icon>mdi-format-columns</v-icon>
+            </v-tab>
+            <v-tab
+              href="#invoice"
+              v-if="checkEstatus('verificado') || checkEstatus('facturado')"
+            >
+              Factura
+              <v-icon>mdi-file-document</v-icon>
+            </v-tab>
+            <v-tab href="#messages" v-if="form.id">
+              Mensajes
+              <v-icon>mdi-message</v-icon>
+            </v-tab>
+          </v-tabs>
+          <v-tabs-items v-model="tab" touchless>
+            <v-tab-item value="concepts">
+              <purchase-concepts :concepts.sync="form.concepts">
+              </purchase-concepts>
+              <v-list
+                class="overline"
+                color="grey lighten-3"
+                elevation="1"
+                dense
+              >
+                <v-subheader>Importes</v-subheader>
+                <v-list-item dense>
+                  <v-list-item-content class="pa-0">
+                    Subtotal:
+                  </v-list-item-content>
+                  <v-list-item-action-text class="text-h6">
+                    {{ Subtotal | currency }}
+                  </v-list-item-action-text>
+                </v-list-item>
+                <v-list-item dense>
+                  <v-list-item-content class="pa-0">
+                    IVA:
+                  </v-list-item-content>
+                  <v-list-item-action-text class="text-h6">
+                    <!-- <div class="d-flex flex-row align-center"> -->
+                    <!-- <v-checkbox v-model="form.check_tax"></v-checkbox> -->
+                    {{ Tax | currency }}
+                    <!-- </div> -->
+                  </v-list-item-action-text>
+                </v-list-item>
+                <v-list-item dense>
+                  <v-list-item-content class="pa-0">
+                    Total:
+                  </v-list-item-content>
+                  <v-list-item-action-text class="blue--text text-h5">
+                    {{ Total | currency }}
+                  </v-list-item-action-text>
+                </v-list-item>
+                <v-list-item dense>
+                  <v-list-item-content class="pa-0">
+                    Estatus Actual:
+                  </v-list-item-content>
+                  <v-list-item-action-text class="text-h5 green--text">
+                    <div class="d-flex align-center">
+                      {{ form.estatus ? form.estatus.title : "Sin Estatus" }}
+                    </div>
+                  </v-list-item-action-text>
+                </v-list-item>
+                <v-list-item dense>
+                  <v-list-item-content class="pa-0">
+                    Acciones:
+                  </v-list-item-content>
+                  <v-list-item-action-text>
+                    <div
+                      class="d-flex flex-wrap-reverse align-center justify-end"
                     >
-                      Guardar
-                    </v-btn>
-                    <v-btn
-                      v-show="
-                        (checkEstatus('pendiente') ||
-                          checkEstatus('denegar')) &&
-                        $gate.allow('authorizePurchase', 'compras')
-                      "
-                      small
-                      color="orange"
-                      dark
-                      class="ml-4"
-                      @click="changeEstatus('autorizado')"
-                    >
-                      Autorizar
-                    </v-btn>
-                    <v-btn
-                      v-show="
-                        (checkEstatus('pendiente') ||
-                          checkEstatus('autorizado')) &&
-                        $gate.allow('authorizePurchase', 'compras')
-                      "
-                      small
-                      color="red darken-5"
-                      dark
-                      class="ml-4"
-                      @click="changeEstatus('denegar')"
-                    >
-                      Rechazar
-                    </v-btn>
-                    <v-btn
-                      v-show="
-                        checkEstatus('autorizado') &&
-                        $gate.allow('validPurchase', 'compras')
-                      "
-                      small
-                      color="blue darken-5"
-                      dark
-                      class="ml-4"
-                      @click="changeEstatus('verificado')"
-                    >
-                      Generar Consecutivo
-                    </v-btn>
-                  </div>
-                </v-list-item-action-text>
-              </v-list-item>
-            </v-list>
-          </v-tab-item>
-          <v-tab-item value="invoice">
-            <purchase-order-document
-              :purchaseId="form.id"
-            ></purchase-order-document>
-          </v-tab-item>
-          <v-tab-item value="messages" v-if="form.id">
-            <purchase-order-messages
-              :purchaseId="form.id"
-            ></purchase-order-messages>
-          </v-tab-item>
-        </v-tabs-items>
-      </v-col>
-    </v-row>
-  </v-form>
+                      <v-btn
+                        v-show="Owner"
+                        small
+                        color="green"
+                        class="ml-4"
+                        @click="save"
+                        :disabled="!valid"
+                      >
+                        Guardar
+                      </v-btn>
+                      <v-btn
+                        v-show="
+                          (checkEstatus('pendiente') ||
+                            checkEstatus('denegar')) &&
+                          $gate.allow('authorizePurchase', 'compras')
+                        "
+                        small
+                        color="orange"
+                        class="ml-4"
+                        @click="changeEstatus('autorizado')"
+                      >
+                        Autorizar
+                      </v-btn>
+                      <v-btn
+                        v-show="
+                          (checkEstatus('pendiente') ||
+                            checkEstatus('autorizado')) &&
+                          $gate.allow('authorizePurchase', 'compras')
+                        "
+                        small
+                        color="red darken-5"
+                        class="ml-4"
+                        @click="changeEstatus('denegar')"
+                      >
+                        Rechazar
+                      </v-btn>
+                      <v-btn
+                        v-show="
+                          checkEstatus('autorizado') &&
+                          $gate.allow('validPurchase', 'compras')
+                        "
+                        small
+                        color="blue darken-5"
+                        class="ml-4"
+                        @click="changeEstatus('verificado')"
+                      >
+                        Generar Consecutivo
+                      </v-btn>
+                    </div>
+                  </v-list-item-action-text>
+                </v-list-item>
+              </v-list>
+            </v-tab-item>
+            <v-tab-item value="invoice">
+              <purchase-order-document
+                :purchaseId="form.id"
+              ></purchase-order-document>
+            </v-tab-item>
+            <v-tab-item value="messages" v-if="form.id">
+              <purchase-order-messages
+                :purchaseId="form.id"
+              ></purchase-order-messages>
+            </v-tab-item>
+          </v-tabs-items>
+        </v-col>
+      </v-row>
+    </v-form>
+  </v-card>
 </template>
 
 <script>
@@ -384,6 +441,18 @@ export default {
     },
   },
   methods: {
+    customFilter(item, queryText, itemText) {
+      const textName = item.business_name.toLowerCase();
+      const textRfc = item.rfc.toLowerCase();
+      const textEmail = item.email.toLowerCase();
+      const searchText = queryText.toLowerCase();
+
+      return (
+        textName.indexOf(searchText) > -1 ||
+        textRfc.indexOf(searchText) > -1 ||
+        textEmail.indexOf(searchText) > -1
+      );
+    },
     async loadOptions(cb) {
       const _this = this;
       await axios

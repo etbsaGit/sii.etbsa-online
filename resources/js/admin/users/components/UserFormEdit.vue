@@ -1,175 +1,169 @@
 <template>
-  <div>
-    <v-card>
-      <v-card-title>
-        <v-icon>mdi-badge-account</v-icon> Perfil Usuario
-      </v-card-title>
-      <v-divider class="mb-2"></v-divider>
-      <v-form v-model="valid" ref="userFormEdit" lazy-validation>
-        <v-container grid-list-md>
-          <v-layout row wrap>
-            <v-flex xs12 sm6>
-              <v-text-field
-                label="Nombre"
-                v-model="name"
-                :rules="nameRules"
-              ></v-text-field>
-            </v-flex>
-            <v-flex xs12 sm6>
-              <v-text-field
-                label="Email"
-                v-model="email"
-                :rules="emailRules"
-              ></v-text-field>
-            </v-flex>
-            <v-flex xs12 sm4>
-              <v-autocomplete
-                v-model="agency"
-                :items="options.agencies"
-                item-text="title"
-                item-value="id"
-                label="Agencia"
-                placeholder="Agencia a cual correponde."
-              ></v-autocomplete>
-            </v-flex>
-            <v-flex xs12 sm4>
-              <v-autocomplete
-                v-model="department"
-                :items="options.departments"
-                item-text="title"
-                item-value="id"
-                label="Departamento:"
-                placeholder="Departamento a cual correponde."
-              ></v-autocomplete>
-            </v-flex>
-            <v-flex xs12 sm4>
-              <v-text-field v-model="jobTitle" label="Puesto"></v-text-field>
-            </v-flex>
-            <v-flex xs12>
-              <v-text-field
-                label="Contraseña (dejar en blanco si no se cambia)"
-                type="password"
-                v-model="password"
-                :rules="passwordRules"
-              ></v-text-field>
-            </v-flex>
-            <v-flex xs12 sm6>
-              <v-switch label="Cuenta Preactivada" v-model="active"></v-switch>
-            </v-flex>
-            <v-flex xs12><v-spacer></v-spacer></v-flex>
-            <v-flex xs12>
-              <h1 class="title">
-                <v-icon>mdi-key</v-icon> Permisos Especiales
-              </h1>
-              <v-alert color="info" icon="info" :value="true">
-                Los permisos especiales son permisos exclusivos para este
-                usuario. Permisos definidos aquí. Son más superiores que
-                cualquier permiso que tenga en su grupo. Así que si el usuario
-                pertenece a un grupo que tiene permiso para "hacer algo" pero
-                luego se le niega "hacer algo" aquí, al usuario se le negará ese
-                permiso. En definitiva, permisos especiales.Tiene alta prioridad
-                que los permisos de grupo.
-              </v-alert>
-              <v-divider></v-divider>
-            </v-flex>
-            <v-flex xs12 sm4>
-              <v-select
-                label="Selecciona Permisos"
-                v-bind:items="options.permissions"
-                v-model="selectedPermission"
-                item-text="title"
-                item-value="key"
-              ></v-select>
-            </v-flex>
-            <v-flex xs12 sm4>
-              <v-select
-                label="Valor del Permiso"
-                v-bind:items="options.permissionValues"
-                v-model="selectedPermissionValue"
-                item-text="label"
-                item-value="value"
-              ></v-select>
-            </v-flex>
-            <v-flex xs12 sm4>
-              <v-btn
-                @click="addSpecialPermission()"
-                class="primary lighten-1"
-                dark
-              >
-                Agregar Permiso
-                <v-icon right>add</v-icon>
-              </v-btn>
-            </v-flex>
-            <v-flex xs12>
-              <div class="permissions_container">
-                <v-chip
-                  v-for="(p, k) in permissions"
-                  :key="k"
-                  @click:close="removePermission(k)"
-                  close
-                  class="white--text"
-                  :class="{
-                    green: p.value == 1,
-                    red: p.value == -1,
-                    blue: p.value == 0,
-                  }"
+  <v-card>
+    <v-card-title>
+      <v-icon left>mdi-account</v-icon> Informacion del Usuario
+    </v-card-title>
+    <v-divider></v-divider>
+    <v-card-text>
+      <v-form v-model="valid" ref="form" lazy-validation>
+        <v-row dense align="center">
+          <v-col cols="12" md="6">
+            <v-text-field
+              label="Nombre de Usuario"
+              v-model="form.name"
+              :rules="[(v) => !!v || 'Nombre es Requerido']"
+              outlined
+              dense
+            ></v-text-field>
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-text-field
+              label="Email"
+              v-model="form.email"
+              :rules="emailRules"
+              outlined
+              dense
+            ></v-text-field
+          ></v-col>
+          <v-col cols="12" md="6">
+            <v-text-field
+              v-model="form.password"
+              label="Contraseña (dejar en blanco si no se cambia)"
+              type="password"
+              :rules="passwordRules"
+              outlined
+              dense
+            ></v-text-field>
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-text-field
+              label="Confirmar Password"
+              type="password"
+              v-model="form.passwordConfirm"
+              :rules="[
+                (v) => v == form.password || 'Contraseña no son iguales',
+              ]"
+              outlined
+              dense
+            ></v-text-field>
+          </v-col>
+          <v-col cols="12" md="4">
+            <v-switch
+              v-model="form.active"
+              label="Pre-Activar Cuenta"
+              dense
+            ></v-switch>
+          </v-col>
+          <v-col cols="12">
+            <h1 class="title">
+              <v-icon left>mdi-key</v-icon> Permisos Especiales
+            </h1>
+            <v-divider></v-divider>
+            <v-row dense align="start">
+              <v-col cols="12" md="12">
+                <v-alert
+                  color="info"
+                  icon="mdi-information-outline"
+                  class="white--text mt-2 caption"
                 >
-                  <v-avatar
-                    v-if="p.value == -1"
-                    class="red darken-1"
-                    title="Deny"
-                  >
-                    <v-icon>mdi-cancel</v-icon>
-                  </v-avatar>
-                  <v-avatar
-                    v-if="p.value == 1"
-                    class="green darken-1"
-                    title="Allow"
-                  >
-                    <v-icon>mdi-check-circle-outline</v-icon>
-                  </v-avatar>
-                  <v-avatar
-                    v-if="p.value == 0"
-                    class="blue darken-1"
-                    title="Inherit"
-                  >
-                    <v-icon>mdi-swap-horizontal</v-icon>
-                  </v-avatar>
-                  {{ p.title }}
-                </v-chip>
-                <div v-if="permissions && permissions.length === 0">
-                  No hay permisos especiales asignados.
-                </div>
-              </div>
-            </v-flex>
-            <v-flex xs12><v-spacer></v-spacer></v-flex>
-            <v-flex xs12>
-              <h1 class="title"><v-icon>people</v-icon> Grupos</h1>
-              <v-divider></v-divider>
-            </v-flex>
-            <v-layout wrap mx-2>
-              <v-flex xs6 md3 v-for="(g, k) in options.groups" :key="k">
-                <v-switch
-                  v-bind:label="g.name"
-                  v-model="groups[g.id]"
-                ></v-switch>
-              </v-flex>
-            </v-layout>
-            <v-flex xs12>
-              <v-btn
-                block
-                @click="save()"
-                :disabled="!valid"
-                color="primary"
-                dark
-                >Update</v-btn
-              >
-            </v-flex>
-          </v-layout>
-        </v-container>
+                  Los permisos especiales son permisos exclusivos para este
+                  usuario. Permisos definidos aquí. Son más superiores que
+                  cualquier permiso que tenga en su grupo. Así que si el usuario
+                  pertenece a un grupo que tiene permiso para "hacer algo" pero
+                  luego se le niega "hacer algo" aquí, al usuario se le negará
+                  ese permiso. En definitiva, permisos especiales.Tiene alta
+                  prioridad que los permisos de grupo.
+                </v-alert>
+              </v-col>
+              <v-col cols="12" md="12">
+                <v-row dense class="mt-2">
+                  <v-col cols="6" md="4">
+                    <v-autocomplete
+                      label="Seleccionar Permiso"
+                      v-bind:items="options.permissions"
+                      v-model="selectedPermission"
+                      item-text="title"
+                      item-value="key"
+                      outlined
+                      dense
+                      hide-detail
+                    ></v-autocomplete>
+                  </v-col>
+                  <v-col cols="6" md="4">
+                    <v-select
+                      v-model="selectedPermissionValue"
+                      label="Valor del Permiso"
+                      v-bind:items="options.permissionValues"
+                      item-text="label"
+                      item-value="value"
+                      outlined
+                      dense
+                      hide-details
+                    ></v-select>
+                  </v-col>
+                  <v-col cols="12" md="4">
+                    <v-btn
+                      @click="addSpecialPermission()"
+                      class="primary lighten-1"
+                      block
+                    >
+                      Agregar Permiso
+                      <v-icon right>mdi-plus</v-icon>
+                    </v-btn>
+                  </v-col>
+                  <v-col cols="12">
+                    <v-chip
+                      v-for="(p, k) in form.permissions"
+                      :key="k"
+                      @click:close="removePermission(k)"
+                      close
+                      close-icon="mdi-close"
+                      outlined
+                      :color="getColorPermission(p.value)"
+                      class="ma-2"
+                    >
+                      <v-icon v-if="p.value == -1" left>mdi-cancel</v-icon>
+                      <v-icon v-if="p.value == 0" left>
+                        mdi-swap-horizontal
+                      </v-icon>
+                      <v-icon v-if="p.value == 1" left>mdi-check-circle</v-icon>
+                      {{ p.title }}
+                    </v-chip>
+                    <v-banner
+                      v-if="form.permissions.length === 0"
+                      single-line
+                      elevation="4"
+                      icon="mdi-key-remove"
+                    >
+                      Sin Permisos Especiales Asigandos
+                    </v-banner>
+                  </v-col>
+                </v-row>
+              </v-col>
+            </v-row>
+          </v-col>
+          <v-col cols="12">
+            <h1 class="title"><v-icon>mdi-account-multiple</v-icon> Grupos</h1>
+            <v-divider></v-divider>
+          </v-col>
+          <v-col
+            cols="6"
+            md="3"
+            v-for="(g, k) in options.groups"
+            :key="k"
+            class="overline"
+          >
+            <v-switch v-model="form.groups[g.id]" :label="g.name"></v-switch>
+          </v-col>
+        </v-row>
       </v-form>
-    </v-card>
-  </div>
+    </v-card-text>
+    <v-card-actions>
+      <v-btn block @click="update()" :disabled="!valid" color="primary">
+        Guardar
+      </v-btn>
+    </v-card-actions>
+  </v-card>
 </template>
 
 <script>
@@ -180,52 +174,49 @@ export default {
     },
   },
   data() {
-    const self = this;
-
+    const _this = this;
     return {
       valid: false,
-      name: "",
-      nameRules: [(v) => !!v || "Nombre Requerido"],
-      email: "",
+      form: {
+        name: "",
+        email: "",
+        password: "",
+        passwordConfirm: "",
+        permissions: [],
+        groups: [],
+        active: "",
+      },
       emailRules: [
         (v) => !!v || "E-mail is required",
         (v) =>
           /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(v) ||
-          "E-mail debe ser valido",
+          "E-mail must be valid",
       ],
-      password: "",
       passwordRules: [
-        (v) => {
-          if (v && v.length > 0 && v.length < 8) {
-            return "La contraseña necesita un mínimo de 8 caracteres.";
-          }
-          return true;
-        },
+        (v) =>
+          (!!v ? v.length >= 8 : true) || "Debe tener al menos 8 Caracteres",
       ],
-      passwordConfirm: "",
       passwordConfirmRules: [
-        (v) => !(v !== self.password) || "Contraseña no coincide.",
+        (v) =>
+          !(!!this.form.password ? v !== _this.form.password : true) ||
+          "Password no es igual",
       ],
-      permissions: [],
-      groups: [],
-      agency: null,
-      department: null,
-      jobTitle: "",
-      active: "",
+      colors: {
+        "-1": "red",
+        "0": "grey",
+        "1": "green",
+      },
       options: {
         permissions: [],
         permissionValues: [
-          { label: "Permitir", value: 1 },
+          { label: "Perimitir", value: 1 },
           { label: "Denegar", value: -1 },
           { label: "Heredar", value: 0 },
         ],
         groups: [],
-        agencies: [],
-        departments: [],
       },
       selectedPermission: {},
       selectedPermissionValue: 0,
-
       alert: {
         show: false,
         icon: "",
@@ -235,58 +226,126 @@ export default {
     };
   },
   mounted() {
-    const self = this;
+    const _this = this;
 
-    self.loadPermissions(() => {
-      self.loadGroups(() => {});
+    _this.loadPermissions(() => {
+      _this.loadGroups(() => {});
     });
 
-    self.$eventBus.$on(["GROUP_ADDED"], () => {
-      self.loadGroups(() => {});
-    });
+    // _this.$eventBus.$on(["GROUP_ADDED"], () => {
+    //   _this.loadGroups(() => {});
+    // });
 
-    this.loadUser(() => {});
+    this.loadUser(() => {
+      _this.$store.commit("setBreadcrumbs", [
+        { label: "Users", to: { name: "users.list" } },
+        { label: _this.form.name, to: "" },
+        { label: "Perfil", to: "" },
+      ]);
+    });
   },
   methods: {
-    removePermission(i) {
-      const self = this;
-
-      self.permissions.splice(i, 1);
+    getColorPermission(value) {
+      return this.colors[value];
     },
-    save() {
-      const self = this;
+    removePermission(i) {
+      const _this = this;
+      _this.form.permissions.splice(i, 1);
+    },
+    addSpecialPermission() {
+      const _this = this;
+      _.each(_this.options.permissions, (p) => {
+        if (_this.selectedPermission === p.key) {
+          if (!_this.existsInPermissions(_this.selectedPermission)) {
+            p.value = _this.selectedPermissionValue;
+            _this.form.permissions.push(p);
+          }
+        }
+      });
+    },
+    existsInPermissions(permissionKey) {
+      const _this = this;
+      let found = false;
+      _.each(_this.form.permissions, (p) => {
+        if (p.key === permissionKey) found = true;
+      });
+      return found;
+    },
+    loadPermissions(cb) {
+      const _this = this;
 
-      let payload = {
-        name: self.name,
-        email: self.email,
-        password: self.password ? self.password : null,
-        active: self.active ? moment().format("YYYY-MM-DD") : null,
-        permissions: self.permissions,
-        groups: self.groups,
-        agency_id: self.agency,
-        departments_id: self.department,
-        job_title: self.jobTitle,
+      let params = {
+        paginate: "no",
       };
 
-      self.$store.commit("showLoader");
-
       axios
-        .put("/admin/users/" + self.propUserId, payload)
-        .then(function(response) {
-          self.$store.commit("showSnackbar", {
+        .get("/admin/permissions", { params: params })
+        .then(function (response) {
+          _this.options.permissions = response.data.data;
+          cb();
+        });
+    },
+    loadGroups(cb) {
+      const _this = this;
+      let params = {
+        paginate: "no",
+      };
+      axios.get("/admin/groups", { params: params }).then(function (response) {
+        _this.options.groups = response.data.data;
+        _.each(_this.options.groups, (g) => {
+          g.selected = false;
+        });
+        cb();
+      });
+    },
+    async loadUser(cb) {
+      const _this = this;
+
+      // reset first
+      _this.groups = [];
+
+      await axios
+        .get("/admin/users/" + _this.propUserId)
+        .then(function (response) {
+          let User = response.data.data;
+          _this.form = { ...User, active: User.active !== null };
+          // _this.name = User.name;
+          // _this.email = User.email;
+          // _this.active = User.active !== null;
+          // _this.permissions = User.permissions;
+
+          // groups
+          _.each(User.groups, (g) => {
+            _this.form.groups[g.id] = true;
+          });
+          cb();
+        });
+    },
+    async update() {
+      const _this = this;
+      if (!_this.$refs.form.validate()) return;
+      let payload = {
+        ..._this.form,
+        active: _this.form.active ? moment().format("YYYY-MM-DD") : null,
+      };
+      _this.$store.commit("showLoader");
+      axios
+        .put("/admin/users/" + _this.propUserId, payload)
+        .then(function (response) {
+          _this.$store.commit("showSnackbar", {
             message: response.data.message,
             color: "success",
             duration: 3000,
           });
 
-          self.$eventBus.$emit("USER_UPDATED");
-          self.$store.commit("hideLoader");
+          _this.$eventBus.$emit("USER_UPDATED");
+          _this.$store.commit("hideLoader");
         })
-        .catch(function(error) {
-          self.$store.commit("hideLoader");
+        .catch(function (error) {
+          _this.$store.commit("hideLoader");
 
           if (error.response) {
-            self.$store.commit("showSnackbar", {
+            _this.$store.commit("showSnackbar", {
               message: error.response.data.message,
               color: "error",
               duration: 3000,
@@ -296,99 +355,6 @@ export default {
           } else {
             console.log("Error", error.message);
           }
-        });
-    },
-    addSpecialPermission() {
-      const self = this;
-
-      _.each(self.options.permissions, (p) => {
-        if (self.selectedPermission === p.key) {
-          if (!self.existsInPermissions(self.selectedPermission)) {
-            p.value = self.selectedPermissionValue;
-            self.permissions.push(p);
-          }
-        }
-      });
-
-      console.log(self.permissions);
-    },
-    existsInPermissions(permissionKey) {
-      const self = this;
-      let found = false;
-      _.each(self.permissions, (p) => {
-        if (p.key === permissionKey) found = true;
-      });
-      return found;
-    },
-    loadUser(cb) {
-      const self = this;
-
-      // reset first
-      self.groups = [];
-
-      axios.get("/admin/users/" + self.propUserId).then(function(response) {
-        let User = response.data.data;
-
-        self.name = User.name;
-        self.email = User.email;
-        self.active = User.active !== null;
-        self.permissions = User.permissions;
-        self.jobTitle = User.job_title
-        self.agency = User.agency_id
-        self.department = User.departments_id
-
-        // groups
-        _.each(User.groups, (g) => {
-          self.groups[g.id] = true;
-        });
-
-        self.$store.commit("setBreadcrumbs", [
-          { label: "Users", to: { name: "users.list" } },
-          { label: User.name, to: "" },
-          { label: "Perfil", to: "" },
-        ]);
-
-        cb();
-      });
-    },
-    loadPermissions(cb) {
-      const self = this;
-
-      let params = {
-        paginate: "no",
-      };
-
-      axios
-        .get("/admin/permissions", { params: params })
-        .then(function(response) {
-          self.options.permissions = response.data.data;
-          cb();
-        });
-    },
-    loadGroups(cb) {
-      const self = this;
-
-      let params = {
-        paginate: "no",
-      };
-
-      axios.get("/admin/groups", { params: params }).then(function(response) {
-        self.options.groups = response.data.data;
-
-        _.each(self.options.groups, (g) => {
-          g.selected = false;
-        });
-
-        cb();
-      });
-
-      axios
-        .get("/admin/tracking/sales_history/resources")
-        .then(function(response) {
-          let Data = response.data.data;
-          self.options.agencies = Data.agencies;
-          self.options.departments = Data.departments;
-          (cb || Function)();
         });
     },
   },

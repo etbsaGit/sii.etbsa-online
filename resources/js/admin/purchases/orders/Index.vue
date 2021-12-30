@@ -4,12 +4,11 @@
     :items="items"
     :options.sync="pagination"
     :server-items-length="totalItems"
-    dense
-    dark
-    fixed-header
     calculate-widths
+    fixed-header
     caption
-    class="text-truncate blue--text text-uppercase"
+    dense
+    class="blue--text text-uppercase text-wrap"
   >
     <template v-slot:top>
       <search-panel
@@ -94,11 +93,7 @@
           </div>
         </v-form>
       </search-panel>
-      <v-card
-        class="d-flex justify-end align-center flex-wrap px-3 py-1"
-        dark
-        flat
-      >
+      <v-card class="d-flex justify-end align-center flex-wrap px-3 py-1" flat>
         <v-card
           flat
           class="d-flex d-flex justify-space-between align-center flex-wrap py-2"
@@ -140,7 +135,6 @@
         <v-btn
           color="primary"
           rounded
-          dark
           class="mb-2"
           :to="{ name: 'purchase.create' }"
         >
@@ -154,25 +148,8 @@
         closeable
         :title="formTitle"
       >
-        <edit-purchase :purchaseId="editedId"></edit-purchase>
+        <edit-purchase v-if="dialogEdit" :purchaseId="editedId"></edit-purchase>
       </dialog-component>
-      <v-dialog v-model="dialogDelete" max-width="500px">
-        <v-card>
-          <v-card-title class="headline">
-            Are you sure you want to delete this item?
-          </v-card-title>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" text @click="closeDelete">
-              Cancel
-            </v-btn>
-            <v-btn color="blue darken-1" text @click="deleteItemConfirm">
-              OK
-            </v-btn>
-            <v-spacer></v-spacer>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
     </template>
     <template v-slot:[`item.actions`]="{ item }">
       <v-menu offset-x transition="slide-x-transition" rounded="r-xl">
@@ -192,10 +169,7 @@
               </v-list-item-content>
             </v-list-item>
             <v-list-item
-              v-if="
-                checkEstatus('verificado', item.estatus.key) ||
-                checkEstatus('facturado', item.estatus.key)
-              "
+              v-if="canPrint(item.estatus.key)"
               icon
               :href="`/admin/purchase-order/${item.id}/resources/print`"
               target="_blank"
@@ -204,7 +178,19 @@
                 <v-icon class="blue--text">mdi-printer</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title>Imprimir OC</v-list-item-title>
+                <v-list-item-title>Imprimir Vista Previa</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item
+              v-if="canMarkAsSend(item.estatus.key)"
+              icon
+              @click="markAsSend(item)"
+            >
+              <v-list-item-icon>
+                <v-icon class="blue--text">mdi-send-check</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title>Enviar a Proveedor</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
           </v-list-item-group>
@@ -215,11 +201,11 @@
       <span> #{{ item.id.toString().padStart(5, 0) }} </span>
     </template>
     <template v-slot:[`item.supplier.business_name`]="{ item }">
-      <v-list-item dense class="pa-0 caption">
-        <v-list-item-content class="pa-0 caption">
-          <v-list-item-title>{{
-            item.supplier.business_name
-          }}</v-list-item-title>
+      <v-list-item dense class="pa-0">
+        <v-list-item-content class="pa-0">
+          <v-list-item-title class="caption text-wrap">
+            {{ item.supplier.business_name }}
+          </v-list-item-title>
           <v-list-item-subtitle>
             {{ item.supplier.rfc }}
           </v-list-item-subtitle>
@@ -227,17 +213,27 @@
       </v-list-item>
     </template>
     <template v-slot:[`item.elaborated`]="{ item }">
-      <v-list-item dense class="pa-0 caption">
-        <v-list-item-content class="pa-0 caption">
-          <v-list-item-title>{{ item.elaborated.name }}</v-list-item-title>
+      <v-list-item dense class="pa-0">
+        <v-list-item-content class="pa-0">
+          <v-list-item-title class="caption text-wrap">
+            {{
+              item.elaborated.profiable
+                ? item.elaborated.profiable.full_name
+                : item.elaborated.name
+            }}
+          </v-list-item-title>
           <v-list-item-subtitle>
-            {{ item.elaborated.department.title }}
+            {{
+              item.elaborated.profiable
+                ? item.elaborated.profiable.agency.title
+                : ""
+            }}
           </v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
     </template>
     <template v-slot:[`item.total`]="{ item }">
-      {{ item.total | currency }}
+      <b>{{ item.total | money }}</b>
     </template>
     <template v-slot:[`item.estatus`]="{ item }">
       <v-chip
@@ -245,9 +241,41 @@
         small
         :color="getColorByStatus(item.estatus.key)"
         text-color="white"
+        dark
       >
         {{ item.estatus.title }}
       </v-chip>
+    </template>
+
+    <template v-slot:[`item.cargos`]="{ item }">
+      <v-dialog transition="dialog-bottom-transition" width="325">
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn text v-bind="attrs" v-on="on">
+            Ver <v-icon right>mdi-eye</v-icon>
+          </v-btn>
+        </template>
+        <template v-slot:default>
+          <v-sheet elevation="10" rounded="xl">
+            <v-sheet class="pa-3 blue title" rounded="t-xl">
+              Cargos a Sucursal
+            </v-sheet>
+            <div class="pa-4">
+              <v-chip-group active-class="primary--text" column>
+                <v-chip
+                  v-for="(tag, index) in item.charges"
+                  :key="`${tag.agency}-${index}`"
+                  class="overline"
+                >
+                  {{ tag.agency }} - {{ tag.department }} - {{ tag.percent }}%
+                </v-chip>
+              </v-chip-group>
+            </div>
+          </v-sheet>
+        </template>
+      </v-dialog>
+    </template>
+    <template v-slot:[`item.created_at`]="{ value }">
+      {{ $appFormatters.formatDate(value, "l") }}
     </template>
   </v-data-table>
 </template>
@@ -261,12 +289,12 @@ import EditPurchase from "./Edit.vue";
 
 export default {
   components: {
-    PurchaseForm,
-    SearchPanel,
-    TableHeaderButtons,
     Create,
+    SearchPanel,
     EditPurchase,
+    PurchaseForm,
     DialogComponent,
+    TableHeaderButtons,
   },
   data: () => ({
     valid: true,
@@ -277,25 +305,35 @@ export default {
     headers: [
       { text: "", value: "actions", sortable: false },
       {
-        text: "Folio",
+        text: "Folio OC",
         align: "center",
         sortable: false,
         value: "id",
         fixed: true,
       },
       {
-        text: "Proveedor - RFC",
+        text: "Proveedor",
         value: "supplier.business_name",
+        width: 200,
         fixed: true,
       },
-      { text: "Realizado por", value: "elaborated" },
-      { text: "Con Cargo:", value: "sucursal.title" },
-      { text: "Conceptos", value: "concepts.length", align: "center" },
-      // { text: "Subtotal", value: "subtotal", align: "right" },
-      // { text: "IVA", value: "tax", align: "right" },
-      { text: "Total", value: "total", align: "right" },
-      { text: "Consecutivo", value: "authorization_token", align: "right" },
+      {
+        text: "Cargos a Sucursal",
+        value: "cargos",
+        fixed: true,
+        sortable: false,
+      },
+      { text: "Concepto Compra", value: "reason", width: 200 },
+      {
+        text: "Articulos",
+        value: "concepts.length",
+        align: "center",
+        sortable: false,
+      },
+      { text: "Importe", value: "total", align: "right" },
+      { text: "Realizado por", value: "elaborated", width: 175 },
       { text: "Estatus", value: "estatus", align: "center" },
+      { text: "Creada", value: "created_at", align: "right" },
     ],
     editedId: -1,
     items: [],
@@ -317,19 +355,25 @@ export default {
       formaPago: [],
       estatus: [
         { text: "Pendientes", value: "pendiente" },
+        { text: "Rechazados", value: "denegar" },
         { text: "Autorizados", value: "autorizado" },
         { text: "Verificados", value: "verificado" },
-        { text: "Rechazados", value: "denegar" },
+        { text: "Enviadas", value: "enviado" },
         { text: "Facturados", value: "facturado" },
+        { text: "Por Pagar", value: "por_pagar" },
+        { text: "Pagadas", value: "pagada" },
         { text: "Todos", value: "todos" },
       ],
     },
     colors: {
       pendiente: "blue",
       autorizado: "orange",
-      verificado: "green",
       denegar: "red",
-      facturado: "purple",
+      verificado: "purple",
+      facturado: "green",
+      por_pagar: "pink",
+      pagada: "cyan",
+      enviado: "brown darken-4",
     },
     totalItems: 0,
     pagination: {
@@ -403,9 +447,53 @@ export default {
     getColorByStatus(status) {
       return this.colors[status];
     },
-
-    checkEstatus(estatus_key, item_estatus) {
-      return item_estatus == estatus_key;
+    async markAsSend(item) {
+      const _this = this;
+      let payload = {
+        estatus_key: "enviado",
+      };
+      await axios
+        .post(`/admin/purchase-order/update-estatus/${item.id}`, payload)
+        .then(function (response) {
+          _this.$store.commit("showSnackbar", {
+            message: response.data.message,
+            color: "success",
+            duration: 3000,
+          });
+          _this.$eventBus.$emit("ORDERS_REFRESH");
+          _this.loadPurchaseEdit();
+          // _this.$eventBus.$emit("CLOSE_DIALOG");
+        })
+        .catch(function (error) {
+          _this.$store.commit("hideLoader");
+          if (error.response) {
+            _this.$store.commit("showSnackbar", {
+              message: error.response.data.message,
+              color: "error",
+              duration: 3000,
+            });
+            return false;
+          } else if (error.request) {
+            console.log(error.request);
+          } else {
+            console.log("Error", error.message);
+          }
+        });
+    },
+    canPrint(estatus_key) {
+      let estatus = {
+        verificado: true,
+        facturado: true,
+        pagada: true,
+        enviado: true,
+      };
+      return estatus[estatus_key] ?? false;
+    },
+    canMarkAsSend(estatus_key) {
+      let estatus = {
+        verificado: true,
+      };
+      return estatus[estatus_key] ?? false;
     },
     async loadPurchaseOrders(cb) {
       const _this = this;

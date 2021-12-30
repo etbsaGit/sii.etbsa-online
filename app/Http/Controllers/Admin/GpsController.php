@@ -115,9 +115,11 @@ class GpsController extends AdminController
     public function edit(Gps $gp)
     {
         $data = [
+            'clave' => $gp->clave,
             'name' => $gp->name,
             'description' => $gp->description,
             'installation_date' => $gp->installation_date,
+            'cancellation_date' => $gp->cancellation_date,
             'renew_date' => $gp->renew_date,
             'currency' => $gp->currency,
             'invoice' => $gp->invoice,

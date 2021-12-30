@@ -1,11 +1,12 @@
 <template>
-  <v-card flat max-width="600" class="overline">
-    <v-form ref="form" v-model="valid" lazy-validation>
-      <gps-cancel :form.sync="form"></gps-cancel>
-    </v-form>
+  <v-card flat class="overline">
+    <v-card-text class="py-4">
+      <v-form ref="form" v-model="valid" lazy-validation>
+        <gps-cancel-form :form.sync="form"></gps-cancel-form>
+      </v-form>
+    </v-card-text>
     <v-card-actions>
-      <v-spacer></v-spacer>
-      <v-btn color="red darken-1" block dark :disabled="!valid" @click="save">
+      <v-btn color="red darken-1" block :disabled="!valid" @click="save">
         Dar de Baja el GPS
       </v-btn>
     </v-card-actions>
@@ -13,10 +14,10 @@
 </template>
 
 <script>
-import GpsCancel from '../forms/GpsCancel.vue';
+import GpsCancelForm from "../forms/GpsCancel.vue";
 
 export default {
-  components: { GpsCancel },
+  components: { GpsCancelForm },
   props: {
     propGpsId: {
       required: true,
@@ -37,38 +38,38 @@ export default {
     save() {
       if (!this.$refs.form.validate()) return;
       const _this = this;
-      _this.$store.commit('showDialog', {
-        type: 'confirm',
-        title: 'Confirmar Cancelacion',
-        message: '¿Seguro en Cancelar el GPS?',
+      _this.$store.commit("showDialog", {
+        type: "confirm",
+        title: "Confirmar Cancelacion",
+        message: "¿Seguro en Cancelar el GPS?",
         okCb: () => {
           axios
             .put(`/admin/gps/${_this.propGpsId}/cancel`, _this.form)
-            .then(function(response) {
-              _this.$store.commit('showSnackbar', {
+            .then(function (response) {
+              _this.$store.commit("showSnackbar", {
                 message: response.data.message,
-                color: 'success',
+                color: "success",
                 duration: 3000,
               });
 
-              _this.$eventBus.$emit('GPS_REFRESH');
+              _this.$eventBus.$emit("GPS_REFRESH");
             })
-            .catch(function(error) {
+            .catch(function (error) {
               if (error.response) {
-                _this.$store.commit('showSnackbar', {
+                _this.$store.commit("showSnackbar", {
                   message: error.response.data.message,
-                  color: 'error',
+                  color: "error",
                   duration: 3000,
                 });
               } else if (error.request) {
                 console.log(error.request);
               } else {
-                console.log('Error', error.message);
+                console.log("Error", error.message);
               }
             });
         },
         cancelCb: () => {
-          console.log('CANCEL');
+          console.log("CANCEL");
         },
       });
     },

@@ -6,7 +6,7 @@
         <v-spacer></v-spacer>
         <v-dialog v-model="dialog" persistent max-width="600px">
           <template v-slot:activator="{ on, attrs }">
-            <v-btn small color="primary" dark v-bind="attrs" v-on="on">
+            <v-btn small color="primary" v-bind="attrs" v-on="on">
               Registrar UUID
             </v-btn>
           </template>
@@ -36,7 +36,6 @@
                         hint="Formato: NNNNNNNN-NNNN-NNNN-NNNN-NNNNNNNNNNNN"
                         counter
                         persistent-hint
-                        required
                       ></v-text-field>
                     </v-col>
                     <v-col v-show="false" cols="12">
@@ -56,7 +55,6 @@
                           <v-chip
                             v-if="index < 2"
                             color="deep-purple accent-4"
-                            dark
                             label
                             small
                           >
@@ -80,7 +78,6 @@
                 <v-spacer></v-spacer>
                 <v-btn
                   color="blue darken-1"
-                  dark
                   @click="(dialog = false), $refs.formDocument.reset()"
                 >
                   Cancelar
@@ -100,7 +97,7 @@
       </v-subheader>
       <v-list-item v-for="file in Files" :key="file.id" dense>
         <v-list-item-avatar>
-          <v-icon :class="file.color" dark v-text="file.icon"></v-icon>
+          <v-icon :class="file.color" v-text="file.icon"></v-icon>
         </v-list-item-avatar>
 
         <v-list-item-content>

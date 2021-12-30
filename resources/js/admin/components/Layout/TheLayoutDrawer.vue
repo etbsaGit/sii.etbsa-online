@@ -1,51 +1,40 @@
 <template>
   <v-navigation-drawer
-    :value="drawer"
+    v-model="Drawer"
+    width="260"
+    class="app-navigation-menu"
     :expand-on-hover="!$vuetify.breakpoint.mobile"
+    floating
+    clipped
+    dark
     app
-    dark
-    fixed
   >
-    <!-- app
-    left
-    dark
-    dense
-    fixed
-    clipped -->
-    <the-layout-drawer-list v-if="nav" dense :routes="nav" icon-show />
+    <the-layout-drawer-list :routes="Menu" icon-show dense />
   </v-navigation-drawer>
 </template>
 
 <script>
+import Profile from "./Profile.vue";
 import TheLayoutDrawerList from "./TheLayoutDrawerList.vue";
-
+// import { mapMutations } from "vuex";
 export default {
   name: "TheLayoutDrawer",
   components: {
     TheLayoutDrawerList,
+    Profile,
   },
-  props: {
-    nav: {
-      type: Array,
-      require: true,
-    },
-    value: { type: Boolean },
-  },
-  data: () => ({}),
   computed: {
-    drawer: {
-      get: function () {
-        return this.value;
+    Drawer: {
+      get() {
+        return this.$store.getters.getNavigationDrawer;
       },
-      set: function (v) {
-        this.value = v;
+      set(val) {
+        this.$store.dispatch.toggleNavigation;
       },
     },
-  },
-  methods: {
-    // stateNavbarShow(state) {
-    //   //   this.$store.dispatch('NavbarState', { state });
-    // },
+    Menu() {
+      return this.$store.getters.getNavigation;
+    },
   },
 };
 </script>

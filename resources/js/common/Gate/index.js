@@ -3,10 +3,12 @@ import GpsPolicy from "~/common/Gate/Policies/GpsPolicy";
 import TrackingPolicy from "~/common/Gate/Policies/TrackingPolicy";
 import VehiclesPolicy from "~/common/Gate/Policies/VehiclesPolicy";
 import PurchasePolicy from "~/common/Gate/Policies/PurchasePolicy";
+import store from "../Store";
 
 export default class Gate {
-  constructor(user) {
-    this.user = user;
+  // constructor(user) {
+  constructor() {
+    // this.user = user;
 
     this.policies = {
       user: UserPolicy,
@@ -22,12 +24,13 @@ export default class Gate {
   }
 
   auth() {
-    let { id, name, email } = this.user;
+    let { id, name, email } = store.state.user;
     return { id, name, email };
   }
 
   before() {
-    return this.user.all_permissions["superuser"] === 1;
+    return store.getters["user/permissions"]["superuser"] === 1;
+    // return this.user.all_permissions["superuser"] === 1;
   }
 
   allow(action, type, model = null) {
@@ -35,7 +38,11 @@ export default class Gate {
       return true;
     }
 
-    return this.policies[type][action](this.user.all_permissions, model);
+    return this.policies[type][action](
+      store.getters["user/permissions"],
+      model
+    );
+    // return this.policies[type][action](this.user.all_permissions, model);
   }
 
   deny(action, type, model = null) {

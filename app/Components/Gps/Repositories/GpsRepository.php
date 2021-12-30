@@ -23,59 +23,59 @@ class GpsRepository extends BaseRepository
     {
         return $this->get($params, ['gpsGroup', 'chip'], function ($query) use ($params) {
             $query->where(function ($query) use ($params) {
-                $query->filter($params)
-                    ->filterByDateRangeInstall($params['datesInstall'] ?? null)
-                    ->filterByDateRangeInstall($params['datesRenew'] ?? null);
+                $query->filter($params);
+                // ->filterByDateRangeInstall($params['datesInstall'] ?? null)
+                // ->filterByDateRangeInstall($params['datesRenew'] ?? null);
             });
 
             return $query;
         });
     }
 
-    public function getStatsGps(Int $month, Int $year)
-    {
-        $Total = $this->model->whereMonth('installation_date', $month)
-            ->whereNull('cancellation_date')
-            ->count();
+    // public function getStatsGps(Int $month, Int $year)
+    // {
+    //     $Total = $this->model->whereMonth('installation_date', $month)
+    //         ->whereNull('cancellation_date')
+    //         ->count();
 
-        $Nuevos = $this->model->where(function ($query) use ($month, $year) {
-            $query->whereMonth('installation_date', $month)
-                ->whereYear('installation_date', $year)
-                ->whereYear('renew_date', '>', $year)
-                ->whereNull('cancellation_date');
-        })->count();
+    //     $Nuevos = $this->model->where(function ($query) use ($month, $year) {
+    //         $query->whereMonth('installation_date', $month)
+    //             ->whereYear('installation_date', $year)
+    //             ->whereYear('renew_date', '>', $year)
+    //             ->whereNull('cancellation_date');
+    //     })->count();
 
-        $Renovados = $this->model->where(function ($query) use ($month, $year) {
-            $query->whereMonth('renew_date', $month)
-                ->whereYear('renew_date', '>', $year)
-                ->whereNull('cancellation_date')
-                ->whereYear('installation_date', '<', $year);
-        })->count();
+    //     $Renovados = $this->model->where(function ($query) use ($month, $year) {
+    //         $query->whereMonth('renew_date', $month)
+    //             ->whereYear('renew_date', '>', $year)
+    //             ->whereNull('cancellation_date')
+    //             ->whereYear('installation_date', '<', $year);
+    //     })->count();
 
-        $PorRenovar = $this->model->where(function ($query) use ($month, $year) {
-            $query->whereMonth('renew_date', $month)
-                ->whereYear('renew_date', $year)
-                ->whereNull('cancellation_date');
-        })->count();
+    //     $PorRenovar = $this->model->where(function ($query) use ($month, $year) {
+    //         $query->whereMonth('renew_date', $month)
+    //             ->whereYear('renew_date', $year)
+    //             ->whereNull('cancellation_date');
+    //     })->count();
 
-        $Cancelados = $this->model->where(function ($query) use ($month, $year) {
-            $query->whereMonth('installation_date', $month)
-                ->whereYear('cancellation_date', $year)
-                ->whereNull('renew_date');
-        })->count();
+    //     $Cancelados = $this->model->where(function ($query) use ($month, $year) {
+    //         $query->whereMonth('installation_date', $month)
+    //             ->whereYear('cancellation_date', $year)
+    //             ->whereNull('renew_date');
+    //     })->count();
 
-        $Porcentaje = $Renovados / ($Total - $Nuevos);
+    //     $Porcentaje = $Renovados / ($Total - $Nuevos);
 
-        return [
-            'Total' => $Total,
-            'Nuevos' => $Nuevos,
-            'Renovados' => $Renovados,
-            'PorRenovar' => $PorRenovar,
-            'Cancelados' => $Cancelados,
-            'Porcentaje' => $Porcentaje,
-            'Month' => $month,
-        ];
-    }
+    //     return [
+    //         'Total' => $Total,
+    //         'Nuevos' => $Nuevos,
+    //         'Renovados' => $Renovados,
+    //         'PorRenovar' => $PorRenovar,
+    //         'Cancelados' => $Cancelados,
+    //         'Porcentaje' => $Porcentaje,
+    //         'Month' => $month,
+    //     ];
+    // }
 
     public function keepHistorical(Gps $gps)
     {

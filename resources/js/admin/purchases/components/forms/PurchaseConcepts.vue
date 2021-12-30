@@ -10,7 +10,6 @@
     fixed-header
     caption
     dense
-    dark
   >
     <template v-slot:top>
       <v-toolbar flat dense>
@@ -24,7 +23,7 @@
           :fullscreen="$vuetify.breakpoint.mobile"
         >
           <template v-slot:activator="{ on, attrs }">
-            <v-btn color="primary" dark v-bind="attrs" v-on="on">
+            <v-btn color="primary" v-bind="attrs" v-on="on">
               Agregar
             </v-btn>
           </template>
@@ -32,7 +31,7 @@
             <v-card-title class="secondary">
               <span class="headline">{{ formTitle }}</span>
               <v-spacer></v-spacer>
-              <v-btn icon color="red darken-1" @click="close" dark>
+              <v-btn icon color="red darken-1" @click="close">
                 <v-icon>mdi-close</v-icon>
               </v-btn>
             </v-card-title>
@@ -198,7 +197,7 @@
             {{ item.name }}
           </span>
         </template>
-        <div class="caption">{{ item.name }}</div>
+        <div class="caption text-uppercase">{{ item.name }}</div>
       </v-tooltip>
     </template>
     <template v-slot:[`item.tax`]="{ item }">
@@ -207,33 +206,10 @@
     <template v-slot:[`item.cost`]="{ item }">
       {{ item.cost | currency }}
     </template>
-    <template v-slot:[`body.append`]>
-      <slot name="append"></slot>
-      <!-- <tr>
-        <td colspan="4"></td>
-        <td class="text-end title">Subtotal:</td>
-        <td class="font-weight-bold overline text-end">
-          {{ Subtotal | currency }}
-        </td>
-      </tr>
-      <tr>
-        <td colspan="4"></td>
-        <td class="text-end title">IVA:</td>
-        <td class="font-weight-bold overline text-end">
-          {{ Tax | currency }}
-        </td>
-      </tr>
-      <tr>
-        <td colspan="4"></td>
-        <td class="text-end title">Total:</td>
-        <td class="font-weight-bold overline text-end">
-          {{ Total | currency }}
-        </td>
-      </tr> -->
-    </template>
+
     <template v-slot:no-data>
       <v-row class="pt-6" justify="center">
-        <v-btn x-large color="primary" dark @click="dialog = true">
+        <v-btn x-large color="primary" @click="dialog = true">
           Agregar Concepto
         </v-btn>
       </v-row>
@@ -258,9 +234,7 @@ export default {
       dialog: false,
       dialogDelete: false,
       headers: [
-        { value: "actions", sortable: false },
         { text: "#", value: "partida", sortable: false },
-        { text: "Cargo a:", value: "user-depto", sortable: false },
         { text: "Cant.", value: "qty", align: "center" },
         { text: "Unidad", value: "unit", align: "center", sortable: false },
         {
@@ -273,6 +247,8 @@ export default {
         { text: "Precio U.", value: "price_unit", align: "end" },
         { text: "IVA", value: "tax", align: "end" },
         { text: "Importe Bruto", value: "cost", align: "end" },
+        { text: "Cargo a:", value: "user-depto", sortable: false },
+        { value: "actions", sortable: false },
       ],
       options: {
         departments: optionDepartments,

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="utf-8" />
@@ -208,7 +208,7 @@
 
         .swiss {
             max-width: 300px;
-            opacity: 0.1;
+            opacity: 0.2;
         }
 
         .full-height {
@@ -238,7 +238,7 @@
         <div class="title">EQUIPOS Y TRACTORES DEL BAJIO , S.A. DE C.V</div>
         <div>Carretera Panamericana Celaya - Salamanca Km. 61</div>
         <div>1ra Fracc. crespo C.P. 38120 Celaya, Gto.</div>
-        <div>Tel. 461-614-23-21, 461-614-23-23, 461-614-23-24, 461-614-23-25</div>
+        <div>Tel. 461-614-23-23, 461-614-23-24, 461-614-23-25</div>
         <div class="subtitle">R.F.C.: ETB-860812-I23</div>
         <div class="flex-center position-ref full-height">
             <div class="content">
@@ -247,6 +247,7 @@
                     <img class="swiss" src="{{ url('img/etbsa-logo-construccion.png') }}">
                 </div>
             </div>
+        </div>
     </header>
     <footer>
         <table>
@@ -271,12 +272,12 @@
                     <table>
                         <tr>
                             <td style="max-width: 100px">
-                                Sucursal ETBSA : {{ $data->sucursal->title }}<br />
-                                Domicilio: {{ $data->sucursal->address }}<br />
+                                {{-- Sucursal ETBSA : {{ $data->sucursal->title }}<br /> --}}
+                                {{-- Domicilio: {{ $data->sucursal->address }}<br /> --}}
                             </td>
                             <td>
                                 ORDEN DE COMPRA: # {{ str_pad($data->id, 5, '0', STR_PAD_LEFT) }}<br />
-                                Fecha: {{ $data->created_at }}<br />
+                                Fecha: {{ $data->updated_at }}<br />
                             </td>
                         </tr>
                     </table>
@@ -309,25 +310,25 @@
 
             <tr class="details">
                 <td>Metodo de Pago</td>
-                <td colspan="4">({{ $data->metodo_pago->description }})</td>
-                <td style="text-align: center">{{ $data->metodo_pago->clave }} </td>
+                <td colspan="4">({{ $data->metodopago->description }})</td>
+                <td style="text-align: center">{{ $data->metodopago->clave }} </td>
             </tr>
             <tr class="details">
                 <td>USO DE CFDI</td>
-                <td colspan="4">({{ $data->uso_cfdi->description }})</td>
-                <td style="text-align: center">{{ $data->uso_cfdi->clave }} </td>
+                <td colspan="4">({{ $data->usocfdi->description }})</td>
+                <td style="text-align: center">{{ $data->usocfdi->clave }} </td>
             </tr>
             <tr class="details">
                 <td>Forma de Pago</td>
-                <td colspan="4">({{ $data->forma_pago->description }})</td>
-                <td style="text-align: center">{{ $data->forma_pago->clave }} </td>
+                <td colspan="4">({{ $data->formapago->description }})</td>
+                <td style="text-align: center">{{ $data->formapago->clave }} </td>
             </tr>
 
             <tr class="heading">
                 {{-- <td>cargo</td> --}}
-                <td>cantidad</td>
+                <td>Producto</td>
+                <td>Cantidad</td>
                 <td>unidad</td>
-                <td>descripcion</td>
                 <td style="text-align: right">precio unit.</td>
                 <td style="text-align: right">iva</td>
                 <td style="text-align: right">importe</td>
@@ -336,18 +337,31 @@
             @foreach ($data->concepts as $concept)
                 <tr class="item">
                     {{-- <td>{{ ($concept['department'] ?? '') . ' ' . ($concept['user'] ?? '') }} --}}
+                    {{-- </td> --}}
+                    <td style="width: 300px; ">
+                        <div>
+                            <b>{{ $concept['name'] }}</b>
+                        </div>
+                        <div>
+                            {{ $concept['description'] }}
+                        </div>
                     </td>
-                    <td style="text-align: left;">{{ $concept['qty'] }}</td>
-                    <td style="text-align: left;">{{ $concept['unit'] }}</td>
-                    <td style="width: 300px; ">{{ $concept['name'] }}
+                    <td style="text-align: left;">
+                        {{ $concept['quantity'] }}</td>
+                    <td style="text-align: left;">
+                        {{ $concept['unit'] }}</td>
+                    <td style="text-align: right">
+                        {{ '$ ' . number_format($concept['price'], 2, '.', ',') }}
                     </td>
-                    <td style="text-align: right">{{ '$ ' . number_format($concept['price_unit'], 2, '.', ',') }}
+                    <td style="text-align: right">
+                        {{ number_format($concept['tax'] ?? 0, 2, '.', ',') . ' %' }}
                     </td>
-                    <td style="text-align: right">{{ '$ ' . number_format($concept['tax'] ?? 0, 2, '.', ',') }}
+                    <td style="text-align: right">
+                        {{ '$ ' . number_format($concept['quantity'] * $concept['price'], 2, '.', ',') }}
                     </td>
-                    <td style="text-align: right">{{ '$ ' . number_format($concept['cost'], 2, '.', ',') }}</td>
                 </tr>
             @endforeach
+
 
             <tr class="item">
                 <td colspan="6"></td>

@@ -16,16 +16,27 @@ class CreateVehicleDispersalTable extends Migration
         Schema::create('vehicle_dispersal', function (Blueprint $table) {
             $table->id();
             $table->foreignId('vehicle_id');
+            $table->boolean('drum_dispersion')->default(false);
+            $table->integer('fuel_odometer')->nullable();
+            $table->integer('mileage_last')->nullable();
+            $table->integer('mileage_actual')->nullable();
+
+            $table->string('reason_dispersal');
+            $table->text('reason_data')->nullable();
+            $table->text('reason_note')->nullable();
+
+            $table->string('fuel_name');
+            $table->double('fuel_liters');
+            $table->double('fuel_cost_liter');
+            $table->date('date_to_disperse');
+
+            $table->text('tickets_info')->nullable();
+
+            $table->foreignId('agency_id');
+            $table->foreignId('department_id');
             $table->foreignId('estatus_id');
             $table->foreignId('created_by');
-            $table->foreignId('updated_by');
-            $table->integer('fuel_odometer');
-            $table->integer('last_mileage');
-            $table->integer('actual_mileage');
-            $table->string('reason');
-            $table->text('reason_description');
-            $table->integer('fuel_lts');
-
+            $table->foreignId('updated_by')->nullable();
             $table->timestamps();
         });
     }

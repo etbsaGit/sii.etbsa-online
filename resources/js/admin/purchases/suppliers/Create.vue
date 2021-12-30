@@ -1,18 +1,27 @@
 <template>
   <v-card>
     <v-card-title>
-      <v-icon class="mr-2">mdi-account-plus</v-icon> Registrar Nuevo Proveedor
+      <v-icon left>mdi-account-plus</v-icon> Registrar Nuevo Proveedor
       <v-spacer></v-spacer>
+      <v-btn
+        v-if="$gate.allow('editSupplier', 'compras')"
+        color="primary"
+        :disabled="!valid"
+        @click="createSupplier"
+        dark
+      >
+        Guardar
+      </v-btn>
     </v-card-title>
-    <v-divider class="mb-2"></v-divider>
+    <v-divider></v-divider>
     <v-card-text>
-      <supplier-form v-model="valid" ref="form" :form.sync="supplier">
+      <supplier-form v-model="valid" ref="form" :form.sync="form">
       </supplier-form>
     </v-card-text>
     <v-card-actions>
       <v-btn
         v-if="$gate.allow('editSupplier', 'compras')"
-        color="green"
+        color="primary"
         :disabled="!valid"
         @click="createSupplier"
         block
@@ -31,14 +40,22 @@ export default {
   data() {
     return {
       valid: true,
-      supplier: {
+      form: {
         alias: null,
         business_name: null,
         rfc: null,
         address: null,
         email: null,
         phone: null,
-        contact: null,
+        contacts: [],
+        addresses: [],
+        giro: [],
+        estate_id: "",
+        township_id: "",
+        observation: "",
+        credit_days: "",
+        credit_limit: "",
+        observation: "",
         billing_data: {
           bank: "",
           account: "",
@@ -59,7 +76,7 @@ export default {
       if (!this.$refs.form.$refs.formSupplier.validate()) return;
       const _this = this;
       return await axios
-        .post("/admin/suppliers", _this.supplier)
+        .post("/admin/suppliers", _this.form)
         .then(function (response) {
           _this.$store.commit("showSnackbar", {
             message: response.data.message,

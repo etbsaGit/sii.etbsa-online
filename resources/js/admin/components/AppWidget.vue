@@ -1,5 +1,5 @@
 <template>
-  <v-card :dark="dark">
+  <v-card>
     <v-app-bar v-if="!headerHide" flat dense color="transparent">
       <v-toolbar-title class="text-h5">
         <v-icon v-if="iconTitle">{{ iconTitle }}</v-icon>
@@ -38,7 +38,6 @@ export default {
     },
     headerHide: Boolean,
     paddingHide: Boolean,
-    dark: Boolean,
   },
   data: () => ({}),
 };

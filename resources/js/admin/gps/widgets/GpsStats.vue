@@ -22,7 +22,6 @@
             <v-tooltip top>
               <template v-slot:activator="{ on, attrs }">
                 <v-chip
-                  dark
                   small
                   v-bind="attrs"
                   v-on="on"
@@ -37,7 +36,6 @@
               <template v-slot:activator="{ on, attrs }">
                 <v-chip
                   color="blue"
-                  dark
                   small
                   v-bind="attrs"
                   v-on="on"
@@ -52,7 +50,6 @@
               <template v-slot:activator="{ on, attrs }">
                 <v-chip
                   color="success"
-                  dark
                   small
                   v-bind="attrs"
                   v-on="on"
@@ -67,7 +64,6 @@
               <template v-slot:activator="{ on, attrs }">
                 <v-chip
                   color="orange"
-                  dark
                   small
                   v-bind="attrs"
                   v-on="on"
@@ -82,7 +78,6 @@
               <template v-slot:activator="{ on, attrs }">
                 <v-chip
                   color="red"
-                  dark
                   small
                   v-bind="attrs"
                   v-on="on"
@@ -95,7 +90,7 @@
             </v-tooltip>
             <v-tooltip top>
               <template v-slot:activator="{ on, attrs }">
-                <v-chip dark small v-bind="attrs" v-on="on">
+                <v-chip small v-bind="attrs" v-on="on">
                   {{ stat.Porcentaje | percent() }}
                 </v-chip>
               </template>

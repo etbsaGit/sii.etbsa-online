@@ -39,7 +39,6 @@ abstract class BaseRepository
     {
         $q = $this->model->with($with);
 
-        $q->orderBy($params['order_by'] ?? 'id', $params['order_sort'] ?? 'desc');
 
         // call the function if provided
         if (!is_null($callable)) {
@@ -56,6 +55,7 @@ abstract class BaseRepository
         if (Helpers::hasValue($params['paginate']) && ($params['paginate'] == 'no')) {
             return $q->get();
         }
+        $q->orderBy($params['order_by'] ?? 'id', $params['order_sort'] ?? 'desc');
 
         return $q->paginate($params['per_page'] ?? 10);
     }

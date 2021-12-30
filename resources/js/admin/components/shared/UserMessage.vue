@@ -3,7 +3,7 @@
     <v-spacer v-if="Owner"></v-spacer>
 
     <v-tooltip top v-if="!Owner">
-      <template v-slot:activator="{ on, attrs }">
+      <template #activator="{ on, attrs }">
         <v-avatar class="mt-n5" size="30" elevation="10" color="pink">
           <span class="white--text overline" v-bind="attrs" v-on="on">
             {{ initials(messageItem.user_name).init }}
@@ -13,10 +13,9 @@
       <span>{{ initials(messageItem.user_name).full_name }}</span>
     </v-tooltip>
     <v-card
-      :class="Owner ? 'mt-10 mr-2' : 'mt-10'"
-      max-width="350px"
+      :class="Owner ? 'mt-10 mx-2' : 'mt-10'"
       :color="Owner ? 'blue darken-1' : ''"
-      :dark="Owner"
+      max-width="350px"
     >
       <v-list-item three-line>
         <v-list-item-content>
@@ -31,7 +30,7 @@
     </v-card>
 
     <v-tooltip top v-if="Owner">
-      <template v-slot:activator="{ on, attrs }">
+      <template #activator="{ on, attrs }">
         <v-avatar class="mt-n5" size="30" elevation="10" color="indigo">
           <span class="white--text overline" v-bind="attrs" v-on="on">
             {{ initials(messageItem.user_name).init }}

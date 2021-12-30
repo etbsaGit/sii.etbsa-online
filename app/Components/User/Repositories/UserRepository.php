@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: darryl
@@ -27,7 +28,7 @@ class UserRepository extends BaseRepository
      */
     public function listUsers($params)
     {
-        return $this->get($params, ['groups', 'agency', 'department'], function ($q) use ($params) {
+        return $this->get($params, ['groups'], function ($q) use ($params) {
             $q->ofGroups(Helpers::commasToArray($params['group_id'] ?? ''));
             $q->ofName($params['name'] ?? '');
             $q->ofEmail($params['email'] ?? '');

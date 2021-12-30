@@ -3,13 +3,16 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Components\Common\Models\Estatus;
+use App\Components\RRHH\Models\Employee;
 use App\Components\Tracking\Models\Prospect;
 use App\Components\Tracking\Models\TrackingProspect;
 use App\Components\Tracking\Repositories\TrackingRepository;
+use App\Components\User\Models\User;
 use App\Notifications\TrackingAssigned;
 use App\Notifications\TrackingNewHistorical;
 use Auth;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -38,6 +41,35 @@ class TrackingProspectController extends AdminController
     {
         $data = $this->trackingRepository->listTracking(request()->all());
         return $this->sendResponseOk($data, "list tracking ok.");
+    }
+
+
+    public function create()
+    {
+        $prospects = Prospect::all('id', 'full_name', 'phone');
+        $categories = DB::table('cat_sales_category')->get(['id', 'title']);
+        $currency = DB::table('currency')->get(['id', 'name']);
+        $agencies = DB::table('agencies')->get(['id', 'code', 'title']);
+        $departments = DB::table('departments')->get(['id', 'title']);
+
+        $sellers = User::whereHasMorph(
+            'profiable',
+            [Employee::class],
+        )->whereHas(
+            'groups',
+            function ($query) {
+                return $query->whereIn('groups.name', ['Vendedor']);
+            }
+        )->with('profiable:id,name,last_name,agency_id,department_id')->get();
+
+        return $this->sendResponseOk(compact(
+            'prospects',
+            'categories',
+            'currency',
+            'agencies',
+            'departments',
+            'sellers'
+        ), "Create Tracking Prospect");
     }
 
     /**
@@ -108,14 +140,17 @@ class TrackingProspectController extends AdminController
                 'reference',
                 'description_topic',
                 'price',
-                'currency',
                 'first_contact',
                 'assertiveness',
-                'invoice',
                 'tracking_condition',
                 'date_next_tracking',
-                'created_at'
+                'date_won_sale',
+                'date_lost_sale',
+                'date_invoice',
+                'invoice',
+                'created_at',
             ),
+            'currency' => $tracking->moneda->name,
             'agency' => $tracking->agency->title,
             'department' => $tracking->department->title,
             'owner' => $tracking->attended->id,
@@ -133,7 +168,6 @@ class TrackingProspectController extends AdminController
                     'last_price' => $H->last_price,
                     'last_currency' => $H->last_currency,
                     'last_assertiveness' => $H->last_assertiveness,
-                    'invoice' => $H->invoice,
                     'type_contacted' => $H->type_contacted,
                     'user' => $H->user->name,
                     'date_next_tracking' => $H->date_next_tracking,
@@ -204,13 +238,14 @@ class TrackingProspectController extends AdminController
             'first_contact',
             'description_topic',
             'tracking_condition',
+            'currency_id',
         );
 
         if (!$tracking) {
             return $this->sendResponseNotFound();
         }
 
-        return $this->sendResponseOk($data);
+        return $this->sendResponseOk($tracking);
     }
 
     public function update(Request $request, $id)
@@ -282,8 +317,10 @@ class TrackingProspectController extends AdminController
                 return ['id' => $i->id, 'title' => $i->title];
             });
         }
+        $categories = DB::table('cat_sales_category')->get(['id', 'title']);
+        $currency = DB::table('currency')->get(['id', 'name']);
         $prospects = Prospect::with('township')->get()->map->only('id', 'full_name', 'email', 'company', 'rfc', 'town', 'phone', 'township');
-        return $this->sendResponseOk(compact('agencies', 'departments', 'prospects'));
+        return $this->sendResponseOk(compact('agencies', 'departments', 'prospects', 'currency', 'categories'));
     }
 
 

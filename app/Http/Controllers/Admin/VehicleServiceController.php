@@ -136,7 +136,7 @@ class VehicleServiceController extends AdminController
 
     public function create()
     {
-        $vehicles = Vehicle::all('id', 'matricula', 'last_mileage');
+        $vehicles = Vehicle::all('id', 'matricula', 'mileage_last');
         $agencies = DB::table('agencies')->get(['id', 'code', 'title']);
         $departments = DB::table('departments')->get(['id', 'code', 'title']);
         return $this->sendResponseOk(compact(

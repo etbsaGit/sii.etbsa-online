@@ -6,7 +6,7 @@ export const vehicles = [
       {
         path: "list",
         name: "vehicle.list",
-        component: require("@admin/vehicles/vehicles/Index").default,
+        component: require("@admin/vehicles/vehicles/VehicleList").default,
       },
       {
         path: "create",
@@ -22,7 +22,8 @@ export const vehicles = [
       {
         path: "/dispersion/list",
         name: "vehicle.dispersal.list",
-        component: require("@admin/vehicles/dispersals/Index").default,
+        component: require("@admin/vehicles/dispersals/VehicleDispersalList")
+          .default,
       },
       {
         path: "/dispersion/create/:propVehicleId?",
@@ -39,7 +40,8 @@ export const vehicles = [
       {
         path: "/services/list",
         name: "vehicle.services.list",
-        component: require("@admin/vehicles/services/Index").default,
+        component: require("@admin/vehicles/services/VehicleServiceList")
+          .default,
       },
       {
         path: "/services/create/:propVehicleId?",
@@ -54,5 +56,15 @@ export const vehicles = [
         props: true,
       },
     ],
+  },
+  {
+    path: "/ticket-cards/list",
+    name: "vehicle.ticketCard.list",
+    component: require("@admin/vehicles/ticketcard/Index").default,
+  },
+  {
+    path: "/fuels/list",
+    name: "vehicle.fuels.list",
+    component: require("@admin/vehicles/fuels/Index").default,
   },
 ];

@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Components\Purchase\Models\PurchaseOrder;
 use App\Components\User\Models\User;
-use App\Notifications\PurchaseOrderMessageNotification;
-use Auth;
+use App\Notifications\MessageNotification;
 use Illuminate\Http\Request;
+use Auth;
 
 class PurchaseOrderMessageController extends AdminController
 {
@@ -33,7 +33,7 @@ class PurchaseOrderMessageController extends AdminController
         $recipient = User::find($request['recipient_id']);
         // if ($recipient->id != auth()->id()) {
         $recipient->notify(
-            new PurchaseOrderMessageNotification($message, auth()->user())
+            new MessageNotification($message, auth()->user())
         );
         // }
 

@@ -1,11 +1,12 @@
 <template>
-  <v-card flat max-width="600">
-    <v-form ref="form" v-model="valid" lazy-validation>
-      <gps-invoice :form.sync="form"></gps-invoice>
-    </v-form>
+  <v-card flat>
+    <v-card-text class="py-4">
+      <v-form ref="form" v-model="valid" lazy-validation>
+        <gps-invoice :form.sync="form"></gps-invoice>
+      </v-form>
+    </v-card-text>
     <v-card-actions>
-      <v-spacer></v-spacer>
-      <v-btn color="red darken-1" block dark :disabled="!valid" @click="save">
+      <v-btn color="red darken-1" block :disabled="!valid" @click="save">
         Facturar
       </v-btn>
     </v-card-actions>
@@ -13,7 +14,7 @@
 </template>
 
 <script>
-import GpsInvoice from '../forms/GpsInvoice.vue';
+import GpsInvoice from "../forms/GpsInvoice.vue";
 
 export default {
   components: { GpsInvoice },
@@ -31,7 +32,7 @@ export default {
         invoice: null,
         invoice_date: null,
         amount: 0.0,
-        currency: 'MXN',
+        currency: "MXN",
         exchange_rate: 1,
       },
     };
@@ -42,26 +43,26 @@ export default {
       const self = this;
       axios
         .put(`/admin/gps/${self.propGpsId}/invoice`, self.form)
-        .then(function(response) {
-          self.$store.commit('showSnackbar', {
+        .then(function (response) {
+          self.$store.commit("showSnackbar", {
             message: response.data.message,
-            color: 'success',
+            color: "success",
             duration: 3000,
           });
 
-          self.$eventBus.$emit('GPS_REFRESH');
+          self.$eventBus.$emit("GPS_REFRESH");
         })
-        .catch(function(error) {
+        .catch(function (error) {
           if (error.response) {
-            self.$store.commit('showSnackbar', {
+            self.$store.commit("showSnackbar", {
               message: error.response.data.message,
-              color: 'error',
+              color: "error",
               duration: 3000,
             });
           } else if (error.request) {
             console.log(error.request);
           } else {
-            console.log('Error', error.message);
+            console.log("Error", error.message);
           }
         });
     },

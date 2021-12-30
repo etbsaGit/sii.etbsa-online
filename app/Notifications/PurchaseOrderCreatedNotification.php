@@ -3,10 +3,8 @@
 namespace App\Notifications;
 
 use App\Components\Purchase\Models\PurchaseOrder;
-use App\Components\User\Models\Group;
 use App\Components\User\Models\User;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -54,9 +52,9 @@ class PurchaseOrderCreatedNotification extends Notification
 
         $uri = url('/admin#/purchases/list');
         return (new MailMessage)
-            ->subject('Solicitud Orden de Compra - ' . $this->purchaseOrder->id)
+            ->subject('Solicitud Orden de Compra - #' . $this->purchaseOrder->id)
             ->cc($ccUsers)
-            ->greeting('Buen dia, Se registro una nueva solictud de OC')
+            ->greeting('Buen dia, Se registro una nueva solictud de Compra')
             ->line('Folio Orden de Compra: #' . $this->purchaseOrder->id)
             ->action('Ir a Ordenes de Compra', $uri)
             ->line('Gracias por usar nuestra Aplicacion.');

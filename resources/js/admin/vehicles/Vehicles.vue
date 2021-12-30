@@ -1,43 +1,26 @@
 <template>
-  <v-card flat>
-    <v-app-bar dark>
-      <v-tabs
-        v-model="tab"
-        background-color="blue lighten-1"
-        active-class="blue darken-1"
-        icons-and-text
-        centered
-        grow
-        dark
-      >
-        <v-tabs-slider color="purple"></v-tabs-slider>
-        <v-tab
-          v-for="item in Tabs.filter((i) => i.show)"
-          :key="item.title"
-          :to="item.to"
-        >
-          {{ item.title }} <v-icon>{{ item.icon }}</v-icon>
-        </v-tab>
-      </v-tabs>
-    </v-app-bar>
-    <v-sheet
-      id="scrolling-techniques-3"
-      class="overflow-y-auto"
-      :max-height="maxHeight"
-    >
-      <v-slide-x-transition>
-        <v-container fluid>
-          <keep-alive max="2">
-            <router-view></router-view>
-          </keep-alive>
-        </v-container>
-      </v-slide-x-transition>
-    </v-sheet>
+  <v-card id="vehicles-card">
+    <!-- tabs -->
+    <v-tabs v-model="tab" show-arrows>
+      <v-tab v-for="tab in Tabs" :key="tab.icon" :to="tab.to">
+        <v-icon size="20" class="me-3">
+          {{ tab.icon }}
+        </v-icon>
+        <span>{{ tab.title }}</span>
+      </v-tab>
+    </v-tabs>
+
+    <v-slide-x-transition>
+      <keep-alive>
+        <router-view></router-view>
+      </keep-alive>
+    </v-slide-x-transition>
   </v-card>
 </template>
 
 <script>
 export default {
+  name: "Vehicles",
   data() {
     return {
       tab: "",

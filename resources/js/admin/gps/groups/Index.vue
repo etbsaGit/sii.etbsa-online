@@ -50,11 +50,7 @@
             </v-row>
           </v-form>
         </search-panel>
-        <v-card
-          class="d-flex justify-end align-center flex-wrap px-3"
-          dark
-          flat
-        >
+        <v-card class="d-flex justify-end align-center flex-wrap px-3" flat>
           <v-card
             flat
             class="d-flex d-flex justify-space-between align-center flex-wrap py-2"
@@ -82,7 +78,7 @@
           <v-toolbar-title>Lista de Clientes GPS</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
           <v-spacer></v-spacer>
-          <v-btn color="primary" dark class="mb-2" @click="dialogs.show = true">
+          <v-btn color="primary" class="mb-2" @click="dialogs.show = true">
             Registrar Cliente GPS
           </v-btn>
         </v-toolbar>
@@ -198,37 +194,31 @@ export default {
           align: "center",
           divider: true,
           width: 10,
-          class: "pa-auto",
           sortable: false,
-          class: "blue-grey darken-5",
         },
         {
           text: "Nombre Cliente",
           value: "name",
           align: "left",
           sortable: true,
-          class: "blue-grey darken-1 white--text overline text-truncate",
         },
         {
           text: "Sucursal - Cargo",
           value: "agency",
           align: "left",
           sortable: true,
-          class: "blue-grey darken-1 white--text overline text-truncate",
         },
         {
           text: "Telefono",
           value: "phone",
           align: "left",
           sortable: false,
-          class: "blue-grey darken-1 white--text overline text-truncate",
         },
         {
           text: "Total GPS",
           value: "gps_count",
           align: "center",
           sortable: false,
-          class: "blue-grey darken-1 white--text overline text-truncate",
         },
       ],
       items: [],

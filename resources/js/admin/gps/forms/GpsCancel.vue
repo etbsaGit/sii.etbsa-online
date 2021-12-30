@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-row>
+    <v-row dense>
       <v-col cols="12">
         <v-text-field
           v-model="form.cancellation_date"
@@ -30,7 +30,7 @@
 
 <script>
 export default {
-  name: 'GpsCancelForm',
+  name: "GpsCancelForm",
   props: {
     form: {
       required: true,
@@ -38,7 +38,7 @@ export default {
   },
   data() {
     return {
-      rules: [(v) => !!v || 'Campo Requerido'],
+      rules: [(v) => !!v || "Campo Requerido"],
     };
   },
 };

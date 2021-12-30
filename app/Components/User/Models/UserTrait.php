@@ -98,14 +98,15 @@ trait UserTrait
         return $this->belongsToMany(SellerAgency::class, 'sellers_agency_pivot', 'user_id');
     }
 
-    public function agency()
-    {
-        return $this->belongsTo('App\Components\Common\Models\Agency', 'agency_id');
-    }
-    public function department()
-    {
-        return $this->belongsTo('App\Components\Common\Models\Department', 'departments_id');
-    }
+    // public function agency()
+    // {
+    //     return $this->belongsTo('App\Components\Common\Models\Agency', 'agency_id');
+    // }
+
+    // public function department()
+    // {
+    //     return $this->belongsTo('App\Components\Common\Models\Department', 'departments_id');
+    // }
 
     /**
      * the users meta

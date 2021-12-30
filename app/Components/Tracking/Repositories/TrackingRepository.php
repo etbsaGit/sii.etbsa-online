@@ -3,10 +3,8 @@
 namespace App\Components\Tracking\Repositories;
 
 use App\Components\Core\BaseRepository;
-use App\Components\Core\Utilities\Helpers;
 use App\Components\Tracking\Models\TrackingProspect;
 use Auth;
-use Illuminate\Support\Facades\Request;
 
 class TrackingRepository extends BaseRepository
 {
@@ -25,11 +23,19 @@ class TrackingRepository extends BaseRepository
     {
         return $this->get(
             $params,
-            ['estatus', 'prospect', 'agency', 'department'],
+            [
+                'estatus', 'prospect:id,full_name,company',
+                'agency:id,title',
+                'department:id,title',
+                'attended.profiable:id,name,last_name,agency_id',
+                'attended.profiable.agency:id,title',
+                'estatus:id,title,key',
+                'moneda:id,name',
+            ],
             function ($query) use ($params) {
                 $query->where(function ($query) use ($params) {
                     $query->filter($params)
-                        ->filterByDateRange($params['dates'] ?? null);
+                        ->filterByDateRange($params['dates'] ?? null, $params['estatus'] ?? null);
                 })->when(Auth::user()->isSuperUser(), function ($query) {
                     return $query;
                 }, function ($query) {

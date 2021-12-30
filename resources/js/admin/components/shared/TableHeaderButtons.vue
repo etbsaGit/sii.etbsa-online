@@ -1,5 +1,28 @@
 <template>
-  <div class="py-2">
+  <v-btn-toggle>
+    <base-tooltip v-if="updateSearchPanel" :text="`Busqueda avanzada`">
+      <template #activator="{ on }">
+        <v-btn icon v-on="on" @click.native.stop="updateSearchPanel">
+          <v-icon>mdi-magnify</v-icon>
+        </v-btn>
+      </template>
+    </base-tooltip>
+    <v-btn icon @click="print">
+      <v-icon>mdi-printer</v-icon>
+    </v-btn>
+    <base-tooltip v-if="exportTable" :text="`Exportar`">
+      <template #activator="{ on }">
+        <v-btn icon v-on="on" @click.native.stop="exportTable">
+          <v-icon color="green">mdi-file-excel</v-icon>
+        </v-btn>
+      </template>
+      <span>Exportar</span>
+    </base-tooltip>
+    <v-btn icon @click.native.stop="reloadTable">
+      <v-icon>mdi-reload</v-icon>
+    </v-btn>
+  </v-btn-toggle>
+  <!-- <div class="py-2">
     <base-tooltip v-if="updateSearchPanel" :text="`Busqueda avanzada`">
       <template #activator="{ on }">
         <v-btn icon v-on="on" @click.native.stop="updateSearchPanel">
@@ -19,7 +42,7 @@
     <v-btn icon @click.native.stop="reloadTable">
       <v-icon>mdi-reload</v-icon>
     </v-btn>
-  </div>
+  </div> -->
 </template>
 <script>
 import BaseTooltip from "../Base/BaseTooltip.vue";

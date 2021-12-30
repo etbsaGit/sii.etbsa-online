@@ -2,7 +2,9 @@
 
 namespace App\Components\Tracking\Models;
 
+use App\Components\Common\Models\Currency;
 use App\Components\Common\Models\Estatus;
+use App\Components\Common\Models\Message;
 use App\Components\User\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use App\Components\Core\Utilities\Helpers;
@@ -13,15 +15,13 @@ class TrackingProspect extends Model
     protected $primaryKey = 'id';
 
     protected $fillable = [
-        'title', 'reference',
-        'description_topic', 'price', 'currency', 'registered_by',
-        'prospect_id', 'estatus_id',
-        'assigned_by', 'attended_by',
-        'agency_id', 'department_id', 'date_next_tracking', 'first_contact',
-        'assertiveness', 'invoice', 'tracking_condition'
+        'title', 'reference', 'description_topic', 'price', 'currency', 'currency_id',
+        'category_id', 'registered_by', 'prospect_id', 'estatus_id', 'assigned_by', 'attended_by',
+        'agency_id', 'department_id',  'first_contact', 'assertiveness', 'tracking_condition', 'invoice',
+        'date_next_tracking', 'date_lost_sale', 'date_won_sale', 'date_invoice'
     ];
 
-    protected $with = ['registered', 'assigned', 'attended', 'prospect'];
+    protected $with = ['registered', 'assigned', 'prospect'];
 
     public function estatus()
     {
@@ -52,9 +52,18 @@ class TrackingProspect extends Model
     {
         return $this->belongsTo('App\Components\Common\Models\Agency', 'agency_id');
     }
+
     public function department()
     {
         return $this->belongsTo('App\Components\Common\Models\Department', 'department_id');
+    }
+    public function moneda()
+    {
+        return $this->belongsTo(Currency::class, 'currency_id');
+    }
+    public function category()
+    {
+        return $this->belongsTo('App\Components\Common\Models\CatTracking', 'category_id');
     }
 
     public function historical()
@@ -62,9 +71,18 @@ class TrackingProspect extends Model
         return $this->hasMany(TrackingHistoricalProspect::class, 'tracking_id', 'id');
     }
 
+    public function getHistoricalCountAttribute()
+    {
+        return $this->historical()->count();
+    }
+
+    // public function messages()
+    // {
+    //     return $this->hasMany(MessageTracking::class, 'tracking_id', 'id');
+    // }
     public function messages()
     {
-        return $this->hasMany(MessageTracking::class, 'tracking_id', 'id');
+        return $this->morphMany(Message::class, 'messageable');
     }
 
     public function scopeFilter($query, array $filters)
@@ -115,15 +133,24 @@ class TrackingProspect extends Model
         });
     }
 
-    public function scopeFilterByDateRange($query, $rangeDates)
+    public function scopeFilterByDateRange($query, $rangeDates = [], $estatus = null)
     {
-        $query->when($rangeDates ?? null, function ($query, $dates) {
-            $query->where(function ($query) use ($dates) {
+        $searchBy = 'updated_at';
+        if ($estatus == 'finlizado') {
+            $searchBy = 'date_lost_sale';
+        } else if ($estatus == 'formalizado') {
+            $searchBy = 'date_won_sale';
+        } else if ($estatus == 'activo') {
+            $searchBy = 'date_next_tracking';
+        }
+
+        $query->when($rangeDates ?? null, function ($query, $dates) use ($searchBy) {
+            $query->where(function ($query) use ($dates, $searchBy) {
                 $dates = Helpers::commasToArray($dates) ?? null;
                 if (count($dates) == 2) {
                     $from = date($dates[0]);
                     $to = date($dates[1]);
-                    $query->whereBetween('updated_at', [$from, $to]);
+                    $query->whereBetween($searchBy, [$from, $to]);
                 }
             });
         });

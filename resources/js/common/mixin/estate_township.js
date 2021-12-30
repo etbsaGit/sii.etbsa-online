@@ -10,31 +10,35 @@ export let mixinEstates = {
     };
   },
   watch: {
-    estate_id: function(v) {
+    estate_id: function (v) {
       this.options.townships = [];
-      // this.township_id = null;
-      if (v) this.loadTownships(this.estate_id);
+      if (v) this.loadTownships(v);
+    },
+    "form.estate_id": function (v) {
+      this.options.townships = [];
+      if (v) this.loadTownships(v);
     },
   },
   methods: {
-    loadEstates(cb) {
-      const self = this;
-      axios.get("/admin/estates").then(function(response) {
-        let Resource = response.data.data;
-        self.options.estates = Resource.estates;
-         (cb || Function)();
+    async loadEstates() {
+      const _this = this;
+      await axios.get("/admin/estates").then(function (response) {
+        let { estates } = response.data.data;
+        _this.options.estates = estates;
       });
     },
-    loadTownships(id) {
-      if (!id) {
-        this.township_id = null;
+    async loadTownships(estate_id) {
+      const _this = this;
+      if (!estate_id) {
+        _this.township_id = [];
         return;
       }
-      const self = this;
-      axios.get("/admin/townships/" + id).then(function(response) {
-        let Resource = response.data.data;
-        self.options.townships = Resource.townships;
-      });
+      await axios
+        .get(`/admin/townships/${estate_id}`)
+        .then(function (response) {
+          let { townships } = response.data.data;
+          _this.options.townships = townships;
+        });
     },
   },
 };

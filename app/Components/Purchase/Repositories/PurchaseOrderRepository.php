@@ -23,7 +23,12 @@ class PurchaseOrderRepository extends BaseRepository
      */
     public function list($params)
     {
-        return $this->get($params, ['supplier'], function ($query) use ($params) {
+        return $this->get($params, [
+            'supplier:id,business_name,rfc',
+            'elaborated.profiable:id,name,last_name,agency_id',
+            'elaborated.profiable.agency:id,title',
+            'estatus:id,title,key'
+        ], function ($query) use ($params) {
             $query->where(function ($query) use ($params) {
                 $query->search($params['search'] ?? '')
                     ->filter($params)

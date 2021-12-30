@@ -26,7 +26,6 @@ class Prospect extends Model
     }
 
     /**
-     * the gps on this group
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
@@ -46,13 +45,17 @@ class Prospect extends Model
         })->count();
     }
 
-    public function scopeOfName($query, $name)
-    {
-        if ($name === null || $name === '') {
-            return false;
-        }
 
-        return $query->where('full_name', 'LIKE', "%{$name}%")
-            ->orWhere('phone', 'LIKE', "%{$name}%");
+
+    public function scopeSearch($query, String $search)
+    {
+        $query->when($search ?? null, function ($query, $search) {
+            $query->where(function ($query) use ($search) {
+                $query->orWhere('full_name', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('company', 'like', "%{$search}%");
+            });
+        });
     }
 }

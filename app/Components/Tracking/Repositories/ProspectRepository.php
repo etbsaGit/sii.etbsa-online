@@ -21,7 +21,7 @@ class ProspectRepository extends BaseRepository
     public function listProspect($params)
     {
         return $this->get($params, ['user'], function ($q) use ($params) {
-            $q->ofName($params['full_name'] ?? '');
+            $q->search($params['search'] ?? '');
             return $q;
         });
     }

@@ -58,7 +58,6 @@
       <v-btn
         v-if="$gate.allow('editSupplier', 'compras')"
         color="green"
-        dark
         class="ml-4"
         @click="save"
         :disabled="!valid"

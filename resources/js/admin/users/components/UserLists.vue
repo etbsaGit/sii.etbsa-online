@@ -1,281 +1,286 @@
 <template>
-  <div class="component-wrap">
-    <!-- search -->
-    <v-card class="pt-2">
-      <div class="d-flex flex-md-row flex-sm-column flex-wrap align-center">
+  <v-data-table
+    :headers="headers"
+    :items="items"
+    :options.sync="pagination"
+    :server-items-length="totalItems"
+    class="text-truncate blue--text caption"
+    calculate-widths
+    fixed-header
+    caption
+    dense
+  >
+    <template v-slot:top>
+      <v-toolbar flat>
+        <v-toolbar-title>Usuarios</v-toolbar-title>
+        <v-divider class="mx-4" inset vertical></v-divider>
+        <v-spacer></v-spacer>
         <v-btn
+          color="primary"
+          class="mb-2"
           @click="$router.push({ name: 'users.create' })"
-          class="primary lighten-1 flex-grow-1 ma-1"
-          dark
-        >
-          Usuario Nuevo
-          <v-icon right dark>mdi-plus</v-icon>
-        </v-btn>
-
-        <v-btn
-          @click="$router.push({ name: 'users.groups.list' })"
-          class="primary lighten-1 float-right flex-grow-1 ma-1"
-          dark
-        >
-          Administrar Grupos <v-icon right dark>mdi-account-multiple</v-icon>
-        </v-btn>
-        <v-btn
-          @click="$router.push({ name: 'users.permissions.list' })"
-          class="primary lighten-1 float-right mr-2 flex-grow-1 ma-1"
-          dark
-        >
-          Administra Permisos <v-icon right dark>mdi-key</v-icon>
-        </v-btn>
-        <v-btn
-          @click="$router.push({ name: 'sellers.list' })"
-          class="orange lighten-1 float-right mr-2 flex-grow-1 ma-1"
-          dark
-        >
-          Administrar Vendedores <v-icon right dark>mdi-account</v-icon>
-        </v-btn>
-      </div>
-      <div class="d-flex flex-lg-row flex-sm-column flex-wrap align-center">
-        <div class="flex-grow-1 pa-2">
-          <v-text-field
-            filled
-            prepend-icon="mdi-magnify"
-            label="Filtrar por Nombre"
-            v-model="filters.name"
-          ></v-text-field>
-        </div>
-        <div class="flex-grow-1 pa-2">
-          <v-text-field
-            filled
-            prepend-icon="mdi-magnify"
-            label="Filtrar por Email"
-            v-model="filters.email"
-          ></v-text-field>
-        </div>
-        <div class="flex-grow-1 pa-2">
-          <v-autocomplete
-            filled
-            multiple
-            chips
-            deletable-chips
-            clearable
-            prepend-icon="mdi-filter-variant"
-            label="Filtrar por Grupos"
-            :items="filters.groupOptions"
-            item-text="name"
-            item-value="id"
-            v-model="filters.groupId"
-          ></v-autocomplete>
-        </div>
-      </div>
-    </v-card>
-    <!-- /search -->
-    <v-divider class="pb-2" />
-
-    <!-- data table -->
-    <v-data-table
-      v-bind:headers="headers"
-      :options.sync="pagination"
-      :items="items"
-      :server-items-length="totalItems"
-      dense
-      fixed-header
-      class="elevation-1 text-uppercase"
-    >
-      <!-- Headers -->
-      <template v-slot:[`header.name`]="{ header }" class="align-center">
-        <v-icon small>mdi-account</v-icon>{{ header.text }}
-      </template>
-      <template v-slot:[`header.email`]="{ header }" class="align-center">
-        <v-icon small>mdi-email</v-icon>{{ header.text }}
-      </template>
-      <template v-slot:[`header.permissions`]="{ header }" class="align-center">
-        <v-icon small>mdi-key</v-icon>{{ header.text }}
-      </template>
-      <template v-slot:[`header.groups`]="{ header }" class="align-center">
-        <v-icon small>mdi-account-multiple</v-icon>{{ header.text }}
-      </template>
-      <template v-slot:[`header.last_login`]="{ header }" class="align-center">
-        <v-icon small>mdi-av-timer</v-icon>{{ header.text }}
-      </template>
-
-      <!-- Body  -->
-      <template v-slot:[`item.action`]="{ item }">
-        <v-btn
-          @click="
-            $router.push({
-              name: 'users.edit',
-              params: { id: item.id }
-            })
-          "
-          x-small
-          outlined
-          icon
-          color="info"
-        >
-          <v-icon small>mdi-pencil</v-icon>
-        </v-btn>
-        <v-btn @click="trash(item)" x-small outlined icon color="red">
-          <v-icon small>mdi-delete</v-icon>
-        </v-btn>
-      </template>
-      <template v-slot:[`item.permissions`]="{ item }">
-        <v-btn
-          small
-          @click="showDialog('user_permissions', item.permissions)"
-          outlined
           rounded
-          color="grey"
-          dark
-          >Mostrar</v-btn
         >
-      </template>
-      <template v-slot:[`item.groups`]="{ item }">
-        <v-chip
-          v-for="group in item.groups"
-          :key="group.id"
-          outlined
-          color="secondary"
-          text-color="accent"
+          Registrar nuevo Usuario
+        </v-btn>
+      </v-toolbar>
+      <search-panel
+        :rightDrawer="rightDrawer"
+        @cancelSearch="cancelSearch"
+        @resetFilter="resetFilter"
+      >
+        <v-form ref="formFilter">
+          <v-row class="mr-2 offset-1 overline" dense>
+            <v-col cols="12">
+              <v-text-field
+                filled
+                prepend-icon="mdi-magnify"
+                label="Filtrar por Nombre"
+                v-model="filters.name"
+                dense
+              ></v-text-field>
+            </v-col>
+            <v-col cols="12">
+              <v-text-field
+                filled
+                prepend-icon="mdi-magnify"
+                label="Filtrar por Email"
+                v-model="filters.email"
+                dense
+              ></v-text-field>
+            </v-col>
+            <v-col cols="12">
+              <v-autocomplete
+                v-model="filters.groupId"
+                prepend-icon="mdi-filter-variant"
+                label="Filtrar por Grupos"
+                :items="filters.groupOptions"
+                item-text="name"
+                item-value="id"
+                deletable-chips
+                clearable
+                multiple
+                chips
+                filled
+              ></v-autocomplete>
+            </v-col>
+          </v-row>
+        </v-form>
+      </search-panel>
+      <v-card class="d-flex justify-end align-center flex-wrap px-3 py-1" flat>
+        <v-card
+          flat
+          class="d-flex d-flex justify-space-between align-center flex-wrap py-2"
+          :class="'flex-grow-1 flex-shrink-0'"
         >
-          {{ group.name }}
-        </v-chip>
-      </template>
-      <template v-slot:[`item.last_login`]="{ item }">
-        {{ $appFormatters.formatDate(item.last_login) }}
-      </template>
-      <template v-slot:[`item.active`]="{ item }">
-        <v-avatar outlined>
-          <v-icon v-if="item.active != null" class="green--text"
-            >mdi-check-circle-outline</v-icon
-          >
-          <v-icon class="grey--text" v-else>mdi-alert-circle-outline</v-icon>
-        </v-avatar>
-      </template>
-    </v-data-table>
-
-    <v-divider class="py-5" />
-
-    <!-- dialog for show permissions -->
-    <v-dialog v-model="dialogs.showPermissions.show" absolute max-width="300px">
-      <v-card>
-        <v-card-title>
-          <div class="headline"><v-icon>vpn_key</v-icon> User Permissions</div>
-        </v-card-title>
-        <v-card-text>
-          <v-chip
-            v-for="(permission, key) in dialogs.showPermissions.items"
-            :key="key"
-            class="white--text ma-1"
-            :class="{
-              green: permission.value == 1,
-              red: permission.value == -1,
-              blue: permission.value == 0
-            }"
-          >
-            <v-avatar
-              v-if="permission.value == -1"
-              class="red darken-4"
-              title="Deny"
-            >
-              <v-icon>block</v-icon>
-            </v-avatar>
-            <v-avatar
-              v-if="permission.value == 1"
-              class="green darken-4"
-              title="Allow"
-            >
-              <v-icon>check_circle</v-icon>
-            </v-avatar>
-            <v-avatar
-              v-if="permission.value == 0"
-              class="blue darken-4"
-              title="Inherit"
-            >
-              <v-icon>swap_horiz</v-icon>
-            </v-avatar>
-            {{ permission.title }}
-          </v-chip>
-          <p v-if="dialogs.showPermissions.items.length == 0">No permissions</p>
-        </v-card-text>
+          <v-text-field
+            v-model="search"
+            label="Buscar"
+            class="pa-2"
+            prepend-icon="mdi-magnify"
+            hide-details
+            clearable
+            outlined
+            filled
+            dense
+          ></v-text-field>
+        </v-card>
+        <v-spacer></v-spacer>
+        <v-divider class="mx-2" inset vertical></v-divider>
+        <table-header-buttons
+          :updateSearchPanel="updateSearchPanel"
+          :reloadTable="reloadTable"
+        ></table-header-buttons>
       </v-card>
-    </v-dialog>
-  </div>
+
+      <v-dialog
+        v-model="dialogs.showPermissions.show"
+        absolute
+        max-width="500px"
+      >
+        <v-card>
+          <v-card-title>
+            <div class="headline">
+              <v-icon>mdi-key</v-icon> Permisos Especiales
+            </div>
+          </v-card-title>
+          <v-card-text>
+            <v-chip
+              v-for="(p, key) in dialogs.showPermissions.items"
+              :key="key"
+              outlined
+              :class="{
+                green: p.value == 1,
+                red: p.value == -1,
+                blue: p.value == 0,
+              }"
+              class="ma-2"
+            >
+              <v-icon v-if="p.value == -1" left color="red">mdi-cancel</v-icon>
+              <v-icon v-if="p.value == 0" left color="blue">
+                mdi-swap-horizontal
+              </v-icon>
+              <v-icon v-if="p.value == 1" left color="green">
+                mdi-check-circle
+              </v-icon>
+              {{ p.title }}
+            </v-chip>
+            <p v-if="dialogs.showPermissions.items.length == 0">
+              Sin Permisos
+            </p>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
+    </template>
+
+    <template v-slot:[`header.email`]="{ header }" class="align-center">
+      <v-icon left small>mdi-email</v-icon> {{ header.text }}
+    </template>
+    <template v-slot:[`item.action`]="{ item }">
+      <v-btn
+        @click="
+          $router.push({
+            name: 'users.edit',
+            params: { id: item.id },
+          })
+        "
+        small
+        icon
+        color="info"
+      >
+        <v-icon small>mdi-pencil</v-icon>
+      </v-btn>
+      <v-btn @click="trash(item)" small icon color="red">
+        <v-icon small>mdi-delete</v-icon>
+      </v-btn>
+    </template>
+    <template v-slot:[`item.permissions`]="{ item }">
+      <v-btn
+        small
+        @click="showDialog('user_permissions', item.permissions)"
+        outlined
+        rounded
+        color="grey"
+      >
+        <v-icon small left>mdi-eye-outline</v-icon> Mostrar
+      </v-btn>
+    </template>
+    <template v-slot:[`item.groups`]="{ item }">
+      <v-chip
+        v-for="group in item.groups"
+        :key="group.id"
+        outlined
+        color="secondary"
+        text-color="accent"
+        small
+      >
+        {{ group.name }}
+      </v-chip>
+    </template>
+    <template v-slot:[`item.last_login`]="{ item }">
+      {{ $appFormatters.formatDate(item.last_login) }}
+    </template>
+    <template v-slot:[`item.active`]="{ item }">
+      <v-avatar outlined>
+        <v-icon v-if="item.active != null" class="green--text">
+          mdi-check-circle-outline
+        </v-icon>
+        <v-icon class="grey--text" v-else>mdi-alert-circle-outline</v-icon>
+      </v-avatar>
+    </template>
+  </v-data-table>
 </template>
 
 <script>
+import SearchPanel from "../../components/shared/SearchPanel.vue";
+import TableHeaderButtons from "../../components/shared/TableHeaderButtons.vue";
 export default {
+  components: { SearchPanel, TableHeaderButtons },
   data() {
     return {
       headers: [
         {
-          text: "Accion",
           value: "action",
           align: "center",
-          sortable: false
+          sortable: false,
         },
         {
           text: "Nombre",
           value: "name",
           align: "left",
-          sortable: true
+          sortable: true,
         },
-        { text: "Email", value: "email", align: "left", sortable: false },
+        { text: "Email", value: "email", align: "left", sortable: true },
         {
           text: "Permisos",
           value: "permissions",
           align: "center",
-          sortable: false
+          sortable: false,
         },
         { text: "Grupos", value: "groups", align: "center", sortable: false },
         {
           text: "Ultimo inicio",
           value: "last_login",
           align: "right",
-          sortable: true
+          sortable: true,
         },
         {
           text: "Activo",
           value: "active",
           align: "center",
           width: 10,
-          sortable: false
-        }
+          sortable: true,
+        },
       ],
       items: [],
       totalItems: 0,
       pagination: {
-        itemsPerPage: 10
+        itemsPerPage: 10,
       },
-
+      search: null,
       filters: {
         name: "",
         email: "",
         groupId: [],
-        groupOptions: []
+        groupOptions: [],
       },
-
       dialogs: {
         showPermissions: {
           items: [],
-          show: false
-        }
-      }
+          show: false,
+        },
+      },
+      dialogCreate: false,
+      dialogEdit: false,
+      dialogShow: false,
+      showSearchPanel: false,
+      dialogDelete: false,
     };
   },
+  computed: {
+    rightDrawer: {
+      get() {
+        return this.showSearchPanel;
+      },
+      set(_showSearchPanel) {
+        this.showSearchPanel = _showSearchPanel;
+      },
+    },
+  },
   mounted() {
-    const self = this;
+    const _this = this;
 
-    self.loadGroups(() => {});
+    _this.loadGroups(() => {});
 
-    self.$eventBus.$on(
+    _this.$eventBus.$on(
       ["USER_ADDED", "USER_UPDATED", "USER_DELETED", "GROUP_ADDED"],
       () => {
-        self.loadUsers(() => {});
+        _this.loadUsers(() => {});
       }
     );
 
-    self.$store.commit("setBreadcrumbs", [
-      { label: "Users", to: { name: "users.list" } }
+    _this.$store.commit("setBreadcrumbs", [
+      { label: "Users", to: { name: "users.list" } },
     ]);
   },
   watch: {
@@ -283,26 +288,41 @@ export default {
       handler() {
         this.loadUsers(() => {});
       },
-      deep: true
+      deep: true,
     },
-    "filters.name": _.debounce(function() {
-      const self = this;
-      self.loadUsers(() => {});
+    "filters.name": _.debounce(function () {
+      const _this = this;
+      _this.loadUsers(() => {});
     }, 700),
-    "filters.email": _.debounce(function() {
-      const self = this;
-      self.loadUsers(() => {});
+    "filters.email": _.debounce(function () {
+      const _this = this;
+      _this.loadUsers(() => {});
     }, 700),
-    "filters.groupId": _.debounce(function() {
-      const self = this;
-      self.loadUsers(() => {});
-    }, 700)
+    "filters.groupId": _.debounce(function () {
+      const _this = this;
+      _this.loadUsers(() => {});
+    }, 700),
   },
   methods: {
+    updateSearchPanel() {
+      this.rightDrawer = !this.rightDrawer;
+    },
+    reloadTable() {
+      this.loadUsers(() => {});
+    },
+    cancelSearch() {
+      this.showSearchPanel = false;
+    },
+    resetFilter() {
+      const _this = this;
+      _this.$refs.formFilter.reset();
+      _this.pagination.itemsPerPage = 10;
+      _this.pagination.page = 1;
+    },
     trash(user) {
-      const self = this;
+      const _this = this;
 
-      self.$store.commit("showDialog", {
+      _this.$store.commit("showDialog", {
         type: "confirm",
         icon: "warning",
         title: "Confirmar Eliminacion",
@@ -310,23 +330,23 @@ export default {
         okCb: () => {
           axios
             .delete("/admin/users/" + user.id)
-            .then(function(response) {
-              self.$store.commit("showSnackbar", {
+            .then(function (response) {
+              _this.$store.commit("showSnackbar", {
                 message: response.data.message,
                 color: "success",
-                duration: 3000
+                duration: 3000,
               });
 
-              self.$eventBus.$emit("USER_DELETED");
+              _this.$eventBus.$emit("USER_DELETED");
             })
-            .catch(function(error) {
-              self.$store.commit("hideLoader");
+            .catch(function (error) {
+              _this.$store.commit("hideLoader");
 
               if (error.response) {
-                self.$store.commit("showSnackbar", {
+                _this.$store.commit("showSnackbar", {
                   message: error.response.data.message,
                   color: "error",
-                  duration: 3000
+                  duration: 3000,
                 });
               } else if (error.request) {
                 console.log(error.request);
@@ -337,53 +357,64 @@ export default {
         },
         cancelCb: () => {
           console.log("CANCEL");
-        }
+        },
       });
     },
     showDialog(dialog, data) {
-      const self = this;
+      const _this = this;
 
       switch (dialog) {
         case "user_permissions":
-          self.dialogs.showPermissions.items = data;
+          _this.dialogs.showPermissions.items = data;
           setTimeout(() => {
-            self.dialogs.showPermissions.show = true;
+            _this.dialogs.showPermissions.show = true;
           }, 500);
           break;
       }
     },
-    loadUsers(cb) {
-      const self = this;
+    async loadUsers(cb) {
+      const _this = this;
 
       let params = {
-        name: self.filters.name,
-        email: self.filters.email,
-        group_id: self.filters.groupId.join(","),
-        order_sort: self.pagination.sortDesc[0] ? "desc" : "asc",
-        order_by: self.pagination.sortBy[0] || "name",
-        page: self.pagination.page,
-        per_page: self.pagination.itemsPerPage
+        ..._this.filters,
+        search: _this.search,
+        group_id: _this.filters.groupId.join(","),
+        order_sort: _this.pagination.sortDesc[0] ? "desc" : "asc",
+        order_by: _this.pagination.sortBy[0] || "name",
+        page: _this.pagination.page,
+        per_page: _this.pagination.itemsPerPage,
       };
+      // let params = {
+      //   name: _this.filters.name,
+      //   email: _this.filters.email,
+      //   group_id: _this.filters.groupId.join(","),
+      //   order_sort: _this.pagination.sortDesc[0] ? "desc" : "asc",
+      //   order_by: _this.pagination.sortBy[0] || "name",
+      //   page: _this.pagination.page,
+      //   per_page: _this.pagination.itemsPerPage,
+      // };
 
-      axios.get("/admin/users", { params: params }).then(function(response) {
-        self.items = response.data.data.data;
-        self.totalItems = response.data.data.total;
-        self.pagination.totalItems = response.data.data.total;
-        (cb || Function)();
-      });
+      await axios
+        .get("/admin/users", { params: params })
+        .then(function (response) {
+          _this.items = response.data.data.data;
+          _this.totalItems = response.data.data.total;
+          _this.pagination.totalItems = response.data.data.total;
+          (cb || Function)();
+        });
     },
     loadGroups(cb) {
-      const self = this;
+      const _this = this;
 
       let params = {
-        paginate: "no"
+        paginate: "no",
       };
 
-      axios.get("/admin/groups", { params: params }).then(function(response) {
-        self.filters.groupOptions = response.data.data;
+      axios.get("/admin/groups", { params: params }).then(function (response) {
+        _this.filters.groupOptions = response.data.data;
         cb();
       });
-    }
-  }
+    },
+  },
 };
 </script>

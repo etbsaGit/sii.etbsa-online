@@ -17,30 +17,28 @@
           class="purple mr-2"
           fab
           small
-          dark
+          
           @click.native="$emit('searchData')"
         >
-          <v-icon dark>mdi-magnify</v-icon>
+          <v-icon >mdi-magnify</v-icon>
         </v-btn> -->
         <v-btn
           elevation="4"
           class="red mr-2"
           fab
           small
-          dark
           @click.native="$emit('resetFilter')"
         >
-          <v-icon dark>mdi-filter-remove</v-icon>
+          <v-icon>mdi-filter-remove</v-icon>
         </v-btn>
         <v-btn
           elevation="4"
           class="grey"
           fab
           small
-          dark
           @click.native="$emit('cancelSearch')"
         >
-          <v-icon dark>mdi-close-circle-outline</v-icon>
+          <v-icon>mdi-close-circle-outline</v-icon>
         </v-btn>
       </v-toolbar>
       <slot></slot>

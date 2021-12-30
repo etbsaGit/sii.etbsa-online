@@ -3,11 +3,39 @@ export default class PurchasePolicy {
     return user["compras.validar"] === 1;
   }
 
+  static rejectPurchase(user) {
+    if (this.isAdmin(user)) {
+      return true;
+    }
+    return user["compras.rechazar"] === 1;
+  }
+
   static authorizePurchase(user) {
     if (this.isAdmin(user)) {
       return true;
     }
     return user["compras.autorizar"] === 1;
+  }
+
+  static shedulePaymentDate(user) {
+    if (this.isAdmin(user)) {
+      return true;
+    }
+    return user["compras.programar.pago"] === 1;
+  }
+
+  static markAsPaidIvoice(user) {
+    if (this.isAdmin(user)) {
+      return true;
+    }
+    return user["factura.pagada"] === 1;
+  }
+
+  static puchaseInvoice(user) {
+    if (this.isAdmin(user)) {
+      return true;
+    }
+    return user["compras.asignar.factura"] === 1;
   }
 
   static createSupplier(user) {
