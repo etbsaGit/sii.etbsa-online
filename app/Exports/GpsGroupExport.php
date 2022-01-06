@@ -22,7 +22,9 @@ class GpsGroupExport implements FromView, ShouldAutoSize, WithTitle
     public function view(): View
     {
         return view('exports.gps_groups', [
-            'group' => $this->group
+            'group' => $this->group->filter(function ($item) {
+                return $item->gps_count > 0;
+            })->values()
         ]);
     }
 
@@ -31,6 +33,6 @@ class GpsGroupExport implements FromView, ShouldAutoSize, WithTitle
      */
     public function title(): string
     {
-        return 'groupS';
+        return 'Clientes';
     }
 }
