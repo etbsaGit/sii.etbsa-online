@@ -164,7 +164,7 @@ class SinglePageController extends AdminController
                         'visible' => true,
                     ]),
                     new MenuItem([
-                        'group_requirements' => ['GERENTE', 'DIRECCION', 'Vendedor', 'Super User'],
+                        'group_requirements' => ['Super User'],
                         'permission_requirements' => [],
                         'label' => 'Graficas',
                         'nav_type' => MenuItem::$NAV_TYPE_NAV,
@@ -276,7 +276,7 @@ class SinglePageController extends AdminController
                 ]
             ]),
             new MenuItem([
-                'group_requirements' => ['Super User'],
+                'group_requirements' => ['Super User',, 'Vendedor'],
                 'permission_requirements' => [],
                 'label' => 'Clientes',
                 'nav_type' => MenuItem::$NAV_TYPE_NAV,
