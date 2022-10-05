@@ -42,7 +42,7 @@ class TrackingProspectHistoricalController extends AdminController
             $tracking->update($request->all());
             $tracking->estatus()->associate($estatus)->save();
 
-            $tracking->attended->notify(new TrackingNewHistorical($tracking));
+            // $tracking->attended->notify(new TrackingNewHistorical($tracking));
         });
 
         return $this->sendResponseOk([], "Seguimiento Guardado.");

@@ -119,7 +119,7 @@ class TrackingProspectController extends AdminController
             $tracking->estatus()->associate($estatus);
             $tracking->save();
 
-            $tracking->attended->notify(new TrackingAssigned($tracking));
+            // $tracking->attended->notify(new TrackingAssigned($tracking));
         });
 
         return $this->sendResponseCreated([], 'Se Registro Nuevo Seguimiento');
@@ -161,6 +161,7 @@ class TrackingProspectController extends AdminController
             'estatus' => $tracking->estatus->only('id', 'title', 'key'),
             'prospect' => $tracking->prospect()->with('township')->first()
                 ->only('full_name', 'email', 'is_moral', 'company', 'rfc', 'town', 'phone', 'township'),
+            'customer' => $tracking->customer,
             'historical' => $tracking->historical->map(function ($H) {
                 return [
                     'id' => $H->id,
@@ -217,7 +218,7 @@ class TrackingProspectController extends AdminController
             $this->trackingRepository->update($id, $request->all());
             $tracking->estatus()->associate($estatus)->save();
 
-            $tracking->attended->notify(new TrackingNewHistorical($tracking));
+            // $tracking->attended->notify(new TrackingNewHistorical($tracking));
         });
 
         return $this->sendResponseOk([], "Seguimiento Guardado.");
@@ -317,7 +318,7 @@ class TrackingProspectController extends AdminController
                 return ['id' => $i->id, 'title' => $i->title];
             });
         }
-        $categories = DB::table('cat_sales_category')->get(['id', 'title']);
+        $categories = DB::table('cat_sales_category')->get(['id', 'title', 'key']);
         $currency = DB::table('currency')->get(['id', 'name']);
         $prospects = Prospect::with('township')->get()->map->only('id', 'full_name', 'email', 'company', 'rfc', 'town', 'phone', 'township');
         return $this->sendResponseOk(compact('agencies', 'departments', 'prospects', 'currency', 'categories'));
@@ -351,5 +352,25 @@ class TrackingProspectController extends AdminController
             ];
         }
         return $this->sendResponseOk(compact('event'), "list tracking ok.");
+    }
+
+    public function associateCustomer(Request $request, $id)
+    {
+        $updated = $this->trackingRepository->update($id, ['customer_id' => $request['customer_id']]);
+
+        if (!$updated) {
+            return $this->sendResponseBadRequest("Failed update");
+        }
+
+        return $this->sendResponseOk([], "Se Asigno el Cliente Correctamente");
+    }
+
+    public function print(TrackingProspect $trackingProspect)
+    {
+        // return dd($trackingProspect);
+        $data = $trackingProspect->load('prospect', 'assigned');
+        // dd(compact('data'));
+        $pdf = \PDF::loadView('pdf.quote', compact('data'));
+        return $pdf->stream();
     }
 }

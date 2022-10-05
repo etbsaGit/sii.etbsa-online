@@ -396,7 +396,7 @@ export default {
           text: "Solicitante",
           align: "center",
           sortable: false,
-          value: "solicitante.profiable.full_name",
+          value: "solicitante.name",
           fixed: true,
         },
         {
@@ -456,7 +456,7 @@ export default {
       colors: {
         pendiente: "blue",
         autorizado: "green",
-        "flotilla.dispersado": "purple",
+        "flotilla.despachado": "purple",
         denegar: "red",
       },
       totalItems: 0,

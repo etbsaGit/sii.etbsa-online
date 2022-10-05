@@ -11,7 +11,7 @@
             label="Matricula"
             :rules="[(v) => !!v || 'Es requerido']"
             placeholder="Seleccione una Matricula"
-            :hint="`${vehicle.last_mileage || 0} Kms ultimo Kilometraje`"
+            :hint="`${vehicle.mileage_last || 0} Kms ultimo Kilometraje`"
             persistent-hint
             return-object
             outlined
@@ -47,7 +47,12 @@
         <div class="d-flex flex-column align-content-space-around">
           <v-select
             v-model="form.reason"
-            :items="['Servicio', 'Reparacion', 'Refaccion', 'Otro']"
+            :items="[
+              'Servicio Mantenimiento',
+              'Reparacion',
+              'Refaccion',
+              'Otro',
+            ]"
             label="Motivo de Servicio"
             :rules="[(v) => !!v || 'Es requerido']"
             outlined
@@ -66,12 +71,12 @@
         </div>
       </v-col>
       <v-col cols="12" md="4">
-        <div v-if="form.reason == 'Servicio'">
+        <div v-if="form.reason == 'Servicio Mantenimiento'">
           <v-text-field
             v-model="form.mileage"
             label="Kilometraje Actual"
             :rules="RulesMileage"
-            :hint="`Debe ser mayor a ${vehicle.last_mileage || 0} Kms `"
+            :hint="`Debe ser mayor a ${vehicle.mileage_last || 0} Kms `"
             persistent-hint
             prepend-icon="mdi-car-traction-control"
             type="number"
@@ -150,13 +155,13 @@ export default {
       set(vehicle) {
         this.vehicle = vehicle;
         this.form.vehicle_id = vehicle.id;
-        this.form.mileage = vehicle.last_mileage;
+        this.form.mileage = vehicle.mileage_last;
       },
     },
     RulesMileage() {
       return [
         (v) =>
-          v > this.vehicle.last_mileage ||
+          v > this.vehicle.mileage_last ||
           "Debe ser mayor al Ultimo Kilometraje",
         (v) => !!v || "Es Requerido",
       ];
@@ -170,7 +175,7 @@ export default {
         .then(function (response) {
           let Vehicle = response.data.data;
           _this.vehicle = Vehicle;
-          _this.form.mileage = Vehicle.last_mileage;
+          _this.form.mileage = Vehicle.mileage_last;
           (cb || Function)(Response);
         });
     },

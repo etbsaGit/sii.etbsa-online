@@ -67,7 +67,11 @@ export default {
       const _this = this;
       let payload = {
         ..._this.form,
-        mileage: _this.form.reason == "Servicio" ? _this.form.mileage : null,
+        vehicle_id: this.propVehicleId,
+        mileage:
+          _this.form.reason == "Servicio Mantenimiento"
+            ? _this.form.mileage
+            : null,
       };
       await axios
         .post("/admin/vehicle-services", payload)
@@ -78,7 +82,7 @@ export default {
             duration: 3000,
           });
           _this.$eventBus.$emit("VEHICLE_REFRESH");
-          _this.$router.push({ name: "vehicle.service.list" });
+          _this.$router.push({ name: "vehicle.services.list" });
         })
         .catch(function (error) {
           if (error.response) {

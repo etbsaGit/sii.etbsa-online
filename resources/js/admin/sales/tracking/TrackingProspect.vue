@@ -32,7 +32,6 @@
         {{ propTracking.estatus.title }}
       </v-chip>
       <v-btn
-        v-if="$gate.allow('isGerente', 'tracking')"
         color="primary"
         class="ml-2"
         @click="

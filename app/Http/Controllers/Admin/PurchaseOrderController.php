@@ -11,6 +11,7 @@ use App\Components\Purchase\Repositories\PurchaseOrderRepository;
 use App\Components\Purchase\Models\PurchaseOrder;
 use App\Components\Purchase\Models\Supplier;
 use App\Components\Common\Models\Estatus;
+use App\Components\Purchase\Models\PurchaseConcept;
 use App\Notifications\PurchaseOrderCreatedNotification;
 use App\Notifications\PurchaseOrderUpdatedNotification;
 // use App\Notifications\PurchaseOrderCreatedNotification;
@@ -50,13 +51,17 @@ class PurchaseOrderController extends AdminController
         $metodoPago = DB::table('cat_metodo_pago')->get(['clave', 'description']);
         $usoCFDI = DB::table('cat_uso_cfdi')->get(['clave', 'description']);
         $formaPago = DB::table('cat_forma_pago')->get(['clave', 'description']);
+        $unitSat = DB::table('cat_unit_sat')->get(['clave', 'name', 'type']);
+        $purchase_concept = PurchaseConcept::all();
         return $this->sendResponseOk(compact(
             'suppliers',
             'agencies',
             'departments',
             'metodoPago',
             'usoCFDI',
-            'formaPago'
+            'formaPago',
+            'unitSat',
+            'purchase_concept'
         ), "list Resources orders ok.");
     }
 
@@ -78,11 +83,12 @@ class PurchaseOrderController extends AdminController
             'supplier_id' => 'required',
             'subtotal' => 'required',
             'tax' => 'required',
+            'discount' => 'required',
             'total' => 'required',
             'concepts' => 'required|Array',
             'charges' => 'required|Array',
             'payment_condition' => 'required',
-            'reason' => 'required',
+            'purchase_concept_id' => 'required',
             'observation' => 'required',
             'uso_cfdi' => 'required',
             'metodo_pago' => 'required',
@@ -101,7 +107,7 @@ class PurchaseOrderController extends AdminController
 
         $purchasesOrder->estatus()->associate($estatus);
         $purchasesOrder->save();
-        $purchasesOrder->elaborated->notify(new PurchaseOrderCreatedNotification($purchasesOrder->refresh()));
+        // $purchasesOrder->elaborated->notify(new PurchaseOrderCreatedNotification($purchasesOrder->refresh()));
 
         return $this->sendResponseCreated($purchasesOrder);
     }
@@ -131,23 +137,28 @@ class PurchaseOrderController extends AdminController
             ],
             'amounts' => [
                 "subtotal" => $purchase_order->subtotal,
+                "discount" => $purchase_order->discount,
+                "with_tax" => $purchase_order->with_tax,
                 "tax" => $purchase_order->tax,
                 "total" => $purchase_order->total,
             ],
-            "reason" => $purchase_order->reason,
+            "purchase_concept" => $purchase_order->purchase_concept,
             "agency_id" => $purchase_order->ship->id,
             "observation" => $purchase_order->observation,
+            "note" => $purchase_order->note,
             "payment_condition" => $purchase_order->payment_condition,
             "estatus" => $purchase_order->estatus,
-            "invoice_info" => [
-                'id' => $purchase_order->invoice->id ?? null,
-                'folio_fiscal' => $purchase_order->invoice->folio_fiscal ?? '',
-                'folio' => $purchase_order->invoice->folio ?? '',
-                'invoice_date' => $purchase_order->invoice->invoice_date ?? '',
-                'date_to_payment' => $purchase_order->invoice->date_to_payment ?? '',
-                'payment_date' => $purchase_order->invoice->payment_date ?? '',
-                'amount' => $purchase_order->invoice->amount ?? 0,
-            ]
+            "invoice_info" => $purchase_order->invoice ?? [],
+
+            // "invoice_info" => [
+            //     'id' => $purchase_order->invoice->id ?? null,
+            //     'folio_fiscal' => $purchase_order->invoice->folio_fiscal ?? '',
+            //     'folio' => $purchase_order->invoice->folio ?? '',
+            //     'invoice_date' => $purchase_order->invoice->invoice_date ?? '',
+            //     'date_to_payment' => $purchase_order->invoice->date_to_payment ?? '',
+            //     'payment_date' => $purchase_order->invoice->payment_date ?? '',
+            //     'amount' => $purchase_order->invoice->amount ?? 0,
+            // ]
         ];
         return $this->sendResponseOk($data, "Edit Purchase Order.");
     }
@@ -197,6 +208,7 @@ class PurchaseOrderController extends AdminController
         // return $pdf->stream();
 
         $data = $purchaseOrder->load('supplier');
+        // dd($data);
         $pdf = \PDF::loadView('pdf.purchase', compact('data'));
         return $pdf->stream();
 
@@ -224,7 +236,7 @@ class PurchaseOrderController extends AdminController
         }
         $purchase_order->estatus()->associate($estatus);
         $purchase_order->save();
-        $purchase_order->elaborated->notify(new PurchaseOrderUpdatedNotification($purchase_order->refresh()));
+        // $purchase_order->elaborated->notify(new PurchaseOrderUpdatedNotification($purchase_order->refresh()));
         return $this->sendResponseUpdated([], 'Estatus Actualizado');
     }
 

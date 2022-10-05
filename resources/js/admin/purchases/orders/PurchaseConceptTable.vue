@@ -43,8 +43,9 @@
             outlined
             dense
             :value="item.quantity"
-            style="width: 50px;"
+            style="max-width: 50px;"
             hide-details
+            reverse
             single-line
             class="py-1"
           ></v-text-field>
@@ -55,6 +56,7 @@
             <v-text-field
               v-model="item.quantity"
               label="Edit"
+              hide-details
               single-line
               counter
               autofocus
@@ -64,8 +66,50 @@
           </template>
         </v-edit-dialog>
       </template>
-      <template v-slot:[`item.tax`]="{ value }">
-        {{ value || 0 | percent }}
+      <template v-slot:[`item.discount`]="{ item, value }">
+        <span v-if="readOnly">{{ value || 0 | money }}</span>
+        <v-edit-dialog
+          v-else
+          :return-value.sync="item.discount"
+          large
+          persistent
+          @save="save"
+          @cancel="cancel"
+          @open="open"
+          @close="close"
+          save-text="Guardar"
+          cancel-text="Cancelar"
+        >
+          <v-text-field
+            readonly
+            outlined
+            dense
+            :value="item.discount"
+            style="max-width: 100px;"
+            suffix="$"
+            hide-details
+            single-line
+            reverse
+            class="py-1"
+          ></v-text-field>
+          <template v-slot:input>
+            <div class="mt-4 text-h6">
+              Modificar Descuento
+            </div>
+            <v-text-field
+              v-model="item.discount"
+              label="Edit"
+              reverse
+              suffix="$"
+              single-line
+              hide-details
+              counter
+              autofocus
+              outlined
+              type="number"
+            ></v-text-field>
+          </template>
+        </v-edit-dialog>
       </template>
       <template v-slot:[`item.total`]="{ item }">
         {{ Amount(item) | money }}
@@ -90,7 +134,7 @@
           <v-container>
             <v-form v-model="valid" ref="form" lazy-validation>
               <v-row class="overline">
-                <v-col cols="9">
+                <v-col cols="8">
                   <v-text-field
                     v-model="form.name"
                     label="Nombre del Articulo*"
@@ -98,13 +142,31 @@
                     dense
                   ></v-text-field>
                 </v-col>
-                <v-col cols="3">
-                  <v-text-field
+                <v-col cols="4">
+                  <!-- <v-text-field
                     v-model="form.unit"
                     label="Unidad*"
                     outlined
                     dense
-                  ></v-text-field>
+                  ></v-text-field> -->
+                  <v-autocomplete
+                    v-model="form.unit"
+                    label="Unidad"
+                    outlined
+                    dense
+                    :items="options.cat_unit"
+                    item-text="name"
+                    item-value="clave"
+                    :filter="customFilter"
+                  >
+                    <template v-slot:item="data">
+                      <v-list-item-content>
+                        <v-list-item-title v-text="data.item.type" />
+                        <v-list-item-subtitle v-text="data.item.name" />
+                        <v-list-item-subtitle v-text="data.item.clave" />
+                      </v-list-item-content>
+                    </template>
+                  </v-autocomplete>
                 </v-col>
                 <v-col cols="6">
                   <v-text-field
@@ -117,16 +179,15 @@
                   ></v-text-field>
                 </v-col>
                 <v-col cols="6">
-                  <v-select
-                    v-model="form.tax"
-                    label="Impuesto"
-                    :items="[{ text: 'IVA 16%', value: 0.16 }]"
+                  <v-text-field
+                    v-model="form.discount"
+                    label="Descuento"
                     type="number"
-                    suffix="%"
+                    prefix="$"
                     clearable
                     outlined
                     dense
-                  ></v-select>
+                  ></v-text-field>
                 </v-col>
                 <v-col cols="12">
                   <v-textarea
@@ -218,34 +279,49 @@ export default {
           divider: true,
         },
         { text: "Cantidad", value: "quantity", align: "center" },
-        { text: "Unidad", value: "unit", sortable: false },
+        { text: "Clave Unidad", value: "unit", sortable: false },
         { text: "Precio", value: "price", align: "right" },
-        { text: "Impuesto", value: "tax", align: "center" },
+        { text: "Descuento", value: "discount", align: "center" },
         { text: "Total", value: "total", sortable: false, align: "right" },
         { value: "accion", sortable: false },
       ],
       editedIndex: -1,
+      options: {
+        cat_unit: [],
+      },
       form: {
         name: "",
         description: "",
         quantity: 1,
-        unit: "pz",
+        unit: "H87",
         price: 0,
-        tax: 0,
+        discount: 0,
       },
       formDefault: {
         name: "",
         description: "",
         quantity: 1,
-        unit: "pz",
+        unit: "H87",
         price: 0,
-        tax: 0,
+        discount: 0,
       },
     };
   },
+  mounted() {
+    this.loadOptions();
+  },
   methods: {
+    async loadOptions(cb) {
+      const _this = this;
+      await axios
+        .get("/admin/purchase-order/resources/options")
+        .then(function (response) {
+          let { unitSat } = response.data.data;
+          _this.options.cat_unit = unitSat;
+        });
+    },
     Amount(item) {
-      return item.quantity * item.price + item.price * item.quantity * item.tax;
+      return item.quantity * item.price - item.discount;
     },
     save() {
       this.snack = true;
@@ -294,6 +370,18 @@ export default {
         this.items.push(this.form);
       }
       this.Dialog = false;
+    },
+    customFilter(item, queryText, itemText) {
+      const textClave = item.clave.toLowerCase();
+      const textName = item.name.toLowerCase();
+      const textType = item.type.toLowerCase();
+      const searchText = queryText.toLowerCase();
+
+      return (
+        textClave.indexOf(searchText) > -1 ||
+        textName.indexOf(searchText) > -1 ||
+        textType.indexOf(searchText) > -1
+      );
     },
   },
 };

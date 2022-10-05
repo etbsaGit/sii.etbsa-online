@@ -27,7 +27,7 @@ class PurchaseOrderRepository extends BaseRepository
             'supplier:id,business_name,rfc',
             'elaborated.profiable:id,name,last_name,agency_id',
             'elaborated.profiable.agency:id,title',
-            'estatus:id,title,key'
+            'estatus:id,title,key', 'purchase_concept:id,name'
         ], function ($query) use ($params) {
             $query->where(function ($query) use ($params) {
                 $query->search($params['search'] ?? '')

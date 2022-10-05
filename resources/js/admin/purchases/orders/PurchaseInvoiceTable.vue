@@ -177,11 +177,19 @@ export default {
         };
       },
     },
+    usocfdi: Array,
+    default: () => {
+      return [];
+    },
   },
   mounted() {
     this.loadOptions();
   },
   watch: {
+    usocfdi(value) {
+      this.form.uso_cfdi = {};
+      this.loadOptions();
+    },
     "form.uso_cfdi"(value) {
       this.form.uso_cfdi_id = value.clave;
     },
@@ -248,7 +256,7 @@ export default {
         .then(function (response) {
           let { usoCFDI, metodoPago, formaPago } = response.data.data;
           _this.options.metodoPago = metodoPago;
-          _this.options.usoCFDI = usoCFDI;
+          _this.options.usoCFDI = _this.usocfdi;
           _this.options.formaPago = formaPago;
         });
     },

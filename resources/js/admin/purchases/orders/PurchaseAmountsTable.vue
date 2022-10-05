@@ -9,10 +9,36 @@
           </td>
         </tr>
 
+        <!-- <tr>
+          <td>Descuento</td>
+          <td class="text-right">
+            {{ Discount || 0 | money }}
+          </td>
+        </tr> -->
         <tr>
-          <td>Impuesto</td>
+          <td class="d-flex align-center">
+            <v-switch
+              v-model="form.with_tax"
+              label="Impuestos 16%"
+              dense
+            ></v-switch>
+          </td>
           <td class="text-right" style="width: 100px;">
             {{ Tax || 0 | money }}
+          </td>
+        </tr>
+        <tr>
+          <td style="width: 100px;">Descuento Adicional</td>
+          <td class="text-right pr-2">
+            <v-text-field
+              v-model="form.discount"
+              outlined
+              dense
+              hide-details
+              type="number"
+              suffix="$"
+              reverse
+            ></v-text-field>
           </td>
         </tr>
         <tr>
@@ -37,24 +63,29 @@ export default {
       type: Object,
     },
   },
+
   computed: {
     Subtotal() {
       return (this.form.subtotal = this.items
-        .map((item) => parseFloat(item.quantity) * parseFloat(item.price))
-        .reduce((acc, crr) => acc + crr, 0));
-    },
-    Tax() {
-      return (this.form.tax = this.items
         .map(
           (item) =>
-            parseFloat(item.quantity) *
-            parseFloat(item.price) *
-            parseFloat(item.tax ? item.tax : 0)
+            parseFloat(item.quantity) * parseFloat(item.price) -
+            parseFloat(item.discount)
         )
         .reduce((acc, crr) => acc + crr, 0));
     },
+    Discount() {
+      return this.items
+        .map((item) => parseFloat(item.discount))
+        .reduce((acc, crr) => acc + crr, 0);
+    },
+    Tax() {
+      return (this.form.tax = this.form.with_tax ? this.Subtotal * 0.16 : 0);
+    },
     Total() {
-      return (this.form.total = this.Subtotal + this.Tax);
+      let Total = this.Subtotal + this.Tax;
+      this.form.total = Total - this.form.discount;
+      return this.form.total;
     },
   },
 };

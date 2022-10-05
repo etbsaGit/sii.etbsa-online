@@ -90,6 +90,12 @@ export const sales = [
         props: true,
       },
       {
+        path: "tracking/stat",
+        name: "tracking.stat",
+        component: require("@admin/sales/statTracking/Index").default,
+        props: true,
+      },
+      {
         path: "charts",
         name: "charts.index",
         component: require("@admin/sales/charts/Index").default,

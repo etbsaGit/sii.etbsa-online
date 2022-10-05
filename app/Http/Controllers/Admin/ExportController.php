@@ -10,10 +10,12 @@ use App\Components\Marketing\Repositories\MarketingRepository;
 use App\Components\Tracking\Repositories\TrackingRepository;
 use App\Components\Gps\Repositories\GpsChipsRepository;
 use App\Components\Gps\Repositories\GpsGroupRepository;
+use App\Components\Purchase\Repositories\SupplierRepository;
 use App\Exports\GpsChipExport;
 use App\Exports\GpsExport;
 use App\Exports\GpsGroupExport;
 use App\Exports\MarketingExport;
+use App\Exports\SupplierExport;
 use App\Exports\TrackingExport;
 
 class ExportController extends AdminController
@@ -26,6 +28,7 @@ class ExportController extends AdminController
     private $gpsGroupRepository;
     private $marketingRepository;
     private $trackingRepository;
+    private $supplierRepository;
 
     /**
      * FileGroupController constructor.
@@ -36,7 +39,8 @@ class ExportController extends AdminController
         MarketingRepository $marketingRepository,
         TrackingRepository $trackingRepository,
         GpsChipsRepository $gpsChipsRepository,
-        GpsGroupRepository $gpsGroupRepository
+        GpsGroupRepository $gpsGroupRepository,
+        SupplierRepository $supplierRepository
 
     ) {
         $this->gpsRepository = $gpsRepository;
@@ -44,6 +48,7 @@ class ExportController extends AdminController
         $this->gpsGroupRepository = $gpsGroupRepository;
         $this->marketingRepository = $marketingRepository;
         $this->trackingRepository = $trackingRepository;
+        $this->supplierRepository = $supplierRepository;
     }
 
     /**
@@ -83,5 +88,12 @@ class ExportController extends AdminController
         $data = $this->trackingRepository->listTracking($request->all());
 
         return Excel::download(new TrackingExport($data), 'tracking.xlsx');
+    }
+
+    public function exportSupplier(Request $request)
+    {
+        $data = $this->supplierRepository->list($request->all());
+
+        return Excel::download(new SupplierExport($data), 'supplier.xlsx');
     }
 }

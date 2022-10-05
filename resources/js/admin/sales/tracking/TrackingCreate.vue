@@ -2,20 +2,20 @@
   <v-card>
     <v-card-title class="grey lighten-4">
       <v-icon left>mdi-file</v-icon> Levantar un Seguimiento
-      <v-spacer></v-spacer>
-      <v-btn :disabled="!valid" color="primary" @click="save">
+
+      <!-- <v-btn :disabled="!valid" color="primary" @click="save">
         Guardar
-      </v-btn>
+      </v-btn> -->
     </v-card-title>
     <v-divider></v-divider>
     <v-card-text>
       <tracking-form ref="form" :form.sync="form"></tracking-form>
     </v-card-text>
-    <!-- <v-card-actions>
-      <v-btn :disabled="!valid" color="primary" @click="save">
+    <v-card-actions>
+      <v-btn :disabled="!valid" color="primary" @click="save" block dark>
         Crear Seguimiento
       </v-btn>
-    </v-card-actions> -->
+    </v-card-actions>
   </v-card>
 </template>
 

@@ -67,11 +67,16 @@ class PurchaseOrder extends Model
 
     public function invoice()
     {
-        return $this->morphOne(Invoice::class, 'invoiceable');
+        return $this->morphMany(Invoice::class, 'invoiceable');
     }
     public function ship()
     {
         return $this->belongsTo(Agency::class, 'agency_id');
+    }
+
+    public function purchase_concept()
+    {
+        return $this->belongsTo(PurchaseConcept::class, 'purchase_concept_id');
     }
 
     /**

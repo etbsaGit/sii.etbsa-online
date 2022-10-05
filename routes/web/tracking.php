@@ -6,8 +6,10 @@ Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function
     Route::get('tracking/sales_history/resources', 'TrackingProspectController@resources')->name('trackingResources');
     Route::put('tracking/historical/{id}', 'TrackingProspectController@addHistoricalTracking')->name('tracking.addHistoricalTracking');
     Route::put('tracking/resetToActive/{id}', 'TrackingProspectController@resetToActive')->name('tracking.resetToActive');
+    Route::put('tracking/associateCustomer/{id}', 'TrackingProspectController@associateCustomer')->name('tracking.associateCustomer');
     Route::get('tracking/historical/diary', 'TrackingProspectController@diaryTrackings')->name('tracking.diary');
     Route::get('tracking-export', 'ExportController@exportTracking')->name('trackingExport');
+    Route::get('tracking/{trackingProspect}/resources/print', 'TrackingProspectController@print')->name('trackingProspect.print');
     // Route::put('tracking/assignSeller/{id}', 'TrackingProspectController@assignSeller')->name('trackingAssignSeller');
     // Route::post('tracking/message', 'MessageTrackingController@store')->name('message.tracking.store');
     // Route::get('tracking/messages/{tracking}', 'MessageTrackingController@getMessagesTracking')->name('message.tracking.getMessagesTracking');

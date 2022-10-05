@@ -24,7 +24,7 @@ class TrackingRepository extends BaseRepository
         return $this->get(
             $params,
             [
-                'estatus', 'prospect:id,full_name,company',
+                'estatus', 'prospect:id,full_name,company,phone',
                 'agency:id,title',
                 'department:id,title',
                 'attended.profiable:id,name,last_name,agency_id',

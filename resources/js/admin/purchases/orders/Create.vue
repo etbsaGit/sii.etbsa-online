@@ -10,7 +10,7 @@
         <v-row dense>
           <v-col cols="12" md="9">
             <v-card color="grey lighten-3" min-height="200">
-              <v-card-title class="pb-0">
+              <v-card-title class="pb-0 overline">
                 <v-autocomplete
                   v-model="form.supplier"
                   :items="options.suppliers"
@@ -35,6 +35,45 @@
                   </template>
                 </v-autocomplete>
               </v-card-title>
+              <v-card-title>Tipo de Orden de Compra</v-card-title>
+              <v-card-text class="pb-0">
+                <v-row dense>
+                  <v-col cols="12" md="4">
+                    <v-combobox
+                      v-model="form.purchase_concept"
+                      label="Concepto de Compra"
+                      :items="options.purchase_concept"
+                      :rules="[(v) => !!v || 'Es requerido']"
+                      item-value="id"
+                      item-text="name"
+                      outlined
+                      dense
+                    ></v-combobox>
+                  </v-col>
+                  <v-col cols="12" md="4">
+                    <v-select
+                      v-model="form.payment_condition"
+                      label="Condiciones de Pago"
+                      :items="options.payment_condition"
+                      :rules="[(v) => !!v || 'Es requerido']"
+                      outlined
+                      dense
+                    ></v-select>
+                  </v-col>
+                  <v-col cols="12" md="4">
+                    <v-select
+                      v-model="form.agency_id"
+                      label="Embarque a:"
+                      :items="options.agencies"
+                      :rules="[(v) => !!v || 'Es requerido']"
+                      item-value="id"
+                      item-text="title"
+                      outlined
+                      dense
+                    ></v-select>
+                  </v-col>
+                </v-row>
+              </v-card-text>
               <v-card-title class="pt-0">
                 Articulos
                 <v-spacer></v-spacer>
@@ -87,41 +126,30 @@
               </v-card-actions>
             </v-card>
             <v-card flat>
-              <v-card-title>Otros Datos</v-card-title>
-              <v-card-text class="pb-0">
+              <!-- <v-card-title>Otros Datos</v-card-title> -->
+              <!-- <v-card-text class="pb-0">
                 <v-row dense>
                   <v-col cols="12" md="4">
                     <v-combobox
-                      v-model="form.reason"
+                      v-model="form.purchase_concept"
                       label="Concepto de Compra"
-                      :items="[
-                        'COMPRA DE MAQUINARIA DIVERSA',
-                        'COMPRA DE LLANTAS PARA VENTA',
-                        'SERVICIO DE MANTENIMIENTO',
-                        'COMPRA DE LLANTAS PARA UNIDADES',
-                        'SANITIZACION',
-                        'REFACCIONES',
-                        'PUBLICIDAD',
-                        'PAPELERIA',
-                        'LIMPIEZA',
-                        'IMPRENTA',
-                        'RIEGO',
-                        'SEGUROS',
-                        'STOCK',
-                      ]"
+                      :items="options.purchase_concept"
                       :rules="[(v) => !!v || 'Es requerido']"
+                      item-value="id"
+                      item-text="name"
                       outlined
                       dense
                     ></v-combobox>
                   </v-col>
                   <v-col cols="12" md="4">
-                    <v-text-field
+                    <v-select
                       v-model="form.payment_condition"
                       label="Condiciones de Pago"
+                      :items="options.payment_condition"
                       :rules="[(v) => !!v || 'Es requerido']"
                       outlined
                       dense
-                    ></v-text-field>
+                    ></v-select>
                   </v-col>
                   <v-col cols="12" md="4">
                     <v-select
@@ -136,19 +164,36 @@
                     ></v-select>
                   </v-col>
                 </v-row>
-              </v-card-text>
-              <v-card-title>Observaciones</v-card-title>
-              <v-card-text class="overline">
-                <v-textarea
-                  v-model="form.observation"
-                  outlined
-                  filled
-                  placeholder="Describir a quien van dirigidos los Productos o servicios"
-                  hint="Justificacion de la compra*"
-                  :rules="[(v) => !!v || 'Es requerido']"
-                  persistent-hint
-                ></v-textarea>
-              </v-card-text>
+              </v-card-text> -->
+              <v-row dense>
+                <v-col cols="12" md="6">
+                  <v-card-title>Observaciones</v-card-title>
+                  <v-card-text class="overline">
+                    <v-textarea
+                      v-model="form.observation"
+                      outlined
+                      filled
+                      placeholder="Describir a quien van dirigidos los Productos o servicios"
+                      hint="Justificacion de la compra*"
+                      :rules="[(v) => !!v || 'Es requerido']"
+                      persistent-hint
+                    ></v-textarea>
+                  </v-card-text>
+                </v-col>
+                <v-col cols="12" md="6">
+                  <v-card-title>Nota a Proveedor</v-card-title>
+                  <v-card-text class="overline">
+                    <v-textarea
+                      v-model="form.note"
+                      outlined
+                      filled
+                      placeholder="Describir a quien van dirigidos los Productos o servicios"
+                      hint="Nota que ira en la OC para conocimiento del proveedor*"
+                      persistent-hint
+                    ></v-textarea>
+                  </v-card-text>
+                </v-col>
+              </v-row>
             </v-card>
           </v-col>
           <v-col cols="12" md="3">
@@ -177,9 +222,11 @@
               </v-card-title>
               <v-card-text class="px-0">
                 <purchase-invoice-table
+                  v-if="form.purchase_concept"
                   :dialogForm="dialogConfigInvoice"
                   @close="dialogConfigInvoice = false"
                   :form.sync="form.invoice"
+                  :usocfdi.sync="form.purchase_concept.usocfdi"
                 ></purchase-invoice-table>
               </v-card-text>
               <v-card-title>Resumen</v-card-title>
@@ -190,7 +237,7 @@
                 ></purchase-amounts-table>
               </v-card-text>
               <v-card-actions>
-                <v-btn block color="blue" @click="createPurchase">
+                <v-btn block color="blue" @click="createPurchase" dark>
                   Crear OC
                 </v-btn>
               </v-card-actions>
@@ -225,7 +272,7 @@ export default {
         { key: "description", label: "Descripcion" },
         { key: "unit", label: "Unidad" },
         { key: "price", label: "Precio" },
-        { key: "tax", label: "Impuesto" },
+        { key: "discount", label: "Descuento" },
       ],
       dialogConcepts: false,
       dialogAddCharge: false,
@@ -244,6 +291,8 @@ export default {
         amounts: {
           subtotal: 0,
           tax: 0,
+          discount: 0,
+          with_tax: false,
           total: 0,
         },
         check_tax: false,
@@ -251,14 +300,38 @@ export default {
         supplier: {},
         estatus: { title: "Pendiente" },
         estatus_id: null,
-        reason: null,
+        purchase_concept: null,
         deliver_date: new Date().toISOString().substr(0, 10),
-        payment_condition: "30 dias",
+        payment_condition: 30,
         agency_id: null,
+        note: "",
+        observation: "",
       },
       options: {
         suppliers: [],
         agencies: [],
+        payment_condition: [
+          { text: "8 Dias", value: 8 },
+          { text: "15 Dias", value: 15 },
+          { text: "30 Dias", value: 30 },
+          { text: "60 Dias", value: 60 },
+          { text: "90 Dias", value: 90 },
+        ],
+        purchase_concept: [
+          // "COMPRA DE MAQUINARIA DIVERSA",
+          // "COMPRA DE LLANTAS PARA VENTA",
+          // "SERVICIO DE MANTENIMIENTO",
+          // "COMPRA DE LLANTAS PARA UNIDADES",
+          // "SANITIZACION",
+          // "REFACCIONES",
+          // "PUBLICIDAD",
+          // "PAPELERIA",
+          // "LIMPIEZA",
+          // "IMPRENTA",
+          // "RIEGO",
+          // "SEGUROS",
+          // "STOCK",
+        ],
       },
     };
   },
@@ -299,10 +372,13 @@ export default {
         uso_cfdi: _this.form.invoice.uso_cfdi_id,
         forma_pago: _this.form.invoice.forma_pago_id,
         payment_condition: _this.form.payment_condition,
-        reason: _this.form.reason,
+        purchase_concept_id: _this.form.purchase_concept.id,
         observation: _this.form.observation,
+        note: _this.form.note,
         agency_id: _this.form.agency_id,
         subtotal: _this.form.amounts.subtotal,
+        discount: _this.form.amounts.discount,
+        with_tax: _this.form.amounts.with_tax,
         tax: _this.form.amounts.tax,
         total: _this.form.amounts.total,
       };
@@ -338,9 +414,10 @@ export default {
       await axios
         .get("/admin/purchase-order/resources/options")
         .then(function (response) {
-          let { suppliers, agencies } = response.data.data;
+          let { suppliers, agencies, purchase_concept } = response.data.data;
           _this.options.suppliers = suppliers;
           _this.options.agencies = agencies;
+          _this.options.purchase_concept = purchase_concept;
         });
     },
     save() {
@@ -381,16 +458,16 @@ export default {
           return {
             name: item.name || "",
             description: item.description || "",
-            unit: item.unit || "pz",
+            unit: item.unit || "H87",
             quantity: 1,
             price: item.price || 0,
-            tax: item.tax || 0,
+            discount: item.discount || 0,
           };
         })
       );
       _this.$store.commit("showDialog", {
         type: "accept",
-        icon: "success",
+        icon: "mdi-import",
         title: "Articulos Importados",
         message: "Articulos Cargados Correctamente ",
       });
@@ -402,7 +479,7 @@ export default {
     loadImportCatch(response) {
       this.$store.commit("showDialog", {
         type: "accept",
-        icon: "warning",
+        icon: "mdi-alert",
         title: "Error CSV",
         message: "Ocurrio un error al importar CSV ",
       });

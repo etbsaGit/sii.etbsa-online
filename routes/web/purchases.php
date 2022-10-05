@@ -20,7 +20,14 @@ Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function
 
     // SUPPLIER
     Route::resource('suppliers', 'SupplierController');
+    Route::get('supplier-export', 'ExportController@exportSupplier')->name('supplierExport');
 
     // PURCHASE INVOICE
     Route::get('purchase-invoice', 'PurchaseInvoiceController@index')->name('purchase-invoice.index');
+    Route::post('purchase-invoice/date_to_payment/{invoice}', 'PurchaseInvoiceController@updateDateToPayment')->name('purchase-invoice.updateDateToPayment');
+    Route::post('purchase-invoice/date_payment/{invoice}', 'PurchaseInvoiceController@updateDatePayment')->name('purchase-invoice.updateDatePayment');
+
+    // PURCHASE CONCEPTS
+    Route::resource('purchase-concept', 'PurchaseConceptController');
+    Route::put('purchase-concept/{purchaseConcept}/update-uso-cfdi', 'PurchaseConceptController@updateUsoCfdi')->name('purchase-concept.updateUsoCfdi');
 });

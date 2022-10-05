@@ -186,7 +186,7 @@
           width="324px"
         >
           <template v-slot:activator="{ on, attrs }">
-            <v-btn color="pink" v-bind="attrs" v-on="on" class="ml-2">
+            <v-btn color="pink" v-bind="attrs" v-on="on" class="ml-2" dark>
               {{
                 date_to_payment
                   ? `Se Pagara(n) el: ${$appFormatters.formatDate(
@@ -293,6 +293,7 @@
                   v-for="(tag, index) in item.invoiceable.charges"
                   :key="`${tag.agency}-${index}`"
                   class="overline"
+                  dark
                 >
                   {{ tag.agency }} - {{ tag.department }} - {{ tag.percent }}%
                 </v-chip>
@@ -357,7 +358,7 @@ export default {
         fixed: true,
         sortable: false,
       },
-      { text: "Concepto", value: "invoiceable.reason" },
+      { text: "Concepto", value: "invoiceable.purchase_concept.name" },
       // {
       //   text: "Productos",
       //   value: "invoiceable.concepts.length",
@@ -526,6 +527,7 @@ export default {
             }
           });
       });
+      _this.selected = [];
     },
   },
   watch: {
