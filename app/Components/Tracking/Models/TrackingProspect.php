@@ -8,6 +8,7 @@ use App\Components\Common\Models\Message;
 use App\Components\User\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use App\Components\Core\Utilities\Helpers;
+use App\Components\Customers\Models\Customers;
 
 class TrackingProspect extends Model
 {
@@ -16,7 +17,7 @@ class TrackingProspect extends Model
 
     protected $fillable = [
         'title', 'reference', 'description_topic', 'price', 'currency', 'currency_id',
-        'category_id', 'registered_by', 'prospect_id', 'estatus_id', 'assigned_by', 'attended_by',
+        'category_id', 'registered_by', 'prospect_id', 'customer_id', 'estatus_id', 'assigned_by', 'attended_by',
         'agency_id', 'department_id',  'first_contact', 'assertiveness', 'tracking_condition', 'invoice',
         'date_next_tracking', 'date_lost_sale', 'date_won_sale', 'date_invoice'
     ];
@@ -46,6 +47,10 @@ class TrackingProspect extends Model
     public function prospect()
     {
         return $this->belongsTo(Prospect::class, 'prospect_id');
+    }
+    public function customer()
+    {
+        return $this->belongsTo(Customers::class, 'customer_id');
     }
 
     public function agency()
@@ -136,7 +141,7 @@ class TrackingProspect extends Model
     public function scopeFilterByDateRange($query, $rangeDates = [], $estatus = null)
     {
         $searchBy = 'updated_at';
-        if ($estatus == 'finlizado') {
+        if ($estatus == 'finalizado') {
             $searchBy = 'date_lost_sale';
         } else if ($estatus == 'formalizado') {
             $searchBy = 'date_won_sale';

@@ -15,5 +15,5 @@ Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function
 
     Route::post('vehicle-ticket-card/reset', 'VehicleTicketCardController@resetBalance')->name('vehcile.ticker-cards.reset');
     Route::post('vehicle-dispersal/{id}/estatus', 'VehicleDispersalController@changeEstatus')->name('dispersal.change.estatus');
-    Route::post('vehicle-services/{id}/estatus', 'VehicleServiceController@changeEstatus')->name('dispersal.change.estatus');
+    Route::post('vehicle-services/{id}/estatus', 'VehicleServiceController@changeEstatus')->name('vehicle-service.changeEstatus');
 });

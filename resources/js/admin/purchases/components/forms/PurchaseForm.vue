@@ -54,13 +54,14 @@
               </v-menu>
             </v-col>
             <v-col cols="12" md="6">
-              <v-text-field
+              <v-select
                 v-model="form.payment_condition"
                 label="condicion de pago:"
                 outlined
                 :rules="[(v) => !!v || 'Es Requerido']"
+                :items="['8 Dias', '15 Dias', '30 Dias', '60 Dias', '90 Dias']"
                 dense
-              ></v-text-field>
+              ></v-select>
             </v-col>
             <v-subheader>Datos Facturacion</v-subheader>
             <v-row dense>

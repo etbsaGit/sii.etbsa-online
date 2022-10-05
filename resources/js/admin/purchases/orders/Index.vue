@@ -323,7 +323,7 @@ export default {
         fixed: true,
         sortable: false,
       },
-      { text: "Concepto Compra", value: "reason", width: 200 },
+      { text: "Concepto Compra", value: "purchase_concept.name", width: 200 },
       {
         text: "Articulos",
         value: "concepts.length",

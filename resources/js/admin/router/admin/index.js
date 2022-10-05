@@ -6,6 +6,8 @@ import { purchases } from "@admin/router/admin/purchases";
 import { system } from "@admin/router/admin/system";
 import { rrhh } from "@admin/router/admin/rrhh";
 import { customers } from "@admin/router/admin/customers";
+import { nt } from "@admin/router/admin/nt";
+import { products } from "@admin/router/admin/products";
 
 export const admin = [
   ...sales,
@@ -16,4 +18,6 @@ export const admin = [
   ...system,
   ...rrhh,
   ...customers,
+  ...nt,
+  ...products
 ];

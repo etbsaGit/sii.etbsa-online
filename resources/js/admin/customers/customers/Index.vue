@@ -70,7 +70,7 @@
         closeable
         :fullscreen="$vuetify.breakpoint.mobile"
         :title="`Registrar Cliente`"
-        max-width="500"
+        max-width="600"
       >
         <create-customer @cancel="dialogCreate = false"></create-customer>
       </dialog-component>

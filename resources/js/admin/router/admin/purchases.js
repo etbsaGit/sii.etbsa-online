@@ -40,6 +40,11 @@ export const purchases = [
         name: "purchase.invoice.list",
         component: require("@admin/purchases/invoices/Index").default,
       },
+      {
+        path: "purchase-concepts",
+        name: "purchase.concepts.index",
+        component: require("@admin/purchases/concepts/Index").default,
+      },
     ],
   },
 ];

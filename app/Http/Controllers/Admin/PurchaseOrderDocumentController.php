@@ -37,7 +37,7 @@ class PurchaseOrderDocumentController extends AdminController
         $purchaseOrder->estatus()->associate($estatus);
         $purchaseOrder->save();
         // Enviar Notificacion
-        $purchaseOrder->elaborated->notify(new PurchaseOrderUpdatedNotification($purchaseOrder->refresh()));
+        // $purchaseOrder->elaborated->notify(new PurchaseOrderUpdatedNotification($purchaseOrder->refresh()));
         return $this->sendResponseOk($document, "Add document to Purchase Order");
     }
     public function destroy(Document $document)

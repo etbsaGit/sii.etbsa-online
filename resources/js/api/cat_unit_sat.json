@@ -1,0 +1,117 @@
+[
+  {
+    "type": "Multiplos / Fracciones / Decimales",
+    "key": "H87",
+    "name": "Pieza"
+  },
+  {
+    "type": "Unidades de venta",
+    "key": "EA",
+    "name": "Elemento"
+  },
+  {
+    "type": "Unidades especificas de la industria (varias)",
+    "key": "E48",
+    "name": "Unidad de Servicio"
+  },
+  {
+    "type": "Unidades de venta",
+    "key": "ACT",
+    "name": "Actividad"
+  },
+  {
+    "type": "Mecanica",
+    "key": "KGM",
+    "name": "Kilogramo"
+  },
+  {
+    "type": "Unidades especificas de la industria (varias)",
+    "key": "E51",
+    "name": "Trabajo"
+  },
+  {
+    "type": "Diversos",
+    "key": "A9",
+    "name": "Tarifa"
+  },
+  {
+    "type": "Tiempo y Espacio",
+    "key": "MTR",
+    "name": "Metro"
+  },
+  {
+    "type": "Diversos",
+    "key": "AB",
+    "name": "Paquete a granel"
+  },
+  {
+    "type": "Unidades especificas de la industria (varias)",
+    "key": "BB",
+    "name": "Caja base"
+  },
+  {
+    "type": "Unidades de venta",
+    "key": "KT",
+    "name": "Kit"
+  },
+  {
+    "type": "Unidades de venta",
+    "key": "SET",
+    "name": "Conjunto"
+  },
+  {
+    "type": "Tiempo y Espacio",
+    "key": "LTR",
+    "name": "Litro"
+  },
+  {
+    "type": "Unidad de empaque",
+    "key": "XBX",
+    "name": "Caja"
+  },
+  {
+    "type": "Tiempo y Espacio",
+    "key": "MON",
+    "name": "Mes"
+  },
+  {
+    "type": "Tiempo y Espacio",
+    "key": "HUR",
+    "name": "Hora"
+  },
+  {
+    "type": "Tiempo y Espacio",
+    "key": "MTK",
+    "name": "Metro cuadrado"
+  },
+  {
+    "type": "Diversos",
+    "key": "11",
+    "name": "Equipos"
+  },
+  {
+    "type": "Mecanica",
+    "key": "GRM",
+    "name": "Gramo"
+  },
+  {
+    "type": "Números enteros / Números / Ratios",
+    "key": "PR",
+    "name": "PAR"
+  },
+  { "type": "Unidades de venta", "key": "DPC", "name": "Docenas de piezas" },
+  { "type": "Unidades de empaque", "key": "xun", "name": "Unidad" },
+  {
+    "type": "Tiempo y Espacio",
+    "key": "DAY",
+    "name": "Día"
+  },
+  { "type": "Unidades de empaque", "key": "XLT", "name": "Lote" },
+  { "type": "Diversos", "key": "10", "name": "Grupos" },
+  { "type": "Tiempo y Espacio", "key": "MLT", "name": "Mililitro" },
+  {
+    "type": "Unidades específicas de la industria (varias)",
+    "key": "E54",
+    "name": "Viaje"
+  }
+]

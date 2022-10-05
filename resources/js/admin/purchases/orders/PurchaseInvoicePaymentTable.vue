@@ -144,22 +144,6 @@
                     dense
                   ></v-text-field>
                 </v-col>
-                <!-- <v-col cols="12" md="6">
-                  <v-text-field
-                    dense
-                    outlined
-                    type="date"
-                    label="Fecha programacion de pago"
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="12" md="6">
-                  <v-text-field
-                    dense
-                    outlined
-                    type="date"
-                    label="Fecha de pago"
-                  ></v-text-field>
-                </v-col> -->
               </v-row>
             </v-form>
           </v-container>

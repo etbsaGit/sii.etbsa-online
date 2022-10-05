@@ -41,7 +41,7 @@
             border: 0px solid #eee;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
             font-size: 10pt;
-            line-height: 12px;
+            line-height: normal;
             font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;
             color: rgb(27, 27, 27);
         }
@@ -74,6 +74,7 @@
 
         .invoice-box table tr.information table td {
             padding-bottom: 18px;
+            font-size: 8pt;
         }
 
         .invoice-box table tr.heading td {
@@ -122,7 +123,6 @@
                 text-align: center;
             }
         }
-
     </style>
     {{-- Header Footer styiling --}}
     <style type="text/css">
@@ -140,8 +140,8 @@
             left: 0px;
             top: -120px;
             right: 0px;
-            height: 100px;
-            background-color: #ddd;
+            height: 40vh;
+            /* background-color: #ddd; */
             text-align: center;
             justify-content: center;
         }
@@ -208,7 +208,7 @@
 
         .swiss {
             max-width: 300px;
-            opacity: 0.2;
+            opacity: 0.07;
         }
 
         .full-height {
@@ -228,21 +228,20 @@
         .position-ref {
             position: relative;
         }
-
     </style>
 </head>
 
 <body>
 
     <header>
-        <div class="title">EQUIPOS Y TRACTORES DEL BAJIO , S.A. DE C.V</div>
+        {{-- <div class="title">EQUIPOS Y TRACTORES DEL BAJIO , S.A. DE C.V</div>
         <div>Carretera Panamericana Celaya - Salamanca Km. 61</div>
         <div>1ra Fracc. crespo C.P. 38120 Celaya, Gto.</div>
         <div>Tel. 461-614-23-23, 461-614-23-24, 461-614-23-25</div>
-        <div class="subtitle">R.F.C.: ETB-860812-I23</div>
+        <div class="subtitle">R.F.C.: ETB-860812-I23</div> --}}
         <div class="flex-center position-ref full-height">
             <div class="content">
-                <div class="title m-b-md align-center" style="margin-top: 200px">
+                <div class="title m-b-md align-center" style="margin-top: 550px">
                     <img class="swiss" src="{{ url('img/etbsa-logo-agricola.png') }}">
                     <img class="swiss" src="{{ url('img/etbsa-logo-construccion.png') }}">
                 </div>
@@ -266,15 +265,19 @@
         </table>
     </footer>
     <div class="invoice-box">
-        <table>
+        <table cellpadding="0" cellspacing="0">
             <tr class="top">
                 <td colspan="6">
                     <table>
                         <tr>
-                            <td style="max-width: 100px">
-                                {{-- Sucursal ETBSA : {{ $data->sucursal->title }}<br /> --}}
-                                {{-- Domicilio: {{ $data->sucursal->address }}<br /> --}}
+                            <td class="title">
+                                <img src="{{ public_path() . '/img/etbsa-logo-agricola.png' }}"
+                                    style="width: 100%; max-width: 125px; height: 60px;" />
                             </td>
+                            {{-- <td style="max-width: 100px">
+                                Sucursal ETBSA : {{ $data->sucursal->title }}<br />
+                                Domicilio: {{ $data->sucursal->address }}<br />
+                            </td> --}}
                             <td>
                                 ORDEN DE COMPRA: # {{ str_pad($data->id, 5, '0', STR_PAD_LEFT) }}<br />
                                 Fecha: {{ $data->updated_at }}<br />
@@ -289,11 +292,14 @@
                     <table>
                         <tr>
                             <td>
-                                Proveedor:<br />
-                                RFC:<br />
-                                Email:
+                                Equipos y Tractores del Bajio SA de CV<br />
+                                Carr. Panamericana Celaya - Salamanca Km. 61<br />
+                                1ra Fracc. crespo C.P. 38120 Celaya, Gto.<br />
+                                R.F.C.: ETB-860812-I23
                             </td>
+
                             <td>
+                                Proveedor:<br />
                                 {{ $data->supplier->business_name }}<br />
                                 {{ $data->supplier->rfc }}<br />
                                 {{ $data->supplier->email }}
@@ -329,9 +335,9 @@
                 <td>Producto</td>
                 <td>Cantidad</td>
                 <td>unidad</td>
-                <td style="text-align: right">precio unit.</td>
-                <td style="text-align: right">iva</td>
-                <td style="text-align: right">importe</td>
+                <td>precio unit.</td>
+                <td>Descuento</td>
+                <td>importe</td>
 
             </tr>
             @foreach ($data->concepts as $concept)
@@ -347,17 +353,19 @@
                         </div>
                     </td>
                     <td style="text-align: left;">
-                        {{ $concept['quantity'] }}</td>
+                        {{ $concept['quantity'] }}
+                    </td>
                     <td style="text-align: left;">
-                        {{ $concept['unit'] }}</td>
+                        {{ $concept['unit'] }}
+                    </td>
                     <td style="text-align: right">
                         {{ '$ ' . number_format($concept['price'], 2, '.', ',') }}
                     </td>
                     <td style="text-align: right">
-                        {{ number_format($concept['tax'] ?? 0, 2, '.', ',') . ' %' }}
+                        {{ '$ ' . number_format($concept['discount'] ?? 0, 2, '.', ',') . '' }}
                     </td>
                     <td style="text-align: right">
-                        {{ '$ ' . number_format($concept['quantity'] * $concept['price'], 2, '.', ',') }}
+                        {{ '$ ' . number_format($concept['quantity'] * $concept['price'] - $concept['discount'], 2, '.', ',') }}
                     </td>
                 </tr>
             @endforeach
@@ -372,6 +380,10 @@
                 </td>
             </tr>
             <tr class="total" style="text-align: right">
+                <td colspan="4">Descuento: </td>
+                <td colspan="2">{{ '$ ' . number_format($data->discount, 2, '.', ',') }}</td>
+            </tr>
+            <tr class="total" style="text-align: right">
                 <td colspan="4">IVA: </td>
                 <td colspan="2">{{ '$ ' . number_format($data->tax, 2, '.', ',') }}</td>
             </tr>
@@ -380,6 +392,25 @@
                 <td colspan="2">{{ '$ ' . number_format($data->total, 2, '.', ',') }}</td>
             </tr>
         </table>
+        <table>
+            {{-- <tr class="heading">
+                <td>Observacion</td>
+                <td colspan="5"></td>
+            </tr>
+            <tr class="details">
+                <td colspan="6" style="text-align: left">{{ $data->observation }} </td>
+            </tr> --}}
+            <tr class="heading">
+                <td>Nota</td>
+                <td colspan="5"></td>
+            </tr>
+            <tr class="details">
+                <td colspan="6" style="text-align: left">{{ $data->note }} </td>
+            </tr>
+        </table>
+    </div>
+
+    </div>
     </div>
     {{-- <p style="page-break-before: always;">
         Podemos romper la página en cualquier momento...</p>

@@ -197,20 +197,16 @@
     </template>
 
     <template #[`item.fuel_odometer`]="{ value }">
-      <v-progress-linear v-if="value" :value="value" height="25">
+      <v-progress-linear v-if="value" :value="value" height="25" dark>
         <strong>{{ value }}%</strong>
       </v-progress-linear>
       <v-icon v-else color="grey">mdi-fuel</v-icon>
     </template>
     <template #[`item.responsable`]="{ item }">
-      <small
-        v-if="item.responsable"
-        class="d-block font-weight-semibold text-truncate"
-      >
-        {{ item.responsable.profiable.full_name }}
-      </small>
       <v-edit-dialog
-        v-else-if="$gate.allow('canAsignar', 'vehicles')"
+        v-if="
+          $gate.allow('canAsignar', 'vehicles') && item.responsable === null
+        "
         large
         persistent
         save-text="asignar"
@@ -234,6 +230,12 @@
           </v-form>
         </template>
       </v-edit-dialog>
+      <small
+        v-else-if="item.responsable"
+        class="d-block font-weight-semibold text-truncate"
+      >
+        {{ item.responsable.name }}
+      </small>
     </template>
 
     <template #[`item.ticket.account_balance`]="{ value }">

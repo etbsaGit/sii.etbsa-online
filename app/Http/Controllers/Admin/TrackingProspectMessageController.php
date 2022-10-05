@@ -32,9 +32,9 @@ class TrackingProspectMessageController extends AdminController
         // Enviar Notificacion
         $recipient = User::find($request['recipient_id']);
         // if ($recipient->id != auth()->id()) {
-        $recipient->notify(
-            new MessageNotification($message, auth()->user())
-        );
+        // $recipient->notify(
+        //     new MessageNotification($message, auth()->user())
+        // );
         // }
 
         return $this->sendResponseOk($message, "Add Message to Tracking");

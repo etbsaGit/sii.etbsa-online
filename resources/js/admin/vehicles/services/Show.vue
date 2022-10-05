@@ -85,22 +85,25 @@
       <v-btn text color="error" @click="changeEstatus('denegar')">
         Denegar
       </v-btn>
-      <v-btn text color="orange" @click="changeEstatus('flotilla.dispersado')">
+      <!-- <v-btn text color="orange" @click="changeEstatus('flotilla.dispersado')">
         Dispersado
-      </v-btn>
+      </v-btn> -->
     </v-card-actions>
 
     <dialog-confirm
       :show="dialog"
       :max-width="500"
-      @close="dialog = false"
-      @agree="dialog = false"
+      @close="updateEstatus(), (dialog = false)"
+      @agree="updateEstatus(), (dialog = false)"
     >
       <template #title>
         Confirmar Accion.
       </template>
       <template #body>
-        <pre> {{ service.estatus_key }} </pre>
+        <v-card-text>
+          La Solicitud de Servicio cambaira a estatus:
+          <v-chip outlined> {{ service.estatus_key }} </v-chip>
+        </v-card-text>
       </template>
     </dialog-confirm>
   </v-card>
@@ -226,6 +229,23 @@ export default {
       const _this = this;
       _this.service.estatus_key = key;
       _this.dialog = true;
+    },
+    async updateEstatus() {
+      const _this = this;
+      let payload = {
+        estatus_key: _this.service.estatus_key,
+      };
+      await axios
+        .post(`/admin/vehicle-services/${_this.serviceId}/estatus`, payload)
+        .then(function (response) {
+          _this.$store.commit("showSnackbar", {
+            message: response.data.message,
+            color: "success",
+            duration: 3000,
+          });
+          _this.$eventBus.$emit("VEHICLE_REFRESH");
+          _this.dialog = false;
+        });
     },
   },
 };

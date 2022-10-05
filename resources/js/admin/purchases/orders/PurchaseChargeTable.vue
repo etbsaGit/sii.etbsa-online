@@ -19,6 +19,7 @@
                 style="max-width: 75px;"
                 small
                 label
+                dark
               >
                 {{ item.percent }} %
               </v-chip>
@@ -30,7 +31,7 @@
                 save-text="Guardar"
                 cancel-text="Cancelar"
               >
-                <v-chip small label color="blue" style="max-width: 75px;">
+                <v-chip small label color="blue" style="max-width: 75px;" dark>
                   {{ item.percent }} %
                 </v-chip>
 
@@ -203,6 +204,7 @@ export default {
       },
     };
   },
+ 
   methods: {
     editItem(item) {
       this.editedIndex = this.items.indexOf(item);

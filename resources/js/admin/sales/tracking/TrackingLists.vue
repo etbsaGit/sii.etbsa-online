@@ -190,6 +190,16 @@
               Calendario
               <v-icon small right>mdi-calendar-account</v-icon>
             </v-btn>
+            <v-btn
+              v-show="false"
+              @click="$router.push({ name: 'tracking.stat' })"
+              color="blue"
+              class="ma-2"
+              dark
+            >
+              Estadisticas
+              <v-icon small right>mdi-chart-arc</v-icon>
+            </v-btn>
           </v-card>
           <v-spacer></v-spacer>
           <v-divider class="mx-2" inset vertical></v-divider>
@@ -240,11 +250,11 @@
         >
           <tracking-create v-if="dialogs.create"></tracking-create>
         </dialog-component> -->
-        <v-dialog v-model="dialogs.create" fullscreen scrollable>
+        <v-dialog v-model="dialogs.create" scrollable max-width="600">
           <v-card flat>
-            <v-toolbar flat dense height="54">
+            <v-toolbar flat dense height="24">
               <v-spacer />
-              <v-icon color="red" @click="dialogs.create = false"
+              <v-icon small color="red" @click="dialogs.create = false"
                 >mdi-close</v-icon
               >
             </v-toolbar>
@@ -433,6 +443,17 @@
                 </v-list-item-icon>
                 <v-list-item-content>
                   <v-list-item-title>Regresar como Activo</v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+              <v-list-item
+                :href="`/admin/tracking/${item.id}/resources/print`"
+                target="_blank"
+              >
+                <v-list-item-icon>
+                  <v-icon class="blue--text" left>mdi-file-pdf-box</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-item-title>PDF</v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
             </v-list-item-group>
@@ -862,6 +883,16 @@ export default {
           });
           self.loadTrackings(() => {});
         });
+    },
+    print(id) {
+      const self = this;
+      axios.get(`/admin/tracking/${id}/resources/print`).then((res) => {
+        self.$store.commit("showSnackbar", {
+          message: response.data.message,
+          color: "success",
+          duration: 3000,
+        });
+      });
     },
   },
 };

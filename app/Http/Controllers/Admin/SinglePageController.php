@@ -126,6 +126,57 @@ class SinglePageController extends AdminController
             //     'visible' => true,
             // ]),
             new MenuItem([
+                'group_requirements' => ['Super User'],
+                'permission_requirements' => [],
+                'label' => 'NT',
+                'nav_type' => MenuItem::$NAV_TYPE_NAV,
+                'icon' => 'mdi-store',
+                'visible' => true,
+                'children' => [
+                    new MenuItem([
+                        'group_requirements' => ['Super User'],
+                        'permission_requirements' => [],
+                        'label' => 'Comparativos AMS',
+                        'nav_type' => MenuItem::$NAV_TYPE_NAV,
+                        'icon' => 'mdi-compare',
+                        'route_type' => 'vue',
+                        'route_name' => 'nt.comparative.list',
+                        'visible' => true,
+                    ]),
+                    new MenuItem([
+                        'group_requirements' => ['Super User'],
+                        'permission_requirements' => [],
+                        'label' => 'AMS Equipos',
+                        'nav_type' => MenuItem::$NAV_TYPE_NAV,
+                        'icon' => 'mdi-car',
+                        'route_type' => 'vue',
+                        'route_name' => 'nt.equipment.list',
+                        'visible' => true,
+                    ]),
+
+                ]
+            ]),
+            new MenuItem([
+                'group_requirements' => ['Super User'],
+                'permission_requirements' => [],
+                'label' => 'Productos',
+                'nav_type' => MenuItem::$NAV_TYPE_NAV,
+                'icon' => 'mdi-shape-outline',
+                'visible' => true,
+                'children' => [
+                    new MenuItem([
+                        'group_requirements' => ['Super User'],
+                        'permission_requirements' => [],
+                        'label' => 'Tractores',
+                        'nav_type' => MenuItem::$NAV_TYPE_NAV,
+                        'icon' => 'mdi-tractor-variant',
+                        'route_type' => 'vue',
+                        'route_name' => 'products.tractors.index',
+                        'visible' => true,
+                    ]),
+                ]
+            ]),
+            new MenuItem([
                 'group_requirements' => ['GERENTE', 'DIRECCION', 'Vendedor', 'Super User'],
                 'permission_requirements' => [],
                 'label' => 'Ventas',
@@ -176,7 +227,7 @@ class SinglePageController extends AdminController
                 ]
             ]),
             new MenuItem([
-                'group_requirements' => ['GERENTE', 'DIRECCION', 'Super User'],
+                'group_requirements' => ['DIRECCION', 'Super User'],
                 'permission_requirements' => [],
                 'label' => 'Historico Ventas',
                 'nav_type' => MenuItem::$NAV_TYPE_NAV,
@@ -243,26 +294,6 @@ class SinglePageController extends AdminController
                         'route_name' => 'purchase.invoice.list',
                         'visible' => true,
                     ]),
-                    // new MenuItem([
-                    //     'group_requirements' => ['Compras', 'Super User'],
-                    //     'permission_requirements' => [],
-                    //     'label' => 'Fac. por Pagar',
-                    //     'nav_type' => MenuItem::$NAV_TYPE_NAV,
-                    //     'icon' => 'mdi-file-clock',
-                    //     'route_type' => 'vue',
-                    //     'route_name' => 'purchase.list',
-                    //     'visible' => true,
-                    // ]),
-                    // new MenuItem([
-                    //     'group_requirements' => ['Compras', 'Super User'],
-                    //     'permission_requirements' => [],
-                    //     'label' => 'Fac. Pagadas',
-                    //     'nav_type' => MenuItem::$NAV_TYPE_NAV,
-                    //     'icon' => 'mdi-file-check',
-                    //     'route_type' => 'vue',
-                    //     'route_name' => 'purchase.list',
-                    //     'visible' => true,
-                    // ]),
                     new MenuItem([
                         'group_requirements' => ['Compras', 'Super User'],
                         'permission_requirements' => [],
@@ -271,6 +302,16 @@ class SinglePageController extends AdminController
                         'icon' => 'mdi-account-box-multiple-outline',
                         'route_type' => 'vue',
                         'route_name' => 'suppliers.list',
+                        'visible' => true,
+                    ]),
+                    new MenuItem([
+                        'group_requirements' => ['Compras', 'Super User'],
+                        'permission_requirements' => [],
+                        'label' => 'Conceptos Compras',
+                        'nav_type' => MenuItem::$NAV_TYPE_NAV,
+                        'icon' => 'mdi-account-box-multiple-outline',
+                        'route_type' => 'vue',
+                        'route_name' => 'purchase.concepts.index',
                         'visible' => true,
                     ]),
                 ]
@@ -285,7 +326,7 @@ class SinglePageController extends AdminController
                 'children' => [
                     new MenuItem([
                         'group_requirements' => ['Super User'],
-                        'permission_requirements' => [],
+                        'permission_requirements' => ['clientes.list'],
                         'label' => 'Lista Clientes',
                         'nav_type' => MenuItem::$NAV_TYPE_NAV,
                         'icon' => 'mdi-folder-multiple',

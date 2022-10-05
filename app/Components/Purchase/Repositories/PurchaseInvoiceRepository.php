@@ -24,11 +24,12 @@ class PurchaseInvoiceRepository extends BaseRepository
     public function list($params)
     {
         return $this->get($params, [
-            'invoiceable:id,created_by,concepts,charges,updated_by,estatus_id,supplier_id,reason',
+            'invoiceable:id,created_by,concepts,charges,updated_by,estatus_id,supplier_id,reason,purchase_concept_id',
             'invoiceable.supplier:id,business_name,rfc',
             'invoiceable.estatus:id,title,key',
             'invoiceable.elaborated.profiable:id,name,last_name,agency_id',
             'invoiceable.elaborated.profiable.agency:id,title',
+            'invoiceable.purchase_concept:id,name',
             // 'invoiceable.updated_by.profiable:id,name,last_name,agency_id',
             // 'invoiceable.updated_by.profiable.agency:id,title',
         ], function ($query) use ($params) {

@@ -9,6 +9,7 @@ use Auth;
 
 use App\Components\Purchase\Repositories\SupplierRepository;
 use App\Components\Purchase\Models\Supplier;
+use App\Exports\SupplierExport;
 use Illuminate\Validation\Rule;
 
 class SupplierController extends AdminController

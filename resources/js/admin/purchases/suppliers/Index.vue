@@ -24,7 +24,10 @@
         ></v-text-field>
         <v-divider class="mx-4" inset vertical></v-divider>
         <v-spacer></v-spacer>
-        <table-header-buttons :reloadTable="reloadTable"></table-header-buttons>
+        <table-header-buttons
+          :reloadTable="reloadTable"
+          :exportTable="exportTable"
+        ></table-header-buttons>
       </v-toolbar>
       <v-toolbar flat>
         <v-toolbar-title>Lista de Proveedores</v-toolbar-title>
@@ -178,6 +181,39 @@ export default {
           _this.totalItems = Response.total;
           _this.pagination.totalItems = Response.total;
           (cb || Function)();
+        });
+    },
+    exportTable() {
+      const _this = this;
+      let params = {
+        search: _this.search,
+        paginate: "no",
+      };
+      axios
+        .get("/admin/supplier-export", {
+          params: params,
+          responseType: "blob",
+        })
+        .then((res) => {
+          const url = window.URL.createObjectURL(new Blob([res.data]));
+          const link = document.createElement("a");
+          link.href = url;
+          link.setAttribute("download", "proveedores.xlsx"); //or any other extension
+          document.body.appendChild(link);
+          link.click();
+        })
+        .catch(function (error) {
+          if (error.response) {
+            _this.$store.commit("showSnackbar", {
+              message: error.response.data.message,
+              color: "error",
+              duration: 3000,
+            });
+          } else if (error.request) {
+            console.log(error.request);
+          } else {
+            console.log("Error", error.message);
+          }
         });
     },
   },
