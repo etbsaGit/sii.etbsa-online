@@ -29,7 +29,7 @@ class PurchaseInvoiceController extends AdminController
     {
         // $data = $this->purchaseInvoiceRepository->list(request()->all());
         $estatus = Estatus::where('key', Estatus::ESTATUS_POR_PAGAR)->first();
-        $updated = $invoice->update($request['date_to_paymnet']);
+        $updated = $invoice->update(['date_to_pay' => $request->date_to_pay]);
         if (!$updated) {
             return $this->sendResponseBadRequest("Error en la Actualizacion");
         }
@@ -37,7 +37,7 @@ class PurchaseInvoiceController extends AdminController
         $purchase_order = $invoice->invoiceable;
         $purchase_order->estatus()->associate($estatus);
         $purchase_order->save();
-        return $this->sendResponseOk($invoice, "list purchases invoices ok.");
+        return $this->sendResponseOk($invoice, "Factura(s) Programadas a Pago.");
     }
 
     public function updateDatePayment(Request $request, Invoice $invoice)

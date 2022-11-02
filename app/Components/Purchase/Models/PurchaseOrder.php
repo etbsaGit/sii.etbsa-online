@@ -10,6 +10,7 @@ use App\Components\Common\Models\Agency;
 use App\Components\Common\Models\CatFormaPago;
 use App\Components\Common\Models\CatMetodoPago;
 use App\Components\Common\Models\CatUsoCfdi;
+use App\Components\Common\Models\Department;
 use App\Components\Common\Models\Document;
 use App\Components\Common\Models\Message;
 use App\Components\Core\Utilities\Helpers;
@@ -79,6 +80,20 @@ class PurchaseOrder extends Model
         return $this->belongsTo(PurchaseConcept::class, 'purchase_concept_id');
     }
 
+    public function chargeAgency()
+    {
+        return $this->belongsToMany(Agency::class, 'purchase_agency_pivot_table', 'purchase_order_id')
+            ->withPivot('department_id', 'percent')
+            ->as('charge');
+    }
+
+    public function chargeDepartment()
+    {
+        return $this->belongsToMany(Department::class, 'purchase_agency_pivot_table', 'purchase_order_id')
+            ->withPivot('agency_id', 'percent')
+            ->as('charge');
+    }
+
     /**
      * serializes concept attribute on the fly before saving to database
      *
@@ -112,8 +127,37 @@ class PurchaseOrder extends Model
             return [];
         }
 
-        return unserialize($this->attributes['charges']);
+        // return unserialize($this->attributes['charges']);
+        $charges = unserialize($this->attributes['charges']);
+
+        return array_map(function ($item) {
+            return [
+                // 'agency' => Agency::find($item['agency_id'])->get(['id', 'code', 'title']),
+                // 'department' => Department::find($item['depto_id'])->get(['id', 'title']),
+                'agency' => \DB::table('agencies')->where('id', '=', $item['agency_id'])->get(['id', 'code', 'title'])->toArray()[0],
+                'department' => \DB::table('departments')->where('id', '=', $item['depto_id'])->get(['id', 'title'])->toArray()[0],
+                'percent' => $item['percent']
+            ];
+        }, $charges);
     }
+    // public function getChargeAttribute()
+    // {
+    //     if (empty($this->attributes['charges']) || is_null($this->attributes['charges'])) {
+    //         return [];
+    //     }
+
+    //     $charges = unserialize($this->attributes['charges']);
+
+    //     return array_map(function ($item) {
+    //         return [
+    //             // 'agency' => Agency::find($item['agency_id'])->get(['id', 'code', 'title']),
+    //             // 'department' => Department::find($item['depto_id'])->get(['id', 'title']),
+    //             'agency' => \DB::table('agencies')->where('id', '=', $item['agency_id'])->get(['id', 'code', 'title'])->toArray()[0],
+    //             'department' => \DB::table('departments')->where('id', '=', $item['depto_id'])->get(['id', 'title'])->toArray()[0],
+    //             'percent' => $item['percent']
+    //         ];
+    //     }, $charges);
+    // }
 
     public function scopeSearch($query, String $search)
     {
@@ -137,6 +181,7 @@ class PurchaseOrder extends Model
 
     public function scopeFilter($query, array $filters)
     {
+        $estatus = $filters['estatus'] ?? null;
         $query->when($filters['folio'] ?? null, function ($query, $folio) {
             $query->where(function ($query) use ($folio) {
                 $query->orWhere('id', 'like', $folio);
@@ -145,20 +190,16 @@ class PurchaseOrder extends Model
             $query->whereHas('supplier', function ($query) use ($supplier) {
                 return $query->where('id', $supplier);
             });
-        })->when($filters['agencie'] ?? null, function ($query, $agencie) {
-            $query->whereHas('sucursal', function ($query) use ($agencie) {
-                return $query->where('id', $agencie);
-            });
         })->when($filters['metodo_pago'] ?? null, function ($query, $metodoPago) {
-            $query->whereHas('metodo_pago', function ($query) use ($metodoPago) {
+            $query->whereHas('metodopago', function ($query) use ($metodoPago) {
                 return $query->where('clave', $metodoPago);
             });
         })->when($filters['uso_cfdi'] ?? null, function ($query, $usoCfdo) {
-            $query->whereHas('uso_cfdi', function ($query) use ($usoCfdo) {
+            $query->whereHas('usocfdi', function ($query) use ($usoCfdo) {
                 return $query->where('clave', $usoCfdo);
             });
         })->when($filters['forma_pago'] ?? null, function ($query, $formaPago) {
-            $query->whereHas('forma_pago', function ($query) use ($formaPago) {
+            $query->whereHas('formapago', function ($query) use ($formaPago) {
                 return $query->where('clave', $formaPago);
             });
         })->when($filters['estatus'] ?? null, function ($query, $estatus) {
@@ -171,6 +212,37 @@ class PurchaseOrder extends Model
             $query->whereHas('estatus', function ($query) {
                 $query->where('key', Estatus::ESTATUS_PENDIENTE);
             });
+        });
+
+        $query->when($filters['agencie'] ?? null, function ($query, $agency_id) {
+            $query->whereHas('chargeAgency', function ($query) use ($agency_id) {
+                return $query->whereIn('agency_id', $agency_id);
+            });
+        })->when($filters['department'] ?? null, function ($query, $depto_id) {
+            $query->whereHas('chargeDepartment', function ($query) use ($depto_id) {
+                return $query->whereIn('department_id', $depto_id);
+            });
+        });
+
+        $query->when($filters['date_range'] ?? null, function ($query, $dates) use ($estatus) {
+            if ($estatus == "todos" || $estatus == "pendiente")
+                return $query->whereBetween('created_at', [$dates[0], $dates[1]]);
+            if ($estatus == "autorizada" || $estatus == 'verificada')
+                return $query->whereBetween('authorization_date', [$dates[0], $dates[1]]);
+            if ($estatus == "enviada")
+                return $query->whereBetween('updated_at', [$dates[0], $dates[1]]);
+            if ($estatus == "facturada")
+                return $query->whereHas('invoice', function ($query) use ($dates) {
+                    return $query->whereBetween('invoice_date', [$dates[0], $dates[1]]);
+                });
+            if ($estatus == "por_pagar")
+                return $query->whereHas('invoice', function ($query) use ($dates) {
+                    return $query->whereBetween('date_to_pay', [$dates[0], $dates[1]]);
+                });
+            if ($estatus == "pagada")
+                return $query->whereHas('invoice', function ($query) use ($dates) {
+                    return $query->whereBetween('payment_date', [$dates[0], $dates[1]]);
+                });
         });
     }
 

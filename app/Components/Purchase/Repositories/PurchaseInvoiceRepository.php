@@ -37,17 +37,12 @@ class PurchaseInvoiceRepository extends BaseRepository
                 'invoiceable',
                 [PurchaseOrder::class],
                 function (Builder $query) use ($params) {
-                    $query->search($params['search'] ?? '')
-                        ->filter($params);
+                    $query->filter($params);
+                    // search($params['search'] ?? '')
                 }
             )
-                // ->whereNotNull('date_to_payment')
                 ->search($params['search'] ?? '');
-            // $query->where(function ($query) use ($params) {
-            //     $query->search($params['search'] ?? '')
-            //         ->filter($params)
-            //         ->filterPermission(Auth::user());
-            // });
+
             return $query;
         });
     }

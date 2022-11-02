@@ -20,6 +20,18 @@ import AxiosAjaxDetct from "~/common/AxiosAjaxDetect";
 import VueCurrencyFilter from "vue-currency-filter";
 
 import lodash from "lodash";
+import VCurrencyField from 'v-currency-field'
+
+Vue.use(VCurrencyField, { 
+	locale: 'es-MX',
+	decimalLength: 2,
+	autoDecimalMode: true,
+	min: null,
+	max: null,
+	// defaultValue: 0,
+  valueAsInteger: false,
+  allowNegative: true
+})
 
 Vue.prototype._ = lodash;
 

@@ -33,8 +33,8 @@
           <tbody>
             <tr v-for="item in items" :key="item.id">
               <td>
-                <div>{{ item.folio }}</div>
-                <div class="text--secondary">{{ item.folio_fiscal }}</div>
+                <div>{{ item.folio_fiscal }}</div>
+                <div class="text--secondary">{{ item.folio }}</div>
               </td>
               <td>{{ item.amount | money }}</td>
               <td>
@@ -119,9 +119,9 @@
                       dark
                     >
                       {{
-                        date_to_payment
+                        item.date_to_payment
                           ? `Pagar el: ${$appFormatters.formatDate(
-                              date_to_payment,
+                              item.date_to_payment,
                               "ll"
                             )}`
                           : "Programar Fecha de Pago"
@@ -222,7 +222,7 @@
         </template>
       </v-simple-table>
     </v-card-text>
-    <v-dialog v-model="dialogForm" max-width="600px" persistent>
+    <v-dialog v-model="dialogForm" max-width="700px" persistent>
       <v-card>
         <v-card-title>
           <span class="text-h5">Facturacion</span>
@@ -230,65 +230,78 @@
         <v-card-text>
           <v-container fluid>
             <v-form v-model="valid" ref="form" lazy-validation>
-              <v-row dense class="overline">
-                <v-col cols="12" md="12">
-                  <v-text-field
-                    v-model="formEdit.folio_fiscal"
-                    label="Folio Fiscal (UUID)*"
-                    v-mask="'NNNNNNNN-NNNN-NNNN-NNNN-NNNNNNNNNNNN'"
-                    hint="Ex. 3366177x-72fx-4xx0-9502-58091xx3x164"
-                    :rules="uuidRules"
-                    counter
+              <v-row>
+                <v-col cols="8">
+                  <v-file-input
+                    v-model="file_xml"
+                    label="Seleccionar XML"
+                    accept="text/xml"
                     outlined
                     dense
-                  ></v-text-field>
+                  ></v-file-input>
                 </v-col>
-                <v-col cols="12" md="6">
-                  <v-text-field
-                    v-model="formEdit.folio"
-                    label="Serie - Folio *"
-                    :rules="[(v) => !!v || 'campo requerido']"
-                    hint="requerido*"
-                    outlined
-                    dense
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="12" md="6">
-                  <v-text-field
-                    v-model="formEdit.invoice_date"
-                    label="Fecha de la Factura"
-                    :rules="[(v) => !!v || 'campo requerido']"
-                    hint="requerido*"
-                    type="date"
-                    outlined
-                    dense
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="12" md="4">
-                  <v-text-field
-                    v-model="formEdit.amount"
-                    label="Importe Factura"
-                    persistent-placeholder
-                    :rules="[(v) => !!v || 'campo requerido']"
-                    placeholder="0.00"
-                    hint="requerido*"
-                    type="number"
-                    prefix="$"
-                    outlined
-                    dense
-                  ></v-text-field>
+                <v-col cols="4">
+                  <v-btn color="primary" dark @click="loadXml()">
+                    Validar XML
+                  </v-btn>
                 </v-col>
               </v-row>
+              <div>
+                <v-simple-table
+                  v-if="DATAXMLKeys"
+                  fixed-header
+                  height="300px"
+                  class="text-uppercase"
+                  dense
+                >
+                  <template v-slot:default>
+                    <thead>
+                      <tr>
+                        <th class="text-left">
+                          Campo XML
+                        </th>
+                        <th class="text-left">
+                          Valor
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="item in DATAXMLKeys" :key="item">
+                        <td class="font-weight-bold">{{ item }}</td>
+                        <td>
+                          <span
+                            class="d-inline-block text-truncate"
+                            style="max-width: 400px;"
+                          >
+                            {{ data_file_xml[item][0] }}
+                          </span>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </template>
+                </v-simple-table>
+              </div>
             </v-form>
           </v-container>
           <small>* indica campo obligatorio</small>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="red darken-1" text @click="dialogForm = false">
+          <v-btn
+            color="red darken-1"
+            text
+            @click="
+              (dialogForm = false), (file_xml = null), (data_file_xml = [])
+            "
+          >
             Cancelar
           </v-btn>
-          <v-btn color="blue darken-1" text @click="save">
+          <v-btn
+            color="blue darken-1"
+            :disabled="!valid_invoice"
+            text
+            @click="save"
+          >
             Guardar
           </v-btn>
         </v-card-actions>
@@ -319,7 +332,11 @@ export default {
     // this.loadOptions();
   },
 
-  computed: {},
+  computed: {
+    DATAXMLKeys() {
+      return Object.keys(this.data_file_xml);
+    },
+  },
   data() {
     return {
       modal: false,
@@ -328,6 +345,9 @@ export default {
       dialogForm: false,
       valid: true,
       editedIndex: -1,
+      file_xml: null,
+      data_file_xml: [],
+      valid_invoice: false,
       formDefault: {
         folio_fiscal: "",
         folio: "",
@@ -356,6 +376,43 @@ export default {
     };
   },
   methods: {
+    async loadXml() {
+      const _this = this;
+      let formData = new FormData();
+      formData.append("file", _this.file_xml);
+
+      await axios
+        .post(
+          `/admin/purchase-order/valid-invoice/${_this.purchaseId}`,
+          formData
+        )
+        .then(function (response) {
+          _this.$store.commit("showSnackbar", {
+            message: response.data.message,
+            color: response.data.data.valid_invoice ? "success" : "error",
+            duration: 3000,
+          });
+          _this.data_file_xml = response.data.data.data_xml;
+          _this.valid_invoice = response.data.data.valid_invoice;
+        })
+        .catch(function (error) {
+          _this.$store.commit("hideLoader");
+          if (error.response) {
+            _this.$store.commit("showSnackbar", {
+              message: error.response.data.message,
+              color: "error",
+              duration: 3000,
+            });
+            return false;
+          } else if (error.request) {
+            console.log(error.request);
+          } else {
+            console.log("Error", error.message);
+          }
+        });
+
+      // console.log(this.file_xml, "load xml");
+    },
     editItem(item) {
       const _this = this;
       _this.editedIndex = _this.items.indexOf(item);
@@ -380,17 +437,12 @@ export default {
     async save() {
       const _this = this;
       if (!_this.$refs.form.validate()) return;
-      let payload = {
-        id: _this.formEdit.id || null,
-        folio_fiscal: _this.formEdit.folio_fiscal,
-        folio: _this.formEdit.folio,
-        amount: _this.formEdit.amount,
-        invoice_date: _this.formEdit.invoice_date,
-      };
+      let formData = new FormData();
+      formData.append("file", _this.file_xml);
       await axios
         .post(
           `/admin/purchase-order/store-invoice/${_this.purchaseId}`,
-          payload
+          formData
         )
         .then(function (response) {
           _this.$store.commit("showSnackbar", {
@@ -434,6 +486,7 @@ export default {
           });
           _this.date_to_payment = "";
           _this.payment_date = "";
+          _this.$eventBus.$emit("ORDERS_REFRESH");
         })
         .catch(function (error) {
           _this.$store.commit("hideLoader");
@@ -468,6 +521,7 @@ export default {
           });
           _this.date_to_payment = "";
           _this.payment_date = "";
+          _this.$eventBus.$emit("ORDERS_REFRESH");
         })
         .catch(function (error) {
           _this.$store.commit("hideLoader");

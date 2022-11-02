@@ -6,7 +6,7 @@
           <v-col cols="12" md="4">
             <v-text-field
               v-model="form.alias"
-              label="Alias del Proveedor:"
+              label="Clave en EQUIP:"
               :rules="[(v) => !!v || 'Es Requerido']"
               outlined
               dense
@@ -26,7 +26,7 @@
               v-model="form.rfc"
               label="RFC:"
               :rules="[(v) => !!v || 'Es Requerido']"
-              counter="12"
+              counter="15"
               outlined
               dense
             ></v-text-field>
@@ -68,7 +68,7 @@
           <v-col cols="12" md="4">
             <v-text-field
               v-model="form.phone"
-              v-mask="'(###)###-##-## Ext: ###'"
+              v-mask="'(###)###-##-##'"
               placeholder="(###)###-##-##"
               hint="Numero 10 digitos"
               label="Telefono:"
@@ -87,22 +87,40 @@
           </v-col>
 
           <v-col cols="12" md="3">
-            <v-text-field
+            <v-select
+              v-model="form.credit_days"
+              label="Condicion de Pago:"
+              outlined
+              :rules="[(v) => !!v || 'Es Requerido']"
+              :items="[
+                { text: '8 Dias', value: 8 },
+                { text: '15 Dias', value: 15 },
+                { text: '30 Dias', value: 30 },
+                { text: '60 Dias', value: 60 },
+                { text: '90 Dias', value: 90 },
+              ]"
+              dense
+            ></v-select>
+            <!-- <v-text-field
               v-model="form.credit_days"
               label="Dias de credito"
               hide-details=""
               outlined
               dense
-            ></v-text-field>
+            ></v-text-field> -->
           </v-col>
           <v-col cols="12" md="3">
-            <v-text-field
+            <v-currency-field
               v-model="form.credit_limit"
-              label="Limite de Credito"
-              hide-details=""
+              :default-value="form.credit_limit"
+              label="Limite Credito:"
+              prefix="$"
+              suffix="MXN"
+              type="number"
+              :rules="[(v) => !!v || 'Es Requerido']"
               outlined
               dense
-            ></v-text-field>
+            />
           </v-col>
           <v-col cols="12" md="6">
             <v-combobox
@@ -200,7 +218,7 @@
               </v-form>
             </v-expansion-panel-content>
           </v-expansion-panel>
-          <v-expansion-panel>
+          <!-- <v-expansion-panel>
             <v-expansion-panel-header
               class="title"
               color="grey lighten-3"
@@ -296,7 +314,7 @@
                 </v-col>
               </v-row>
             </v-expansion-panel-content>
-          </v-expansion-panel>
+          </v-expansion-panel> -->
         </v-expansion-panels>
       </v-col>
 

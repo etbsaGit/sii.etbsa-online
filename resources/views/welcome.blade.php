@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="{{ app()->getLocale() }}">
+
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -12,7 +13,8 @@
 
     <!-- Styles -->
     <style>
-        html, body {
+        html,
+        body {
             background-color: #fff;
             color: #636b6f;
             font-family: 'Raleway', sans-serif;
@@ -49,7 +51,7 @@
             font-size: 84px;
         }
 
-        .links > a {
+        .links>a {
             color: #636b6f;
             padding: 0 25px;
             font-size: 12px;
@@ -64,35 +66,37 @@
         }
 
         .swiss {
-            max-width: 300px;
+            max-width: 650px;
             opacity: 0.2;
         }
     </style>
 </head>
+
 <body>
-<div class="flex-center position-ref full-height">
-    @if (Route::has('login'))
-        <div class="top-right links">
-            @auth
-                <a href="{{ url('/admin') }}">Dashboard</a>
+    <div class="flex-center position-ref full-height">
+        @if (Route::has('login'))
+            <div class="top-right links">
+                @auth
+                    <a href="{{ url('/admin') }}">Dashboard</a>
                 @else
                     <a href="{{ route('login') }}">Login</a>
                     {{-- <a href="{{ route('register') }}">Register</a> --}}
-                    @endauth
-        </div>
-    @endif
+                @endauth
+            </div>
+        @endif
 
-    <div class="content">
-        <div class="title m-b-md align-center">
-            <img class="swiss" src="{{url('img/etbsa-logo-agricola.png')}}">
-            <img class="swiss" src="{{url('img/etbsa-logo-construccion.png')}}">
-        </div>
+        <div class="content">
+            <div class="title m-b-md align-center">
+                <img class="swiss" src="{{ url('img/etbsa-logo-corporativo-dark.jpeg') }}">
+                {{-- <img class="swiss" src="{{url('img/etbsa-logo-construccion.png')}}"> --}}
+            </div>
 
-        <div class="links">
-            <h1>SII <span style="color: #F4D8D8">ETBSA</span></h1>
-            {{-- <h4>Powered by VueJS + Material Design</h4> --}}
+            <div class="links">
+                <h1>SII <span style="color: #F4D8D8">ETBSA</span></h1>
+                {{-- <h4>Powered by VueJS + Material Design</h4> --}}
+            </div>
         </div>
     </div>
-</div>
 </body>
+
 </html>
