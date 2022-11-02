@@ -2,6 +2,7 @@
 
 namespace App\Components\Common\Models;
 
+use App\Components\Purchase\Models\PurchaseOrder;
 use Illuminate\Database\Eloquent\Model;
 use App\Components\User\Models\User;
 
@@ -29,5 +30,10 @@ class Agency extends Model
     public function tracking()
     {
         return $this->hasMany('App\Components\Tracking\Models\TrackingProspect');
+    }
+
+    public function purchaseOrder()
+    {
+        return $this->belongsToMany(PurchaseOrder::class, 'purchase_agency_pivot_table', 'agency_id');
     }
 }

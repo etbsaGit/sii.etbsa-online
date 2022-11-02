@@ -2,6 +2,7 @@
   <v-card flat>
     <v-card-title class="overline">
       <v-icon left>mdi-file-document</v-icon> Acciones
+
       <v-spacer></v-spacer>
       <v-btn class="ml-2" color="blue" @click="dialogMessages = true" dark>
         Mensajes <v-icon right>mdi-forum</v-icon>
@@ -146,6 +147,12 @@
         </v-date-picker>
       </v-dialog> -->
     </v-card-title>
+    <v-card-subtitle>
+      Estatus:
+      <v-chip label>
+        {{ form.estatus.title }}
+      </v-chip>
+    </v-card-subtitle>
 
     <v-divider></v-divider>
     <v-card-text>
@@ -346,6 +353,8 @@
                   @close="dialogAddCharge = false"
                   :items.sync="form.charges"
                   :read-only="ReadOnly"
+                  :agencies="options.agencies"
+                  :departments="options.departments"
                 ></purchase-charge-table>
               </v-card-text>
               <v-card-title>
@@ -376,23 +385,6 @@
                   :form.sync="form.amounts"
                 ></purchase-amounts-table>
               </v-card-text>
-              <!-- <template v-if="showInvoiceInfo || form.estatus.key == 'enviado'">
-                <v-card-title>
-                  Factura Relacionada
-                  <v-spacer></v-spacer>
-                  <v-btn icon @click="dialogInvoice = true">
-                    <v-icon color="blue">mdi-pencil</v-icon>
-                  </v-btn>
-                </v-card-title>
-                <v-card-text class="px-0">
-                  <purchase-invoice-payment-table
-                    :dialogForm="dialogInvoice"
-                    @close="dialogInvoice = false"
-                    :purchase-id="purchaseId"
-                    :form="form.invoice_info"
-                  ></purchase-invoice-payment-table>
-                </v-card-text>
-              </template> -->
             </v-card>
           </v-col>
         </v-row>
@@ -494,10 +486,21 @@ export default {
           date_to_payment: null,
           payment_date: null,
         },
+        colors: {
+          pendiente: "blue",
+          autorizado: "orange",
+          denegar: "red",
+          verificado: "purple",
+          facturado: "green",
+          por_pagar: "pink",
+          pagada: "cyan",
+          enviado: "brown darken-4",
+        },
       },
       options: {
         suppliers: [],
         agencies: [],
+        departments: [],
         purchase_concept: [],
       },
     };
@@ -510,7 +513,6 @@ export default {
       { label: "Detalle", name: "" },
     ]);
     _this.loadPurchaseEdit();
-    // _this.$eventBus.$on("CHANGE_ESTATUS", () => {
     _this.$eventBus.$on("ORDERS_REFRESH", () => {
       _this.loadPurchaseEdit();
     });
@@ -613,6 +615,7 @@ export default {
           return { ...response.data.data };
         });
     },
+
     async updatePurchase() {
       if (!this.$refs.form_info.validate()) return;
       if (this.form.concepts.length <= 0)
@@ -631,7 +634,13 @@ export default {
       let payload = {
         supplier_id: _this.form.supplier.id,
         concepts: _this.form.concepts,
-        charges: _this.form.charges,
+        charges: _this.form.charges.map((item) => {
+          return {
+            agency_id: item.agency.id,
+            depto_id: item.department.id,
+            percent: item.percent,
+          };
+        }),
         metodo_pago: _this.form.invoice.metodo_pago_id,
         uso_cfdi: _this.form.invoice.uso_cfdi_id,
         forma_pago: _this.form.invoice.forma_pago_id,
@@ -714,9 +723,15 @@ export default {
       await axios
         .get("/admin/purchase-order/resources/options")
         .then(function (response) {
-          let { suppliers, agencies, purchase_concept } = response.data.data;
+          let {
+            suppliers,
+            agencies,
+            departments,
+            purchase_concept,
+          } = response.data.data;
           _this.options.suppliers = suppliers;
           _this.options.agencies = agencies;
+          _this.options.departments = departments;
           _this.options.purchase_concept = purchase_concept;
         });
     },

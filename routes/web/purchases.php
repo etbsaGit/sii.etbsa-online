@@ -8,7 +8,8 @@ Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function
     Route::get('purchase-order/resources/options', 'PurchaseOrderController@resources')->name('purchase-order.options');
     Route::get('purchase-order/{purchaseOrder}/resources/print', 'PurchaseOrderController@print')->name('purchase-order.print');
     Route::post('purchase-order/update-estatus/{purchase_order}', 'PurchaseOrderController@updateEstatus')->name('purchase-order.updateEstatus');
-    Route::post('purchase-order/store-invoice/{purchase_order}', 'PurchaseOrderController@storeInvoicePurchase')->name('purchase-order.storeInvoicePurchase');
+    Route::post('purchase-order/valid-invoice/{purchase_order}', 'PurchaseOrderController@validInvoicePurchaseOrder')->name('purchase-order.validInvoicePurchaseOrder');
+    Route::post('purchase-order/store-invoice/{purchase_order}', 'PurchaseOrderController@storeInvoicePurchase')->name('purchase-order.validInvoicePurchaseOrder');
 
     //PURCHASE_ORDERS_DOCUMENT
     Route::get('purchase-order/{purchaseOrder}/document', 'PurchaseOrderDocumentController@index')->name('purchase-order-document.index');

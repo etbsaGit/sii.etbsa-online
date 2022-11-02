@@ -18,7 +18,7 @@
       >
         <v-form ref="formFilter">
           <div class="d-flex flex-column ma-2">
-            <v-select
+            <v-autocomplete
               v-model="filters.supplier"
               :items="options.suppliers"
               item-text="business_name"
@@ -31,7 +31,7 @@
               clearable
               dense
               class="mb-3"
-            ></v-select>
+            ></v-autocomplete>
             <v-select
               v-model="filters.agencie"
               :items="options.agencies"
@@ -45,6 +45,26 @@
               clearable
               dense
               class="mb-2"
+              multiple
+              chips
+              deletable-chips
+            ></v-select>
+            <v-select
+              v-model="filters.department"
+              :items="options.departments"
+              item-text="title"
+              item-value="id"
+              label="Departamento"
+              prepend-icon="mdi-filter-variant"
+              hide-details
+              outlined
+              filled
+              clearable
+              dense
+              class="mb-2"
+              multiple
+              chips
+              deletable-chips
             ></v-select>
             <v-select
               v-model="filters.forma_pago"
@@ -120,6 +140,43 @@
             hide-details
             dense
           ></v-select>
+          <v-dialog
+            ref="dialog"
+            v-model="modalDateRange"
+            :return-value.sync="filters.date_range"
+            persistent
+            width="450px"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-text-field
+                v-model="filters.date_range"
+                label="Rango de Fechas"
+                prepend-icon="mdi-calendar"
+                readonly
+                v-bind="attrs"
+                v-on="on"
+                class="pa-2"
+                outlined
+                filled
+                hide-details
+                dense
+                clearable
+              ></v-text-field>
+            </template>
+            <v-date-picker v-model="filters.date_range" scrollable range>
+              <v-spacer></v-spacer>
+              <v-btn text color="primary" @click="modalDateRange = false">
+                Cancel
+              </v-btn>
+              <v-btn
+                text
+                color="primary"
+                @click="$refs.dialog.save(filters.date_range)"
+              >
+                OK
+              </v-btn>
+            </v-date-picker>
+          </v-dialog>
         </v-card>
         <v-spacer></v-spacer>
         <v-divider class="mx-2" inset vertical></v-divider>
@@ -201,15 +258,15 @@
       <span> #{{ item.id.toString().padStart(5, 0) }} </span>
     </template>
     <template v-slot:[`item.supplier.business_name`]="{ item }">
-      <v-list-item dense class="pa-0">
-        <v-list-item-content class="pa-0">
-          <v-list-item-title class="caption text-wrap">
+      <v-list-item dense>
+        <div class="d-flex flex-column">
+          <span
+            class="d-block font-weight-semibold text--primary text-truncate"
+          >
             {{ item.supplier.business_name }}
-          </v-list-item-title>
-          <v-list-item-subtitle>
-            {{ item.supplier.rfc }}
-          </v-list-item-subtitle>
-        </v-list-item-content>
+          </span>
+          <small>{{ item.supplier.rfc }}</small>
+        </div>
       </v-list-item>
     </template>
     <template v-slot:[`item.elaborated`]="{ item }">
@@ -248,7 +305,7 @@
     </template>
 
     <template v-slot:[`item.cargos`]="{ item }">
-      <v-dialog transition="dialog-bottom-transition" width="325">
+      <v-dialog transition="dialog-bottom-transition" width="600">
         <template v-slot:activator="{ on, attrs }">
           <v-btn text v-bind="attrs" v-on="on">
             Ver <v-icon right>mdi-eye</v-icon>
@@ -256,19 +313,33 @@
         </template>
         <template v-slot:default>
           <v-sheet elevation="10" rounded="xl">
-            <v-sheet class="pa-3 blue title" rounded="t-xl">
+            <v-sheet
+              class="pa-3 blue white--text text-h5 overline"
+              rounded="t-xl"
+            >
               Cargos a Sucursal
             </v-sheet>
             <div class="pa-4">
-              <v-chip-group active-class="primary--text" column>
-                <v-chip
+              <!-- <v-chip-group active-class="primary--text" column> -->
+              <v-chip
+                v-for="(tag, index) in item.charge_agency"
+                :key="`${tag.agency}-${index}`"
+                class="overline ma-2"
+                large
+                dark
+              >
+                {{ item.charge_agency[index].title }} -
+                {{ item.charge_department[index].title }} -
+                {{ item.charge_agency[index].charge.percent }}%
+              </v-chip>
+              <!-- <v-chip
                   v-for="(tag, index) in item.charges"
                   :key="`${tag.agency}-${index}`"
                   class="overline"
                 >
                   {{ tag.agency }} - {{ tag.department }} - {{ tag.percent }}%
-                </v-chip>
-              </v-chip-group>
+                </v-chip> -->
+              <!-- </v-chip-group> -->
             </div>
           </v-sheet>
         </template>
@@ -298,12 +369,13 @@ export default {
   },
   data: () => ({
     valid: true,
+    modalDateRange: false,
     dialogCreate: false,
     dialogEdit: false,
     showSearchPanel: false,
     dialogDelete: false,
     headers: [
-      { text: "", value: "actions", sortable: false },
+      { text: "", value: "actions", width: "100", sortable: false },
       {
         text: "Folio OC",
         align: "center",
@@ -314,7 +386,7 @@ export default {
       {
         text: "Proveedor",
         value: "supplier.business_name",
-        width: 200,
+
         fixed: true,
       },
       {
@@ -346,10 +418,12 @@ export default {
       metodo_pago: null,
       forma_pago: null,
       estatus: "todos",
+      date_range: null,
     },
     options: {
       suppliers: [],
       agencies: [],
+      departments: [],
       metodoPago: [],
       usoCFDI: [],
       formaPago: [],
@@ -527,6 +601,7 @@ export default {
           let Data = response.data.data;
           _this.options.suppliers = Data.suppliers;
           _this.options.agencies = Data.agencies;
+          _this.options.departments = Data.departments;
           _this.options.metodoPago = Data.metodoPago;
           _this.options.usoCFDI = Data.usoCFDI;
           _this.options.formaPago = Data.formaPago;

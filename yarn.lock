@@ -6501,6 +6501,11 @@ uuid@^8.3.0:
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-8.3.2.tgz#80d5b5ced271bb9af6c445f21a1a04c606cefbe2"
   integrity sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==
 
+v-currency-field@^3.1.1:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/v-currency-field/-/v-currency-field-3.1.1.tgz#d3472aced63008a67d21d249dba5856744d33d48"
+  integrity sha512-1Jlk+RmHTX2uFRmN70hX0R2JOKtlNLNTlQZArrAYrFEWvZR34Cii/kNMXptBS97rVXs31tw5nZ11H6+qJI4gvA==
+
 v-mask@^2.2.4:
   version "2.2.4"
   resolved "https://registry.yarnpkg.com/v-mask/-/v-mask-2.2.4.tgz#d7452982c8774478c0475f771e8d1367cb2b04e0"

@@ -132,7 +132,7 @@
         }
 
         @page {
-            margin: 120px 10px;
+            margin: 30px 10px;
         }
 
         header {
@@ -207,7 +207,7 @@
         }
 
         .swiss {
-            max-width: 300px;
+            max-width: 600px;
             opacity: 0.07;
         }
 
@@ -241,9 +241,9 @@
         <div class="subtitle">R.F.C.: ETB-860812-I23</div> --}}
         <div class="flex-center position-ref full-height">
             <div class="content">
-                <div class="title m-b-md align-center" style="margin-top: 550px">
-                    <img class="swiss" src="{{ url('img/etbsa-logo-agricola.png') }}">
-                    <img class="swiss" src="{{ url('img/etbsa-logo-construccion.png') }}">
+                <div class="title m-b-md align-center" style="margin-top: 400px">
+                    <img class="swiss" src="{{ url('img/etbsa-logo-corporativo-dark.jpeg') }}">
+                    {{-- <img class="swiss" src="{{ url('img/etbsa-logo-construccion.png') }}"> --}}
                 </div>
             </div>
         </div>
@@ -264,15 +264,16 @@
             </tr>
         </table>
     </footer>
-    <div class="invoice-box">
+    <div class="invoice-box" style="text-transform:uppercase;">
         <table cellpadding="0" cellspacing="0">
-            <tr class="top">
+            {{-- <tr class="top"> --}}
+            <tr>
                 <td colspan="6">
                     <table>
                         <tr>
                             <td class="title">
-                                <img src="{{ public_path() . '/img/etbsa-logo-agricola.png' }}"
-                                    style="width: 100%; max-width: 125px; height: 60px;" />
+                                <img src="{{ public_path() . '/img/etbsa-logo-corporativo-dark.jpeg' }}"
+                                    style="width: 100%; max-width: 189px; height: 100px;" />
                             </td>
                             {{-- <td style="max-width: 100px">
                                 Sucursal ETBSA : {{ $data->sucursal->title }}<br />
@@ -280,7 +281,7 @@
                             </td> --}}
                             <td>
                                 ORDEN DE COMPRA: # {{ str_pad($data->id, 5, '0', STR_PAD_LEFT) }}<br />
-                                Fecha: {{ $data->updated_at }}<br />
+                                Fecha: {{ $data->authorization_date }}<br />
                             </td>
                         </tr>
                     </table>
@@ -291,14 +292,14 @@
                 <td colspan="6">
                     <table>
                         <tr>
-                            <td>
+                            <td colspan="6">
                                 Equipos y Tractores del Bajio SA de CV<br />
                                 Carr. Panamericana Celaya - Salamanca Km. 61<br />
                                 1ra Fracc. crespo C.P. 38120 Celaya, Gto.<br />
                                 R.F.C.: ETB-860812-I23
                             </td>
 
-                            <td>
+                            <td colspan="6">
                                 Proveedor:<br />
                                 {{ $data->supplier->business_name }}<br />
                                 {{ $data->supplier->rfc }}<br />
@@ -341,7 +342,7 @@
 
             </tr>
             @foreach ($data->concepts as $concept)
-                <tr class="item">
+                <tr class="item" style="font-size: 8pt;">
                     {{-- <td>{{ ($concept['department'] ?? '') . ' ' . ($concept['user'] ?? '') }} --}}
                     {{-- </td> --}}
                     <td style="width: 300px; ">
@@ -407,10 +408,17 @@
             <tr class="details">
                 <td colspan="6" style="text-align: left">{{ $data->note }} </td>
             </tr>
+            <tr class="details">
+                <td colspan="6" style="text-align: left; font-size: 8pt;">
+                    Atencion Proveedor si tu Factura NO Coincide con los Requisitos Fiscales>de esta Orden compra <br>
+                    NO sera programada para Pago<br><br>
+                    *Poner en copia al/los correos:<br>
+                    @foreach ($data->chargeAgency as $agency)
+                        {{ $agency->email }}<br>
+                    @endforeach
+                </td>
+            </tr>
         </table>
-    </div>
-
-    </div>
     </div>
     {{-- <p style="page-break-before: always;">
         Podemos romper la página en cualquier momento...</p>

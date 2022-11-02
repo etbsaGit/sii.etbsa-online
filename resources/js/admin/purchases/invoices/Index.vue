@@ -20,7 +20,7 @@
       >
         <v-form ref="formFilter">
           <div class="d-flex flex-column ma-2">
-            <v-select
+            <v-autocomplete
               v-model="filters.supplier"
               :items="options.suppliers"
               item-text="business_name"
@@ -33,7 +33,7 @@
               clearable
               dense
               class="mb-3"
-            ></v-select>
+            ></v-autocomplete>
             <v-select
               v-model="filters.agencie"
               :items="options.agencies"
@@ -47,6 +47,26 @@
               clearable
               dense
               class="mb-2"
+              multiple
+              chips
+              deletable-chips
+            ></v-select>
+            <v-select
+              v-model="filters.department"
+              :items="options.departments"
+              item-text="title"
+              item-value="id"
+              label="Departamento"
+              prepend-icon="mdi-filter-variant"
+              hide-details
+              outlined
+              filled
+              clearable
+              dense
+              class="mb-2"
+              multiple
+              chips
+              deletable-chips
             ></v-select>
             <v-select
               v-model="filters.forma_pago"
@@ -103,7 +123,7 @@
         >
           <v-text-field
             v-model="search"
-            label="Search"
+            label="Buscar Folio Fiscal"
             class="pa-2"
             outlined
             filled
@@ -122,6 +142,43 @@
             hide-details
             dense
           ></v-select>
+          <v-dialog
+            ref="dialog"
+            v-model="modalDateRange"
+            :return-value.sync="filters.date_range"
+            persistent
+            width="450px"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-text-field
+                v-model="filters.date_range"
+                label="Rango de Fechas"
+                prepend-icon="mdi-calendar"
+                readonly
+                v-bind="attrs"
+                v-on="on"
+                class="pa-2"
+                outlined
+                filled
+                hide-details
+                dense
+                clearable
+              ></v-text-field>
+            </template>
+            <v-date-picker v-model="filters.date_range" scrollable range>
+              <v-spacer></v-spacer>
+              <v-btn text color="primary" @click="modalDateRange = false">
+                Cancel
+              </v-btn>
+              <v-btn
+                text
+                color="primary"
+                @click="$refs.dialog.save(filters.date_range)"
+              >
+                OK
+              </v-btn>
+            </v-date-picker>
+          </v-dialog>
         </v-card>
         <v-spacer></v-spacer>
         <v-divider class="mx-2" inset vertical></v-divider>
@@ -131,9 +188,10 @@
         ></table-header-buttons>
       </v-card>
       <v-toolbar flat>
-        <v-toolbar-title>Facturas</v-toolbar-title>
+        <v-toolbar-title>Facturas Por Pagar</v-toolbar-title>
         <v-divider class="mx-4" inset vertical></v-divider>
         <v-spacer></v-spacer>
+        <!-- btn Registrar Pago -->
         <v-dialog
           v-if="selected.length > 0 && filters.estatus == 'por_pagar'"
           ref="dialog_payment"
@@ -144,23 +202,20 @@
           width="324px"
         >
           <template v-slot:activator="{ on, attrs }">
-            <v-btn color="cyan" v-bind="attrs" v-on="on" class="ml-2">
+            <v-btn color="blue" v-bind="attrs" v-on="on" class="ml-2" dark>
               {{
                 payment_date
-                  ? `Se Pago el: ${$appFormatters.formatDate(
+                  ? `Factura se Pago: ${$appFormatters.formatDate(
                       payment_date,
                       "ll"
                     )}`
-                  : "Registrar Factura Pagada"
+                  : "Fecha de Pago"
               }}
-              <v-icon right>mdi-file-check-outline</v-icon>
+              <v-icon right>mdi-update</v-icon>
             </v-btn>
           </template>
-          <v-date-picker
-            v-model="payment_date"
-            scrollable
-            :min="new Date().toISOString().substr(0, 10)"
-          >
+          <v-date-picker v-model="payment_date" scrollable>
+            <!-- :min="new Date().toISOString().substr(0, 10)" -->
             <v-spacer></v-spacer>
             <v-btn text color="primary" @click="dialogPayment = false">
               Cancel
@@ -169,18 +224,19 @@
               text
               color="primary"
               @click="
-                $refs.dialog_payment.save(payment_date), updateDateToPayment()
+                $refs.dialog_payment.save(payment_date), updateDatePayment()
               "
             >
               Confirmar
             </v-btn>
           </v-date-picker>
         </v-dialog>
+        <!-- btn Prg Pago -->
         <v-dialog
           v-if="selected.length > 0 && filters.estatus == 'facturado'"
-          ref="dialog_payment"
+          ref="dialog_pay"
           v-model="dialogDayToPayment"
-          :return-value.sync="date_to_payment"
+          :return-value.sync="date_to_pay"
           persistent
           transition="scale-transition"
           width="324px"
@@ -188,9 +244,9 @@
           <template v-slot:activator="{ on, attrs }">
             <v-btn color="pink" v-bind="attrs" v-on="on" class="ml-2" dark>
               {{
-                date_to_payment
+                date_to_pay
                   ? `Se Pagara(n) el: ${$appFormatters.formatDate(
-                      date_to_payment,
+                      date_to_pay,
                       "ll"
                     )}`
                   : "Programar fecha de Pago"
@@ -198,11 +254,8 @@
               <v-icon right>mdi-update</v-icon>
             </v-btn>
           </template>
-          <v-date-picker
-            v-model="date_to_payment"
-            scrollable
-            :min="new Date().toISOString().substr(0, 10)"
-          >
+          <v-date-picker v-model="date_to_pay" scrollable>
+            <!-- :min="new Date().toISOString().substr(0, 10)" -->
             <v-spacer></v-spacer>
             <v-btn text color="primary" @click="dialogDayToPayment = false">
               Cancel
@@ -210,10 +263,7 @@
             <v-btn
               text
               color="primary"
-              @click="
-                $refs.dialog_payment.save(date_to_payment),
-                  updateDateToPayment()
-              "
+              @click="$refs.dialog_pay.save(date_to_pay), updateDateToPayment()"
             >
               Confirmar
             </v-btn>
@@ -225,10 +275,10 @@
       <v-list-item dense class="pa-0 caption">
         <v-list-item-content class="pa-0 caption text-wrap">
           <v-list-item-title class="caption">
-            {{ item.folio }}
+            {{ item.folio_fiscal }}
           </v-list-item-title>
           <v-list-item-subtitle class="caption">
-            {{ item.folio_fiscal }}
+            {{ item.folio }}{{ item.serie }}
           </v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
@@ -251,19 +301,6 @@
     <template v-slot:[`item.amount`]="{ value }">
       {{ value | currency }}
     </template>
-    <!-- <template v-slot:[`item.invoiceable.elaborated`]="{ value }">
-      <v-list-item dense class="pa-0 caption">
-        <v-list-item-content class="pa-0 caption text-wrap">
-          <v-list-item-title style="max-width: 170px;" class="caption">
-            {{ value.profiable ? value.profiable.full_name : value.name }}
-          </v-list-item-title>
-          <v-list-item-subtitle>
-            {{ value.profiable ? value.profiable.agency.title : "" }}
-          </v-list-item-subtitle>
-        </v-list-item-content>
-      </v-list-item>
-    </template> -->
-
     <template v-slot:[`item.invoiceable.estatus`]="{ value }">
       <v-chip
         label
@@ -276,7 +313,7 @@
     </template>
 
     <template v-slot:[`item.cargos`]="{ item }">
-      <v-dialog transition="dialog-bottom-transition" width="300">
+      <v-dialog transition="dialog-bottom-transition" width="600">
         <template v-slot:activator="{ on, attrs }">
           <v-btn text v-bind="attrs" v-on="on">
             Ver <v-icon right>mdi-eye</v-icon>
@@ -295,7 +332,8 @@
                   class="overline"
                   dark
                 >
-                  {{ tag.agency }} - {{ tag.department }} - {{ tag.percent }}%
+                  {{ tag.agency.title }} - {{ tag.department.title }} -
+                  {{ tag.percent }}%
                 </v-chip>
               </v-chip-group>
             </div>
@@ -306,7 +344,7 @@
     <template v-slot:[`item.invoice_date`]="{ value }">
       {{ $appFormatters.formatDate(value, "l") }}
     </template>
-    <template v-slot:[`item.date_to_payment`]="{ value }">
+    <template v-slot:[`item.date_to_pay`]="{ value }">
       {{ $appFormatters.formatDate(value, "l") }}
     </template>
     <template v-slot:[`item.payment_date`]="{ value }">
@@ -327,12 +365,13 @@ export default {
   },
   data: () => ({
     valid: true,
+    modalDateRange: false,
     selected: [],
     showSearchPanel: false,
     dialogPayment: false,
     dialogDayToPayment: false,
     payment_date: null,
-    date_to_payment: null,
+    date_to_pay: null,
     headers: [
       // { text: "", value: "actions", sortable: false },
       {
@@ -348,7 +387,7 @@ export default {
         fixed: true,
       },
       {
-        text: "Orden Compra",
+        text: "Orden de Compra",
         value: "invoiceable.id",
         fixed: true,
       },
@@ -369,7 +408,7 @@ export default {
       // { text: "Realizado por", value: "invoiceable.elaborated" },
       { text: "Estatus", value: "invoiceable.estatus", align: "center" },
       { text: "Fecha Factura", value: "invoice_date", align: "center" },
-      { text: "Pagar el", value: "date_to_payment", align: "center" },
+      { text: "Pagar el", value: "date_to_pay", align: "center" },
       { text: "Pagada el", value: "payment_date", align: "center" },
     ],
     items: [],
@@ -378,14 +417,17 @@ export default {
       folio: null,
       supplier: null,
       agencie: null,
+      department: null,
       uso_cfdi: null,
       metodo_pago: null,
       forma_pago: null,
-      estatus: "por_pagar",
+      estatus: "todos",
+      date_range: null,
     },
     options: {
       suppliers: [],
       agencies: [],
+      departments: [],
       metodoPago: [],
       usoCFDI: [],
       formaPago: [],
@@ -434,6 +476,9 @@ export default {
     },
     reloadTable() {
       this.loadPurchaseOrders(() => {});
+      this.date_to_pay = null;
+      this.payment_date = null;
+      this.selected = [];
     },
     cancelSearch() {
       this.showSearchPanel = false;
@@ -478,6 +523,7 @@ export default {
           let Data = response.data.data;
           _this.options.suppliers = Data.suppliers;
           _this.options.agencies = Data.agencies;
+          _this.options.departments = Data.departments;
           _this.options.metodoPago = Data.metodoPago;
           _this.options.usoCFDI = Data.usoCFDI;
           _this.options.formaPago = Data.formaPago;
@@ -489,18 +535,17 @@ export default {
       _this.pagination.itemsPerPage = 10;
       _this.pagination.page = 1;
     },
+
     async updateDateToPayment() {
       const _this = this;
+
+      let payload = {
+        date_to_pay: _this.date_to_pay,
+      };
       _this.selected.forEach(async (element) => {
-        let payload = {
-          date_to_payment: element.date_to_payment
-            ? element.date_to_payment
-            : _this.date_to_payment,
-          payment_date: _this.payment_date,
-        };
         await axios
           .post(
-            `/admin/purchase-order/store-invoice/${element.invoiceable.id}`,
+            `/admin/purchase-invoice/date_to_payment/${element.id}`,
             payload
           )
           .then(function (response) {
@@ -509,6 +554,8 @@ export default {
               color: "success",
               duration: 3000,
             });
+            _this.date_to_pay = "";
+            _this.payment_date = "";
             _this.reloadTable();
           })
           .catch(function (error) {
@@ -526,6 +573,45 @@ export default {
               console.log("Error", error.message);
             }
           });
+      });
+      this.selected = [];
+    },
+    async updateDatePayment() {
+      const _this = this;
+
+      let payload = {
+        payment_date: _this.payment_date,
+      };
+      _this.selected.forEach(async (element) => {
+        //
+        await axios
+          .post(`/admin/purchase-invoice/date_payment/${element.id}`, payload)
+          .then(function (response) {
+            _this.$store.commit("showSnackbar", {
+              message: response.data.message,
+              color: "success",
+              duration: 3000,
+            });
+            _this.date_to_pay = "";
+            _this.payment_date = "";
+            _this.reloadTable();
+          })
+          .catch(function (error) {
+            _this.$store.commit("hideLoader");
+            if (error.response) {
+              _this.$store.commit("showSnackbar", {
+                message: error.response.data.message,
+                color: "error",
+                duration: 3000,
+              });
+              return false;
+            } else if (error.request) {
+              console.log(error.request);
+            } else {
+              console.log("Error", error.message);
+            }
+          });
+        //
       });
       _this.selected = [];
     },

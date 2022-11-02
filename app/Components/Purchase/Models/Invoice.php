@@ -9,9 +9,9 @@ class Invoice extends Model
     protected $table = 'invoices';
     protected $guarded = ['id'];
 
-    protected $fillable = [
-        'folio', 'folio_fiscal', 'invoice_date', 'amount', 'date_to_payment', 'payment_date'
-    ];
+    // protected $fillable = [
+    //     'folio', 'folio_fiscal', 'invoice_date', 'amount', 'date_to_payment', 'payment_date'
+    // ];
 
     public function invoiceable()
     {

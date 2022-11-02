@@ -59,7 +59,13 @@
                 label="condicion de pago:"
                 outlined
                 :rules="[(v) => !!v || 'Es Requerido']"
-                :items="['8 Dias', '15 Dias', '30 Dias', '60 Dias', '90 Dias']"
+                :items="[
+                  { text: '8 Dias', value: 8 },
+                  { text: '15 Dias', value: 15 },
+                  { text: '30 Dias', value: 30 },
+                  { text: '60 Dias', value: 60 },
+                  { text: '90 Dias', value: 90 },
+                ]"
                 dense
               ></v-select>
             </v-col>

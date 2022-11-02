@@ -9,7 +9,7 @@
       <v-form ref="form_info" v-model="validFormInfo" lazy-validation>
         <v-row dense>
           <v-col cols="12" md="9">
-            <v-card color="grey lighten-3" min-height="200">
+            <v-card color="grey lighten-2" min-height="200">
               <v-card-title class="pb-0 overline">
                 <v-autocomplete
                   v-model="form.supplier"
@@ -126,54 +126,15 @@
               </v-card-actions>
             </v-card>
             <v-card flat>
-              <!-- <v-card-title>Otros Datos</v-card-title> -->
-              <!-- <v-card-text class="pb-0">
-                <v-row dense>
-                  <v-col cols="12" md="4">
-                    <v-combobox
-                      v-model="form.purchase_concept"
-                      label="Concepto de Compra"
-                      :items="options.purchase_concept"
-                      :rules="[(v) => !!v || 'Es requerido']"
-                      item-value="id"
-                      item-text="name"
-                      outlined
-                      dense
-                    ></v-combobox>
-                  </v-col>
-                  <v-col cols="12" md="4">
-                    <v-select
-                      v-model="form.payment_condition"
-                      label="Condiciones de Pago"
-                      :items="options.payment_condition"
-                      :rules="[(v) => !!v || 'Es requerido']"
-                      outlined
-                      dense
-                    ></v-select>
-                  </v-col>
-                  <v-col cols="12" md="4">
-                    <v-select
-                      v-model="form.agency_id"
-                      label="Embarque a:"
-                      :items="options.agencies"
-                      :rules="[(v) => !!v || 'Es requerido']"
-                      item-value="id"
-                      item-text="title"
-                      outlined
-                      dense
-                    ></v-select>
-                  </v-col>
-                </v-row>
-              </v-card-text> -->
               <v-row dense>
                 <v-col cols="12" md="6">
-                  <v-card-title>Observaciones</v-card-title>
+                  <v-card-title>Justificacion</v-card-title>
                   <v-card-text class="overline">
                     <v-textarea
                       v-model="form.observation"
                       outlined
                       filled
-                      placeholder="Describir a quien van dirigidos los Productos o servicios"
+                      placeholder="Describir el motivo de compra"
                       hint="Justificacion de la compra*"
                       :rules="[(v) => !!v || 'Es requerido']"
                       persistent-hint
@@ -199,10 +160,11 @@
           <v-col cols="12" md="3">
             <v-card color="grey lighten-3" min-height="200">
               <v-card-title>
-                Cargos a Sucursal
+                Cargo a Sucursales
                 <v-spacer></v-spacer>
-                <v-btn icon @click="dialogAddCharge = true">
-                  <v-icon color="primary">mdi-plus-thick</v-icon>
+                <v-btn color="primary" dark @click="dialogAddCharge = true">
+                  Asignar Cargo
+                  <v-icon>mdi-plus-thick</v-icon>
                 </v-btn>
               </v-card-title>
               <v-card-text class="px-0">
@@ -211,6 +173,8 @@
                   @edit="dialogAddCharge = true"
                   @close="dialogAddCharge = false"
                   :items.sync="form.charges"
+                  :agencies="options.agencies"
+                  :departments="options.departments"
                 ></purchase-charge-table>
               </v-card-text>
               <v-card-title>
@@ -310,6 +274,7 @@ export default {
       options: {
         suppliers: [],
         agencies: [],
+        departments: [],
         payment_condition: [
           { text: "8 Dias", value: 8 },
           { text: "15 Dias", value: 15 },
@@ -317,21 +282,7 @@ export default {
           { text: "60 Dias", value: 60 },
           { text: "90 Dias", value: 90 },
         ],
-        purchase_concept: [
-          // "COMPRA DE MAQUINARIA DIVERSA",
-          // "COMPRA DE LLANTAS PARA VENTA",
-          // "SERVICIO DE MANTENIMIENTO",
-          // "COMPRA DE LLANTAS PARA UNIDADES",
-          // "SANITIZACION",
-          // "REFACCIONES",
-          // "PUBLICIDAD",
-          // "PAPELERIA",
-          // "LIMPIEZA",
-          // "IMPRENTA",
-          // "RIEGO",
-          // "SEGUROS",
-          // "STOCK",
-        ],
+        purchase_concept: [],
       },
     };
   },
@@ -367,7 +318,13 @@ export default {
       let payload = {
         supplier_id: _this.form.supplier.id,
         concepts: _this.form.concepts,
-        charges: _this.form.charges,
+        charges: _this.form.charges.map((item) => {
+          return {
+            agency_id: item.agency.id,
+            depto_id: item.department.id,
+            percent: item.percent,
+          };
+        }),
         metodo_pago: _this.form.invoice.metodo_pago_id,
         uso_cfdi: _this.form.invoice.uso_cfdi_id,
         forma_pago: _this.form.invoice.forma_pago_id,
@@ -414,9 +371,15 @@ export default {
       await axios
         .get("/admin/purchase-order/resources/options")
         .then(function (response) {
-          let { suppliers, agencies, purchase_concept } = response.data.data;
+          let {
+            suppliers,
+            agencies,
+            departments,
+            purchase_concept,
+          } = response.data.data;
           _this.options.suppliers = suppliers;
           _this.options.agencies = agencies;
+          _this.options.departments = departments;
           _this.options.purchase_concept = purchase_concept;
         });
     },

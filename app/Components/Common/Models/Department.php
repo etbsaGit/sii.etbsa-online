@@ -30,4 +30,9 @@ class Department extends Model
     {
         return $this->hasMany('App\Components\Tracking\Models\TrackingProspect');
     }
+
+    public function purchaseOrder()
+    {
+        return $this->belongsToMany(PurchaseOrder::class, 'purchase_agency_pivot_table', 'department_id');
+    }
 }
