@@ -157,16 +157,16 @@ class SinglePageController extends AdminController
                 ]
             ]),
             new MenuItem([
-                'group_requirements' => ['Super User'],
-                'permission_requirements' => [],
+                'group_requirements' => [],
+                'permission_requirements' => ['product.admin'],
                 'label' => 'Productos',
                 'nav_type' => MenuItem::$NAV_TYPE_NAV,
                 'icon' => 'mdi-shape-outline',
                 'visible' => true,
                 'children' => [
                     new MenuItem([
-                        'group_requirements' => ['Super User'],
-                        'permission_requirements' => [],
+                        'group_requirements' => [],
+                        'permission_requirements' => ['product.admin'],
                         'label' => 'Productos',
                         'nav_type' => MenuItem::$NAV_TYPE_NAV,
                         'icon' => 'mdi-tractor',
@@ -175,8 +175,8 @@ class SinglePageController extends AdminController
                         'visible' => true,
                     ]),
                     new MenuItem([
-                        'group_requirements' => ['Super User'],
-                        'permission_requirements' => [],
+                        'group_requirements' => [],
+                        'permission_requirements' => ['product.admin'],
                         'label' => 'Categorias',
                         'nav_type' => MenuItem::$NAV_TYPE_NAV,
                         'icon' => 'mdi-shape',
@@ -202,6 +202,16 @@ class SinglePageController extends AdminController
                         'icon' => 'mdi-calendar-check',
                         'route_type' => 'vue',
                         'route_name' => 'tracking.list',
+                        'visible' => true,
+                    ]),
+                    new MenuItem([
+                        'group_requirements' => ['GERENTE', 'DIRECCION', 'Vendedor', 'Super User'],
+                        'permission_requirements' => [],
+                        'label' => 'Mi Calendario',
+                        'nav_type' => MenuItem::$NAV_TYPE_NAV,
+                        'icon' => 'mdi-calendar',
+                        'route_type' => 'vue',
+                        'route_name' => 'tracking.diary',
                         'visible' => true,
                     ]),
                     // new MenuItem([

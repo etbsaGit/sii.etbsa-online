@@ -12,7 +12,7 @@
         class="mr-3"
         hide-details
       ></v-text-field>
-      <v-btn @click="dialog = true" color="primary" dark>
+      <v-btn @click="create" color="primary" dark>
         Agregar Categoria
       </v-btn>
     </v-toolbar>
@@ -31,7 +31,7 @@
         </v-chip>
       </template>
       <template #[`item.action`]="{ item }">
-        <v-icon right class="green--text" @click="editItem(item.id)">
+        <v-icon right class="green--text" @click="editItem(item)">
           mdi-pencil
         </v-icon>
 
@@ -49,6 +49,7 @@
         <v-card-text>
           <v-form lazy-validation ref="form" v-model="valid">
             <v-text-field
+              v-model="form.name"
               label="Nombre Categoria"
               :rules="[(v) => !!v || 'Es Requerido']"
             >
@@ -101,6 +102,9 @@ export default {
   // components: { EditAmsEquipment, CreateAmsEquipment },
   data() {
     return {
+      form: {
+        name: "",
+      },
       headers: [
         {
           text: "ID",
@@ -186,9 +190,12 @@ export default {
           (cb || Function)();
         });
     },
+
     editItem(item) {
-      this.editedId = item;
       this.dialog = true;
+      this.editedId = item.id;
+      this.form.name = item.name;
+      this.$refs.form.resetValidation();
     },
 
     deleteItem(item) {
@@ -213,17 +220,73 @@ export default {
         this.loadProductCategory();
       });
     },
-    submit() {
+    create() {
+      this.dialog = true;
+      this.editedId = -1;
+      this.$refs.form.reset();
+      this.$refs.form.resetValidation();
+    },
+    async submit() {
       const _this = this;
       if (!this.$refs.form.validate()) {
         return;
       }
       if (_this.editedId === -1) {
         //create
-        console.log("Store");
+        console.log("Store", this.form);
+        await axios
+          .post("/admin/products/category", _this.form)
+          .then((response) => {
+            _this.$store.commit("showSnackbar", {
+              message: response.data.message,
+              color: "success",
+              duration: 3000,
+            });
+            _this.loadProductCategory();
+            _this.close();
+            // _this.$emit("submit");
+          })
+          .catch(function (error) {
+            if (error.response) {
+              _this.$store.commit("showSnackbar", {
+                message: error.response.data.message,
+                color: "error",
+                duration: 3000,
+              });
+            } else if (error.request) {
+              console.log(error.request);
+            } else {
+              console.log("Error", error.message);
+            }
+          });
       } else {
         //update
-        console.log("Update");
+        console.log("Update", this.form, this.editedId);
+        await axios
+          .put(`/admin/products/category/${_this.editedId}`, _this.form)
+          .then(function (response) {
+            _this.$store.commit("showSnackbar", {
+              message: response.data.message,
+              color: "success",
+              duration: 3000,
+            });
+            _this.loadProductCategory();
+            _this.close();
+            // _this.$emit("submit");
+          })
+          .catch(function (error) {
+            if (error.response) {
+              _this.$store.commit("showSnackbar", {
+                message: error.response.data.message,
+                color: "error",
+                duration: 3000,
+              });
+            } else if (error.request) {
+              console.log(error.request);
+            } else {
+              console.log("Error", error.message);
+            }
+          });
       }
     },
   },

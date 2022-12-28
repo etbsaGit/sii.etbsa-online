@@ -49,6 +49,7 @@ class ProductController extends AdminController
         if ($validate->fails()) {
             return $this->sendResponseBadRequest($validate->errors()->first());
         }
+        $request['currency_id'] = $request->get('is_dollar', false) ? 2 : 1;
         $product = $this->productRepository->create($request->all());
         if (!$product) {
             return $this->sendResponseBadRequest("Failed create.");
@@ -91,6 +92,7 @@ class ProductController extends AdminController
         if ($validate->fails()) {
             return $this->sendResponseBadRequest($validate->errors()->first());
         }
+        $request['currency_id'] = $request->get('is_dollar', false) ? 2 : 1;
         $updated = $product->update($request->all());
         if (!$updated) {
             return $this->sendResponseBadRequest("Failed update.");

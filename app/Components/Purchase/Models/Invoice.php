@@ -18,6 +18,11 @@ class Invoice extends Model
         return $this->morphTo();
     }
 
+    public function complementos()
+    {
+        return $this->belongsToMany(InvoiceComplemento::class, 'invoice_complemento_pivot_table', 'invoice_id');
+    }
+
 
     public function scopeSearch($query, String $search)
     {

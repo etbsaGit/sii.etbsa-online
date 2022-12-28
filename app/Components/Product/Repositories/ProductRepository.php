@@ -17,7 +17,7 @@ class ProductRepository extends BaseRepository
 
     public function list($params)
     {
-        return $this->get($params, ['category:id,name', 'model:id,name', 'agency:id,title'], function ($q) use ($params) {
+        return $this->get($params, ['category:id,name', 'model:id,name', 'agency:id,title', 'currency'], function ($q) use ($params) {
             $q->search($params['search'] ?? '');
             return $q;
         });

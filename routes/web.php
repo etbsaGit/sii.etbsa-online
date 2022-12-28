@@ -275,21 +275,29 @@ Route::get('/test', function () {
     //     $xmlObject,
     //     $xmlString
     // );
-    $xml = simplexml_load_file(public_path('sample.xml'));
+    $xml = simplexml_load_file(public_path('SAMPLE3.xml'));
     $ns = $xml->getNamespaces(true);
     $xml->registerXPathNamespace('c', $ns['cfdi']);
     $xml->registerXPathNamespace('t', $ns['tfd']);
 
     dd(
-        $xml,
-        $ns,
-        $xml->registerXPathNamespace('c', $ns['cfdi']),
+        // $xml,
+        // $ns,
+        // $xml->registerXPathNamespace('c', $ns['cfdi']),
         $xml->registerXPathNamespace('t', $ns['tfd']),
-        $xml->xpath('//cfdi:Comprobante'),
-        $xml->xpath('//cfdi:Comprobante//cfdi:Emisor'),
         $xml->xpath('//t:TimbreFiscalDigital'),
-        $xml->xpath('//cfdi:Comprobante//cfdi:Conceptos//cfdi:Concepto'),
-        $xml->xpath('//cfdi:Comprobante//cfdi:Receptor')
+        $xml->xpath('//cfdi:Emisor'),
+        $xml->xpath('//cfdi:Receptor'),
+        $xml->xpath('//cfdi:Comprobante'),
+        $xml->xpath('//cfdi:Complemento'),
+        $xml->xpath('//pago10:Pagos'),
+        $xml->xpath('//pago10:Pago'),
+        $xml->xpath('//pago10:DoctoRelacionado'),
+        // $xml->xpath('//pago10:Pagos//pago10:Pago//pago10:DoctoRelacionado'),
+        // $xml->xpath('//cfdi:Comprobante//cfdi:Emisor'),
+        // $xml->xpath('//t:TimbreFiscalDigital'),
+        // $xml->xpath('//cfdi:Comprobante//cfdi:Conceptos//cfdi:Concepto'),
+        // $xml->xpath('//cfdi:Comprobante//cfdi:Receptor'),
     );
 
 

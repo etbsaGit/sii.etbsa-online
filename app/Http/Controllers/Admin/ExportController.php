@@ -10,11 +10,15 @@ use App\Components\Marketing\Repositories\MarketingRepository;
 use App\Components\Tracking\Repositories\TrackingRepository;
 use App\Components\Gps\Repositories\GpsChipsRepository;
 use App\Components\Gps\Repositories\GpsGroupRepository;
+use App\Components\Product\Repositories\ProductRepository;
+use App\Components\Purchase\Repositories\PurchaseInvoiceRepository;
 use App\Components\Purchase\Repositories\SupplierRepository;
 use App\Exports\GpsChipExport;
 use App\Exports\GpsExport;
 use App\Exports\GpsGroupExport;
 use App\Exports\MarketingExport;
+use App\Exports\ProductExport;
+use App\Exports\PurchaseInvoiceExport;
 use App\Exports\SupplierExport;
 use App\Exports\TrackingExport;
 
@@ -40,7 +44,9 @@ class ExportController extends AdminController
         TrackingRepository $trackingRepository,
         GpsChipsRepository $gpsChipsRepository,
         GpsGroupRepository $gpsGroupRepository,
-        SupplierRepository $supplierRepository
+        SupplierRepository $supplierRepository,
+        PurchaseInvoiceRepository $purchaseInvoiceRepository,
+        ProductRepository $productRepository
 
     ) {
         $this->gpsRepository = $gpsRepository;
@@ -49,6 +55,8 @@ class ExportController extends AdminController
         $this->marketingRepository = $marketingRepository;
         $this->trackingRepository = $trackingRepository;
         $this->supplierRepository = $supplierRepository;
+        $this->purchaseInvoiceRepository = $purchaseInvoiceRepository;
+        $this->productRepository = $productRepository;
     }
 
     /**
@@ -95,5 +103,18 @@ class ExportController extends AdminController
         $data = $this->supplierRepository->list($request->all());
 
         return Excel::download(new SupplierExport($data), 'supplier.xlsx');
+    }
+    public function exportInvoice(Request $request)
+    {
+        $data = $this->purchaseInvoiceRepository->list($request->all());
+
+        return Excel::download(new PurchaseInvoiceExport($data), 'invoices.xlsx');
+    }
+    public function exportProducts(Request $request)
+    {
+        $data = $this->productRepository->list($request->all());
+        // return dd($data);
+
+        return Excel::download(new ProductExport($data), 'products.xlsx');
     }
 }

@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card height="100%">
     <v-navigation-drawer v-model="drawer" width="250" touchless absolute>
       <v-sheet
         color="grey lighten-4"
@@ -61,14 +61,15 @@
           :type="type"
           @click:event="showEvent"
           @click:more="viewDay"
+          style="height: 80vh;"
         ></v-calendar>
         <v-menu
           v-model="selectedOpen"
           :close-on-content-click="false"
           :activator="selectedElement"
-          max-width="500"
+          max-width="600"
         >
-          <v-card color="grey lighten-4" max-width="500" flat>
+          <v-card color="grey lighten-4" max-width="600" flat>
             <v-card-title :class="selectedEvent.color">
               <span
                 class="white--text"
@@ -133,6 +134,10 @@ export default {
 
   mounted() {
     this.$refs.calendar.checkChange();
+    this.$store.commit("setBreadcrumbs", [
+      { label: "Seguimientos", to: { name: "tracking.list" } },
+      { label: "Calendario", to: { name: "" } },
+    ]);
     this.loadHistorical();
     // this.updateRange({ start, end });
   },

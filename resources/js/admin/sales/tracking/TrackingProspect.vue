@@ -4,8 +4,14 @@
       <span class="text-h4">
         Folio #{{ propTracking.id.toString().padStart(5, 0) }}
       </span>
-      <v-spacer />
-      <v-tooltip left>
+      <v-chip
+        class="ml-2 overline"
+        :color="color[propTracking.estatus.key]"
+        dark
+      >
+        {{ propTracking.estatus.title }}
+      </v-chip>
+      <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
           <v-progress-circular
             v-bind="attrs"
@@ -24,13 +30,7 @@
         </template>
         <span>{{ percenAssertiveness.text }}</span>
       </v-tooltip>
-      <v-chip
-        class="ml-2 overline"
-        :color="color[propTracking.estatus.key]"
-        dark
-      >
-        {{ propTracking.estatus.title }}
-      </v-chip>
+      <v-spacer />
       <v-btn
         color="primary"
         class="ml-2"
@@ -49,194 +49,65 @@
         <v-col cols="12" md="5" v-if="Tracking">
           <card-info-tracking :info="Tracking"></card-info-tracking>
         </v-col>
-        <v-col cols="12" md="7" v-if="Tracking.historical">
-          <v-card flat>
-            <v-card-actions
-              class="d-flex justify-space-around align-content-center flex-wrap"
-            >
-              <v-btn
-                dark
-                small
-                class="ma-1"
-                color="green"
-                @click="dialog = true"
-                v-if="propTracking.estatus.key == 'activo'"
-              >
-                Agregar Actividad <v-icon right>mdi-plus-thick</v-icon>
-              </v-btn>
+        <v-col cols="12" md="7">
+          <v-tabs color="deep-purple accent-3" right>
+            <v-tab>Actividades</v-tab>
+            <v-tab>Cotizaciones</v-tab>
+            <v-tab>Mensajes</v-tab>
 
-              <v-btn
-                dark
-                small
-                class="ma-1"
-                color="purple"
-                @click="dialogDelivery = true"
-                v-if="propTracking.estatus.key == 'formalizado'"
-              >
-                Programar / Registrar Entrega
-                <v-icon right>mdi-timeline-clock-outline</v-icon>
-              </v-btn>
-
-              <v-btn
-                dark
-                small
-                class="ma-1"
-                color="red"
-                @click="dialogDiscard = true"
-                v-if="propTracking.estatus.key == 'activo'"
-              >
-                Venta Perdida <v-icon right>mdi-trash-can</v-icon>
-              </v-btn>
-              <v-btn
-                dark
-                small
-                class="ma-1"
-                color="indigo"
-                @click="dialogFormalize = true"
-                v-if="propTracking.estatus.key != 'formalizado'"
-              >
-                Venta Ganada <v-icon right>mdi-receipt</v-icon>
-              </v-btn>
-              <v-btn
-                dark
-                small
-                class="ma-1"
-                color="blue"
-                @click="dialogMessages = true"
-              >
-                Mensajes <v-icon right>mdi-forum</v-icon>
-              </v-btn>
-            </v-card-actions>
-            <v-card-title>
-              Actividades
-            </v-card-title>
-            <v-card-text>
-              <historical-tracking
-                :Tracking="propTracking"
+            <v-tab-item>
+              <tracking-activity
+                v-if="Tracking.historical"
+                :propTracking="propTracking"
                 :timeline="timeline"
-              ></historical-tracking>
-            </v-card-text>
-          </v-card>
+              ></tracking-activity>
+            </v-tab-item>
+            <v-tab-item>
+              <v-container fluid>
+                <tracking-quote-component
+                  :tracking-id="propTrackingId"
+                ></tracking-quote-component>
+              </v-container>
+            </v-tab-item>
+            <v-tab-item>
+              <message-tracking
+                :seller-id="propTracking.owner"
+                :tracking-id="propTracking.id"
+              ></message-tracking>
+            </v-tab-item>
+          </v-tabs>
         </v-col>
       </v-row>
     </v-card-text>
-
-    <dialog-component
-      :show="dialog"
-      @close="(dialog = false), forceRerender()"
-      :maxWidth="600"
-      title="Agregar Proximo Seguimiento"
-      closeable
-    >
-      <tracking-historical-form-add
-        :key="componentKey"
-        :trackingId="propTracking.id"
-        :tracking="propTracking"
-      ></tracking-historical-form-add>
-    </dialog-component>
-
-    <dialog-component
-      :show="dialogDiscard"
-      @close="(dialogDiscard = false), forceRerender()"
-      :maxWidth="600"
-      title="Descartar Seguimiento"
-      closeable
-    >
-      <tracking-historical-form-discard
-        :key="componentKey"
-        :trackingId="propTracking.id"
-        :tracking="propTracking"
-      ></tracking-historical-form-discard>
-    </dialog-component>
-
-    <dialog-component
-      :show="dialogDelivery"
-      @close="(dialogDelivery = false), forceRerender()"
-      :maxWidth="600"
-      title="Programar o Resgitrar Entrega"
-      closeable
-    >
-      <tracking-historical-form-delivery
-        :key="componentKey"
-        :trackingId="propTracking.id"
-        :tracking="propTracking"
-      ></tracking-historical-form-delivery>
-    </dialog-component>
-
-    <dialog-component
-      :show="dialogFormalize"
-      @close="dialogFormalize = false"
-      :maxWidth="600"
-      title="Formalizar Registrar Factura"
-      closeable
-    >
-      <tracking-historical-form-order
-        v-if="dialogFormalize"
-        :trackingId="propTracking.id"
-        :tracking="propTracking"
-      >
-      </tracking-historical-form-order>
-    </dialog-component>
-
-    <dialog-component
-      :show="dialogMessages"
-      @close="dialogMessages = false"
-      :maxWidth="600"
-      title=" Mensajes del Seguimiento"
-      closeable
-    >
-      <message-tracking
-        :seller-id="propTracking.owner"
-        :tracking-id="propTracking.id"
-      ></message-tracking>
-    </dialog-component>
   </v-card>
 </template>
 
 <script>
 import CardInfoTracking from "@admin/sales/tracking/components/CardInfoTracking.vue";
 import HistoricalTracking from "@admin/sales/tracking/components/HistoricalTracking.vue";
-import MessageTracking from "./components/TrackingMessages.vue";
-import DialogComponent from "../../components/DialogComponent.vue";
-import TrackingHistoricalFormAdd from "./TrackingHistoricalFormAdd.vue";
-import TrackingHistoricalFormDiscard from "./TrackingHistoricalFormDiscard.vue";
-import TrackingHistoricalFormOrder from "./TrackingHistoricalFormOrder.vue";
+import MessageTracking from "@admin/sales/tracking/components/TrackingMessages.vue";
 import Assertiveness from "@admin/sales/tracking/resources/assertiveness.json";
-import TrackingHistoricalFormDelivery from "./TrackingHistoricalFormDelivery.vue";
+import TrackingActivity from "@admin/sales/tracking/components/TrackingActivityComponent.vue";
+import TrackingQuoteComponent from "@admin/sales/tracking/components/TrackingQuoteComponent.vue";
 
 export default {
   components: {
     CardInfoTracking,
     HistoricalTracking,
     MessageTracking,
-    DialogComponent,
-    TrackingHistoricalFormAdd,
-    TrackingHistoricalFormDiscard,
-    TrackingHistoricalFormOrder,
-    TrackingHistoricalFormDelivery,
+    TrackingActivity,
+    TrackingQuoteComponent,
   },
   props: {
     propTrackingId: {
-      required: true,
       type: [Number, String],
+      required: true,
     },
   },
   data() {
     return {
-      componentKey: 0,
-      dialogMessages: false,
-      dialogCalendar: false,
-      dialogDiscard: false,
-      dialogDelivery: false,
-      dialogFormalize: false,
-      dialog: false,
-      form: {
-        date_next_tracking: null,
-      },
-      formAdd: {},
       Tracking: null,
       tab: null,
-      items: ["Seguimiento", "Mensajes"],
       color: {
         activo: "primary",
         finalizado: "red",
@@ -247,14 +118,13 @@ export default {
 
   mounted() {
     const self = this;
+    self.$store.commit("setBreadcrumbs", [
+      { label: "Segumientos", to: { name: "tracking.list" } },
+      { label: "Detalle Seguimiento", to: "" },
+    ]);
     self.loadTracking(() => {});
     self.$eventBus.$on(["MESSAGE_ADDED"], () => {
       self.loadTracking(() => {});
-      self.dialogMessages = false;
-      self.dialogCalendar = false;
-      self.dialogDiscard = false;
-      self.dialogDelivery = false;
-      self.dialogFormalize = false;
     });
   },
   computed: {
@@ -297,9 +167,6 @@ export default {
   },
 
   methods: {
-    forceRerender() {
-      this.componentKey += 1;
-    },
     async loadTracking(cb) {
       const self = this;
       await axios

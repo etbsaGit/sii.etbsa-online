@@ -139,8 +139,8 @@ class PurchaseOrderController extends AdminController
             'created_by' => $purchase_order->created_by,
             'supplier' => $purchase_order->supplier,
             'concepts' => $purchase_order->concepts,
-            // 'charges' => $purchase_order->charges,
-            'charges' => $purchase_order->charge,
+            'charges' => $purchase_order->charges,
+            // 'charges' => $purchase_order->charge,
             "invoice" => [
                 'metodo_pago' => $purchase_order->metodopago,
                 'uso_cfdi' => $purchase_order->usocfdi,
