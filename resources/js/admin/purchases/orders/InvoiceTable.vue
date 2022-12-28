@@ -46,69 +46,13 @@
                 }}
               </td>
               <td>
-                <!-- <v-btn
-                  v-if="item.date_to_payment == null"
-                  text
-                  color="pink"
-                  small
-                >
-                  Programar Pago
-                </v-btn> -->
-                <!-- <v-dialog
-                  ref="dialog_calendar"
-                  v-model="dialogCalendar"
-                  :return-value.sync="date_to_payment"
-                  persistent
-                  transition="scale-transition"
-                  width="324px"
-                  v-if="item.date_to_payment == null"
-                >
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn
-                      color="pink"
-                      v-bind="attrs"
-                      v-on="on"
-                      class="ml-2"
-                      dark
-                    >
-                      {{
-                        date_to_payment
-                          ? `Pagar el: ${$appFormatters.formatDate(
-                              date_to_payment,
-                              "ll"
-                            )}`
-                          : "Programar Fecha de Pago"
-                      }}
-                      <v-icon right>mdi-clock-check-outline</v-icon>
-                    </v-btn>
-                  </template>
-                  <v-date-picker
-                    v-model="date_to_payment"
-                    scrollable
-                    :min="new Date().toISOString().substr(0, 10)"
-                  >
-                    <v-spacer></v-spacer>
-                    <v-btn text color="primary" @click="dialogCalendar = false">
-                      Cancel
-                    </v-btn>
-                    <v-btn
-                      text
-                      color="primary"
-                      @click="$refs.dialog_calendar.save(date_to_payment)"
-                    >
-                      updateDateToPayment(item.id)
-                      Confirmar
-                    </v-btn>
-                  </v-date-picker>
-                </v-dialog> -->
-
                 <v-dialog
                   :ref="`dialog-${item.id}`"
                   v-model="modal"
-                  :return-value.sync="date_to_payment"
+                  :return-value.sync="date_to_pay"
                   persistent
                   width="290px"
-                  v-if="item.date_to_payment == null"
+                  v-if="item.date_to_pay == null"
                 >
                   <template v-slot:activator="{ on, attrs }">
                     <v-btn
@@ -119,9 +63,9 @@
                       dark
                     >
                       {{
-                        item.date_to_payment
+                        item.date_to_pay
                           ? `Pagar el: ${$appFormatters.formatDate(
-                              item.date_to_payment,
+                              item.date_to_pay,
                               "ll"
                             )}`
                           : "Programar Fecha de Pago"
@@ -129,7 +73,7 @@
                       <v-icon right>mdi-clock-check-outline</v-icon>
                     </v-btn>
                   </template>
-                  <v-date-picker v-model="date_to_payment" scrollable>
+                  <v-date-picker v-model="date_to_pay" scrollable>
                     <v-spacer></v-spacer>
                     <v-btn text color="primary" @click="modal = false">
                       Cancel
@@ -146,7 +90,7 @@
                 <span v-else>
                   {{
                     $appFormatters.formatDate(
-                      item.date_to_payment || "",
+                      item.date_to_pay || "",
                       "DD MMM YYYY"
                     )
                   }}
@@ -354,9 +298,7 @@ export default {
         invoice_date: "",
         amount: 0,
       },
-      date_to_payment: new Date(
-        Date.now() - new Date().getTimezoneOffset() * 60000
-      )
+      date_to_pay: new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
         .toISOString()
         .substr(0, 10),
       payment_date: "",
@@ -473,7 +415,7 @@ export default {
       const _this = this;
 
       let payload = {
-        date_to_payment: _this.date_to_payment,
+        date_to_pay: _this.date_to_pay,
         // payment_date: _this.payment_date,
       };
       await axios
@@ -484,7 +426,7 @@ export default {
             color: "success",
             duration: 3000,
           });
-          _this.date_to_payment = "";
+          _this.date_to_pay = "";
           _this.payment_date = "";
           _this.$eventBus.$emit("ORDERS_REFRESH");
         })
@@ -508,7 +450,6 @@ export default {
       const _this = this;
 
       let payload = {
-        // date_to_payment: _this.date_to_payment,
         payment_date: _this.payment_date,
       };
       await axios
@@ -519,7 +460,7 @@ export default {
             color: "success",
             duration: 3000,
           });
-          _this.date_to_payment = "";
+          _this.date_to_pay = "";
           _this.payment_date = "";
           _this.$eventBus.$emit("ORDERS_REFRESH");
         })

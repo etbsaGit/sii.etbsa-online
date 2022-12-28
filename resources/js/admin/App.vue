@@ -76,7 +76,7 @@
       v-show="showDialog"
       v-model="showDialog"
       absolute
-      max-width="450px"
+      max-width="500px"
     >
       <v-card>
         <v-card-title class="headline grey lighten-3 text-uppercase">
@@ -90,7 +90,7 @@
         </v-card-text>
         <v-card-actions v-if="dialogType == 'confirm'">
           <v-spacer></v-spacer>
-          <v-btn color="green" @click.native="dialogCancel">
+          <v-btn color="blue" dark @click.native="dialogCancel">
             Cancelar
           </v-btn>
           <v-btn color="red" text @click.native="dialogOk">

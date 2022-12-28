@@ -162,9 +162,14 @@
               <v-card-title>
                 Cargo a Sucursales
                 <v-spacer></v-spacer>
-                <v-btn color="primary" dark @click="dialogAddCharge = true">
-                  Asignar Cargo
-                  <v-icon>mdi-plus-thick</v-icon>
+                <v-btn
+                  color="primary"
+                  dark
+                  @click="dialogAddCharge = true"
+                  small
+                >
+                  Asignar
+                  <v-icon right>mdi-plus-thick</v-icon>
                 </v-btn>
               </v-card-title>
               <v-card-text class="px-0">
@@ -180,8 +185,14 @@
               <v-card-title>
                 Facturacion
                 <v-spacer></v-spacer>
-                <v-btn icon @click="dialogConfigInvoice = true">
-                  <v-icon>mdi-settings</v-icon>
+                <v-btn
+                  @click="dialogConfigInvoice = true"
+                  color="purple"
+                  dark
+                  small
+                >
+                  Configurar
+                  <v-icon right>mdi-settings</v-icon>
                 </v-btn>
               </v-card-title>
               <v-card-text class="px-0">

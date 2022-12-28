@@ -241,15 +241,7 @@
             :propTrackingId="dialogs.id"
           ></tracking-prospect>
         </dialog-component>
-        <!-- <dialog-component
-          :show="dialogs.create"
-          @close="(dialogs.create = false), (dialogs.id = null)"
-          fullscreen
-          closeable
-          title=""
-        >
-          <tracking-create v-if="dialogs.create"></tracking-create>
-        </dialog-component> -->
+
         <v-dialog v-model="dialogs.create" scrollable max-width="600">
           <v-card flat>
             <v-toolbar flat dense height="24">
@@ -264,14 +256,6 @@
             ></tracking-create>
           </v-card>
         </v-dialog>
-        <!-- <v-dialog
-          v-model="dialogCreateStepper"
-          width="700"
-          scrollable
-          :fullscreen="$vuetify.breakpoint.mobile"
-        >
-          <tracking-create-stepper></tracking-create-stepper>
-        </v-dialog> -->
       </template>
 
       <!-- body.prepend -->
@@ -578,7 +562,6 @@ import Notification from "./components/Notification.vue";
 import SearchPanel from "@admin/components/shared/SearchPanel.vue";
 import TableHeaderButtons from "@admin/components/shared/TableHeaderButtons.vue";
 import DialogComponent from "@admin/components/DialogComponent.vue";
-// import TrackingCreateStepper from "./TrackingCreateStepper.vue";
 import TrackingCreate from "./TrackingCreate.vue";
 
 export default {
@@ -588,7 +571,6 @@ export default {
     SearchPanel,
     TableHeaderButtons,
     DialogComponent,
-    // TrackingCreateStepper,
     TrackingCreate,
   },
   data() {
@@ -625,7 +607,7 @@ export default {
           width: 200,
         },
         {
-          text: "Precio",
+          text: "Valor",
           value: "price",
           sortable: true,
         },

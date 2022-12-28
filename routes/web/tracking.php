@@ -1,5 +1,6 @@
 <?php
 
+
 Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function () {
 
     Route::resource('tracking', 'TrackingProspectController');
@@ -23,4 +24,10 @@ Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function
     // TRACKING_MESSAGES
     Route::get('tracking/{tracking}/message', 'TrackingProspectMessageController@index')->name('tracking-message.index');
     Route::post('tracking/{tracking}/message', 'TrackingProspectMessageController@store')->name('tracking-message.store');
+
+    // TRACKING QUOTES
+    Route::resource('quotes', 'TrackingQuoteController');
+    Route::get('quote/options', 'TrackingQuoteController@getOptions')->name('tracking-quote.getOptions');
+    Route::get('quote/products_by_category/{product_category}', 'TrackingQuoteController@getProductsByCategory')->name('tracking-quote.getProductsByCategory');
+    Route::get('quote/{quote}/print', 'TrackingQuoteController@printQuote')->name('tracking-quote.print');
 });

@@ -27,8 +27,11 @@ Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function
     Route::get('purchase-invoice', 'PurchaseInvoiceController@index')->name('purchase-invoice.index');
     Route::post('purchase-invoice/date_to_payment/{invoice}', 'PurchaseInvoiceController@updateDateToPayment')->name('purchase-invoice.updateDateToPayment');
     Route::post('purchase-invoice/date_payment/{invoice}', 'PurchaseInvoiceController@updateDatePayment')->name('purchase-invoice.updateDatePayment');
-
+    Route::get('purchase-invoice-export', 'ExportController@exportInvoice')->name('purchase-invoice.export');
     // PURCHASE CONCEPTS
     Route::resource('purchase-concept', 'PurchaseConceptController');
     Route::put('purchase-concept/{purchaseConcept}/update-uso-cfdi', 'PurchaseConceptController@updateUsoCfdi')->name('purchase-concept.updateUsoCfdi');
+
+    // EXPORT
+    Route::get('purchase-order/export', 'ExportController@exportPurchaseInvoice')->name('purchase.export');
 });

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Components\Common\Models\Currency;
 use App\Components\Common\Models\Estatus;
 use App\Components\RRHH\Models\Employee;
 use App\Components\Tracking\Models\Prospect;
@@ -104,9 +105,12 @@ class TrackingProspectController extends AdminController
         if ($validate->fails()) {
             return $this->sendResponseBadRequest($validate->errors()->first());
         }
+
         DB::transaction(function () use ($request) {
             $request['registered_by'] = Auth::user()->id;
             $request['assigned_by'] = Auth::user()->id;
+            $request['date_next_tracking'] = Carbon::now()->addDays(15);
+            $currency_name = Currency::where('id', $request['currency_id'])->first();
 
             /** @var Prospect $tracking */
             $created = $this->trackingRepository->create($request->all());
@@ -115,9 +119,22 @@ class TrackingProspectController extends AdminController
             if (!$created) {
                 return $this->sendResponseBadRequest("Failed create.");
             }
+
             $estatus = Estatus::where('key', Estatus::ESTATUS_ACTIVO)->first();
             $tracking->estatus()->associate($estatus);
             $tracking->save();
+            $tracking->refresh();
+
+
+            $tracking->historical()->create([
+                'message' => 'Llamar para dar Seguimiento',
+                'last_price' => $request['price'],
+                'last_currency' => $currency_name->name,
+                'type_contacted' => 'Llamada',
+                'user_id' => $request['attended_by'],
+                'date_next_tracking' =>  $request['date_next_tracking'],
+                'last_assertiveness' => $request['assertiveness'],
+            ]);
 
             // $tracking->attended->notify(new TrackingAssigned($tracking));
         });

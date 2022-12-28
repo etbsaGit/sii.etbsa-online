@@ -2,6 +2,7 @@
 
 namespace App\Components\Common\Models;
 
+use App\Components\Product\Models\Product;
 use Illuminate\Database\Eloquent\Model;
 
 class Currency extends Model
@@ -24,5 +25,9 @@ class Currency extends Model
     public function tracking()
     {
         return $this->hasMany('App\Components\Tracking\Models\TrackingProspect');
+    }
+    public function products()
+    {
+        return $this->hasMany(Product::class);
     }
 }

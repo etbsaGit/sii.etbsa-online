@@ -15,16 +15,33 @@
       <v-btn color="primary" dark @click="create">
         Registrar Producto
       </v-btn>
+      <v-spacer />
+      <table-header-buttons
+        :reloadTable="reloadTable"
+        :exportTable="exportTable"
+      ></table-header-buttons>
     </v-toolbar>
 
     <v-data-table
-      v-bind:headers="headers"
-      :options.sync="pagination"
+      :headers="headers"
       :items="items"
+      :options.sync="pagination"
       :server-items-length="totalItems"
       fixed-header
+      calculate-widths
+      caption
       dense
     >
+      <template #[`header.qty`]="{ header }">
+        <span v-if="$router.currentRoute.name != 'products.index'">
+          {{ header.text }}
+        </span>
+      </template>
+
+      <template #[`item.name`]="{ item }">
+        <div class="text-uppercase font-weight-bold">{{ item.name }}</div>
+        <div class="caption text--secondary">SKU: {{ item.sku }}</div>
+      </template>
       <template #[`item.price_1`]="{ item }">
         {{ item.price_1 | money }} {{ item.is_dollar ? "USD" : "MXN" }}
       </template>
@@ -34,14 +51,36 @@
       <template #[`item.is_usado`]="{ value }">
         <v-icon :color="value ? 'green' : 'grey'">mdi-check-circle</v-icon>
       </template>
+      <template #[`item.qty`]="{ item }">
+        <v-text-field
+          v-if="$router.currentRoute.name != 'products.index'"
+          v-model.number="item.qty"
+          placeholder="qty"
+          append-outer-icon="pz"
+          type="number"
+          outlined
+          hide-details
+          dense
+          reverse
+        ></v-text-field>
+      </template>
       <template #[`item.action`]="{ item }">
-        <v-icon right class="green--text" @click="editItem(item)">
-          mdi-pencil
-        </v-icon>
+        <td v-if="$router.currentRoute.name != 'products.index'">
+          <v-btn @click="select(item)" icon>
+            <v-icon class="green--text">
+              mdi-plus-thick
+            </v-icon>
+          </v-btn>
+        </td>
+        <td v-else>
+          <v-icon right class="green--text" @click="editItem(item)">
+            mdi-pencil
+          </v-icon>
 
-        <v-icon left class="red--text" @click="deleteItem(item.id)">
-          mdi-trash-can
-        </v-icon>
+          <v-icon left class="red--text" @click="deleteItem(item.id)">
+            mdi-trash-can
+          </v-icon>
+        </td>
       </template>
     </v-data-table>
 
@@ -183,8 +222,22 @@
   </div>
 </template>
 <script>
+import TableHeaderButtons from "../../components/shared/TableHeaderButtons.vue";
 export default {
-  name: "Tractors",
+  components: { TableHeaderButtons },
+  name: "ProductsList",
+  props: {
+    filters: {
+      type: Object,
+      require: false,
+      default: () => {
+        return {
+          search: "",
+          active: null,
+        };
+      },
+    },
+  },
   mounted() {
     const _this = this;
     _this.$store.commit("setBreadcrumbs", [{ label: "Productos", name: "" }]);
@@ -236,6 +289,13 @@ export default {
           sortable: false,
         },
 
+        {
+          text: "Cantidad",
+          value: "qty",
+          align: "center",
+          sortable: false,
+          width: "150",
+        },
         { text: "Action", value: "action", align: "left", sortable: false },
       ],
       valid: true,
@@ -262,11 +322,13 @@ export default {
       options: {},
       totalItems: 0,
       pagination: {
-        rowsPerPage: 10,
+        itemsPerPage: 10,
+        page: 1,
       },
-      filters: {
-        search: "",
-      },
+      // filters: {
+      //   search: "",
+      //   active: null,
+      // },
       options: {
         category: [],
         agency: [],
@@ -282,6 +344,7 @@ export default {
     },
     filters: {
       handler: _.debounce(function (v) {
+        this.pagination.page = 1;
         this.loadProducts(() => {});
       }, 700),
       deep: true,
@@ -306,6 +369,9 @@ export default {
     },
   },
   methods: {
+    reloadTable() {
+      this.loadProducts(() => {});
+    },
     async loadProducts(cb) {
       const _this = this;
 
@@ -321,10 +387,42 @@ export default {
       await axios.get("/admin/products", { params }).then((response) => {
         _this.items = response.data.data.data.data;
         _this.options = response.data.data.options;
-        _this.totalItems = response.data.data.total;
-        _this.pagination.totalItems = response.data.data.total;
+        _this.totalItems = response.data.data.data.total;
+        _this.pagination.totalItems = response.data.data.data.total;
         (cb || Function)();
       });
+    },
+    async exportTable(cb) {
+      const _this = this;
+
+      let params = {
+        ..._this.filters,
+        paginate: "no",
+      };
+
+      await axios
+        .get("/admin/product-export", { params, responseType: "blob" })
+        .then((res) => {
+          const url = window.URL.createObjectURL(new Blob([res.data]));
+          const link = document.createElement("a");
+          link.href = url;
+          link.setAttribute("download", "products.xlsx"); //or any other extension
+          document.body.appendChild(link);
+          link.click();
+        })
+        .catch(function (error) {
+          if (error.response) {
+            _this.$store.commit("showSnackbar", {
+              message: error.response.data.message,
+              color: "error",
+              duration: 3000,
+            });
+          } else if (error.request) {
+            console.log(error.request);
+          } else {
+            console.log("Error", error.message);
+          }
+        });
     },
 
     deleteItem(item) {
@@ -377,7 +475,6 @@ export default {
         _this.form.price_3 = item.price_3;
       }, 500);
     },
-
     async submit() {
       const _this = this;
       if (!this.$refs.form.validate()) {
@@ -388,6 +485,7 @@ export default {
         active: !!_this.form.active,
         is_usado: Boolean(_this.form.is_usado),
         is_dollar: !!_this.form.is_dollar,
+        currency_id: !!_this.form.is_dollar ? 2 : 1,
       };
       if (_this.editedId === -1) {
         //create
@@ -446,6 +544,10 @@ export default {
             }
           });
       }
+    },
+    select(product) {
+      const _this = this;
+      _this.$eventBus.$emit("PRODUCT_SELECTED", product);
     },
   },
 };

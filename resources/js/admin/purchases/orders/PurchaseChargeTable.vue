@@ -7,9 +7,9 @@
             <td class="pr-1" @click="editItem(item)">
               <v-list-item-content>
                 <v-list-item-title>{{ item.agency.title }}</v-list-item-title>
-                <v-list-item-subtitle>{{
-                  item.department.title
-                }}</v-list-item-subtitle>
+                <v-list-item-subtitle>
+                  {{ item.department.title }}
+                </v-list-item-subtitle>
               </v-list-item-content>
             </td>
             <td class="text-center px-0" style="width: 70px;">
