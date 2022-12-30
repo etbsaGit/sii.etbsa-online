@@ -3,6 +3,7 @@ import GpsPolicy from "~/common/Gate/Policies/GpsPolicy";
 import TrackingPolicy from "~/common/Gate/Policies/TrackingPolicy";
 import VehiclesPolicy from "~/common/Gate/Policies/VehiclesPolicy";
 import PurchasePolicy from "~/common/Gate/Policies/PurchasePolicy";
+import ProductsPolicy from "~/common/Gate/Policies/ProductsPolicy";
 import store from "../Store";
 
 export default class Gate {
@@ -16,6 +17,7 @@ export default class Gate {
       tracking: TrackingPolicy,
       vehicles: VehiclesPolicy,
       compras: PurchasePolicy,
+      products: ProductsPolicy,
     };
 
     // this.groups = {

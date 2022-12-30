@@ -12,7 +12,12 @@
         class="mr-3"
         hide-details
       ></v-text-field>
-      <v-btn color="primary" dark @click="create">
+      <v-btn
+        v-if="$gate.allow('isAdmin', 'products')"
+        color="primary"
+        dark
+        @click="create"
+      >
         Registrar Producto
       </v-btn>
       <v-spacer />
