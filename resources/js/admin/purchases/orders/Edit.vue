@@ -1,13 +1,10 @@
 <template>
   <v-card flat>
-    <v-card-title class="overline">
-      <v-icon left>mdi-file-document</v-icon> Acciones
-
+    <v-card-title class="overline align-center">
+      <v-icon left>mdi-file-document</v-icon> Detalle Orden de compra #
+      {{ purchaseId.toString().padStart(5, 0) }}
       <v-spacer></v-spacer>
-      <v-btn class="ml-2" color="blue" @click="dialogMessages = true" dark>
-        Mensajes <v-icon right>mdi-forum</v-icon>
-      </v-btn>
-
+      <b>Acciones:</b>
       <v-btn
         v-if="canSave"
         class="ml-2"
@@ -15,10 +12,30 @@
         @click="updatePurchase"
         dark
       >
-        Guardar
+        Guardar Cambios de OC
         <v-icon right>mdi-content-save</v-icon>
       </v-btn>
+      <v-btn
+        v-if="canPrint"
+        class="ml-2"
+        color="green"
+        :href="`/admin/purchase-order/${purchaseId}/resources/print`"
+        target="_blank"
+        dark
+      >
+        Descargar OC PDF
+        <v-icon right>mdi-file-pdf-box</v-icon>
+      </v-btn>
 
+      <v-btn
+        v-if="canMarkAsSend"
+        class="ml-2"
+        color="black"
+        @click="updateEstatusPurchase('por_facturar')"
+        dark
+      >
+        Marcar OC Como Por Facturar <v-icon right>mdi-file-send-outline</v-icon>
+      </v-btn>
       <v-btn
         v-if="canAutorize"
         class="ml-2"
@@ -26,19 +43,8 @@
         @click="updateEstatusPurchase('autorizado')"
         dark
       >
-        Autorizar <v-icon right>mdi-check</v-icon>
+        Marcar OC Autorizada <v-icon right>mdi-check</v-icon>
       </v-btn>
-
-      <v-btn
-        v-if="canReject"
-        class="ml-2"
-        color="red"
-        @click="updateEstatusPurchase('denegar')"
-        dark
-      >
-        Rechazar <v-icon right>mdi-window-close</v-icon>
-      </v-btn>
-
       <v-btn
         v-if="canVerify"
         class="ml-2"
@@ -46,110 +52,24 @@
         @click="updateEstatusPurchase('verificado')"
         dark
       >
-        Validar OC <v-icon right>mdi-check-all</v-icon>
+        Marcar OC VALIDA <v-icon right>mdi-check-all</v-icon>
       </v-btn>
-
-      <!-- <v-btn
-        v-if="form.estatus.key == 'enviado'"
+      <v-btn
+        v-if="canReject"
         class="ml-2"
-        color="indigo"
-        @click="dialogInvoice = true"
+        color="red"
+        @click="updateEstatusPurchase('denegar')"
         dark
       >
-        Registrar Factura <v-icon right>mdi-receipt</v-icon>
-      </v-btn> -->
-
-      <!-- <v-dialog
-        ref="dialog_calendar"
-        v-model="dialogCalendar"
-        :return-value.sync="form.invoice_info.date_to_payment"
-        persistent
-        transition="scale-transition"
-        width="324px"
-        v-if="canShedulePaymentDate"
-      >
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn color="pink" v-bind="attrs" v-on="on" class="ml-2" dark>
-            {{
-              form.invoice_info.date_to_payment
-                ? `Pagar el: ${$appFormatters.formatDate(
-                    form.invoice_info.date_to_payment,
-                    "ll"
-                  )}`
-                : "Programar Fecha de Pago"
-            }}
-            <v-icon right>mdi-clock-check-outline</v-icon>
-          </v-btn>
-        </template>
-        <v-date-picker
-          v-model="form.invoice_info.date_to_payment"
-          scrollable
-          :min="new Date().toISOString().substr(0, 10)"
-        >
-          <v-spacer></v-spacer>
-          <v-btn text color="primary" @click="dialogCalendar = false">
-            Cancel
-          </v-btn>
-          <v-btn
-            text
-            color="primary"
-            @click="
-              $refs.dialog_calendar.save(form.invoice_info.date_to_payment),
-                updateDateToPayment()
-            "
-          >
-            Confirmar
-          </v-btn>
-        </v-date-picker>
-      </v-dialog> -->
-
-      <!-- <v-dialog
-        ref="dialog_payment"
-        v-model="dialogPayment"
-        :return-value.sync="form.invoice_info.payment_date"
-        persistent
-        transition="scale-transition"
-        width="324px"
-        v-if="markAsPaid"
-      >
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn color="cyan" v-bind="attrs" v-on="on" class="ml-2" dark>
-            {{
-              form.invoice_info.payment_date
-                ? `Pagada el: ${$appFormatters.formatDate(
-                    form.invoice_info.payment_date,
-                    "ll"
-                  )}`
-                : "Fecha Pago Factura"
-            }}
-            <v-icon right>mdi-file-check-outline</v-icon>
-          </v-btn>
-        </template>
-        <v-date-picker
-          v-model="form.invoice_info.payment_date"
-          scrollable
-          :min="new Date().toISOString().substr(0, 10)"
-        >
-          <v-spacer></v-spacer>
-          <v-btn text color="primary" @click="dialogPayment = false">
-            Cancel
-          </v-btn>
-          <v-btn
-            text
-            color="primary"
-            @click="
-              $refs.dialog_payment.save(form.invoice_info.payment_date),
-                updateDateToPayment()
-            "
-          >
-            Confirmar
-          </v-btn>
-        </v-date-picker>
-      </v-dialog> -->
+        Rechazar <v-icon right>mdi-close-octagon</v-icon>
+      </v-btn>
+      <v-btn class="ml-2" color="blue" @click="dialogMessages = true" dark>
+        Mensajes <v-icon right>mdi-forum</v-icon>
+      </v-btn>
     </v-card-title>
     <v-card-subtitle>
-      Estatus:
-      <v-chip label>
+      <b>Estatus Actual:</b>
+      <v-chip label color="primary" class="overline" dark>
         {{ form.estatus.title }}
       </v-chip>
     </v-card-subtitle>
@@ -159,8 +79,8 @@
       <v-form ref="form_info" v-model="validFormInfo" lazy-validation>
         <v-row dense>
           <v-col cols="12" md="9">
-            <v-card color="grey lighten-3" min-height="200">
-              <v-card-title class="pb-0">
+            <v-card color="grey lighten-2">
+              <v-card-title class="pb-0 overline">
                 <v-autocomplete
                   v-model="form.supplier"
                   :items="options.suppliers"
@@ -177,48 +97,53 @@
                   filled
                   outlined
                   dense
-                  :readonly="ReadOnly"
                 >
-                  <template v-slot:item="data">
-                    <v-list-item-content>
-                      <v-list-item-title v-text="data.item.business_name" />
-                      <v-list-item-subtitle v-text="data.item.rfc" />
-                      <v-list-item-subtitle
-                        v-text="`Email:${data.item.email}`"
-                      />
-                    </v-list-item-content>
+                  <template v-slot:item="{ item }">
+                    <v-list-item-title v-text="item.business_name" />
+                    <v-list-item-subtitle v-html="item.rfc" />
+                    <v-list-item-subtitle v-html="item.email" />
                   </template>
                 </v-autocomplete>
               </v-card-title>
-              <v-card-title>Otros Datos</v-card-title>
               <v-card-text class="pb-0">
                 <v-row dense>
+                  <v-radio-group v-model="form.purchase_type_id" row mandatory>
+                    <template v-slot:label>
+                      <div class="title font-weight-bold">
+                        Tipo de Orden de Compra:
+                      </div>
+                    </template>
+                    <v-radio
+                      v-for="(item, index) in options.purchase_types"
+                      :key="index"
+                      :label="item.name"
+                      :value="item.id"
+                    ></v-radio>
+                  </v-radio-group>
+                </v-row>
+                <v-row dense>
                   <v-col cols="12" md="4">
-                    <v-combobox
+                    <v-select
                       v-model="form.purchase_concept"
                       label="Concepto de Compra"
-                      :items="options.purchase_concept"
+                      :items="PurchaseConcept"
+                      :rules="[(v) => !!v || 'Es requerido']"
                       item-value="id"
                       item-text="name"
                       outlined
+                      return-object
                       dense
-                      :readonly="ReadOnly"
-                    ></v-combobox>
+                    ></v-select>
                   </v-col>
                   <v-col cols="12" md="4">
                     <v-select
                       v-model="form.payment_condition"
                       label="Condiciones de Pago"
-                      :items="[
-                        { text: '8 Dias', value: 8 },
-                        { text: '15 Dias', value: 15 },
-                        { text: '30 Dias', value: 30 },
-                        { text: '60 Dias', value: 60 },
-                        { text: '90 Dias', value: 90 },
-                      ]"
+                      :items="options.payment_condition"
+                      :rules="[(v) => !!v || 'Es requerido']"
                       outlined
+                      readonly
                       dense
-                      :readonly="ReadOnly"
                     ></v-select>
                   </v-col>
                   <v-col cols="12" md="4">
@@ -235,59 +160,25 @@
                   </v-col>
                 </v-row>
               </v-card-text>
+
               <v-card-title class="pt-0">
                 Articulos
                 <v-spacer></v-spacer>
-                <v-dialog transition="dialog-top-transition" max-width="600">
-                  <template v-if="!ReadOnly" v-slot:activator="{ on, attrs }">
-                    <v-btn icon v-bind="attrs" v-on="on">
-                      <v-icon>mdi-file-import-outline</v-icon>
-                    </v-btn>
-                  </template>
-                  <template v-slot:default="dialog">
-                    <v-card>
-                      <v-card-title
-                        class="white--text primary title text-uppercase"
-                      >
-                        Importar Articulos
-                      </v-card-title>
-                      <v-container fluid>
-                        <import-csv-component
-                          v-if="dialog.value"
-                          @input="inputImportCsv"
-                          :map-fields="mapFields"
-                          loadBtnText="Cargar CSV"
-                          submitBtnText="Importar"
-                          :callback="loadImportCb"
-                          :catch="loadImportCatch"
-                        ></import-csv-component>
-                      </v-container>
-                      <v-card-actions class="justify-end">
-                        <v-btn text @click="dialog.value = false">Cerrar</v-btn>
-                      </v-card-actions>
-                    </v-card>
-                  </template>
-                </v-dialog>
-                <v-btn :disabled="ReadOnly" icon @click="form.concepts = []">
+                <v-btn icon @click="form.products = []">
                   <v-icon color="red">mdi-delete-empty-outline</v-icon>
                 </v-btn>
               </v-card-title>
               <v-card-text>
-                <purchase-concept-table
-                  :dialogForm="dialogConcepts"
-                  @edit="dialogConcepts = true"
-                  @close="dialogConcepts = false"
-                  :items.sync="form.concepts"
-                  :read-only="ReadOnly"
-                ></purchase-concept-table>
+                <purchase-products-table
+                  :dialogForm="dialogSupplierProducts"
+                  @edit="dialogSupplierProducts = true"
+                  @close="dialogSupplierProducts = false"
+                  :items.sync="form.products"
+                  :ConceptProductProp="PurchaseConceptProduct"
+                ></purchase-products-table>
               </v-card-text>
               <v-card-actions>
-                <v-btn
-                  :disabled="ReadOnly"
-                  text
-                  color="blue"
-                  @click="dialogConcepts = true"
-                >
+                <v-btn text color="blue" @click="dialogSupplierProducts = true">
                   <v-icon left>mdi-plus</v-icon> Agregar Articulo o Servicio
                 </v-btn>
               </v-card-actions>
@@ -295,13 +186,13 @@
             <v-card flat>
               <v-row dense>
                 <v-col cols="12" md="6">
-                  <v-card-title>Observaciones</v-card-title>
+                  <v-card-title>Justificacion</v-card-title>
                   <v-card-text class="overline">
                     <v-textarea
                       v-model="form.observation"
                       outlined
                       filled
-                      placeholder="Describir a quien van dirigidos los Productos o servicios"
+                      placeholder="Describir el motivo de compra"
                       hint="Justificacion de la compra*"
                       :rules="[(v) => !!v || 'Es requerido']"
                       persistent-hint
@@ -315,15 +206,14 @@
                       v-model="form.note"
                       outlined
                       filled
-                      placeholder="Instrucciones para el Proveedor"
+                      placeholder="Describir a quien van dirigidos los Productos o servicios"
                       hint="Nota que ira en la OC para conocimiento del proveedor*"
                       persistent-hint
                     ></v-textarea>
                   </v-card-text>
                 </v-col>
               </v-row>
-              <!-- Invoices Table -->
-              <v-row v-if="showInvoiceInfo || form.estatus.key == 'enviado'">
+              <v-row v-if="InvoiceTableShow">
                 <v-col cols="12">
                   <invoice-table
                     :purchase-id="purchaseId"
@@ -333,55 +223,58 @@
               </v-row>
             </v-card>
           </v-col>
+          <!-- Second Col -->
           <v-col cols="12" md="3">
             <v-card color="grey lighten-3" min-height="200">
               <v-card-title>
-                Cargos a Sucursal
+                Cargo a Sucursales
                 <v-spacer></v-spacer>
                 <v-btn
-                  v-if="!ReadOnly"
-                  icon
-                  @click="!ReadOnly ? (dialogAddCharge = true) : null"
+                  color="primary"
+                  dark
+                  @click="dialogAddCharge = true"
+                  small
                 >
-                  <v-icon color="primary">mdi-plus-thick</v-icon>
+                  Asignar
+                  <v-icon right>mdi-plus-thick</v-icon>
                 </v-btn>
               </v-card-title>
               <v-card-text class="px-0">
                 <purchase-charge-table
                   :dialogForm="dialogAddCharge"
-                  @edit="!ReadOnly ? (dialogAddCharge = true) : null"
+                  @edit="dialogAddCharge = true"
                   @close="dialogAddCharge = false"
                   :items.sync="form.charges"
-                  :read-only="ReadOnly"
                   :agencies="options.agencies"
                   :departments="options.departments"
                 ></purchase-charge-table>
               </v-card-text>
               <v-card-title>
-                Datos Facturacion
+                Facturacion
                 <v-spacer></v-spacer>
                 <v-btn
-                  v-if="!ReadOnly"
-                  icon
-                  @click="!ReadOnly ? (dialogConfigInvoice = true) : null"
+                  @click="dialogConfigInvoice = true"
+                  color="purple"
+                  dark
+                  small
                 >
-                  <v-icon>mdi-settings</v-icon>
+                  Configurar
+                  <v-icon right>mdi-settings</v-icon>
                 </v-btn>
               </v-card-title>
               <v-card-text class="px-0">
                 <purchase-invoice-table
                   v-if="form.purchase_concept"
-                  :dialogForm="dialogConfigInvoice"
-                  @close="dialogConfigInvoice = false"
                   :form.sync="form.invoice"
+                  :dialogForm="dialogConfigInvoice"
                   :usocfdi.sync="form.purchase_concept.usocfdi"
+                  @close="dialogConfigInvoice = false"
                 ></purchase-invoice-table>
               </v-card-text>
-
-              <v-card-title>Resumen Orden</v-card-title>
+              <v-card-title>Monto y Retenciones</v-card-title>
               <v-card-text class="px-0">
                 <purchase-amounts-table
-                  :items="form.concepts"
+                  :items="form.products"
                   :form.sync="form.amounts"
                 ></purchase-amounts-table>
               </v-card-text>
@@ -406,22 +299,20 @@
 </template>
 <script>
 import DialogComponent from "../../components/DialogComponent.vue";
-import ImportCsvComponent from "../../components/ImportCsvComponent.vue";
 import PurchaseOrderMessages from "../components/PurchaseOrderMessages.vue";
 import PurchaseAmountsTable from "./PurchaseAmountsTable.vue";
 import PurchaseChargeTable from "./PurchaseChargeTable.vue";
-import PurchaseConceptTable from "./PurchaseConceptTable.vue";
+import PurchaseProductsTable from "./PurchaseProductsTable.vue";
 import PurchaseInvoicePaymentTable from "./PurchaseInvoicePaymentTable.vue";
 import PurchaseInvoiceTable from "./PurchaseInvoiceTable.vue";
 import InvoiceTable from "./InvoiceTable.vue";
 export default {
-  name: "PurchaseOrderShow",
+  name: "PurchaseOrderUpdate",
   components: {
-    PurchaseConceptTable,
+    PurchaseProductsTable,
     PurchaseAmountsTable,
     PurchaseChargeTable,
     PurchaseInvoiceTable,
-    ImportCsvComponent,
     PurchaseOrderMessages,
     PurchaseInvoicePaymentTable,
     InvoiceTable,
@@ -430,7 +321,7 @@ export default {
   props: {
     purchaseId: {
       require: true,
-      type: Number,
+      type: Number | String,
     },
   },
   data() {
@@ -448,76 +339,52 @@ export default {
       ],
       dialogMessages: false,
       dialogInvoice: false,
-      dialogConcepts: false,
-      dialogAddCharge: false,
+      dialogSupplierProducts: false,
       dialogAddCharge: false,
       dialogConfigInvoice: false,
-      dialog: false,
-      valid: true,
-      form: {
-        charges: [],
-        concepts: [],
-        invoice: {
-          uso_cfdi: {},
-          metodo_pago: {},
-          forma_pago: {},
-        },
-        amounts: {
-          subtotal: 0,
-          with_tax: false,
-          tax: 0,
-          discount: 0,
-          total: 0,
-        },
-        check_tax: false,
-        supplier_id: null,
-        supplier: {},
-        estatus: { title: "Pendiente" },
-        estatus_id: null,
-        purchase_concept: null,
-        deliver_date: new Date().toISOString().substr(0, 10),
-        payment_condition: "30 dias",
-        agency_id: null,
-        invoice_info: {
-          folio_fiscal: "",
-          folio: "",
-          invoice_date: "",
-          amount: 0,
-          date_to_payment: null,
-          payment_date: null,
-        },
-        colors: {
-          pendiente: "blue",
-          autorizado: "orange",
-          denegar: "red",
-          verificado: "purple",
-          facturado: "green",
-          por_pagar: "pink",
-          pagada: "cyan",
-          enviado: "brown darken-4",
-        },
-      },
+      form: {},
+      PurchaseItem: {},
+      forUpdate: false,
       options: {
         suppliers: [],
         agencies: [],
         departments: [],
+        payment_condition: [
+          { text: "8 Dias", value: 8 },
+          { text: "15 Dias", value: 15 },
+          { text: "30 Dias", value: 30 },
+          { text: "60 Dias", value: 60 },
+          { text: "90 Dias", value: 90 },
+        ],
         purchase_concept: [],
+        purchase_types: [],
       },
     };
   },
   mounted() {
     const _this = this;
-    this.loadOptions();
-    this.$store.commit("setBreadcrumbs", [
+    _this.loadOptions();
+    _this.loadPurchaseEdit();
+    _this.$store.commit("setBreadcrumbs", [
       { label: "Ordenes de Compra", to: { name: "purchase.list" } },
       { label: "Detalle", name: "" },
     ]);
-    _this.loadPurchaseEdit();
     _this.$eventBus.$on("ORDERS_REFRESH", () => {
       _this.loadPurchaseEdit();
     });
   },
   computed: {
+    PurchaseConcept() {
+      const _this = this;
+      return _this.options.purchase_types.find(
+        (e) => e.id == _this.form.purchase_type_id
+      ).purchase_concept;
+    },
+    PurchaseConceptProduct() {
+      const _this = this;
+      if (_this.form.purchase_concept != null)
+        return _this.form.purchase_concept.concept_product ?? [];
+    },
     minHeight() {
       const height = "82vh";
       return `calc(${height} - ${this.$vuetify.application.top}px)`;
@@ -527,16 +394,31 @@ export default {
         pendiente: true,
         denegar: true,
       };
-      if (this.$gate.auth().id == this.form.created_by) {
+      if (this.$gate.auth().id == this.form.created_by && this.forUpdate) {
         return !!this.form.estatus ? !!estatus[this.form.estatus.key] : false;
       } else {
         return false;
       }
     },
+    canPrint() {
+      let estatus = {
+        autorizado: true,
+        programar_pago: true,
+        pagada: true,
+        por_facturar: true,
+        por_pagar: true,
+      };
+      return estatus[this.form.estatus.key] ?? false;
+    },
+    canMarkAsSend() {
+      let estatus = {
+        autorizado: true,
+      };
+      return estatus[this.form.estatus.key] ?? false;
+    },
     canAutorize() {
       let estatus = {
-        pendiente: true,
-        denegar: true,
+        verificado: true,
       };
       if (this.$gate.allow("authorizePurchase", "compras")) {
         return !!this.form.estatus ? !!estatus[this.form.estatus.key] : false;
@@ -546,7 +428,7 @@ export default {
     },
     canReject() {
       let estatus = {
-        autorizado: true,
+        autorizado: false,
         pendiente: true,
         verificado: true,
       };
@@ -558,7 +440,8 @@ export default {
     },
     canVerify() {
       let estatus = {
-        autorizado: true,
+        pendiente: true,
+        denegar: true,
       };
       if (this.$gate.allow("validPurchase", "compras")) {
         return !!this.form.estatus ? !!estatus[this.form.estatus.key] : false;
@@ -566,17 +449,18 @@ export default {
         return false;
       }
     },
-    showInvoiceInfo() {
+    InvoiceTableShow() {
       let estatus = {
-        facturado: true,
+        programar_pago: true,
         por_pagar: true,
         pagada: true,
+        por_facturar: true,
       };
       return !!this.form.estatus ? !!estatus[this.form.estatus.key] : false;
     },
     canShedulePaymentDate() {
       let estatus = {
-        facturado: true,
+        programar_pago: true,
         por_pagar: true,
       };
       if (this.$gate.allow("shedulePaymentDate", "compras")) {
@@ -599,26 +483,54 @@ export default {
       //  $gate.allow('authorizePurchase', 'compras')
       let estatus = {
         validado: true,
-        enviado: true,
-        facturado: true,
+        por_facturar: true,
+        programar_pago: true,
         por_pagar: true,
         pagada: true,
       };
       return !!this.form.estatus ? !!estatus[this.form.estatus.key] : false;
     },
   },
+  watch: {
+    form: {
+      handler() {
+        this.forUpdate = true;
+      },
+      deep: true,
+      flush: "post",
+    },
+  },
   methods: {
     async loadPurchaseEdit() {
-      this.form = await axios
-        .get(`/admin/purchase-order/${this.purchaseId}/edit`)
-        .then((response) => {
-          return { ...response.data.data };
+      const _this = this;
+      await axios
+        .get(`/admin/purchase-order/${_this.purchaseId}/edit`)
+        .then((res) => {
+          let { purchase } = res.data.data;
+          _this.form = purchase;
+        });
+      this.forUpdate = false;
+    },
+    async loadOptions(cb) {
+      const _this = this;
+      await axios
+        .get("/admin/purchase-order/resources/options")
+        .then(function (response) {
+          let {
+            suppliers,
+            agencies,
+            departments,
+            purchase_types,
+          } = response.data.data;
+          _this.options.suppliers = suppliers;
+          _this.options.agencies = agencies;
+          _this.options.departments = departments;
+          _this.options.purchase_types = purchase_types;
         });
     },
-
     async updatePurchase() {
       if (!this.$refs.form_info.validate()) return;
-      if (this.form.concepts.length <= 0)
+      if (this.form.products.length <= 0)
         return this.$store.commit("showSnackbar", {
           message: "Agrege al Menos un Articulo",
           color: "error",
@@ -630,10 +542,40 @@ export default {
           color: "error",
           duration: 3000,
         });
+      let percent = this.form.charges
+        .map((i) => i.percent)
+        .reduce((acc, crr) => acc + crr, 0);
+      if (percent != 100)
+        return this.$store.commit("showSnackbar", {
+          message: "La suma de los Porcentaje de cargos debe ser 100%",
+          color: "error",
+          duration: 3000,
+        });
       const _this = this;
       let payload = {
         supplier_id: _this.form.supplier.id,
-        concepts: _this.form.concepts,
+        estatus: _this.form.estatus,
+        products: _this.form.products.map((item) => {
+          return {
+            concept_product_id: item.group.id,
+            description: item.description,
+            unit_id: item.unit.id,
+            unit: item.unit,
+            qty: item.qty,
+            price: item.price,
+            discount: item.discount,
+            subtotal: item.subtotal,
+          };
+        }),
+        metodo_pago: _this.form.invoice.metodo_pago.clave,
+        uso_cfdi: _this.form.invoice.uso_cfdi.clave,
+        forma_pago: _this.form.invoice.forma_pago.clave,
+        payment_condition: _this.form.payment_condition,
+        purchase_concept_id: _this.form.purchase_concept.id,
+        purchase_type_id: _this.form.purchase_type_id,
+        observation: _this.form.observation,
+        note: _this.form.note,
+        agency_id: _this.form.agency_id,
         charges: _this.form.charges.map((item) => {
           return {
             agency_id: item.agency.id,
@@ -641,17 +583,21 @@ export default {
             percent: item.percent,
           };
         }),
-        metodo_pago: _this.form.invoice.metodo_pago_id,
-        uso_cfdi: _this.form.invoice.uso_cfdi_id,
-        forma_pago: _this.form.invoice.forma_pago_id,
-        payment_condition: _this.form.payment_condition,
-        purchase_concept_id: _this.form.purchase_concept.id,
-        observation: _this.form.observation,
-        agency_id: _this.form.agency_id,
+        //Amount
         subtotal: _this.form.amounts.subtotal,
+        discount: _this.form.amounts.discount,
         with_tax: _this.form.amounts.with_tax,
         tax: _this.form.amounts.tax,
-        discount: _this.form.amounts.discount,
+        with_isr: _this.form.amounts.with_isr,
+        tax_isr: _this.form.amounts.tax_isr,
+        with_iva_retenido: _this.form.amounts.with_iva_retenido,
+        tax_iva_retenido: _this.form.amounts.tax_iva_retenido,
+        with_retencion_cedular: _this.form.amounts.with_retencion_cedular,
+        tax_retencion_cedular: _this.form.amounts.tax_retencion_cedular,
+        with_retencion_125: _this.form.amounts.with_retencion_125,
+        tax_retencion_125: _this.form.amounts.tax_retencion_125,
+        with_flete: _this.form.amounts.with_flete,
+        tax_flete: _this.form.amounts.tax_flete,
         total: _this.form.amounts.total,
       };
       await axios
@@ -662,8 +608,8 @@ export default {
             color: "success",
             duration: 3000,
           });
-          _this.$eventBus.$emit("ORDERS_REFRESH");
           _this.loadPurchaseEdit();
+          // _this.$eventBus.$emit("ORDERS_REFRESH");
           // _this.$eventBus.$emit("CLOSE_DIALOG");
         })
         .catch(function (error) {
@@ -718,23 +664,6 @@ export default {
           }
         });
     },
-    async loadOptions(cb) {
-      const _this = this;
-      await axios
-        .get("/admin/purchase-order/resources/options")
-        .then(function (response) {
-          let {
-            suppliers,
-            agencies,
-            departments,
-            purchase_concept,
-          } = response.data.data;
-          _this.options.suppliers = suppliers;
-          _this.options.agencies = agencies;
-          _this.options.departments = departments;
-          _this.options.purchase_concept = purchase_concept;
-        });
-    },
     async updateDateToPayment(invoice_id = null) {
       const _this = this;
 
@@ -768,59 +697,6 @@ export default {
           }
         });
     },
-    // async updateDateToPayment() {
-    //   const _this = this;
-    //   let payload = {
-    //     date_to_payment: this.form.invoice_info.date_to_payment,
-    //     payment_date: this.form.invoice_info.payment_date,
-    //   };
-    //   await axios
-    //     .post(
-    //       `/admin/purchase-order/store-invoice/${_this.purchaseId}`,
-    //       payload
-    //     )
-    //     .then(function (response) {
-    //       _this.$store.commit("showSnackbar", {
-    //         message: response.data.message,
-    //         color: "success",
-    //         duration: 3000,
-    //       });
-    //       _this.$eventBus.$emit("ORDERS_REFRESH");
-    //     })
-    //     .catch(function (error) {
-    //       _this.$store.commit("hideLoader");
-    //       if (error.response) {
-    //         _this.$store.commit("showSnackbar", {
-    //           message: error.response.data.message,
-    //           color: "error",
-    //           duration: 3000,
-    //         });
-    //         return false;
-    //       } else if (error.request) {
-    //         console.log(error.request);
-    //       } else {
-    //         console.log("Error", error.message);
-    //       }
-    //     });
-    // },
-    save() {
-      this.snack = true;
-      this.snackColor = "success";
-      this.snackText = "Data saved";
-    },
-    cancel() {
-      this.snack = true;
-      this.snackColor = "error";
-      this.snackText = "Canceled";
-    },
-    open() {
-      this.snack = true;
-      this.snackColor = "info";
-      this.snackText = "Dialog opened";
-    },
-    close() {
-      console.log("Dialog closed");
-    },
     customFilter(item, queryText, itemText) {
       const textName = item.business_name.toLowerCase();
       const textRfc = item.rfc.toLowerCase();
@@ -832,40 +708,6 @@ export default {
         textRfc.indexOf(searchText) > -1 ||
         textEmail.indexOf(searchText) > -1
       );
-    },
-    inputImportCsv: function (csv_import) {
-      const _this = this;
-      // _this.form.concepts = _this.form.concepts.concat(csv_import);
-      _this.form.concepts = _this.form.concepts.concat(
-        csv_import.map((item) => {
-          return {
-            name: item.name || "",
-            description: item.description || "",
-            unit: item.unit || "pz",
-            quantity: 1,
-            price: item.price || 0,
-            discount: !!item.discount ? item.discount : 0,
-          };
-        })
-      );
-      _this.$store.commit("showDialog", {
-        type: "accept",
-        icon: "mdi-import",
-        title: "Articulos Importados",
-        message: "Articulos Cargados Correctamente ",
-      });
-    },
-    loadImportCb(response) {
-      const self = this;
-      console.log("importCB", response);
-    },
-    loadImportCatch(response) {
-      this.$store.commit("showDialog", {
-        type: "accept",
-        icon: "warning",
-        title: "Error CSV",
-        message: "Ocurrio un error al importar CSV ",
-      });
     },
   },
 };

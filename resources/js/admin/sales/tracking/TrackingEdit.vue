@@ -4,7 +4,7 @@
       <v-icon left>mdi-file</v-icon> Editar Segumiento
       <v-spacer></v-spacer>
       <v-btn :disabled="!valid" color="primary" @click="update">
-        Editar Seguimiento
+        Editar Seguimiento Folio {{ propTrackingId.toString().padStart(5, 0) }}
       </v-btn>
     </v-card-title>
     <v-divider></v-divider>
@@ -64,8 +64,12 @@ export default {
             color: "success",
             duration: 3000,
           });
+          _this.$router.push({
+            name: "tracking.prospect",
+            params: { propTrackingId: _this.propTrackingId },
+          });
 
-          _this.$router.go(-1);
+          // _this.$router.go(-1);
         })
         .catch(function (error) {
           _this.$store.commit("hideLoader");

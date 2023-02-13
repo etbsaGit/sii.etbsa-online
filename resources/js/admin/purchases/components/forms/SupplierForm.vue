@@ -5,7 +5,7 @@
         <v-row class="caption text-uppercase" dense>
           <v-col cols="12" md="4">
             <v-text-field
-              v-model="form.alias"
+              v-model="form.code_equip"
               label="Clave en EQUIP:"
               :rules="[(v) => !!v || 'Es Requerido']"
               outlined

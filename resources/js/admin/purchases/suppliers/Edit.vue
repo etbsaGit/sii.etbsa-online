@@ -41,7 +41,7 @@ export default {
       valid: true,
       supplier: {
         id: null,
-        alias: null,
+        code_equip: null,
         business_name: null,
         rfc: null,
         address: null,
@@ -61,7 +61,7 @@ export default {
       _this.$store.commit("setBreadcrumbs", [
         { label: "Proveedores", to: { name: "suppliers.list" } },
         { label: "Editar" },
-        { label: this.supplier.alias },
+        { label: this.supplier.code_equip },
       ]);
     });
   },

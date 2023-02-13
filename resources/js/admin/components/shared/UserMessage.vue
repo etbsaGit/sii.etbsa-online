@@ -1,7 +1,6 @@
 <template lang="">
   <v-app-bar color="rgba(0,0,0,0)" flat class="mb-16">
     <v-spacer v-if="Owner"></v-spacer>
-
     <v-tooltip top v-if="!Owner">
       <template #activator="{ on, attrs }">
         <v-avatar class="mt-n5" size="30" elevation="10" color="pink">
@@ -15,14 +14,13 @@
     <v-card
       :class="Owner ? 'mt-10 mx-2' : 'mt-10'"
       :color="Owner ? 'blue darken-1' : ''"
+      class="overline"
       max-width="350px"
     >
       <v-list-item three-line>
-        <v-list-item-content>
-          <div class="mb-4">
-            {{ messageItem.body.message }}
-          </div>
-          <v-list-item-subtitle>
+        <v-list-item-content :class="Owner ? 'white--text' : ''">
+          {{ messageItem.body.message }}
+          <v-list-item-subtitle :class="Owner ? 'white--text' : ''">
             {{ $appFormatters.formatTimeFromNow(messageItem.times) }}
           </v-list-item-subtitle>
         </v-list-item-content>

@@ -97,7 +97,7 @@
                 </v-col>
                 <v-col cols="12" md="4">
                   <v-text-field
-                    v-model="form.percent"
+                    v-model.number="form.percent"
                     label="Porcentaje"
                     suffix="%"
                     type="number"

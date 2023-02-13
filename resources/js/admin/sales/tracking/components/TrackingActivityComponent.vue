@@ -4,6 +4,7 @@
       <v-card-actions
         class="d-flex justify-space-around align-content-center flex-wrap"
       >
+        <v-spacer />
         <v-btn
           dark
           small
@@ -14,7 +15,6 @@
         >
           Agregar Actividad <v-icon right>mdi-plus-thick</v-icon>
         </v-btn>
-
         <v-btn
           dark
           small
@@ -26,7 +26,6 @@
           Programar / Registrar Entrega
           <v-icon right>mdi-timeline-clock-outline</v-icon>
         </v-btn>
-
         <v-btn
           dark
           small
@@ -43,24 +42,15 @@
           class="ma-1"
           color="indigo"
           @click="dialogFormalize = true"
-          v-if="propTracking.estatus.key != 'formalizado'"
+          v-if="propTracking.estatus.key == 'activo' && timeline.length >= 3"
         >
           Venta Ganada <v-icon right>mdi-receipt</v-icon>
         </v-btn>
-        <!-- <v-btn
-          dark
-          small
-          class="ma-1"
-          color="blue"
-          @click="dialogMessages = true"
-        >
-          Mensajes <v-icon right>mdi-forum</v-icon>
-        </v-btn> -->
       </v-card-actions>
       <v-card-text>
         <historical-tracking
           :Tracking="propTracking"
-          :timeline="timeline"
+          :timeline.sync="timeline"
         ></historical-tracking>
       </v-card-text>
     </v-card>
@@ -123,25 +113,10 @@
       >
       </tracking-historical-form-order>
     </dialog-component>
-
-    <!-- message-tracking Mensajes -->
-    <!-- <dialog-component
-      :show="dialogMessages"
-      @close="dialogMessages = false"
-      :maxWidth="600"
-      title=" Mensajes del Seguimiento"
-      closeable
-    >
-      <message-tracking
-        :seller-id="propTracking.owner"
-        :tracking-id="propTracking.id"
-      ></message-tracking>
-    </dialog-component> -->
   </div>
 </template>
 <script>
 import DialogComponent from "@admin/components/DialogComponent.vue";
-// import MessageTracking from "@admin/sales/tracking/components/TrackingMessages.vue";
 import HistoricalTracking from "@admin/sales/tracking/components/HistoricalTracking.vue";
 import TrackingHistoricalFormAdd from "@admin/sales/tracking/TrackingHistoricalFormAdd.vue";
 import TrackingHistoricalFormDiscard from "@admin/sales/tracking/TrackingHistoricalFormDiscard.vue";
@@ -160,7 +135,6 @@ export default {
   },
   components: {
     HistoricalTracking,
-    // MessageTracking,
     DialogComponent,
     TrackingHistoricalFormAdd,
     TrackingHistoricalFormDiscard,
@@ -176,16 +150,18 @@ export default {
       dialogDelivery: false,
       dialogFormalize: false,
       dialog: false,
+      Activities: 0,
     };
   },
   mounted() {
+    // console.log(this.timeline.length, "prop");
     this.dialogMessages = false;
     this.dialogCalendar = false;
     this.dialogDiscard = false;
     this.dialogDelivery = false;
     this.dialogFormalize = false;
+    this.Activities = this.timeline.length;
   },
-
   methods: {
     forceRerender() {
       this.componentKey += 1;

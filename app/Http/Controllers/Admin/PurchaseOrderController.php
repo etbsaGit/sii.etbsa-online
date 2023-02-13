@@ -12,9 +12,7 @@ use App\Components\Purchase\Models\PurchaseOrder;
 use App\Components\Purchase\Models\Supplier;
 use App\Components\Common\Models\Estatus;
 use App\Components\Purchase\Models\PurchaseConcept;
-use App\Notifications\PurchaseOrderCreatedNotification;
-use App\Notifications\PurchaseOrderUpdatedNotification;
-// use App\Notifications\PurchaseOrderCreatedNotification;
+use App\Components\Purchase\Models\PurchaseType;
 use Barryvdh\DomPDF\PDF;
 use Carbon\Carbon;
 
@@ -52,8 +50,9 @@ class PurchaseOrderController extends AdminController
         $metodoPago = DB::table('cat_metodo_pago')->get(['clave', 'description']);
         $usoCFDI = DB::table('cat_uso_cfdi')->get(['clave', 'description']);
         $formaPago = DB::table('cat_forma_pago')->get(['clave', 'description']);
-        $unitSat = DB::table('cat_unit_sat')->get(['clave', 'name', 'type']);
+        $unitSat = DB::table('cat_unit_sat')->get(['id', 'clave', 'name', 'type']);
         $purchase_concept = PurchaseConcept::all();
+        $purchase_types = PurchaseType::with('purchaseConcept')->get();
         return $this->sendResponseOk(compact(
             'suppliers',
             'agencies',
@@ -62,7 +61,8 @@ class PurchaseOrderController extends AdminController
             'usoCFDI',
             'formaPago',
             'unitSat',
-            'purchase_concept'
+            'purchase_concept',
+            'purchase_types'
         ), "list Resources orders ok.");
     }
 
@@ -75,19 +75,13 @@ class PurchaseOrderController extends AdminController
      */
     public function store(Request $request)
     {
-        $estatus = Estatus::where('key', Estatus::ESTATUS_PENDIENTE)->first();
-        $request['estatus_id'] = $estatus->id;
-        $request['created_by'] = Auth::user()->id;
         $validate = validator($request->all(), [
-            'created_by' => 'required',
-            'estatus_id' => 'required',
             'supplier_id' => 'required',
             'subtotal' => 'required',
-            'tax' => 'required',
             'discount' => 'required',
             'total' => 'required',
-            'concepts' => 'required|Array',
             'charges' => 'required|Array',
+            'products' => 'required|Array',
             'payment_condition' => 'required',
             'purchase_concept_id' => 'required',
             'observation' => 'required',
@@ -100,26 +94,52 @@ class PurchaseOrderController extends AdminController
             return $this->sendResponseBadRequest($validate->errors()->first());
         }
 
-        $purchasesOrder = $this->purchaseOrderRepository->create($request->all());
+        DB::transaction(
+            function () use ($request) {
+                $request['created_by'] = Auth::user()->id;
+                $purchasesOrder = $this->purchaseOrderRepository->create($request->all());
 
-        if (!$purchasesOrder) {
-            return $this->sendResponseBadRequest("Failed to create.");
-        }
+                if (!$purchasesOrder) {
+                    return $this->sendResponseBadRequest("Failed to create.");
+                }
+                $estatus = Estatus::where('key', Estatus::ESTATUS_PENDIENTE)->first();
+                $purchasesOrder->estatus()->associate($estatus);
+                $purchasesOrder->save();
 
-        $purchasesOrder->estatus()->associate($estatus);
-        $purchasesOrder->save();
+                // $charges = $request->get('charges', []);
+                if ($charges = $request->get('charges', [])) {
+                    foreach ($charges as $key => $value) {
+                        # code... 
+                        $purchasesOrder->chargeAgency()->attach($value['agency_id'], [
+                            'department_id' => $value['depto_id'],
+                            'percent' => $value['percent']
+                        ]);
+                    }
+                }
+                if ($products = $request->get('products', [])) {
+                    foreach ($products as $product => $value) {
+                        if ($value) {
+                            $purchasesOrder->detailPurchase()->attach(
+                                $value['concept_product_id'],
+                                [
+                                    'unit_id' => $value['unit_id'],
+                                    'description' => $value['description'],
+                                    'qty' => $value['qty'],
+                                    'price' => $value['price'],
+                                    'discount' => $value['discount'],
+                                    'subtotal' => $value['subtotal']
+                                ]
+                            );
+                        }
+                    }
+                }
+                $purchasesOrder->refresh();
+                return $this->sendResponseCreated($purchasesOrder);
+            }
+        );
 
-        $charges = $request->get('charges', []);
-        foreach ($charges as $key => $value) {
-            # code... 
-            $purchasesOrder->chargeAgency()->attach($value['agency_id'], [
-                'department_id' => $value['depto_id'],
-                'percent' => $value['percent']
-            ]);
-        }
         // $purchasesOrder->elaborated->notify(new PurchaseOrderCreatedNotification($purchasesOrder->refresh()));
 
-        return $this->sendResponseCreated($purchasesOrder);
     }
 
     /**
@@ -135,12 +155,11 @@ class PurchaseOrderController extends AdminController
 
     public function edit(PurchaseOrder $purchase_order)
     {
-        $data = [
-            'created_by' => $purchase_order->created_by,
+
+        $purchase = [
             'supplier' => $purchase_order->supplier,
-            'concepts' => $purchase_order->concepts,
             'charges' => $purchase_order->charges,
-            // 'charges' => $purchase_order->charge,
+            'products' => $purchase_order->products,
             "invoice" => [
                 'metodo_pago' => $purchase_order->metodopago,
                 'uso_cfdi' => $purchase_order->usocfdi,
@@ -151,27 +170,29 @@ class PurchaseOrderController extends AdminController
                 "discount" => $purchase_order->discount,
                 "with_tax" => $purchase_order->with_tax,
                 "tax" => $purchase_order->tax,
+                "with_isr" => $purchase_order->with_isr,
+                "tax_isr" => $purchase_order->tax_isr,
+                "with_iva_retenido" => $purchase_order->with_iva_retenido,
+                "tax_iva_retenido" => $purchase_order->tax_iva_retenido,
+                "with_retencion_cedular" => $purchase_order->with_retencion_cedular,
+                "tax_retencion_cedular" => $purchase_order->tax_retencion_cedular,
+                "with_retencion_125" => $purchase_order->with_retencion_125,
+                "tax_retencion_125" => $purchase_order->tax_retencion_125,
+                "with_flete" => $purchase_order->with_flete,
+                "tax_flete" => $purchase_order->tax_flete,
                 "total" => $purchase_order->total,
             ],
             "purchase_concept" => $purchase_order->purchase_concept,
+            "purchase_type_id" => $purchase_order->purchase_type_id,
             "agency_id" => $purchase_order->ship->id,
             "observation" => $purchase_order->observation,
             "note" => $purchase_order->note,
             "payment_condition" => $purchase_order->payment_condition,
             "estatus" => $purchase_order->estatus,
+            "created_by" => $purchase_order->created_by,
             "invoice_info" => $purchase_order->invoice ?? [],
-
-            // "invoice_info" => [
-            //     'id' => $purchase_order->invoice->id ?? null,
-            //     'folio_fiscal' => $purchase_order->invoice->folio_fiscal ?? '',
-            //     'folio' => $purchase_order->invoice->folio ?? '',
-            //     'invoice_date' => $purchase_order->invoice->invoice_date ?? '',
-            //     'date_to_payment' => $purchase_order->invoice->date_to_payment ?? '',
-            //     'payment_date' => $purchase_order->invoice->payment_date ?? '',
-            //     'amount' => $purchase_order->invoice->amount ?? 0,
-            // ]
         ];
-        return $this->sendResponseOk($data, "Edit Purchase Order.");
+        return $this->sendResponseOk(compact('purchase'), "Get Edit PurchaseOrder");
     }
     /**
      * Update the specified resource in storage.
@@ -184,33 +205,69 @@ class PurchaseOrderController extends AdminController
     {
         $request['updated_by'] = Auth::user()->id;
         $validate = validator($request->all(), [
-            'estatus_key' => 'string',
+            'supplier_id' => 'required',
+            'subtotal' => 'required',
+            'discount' => 'required',
+            'total' => 'required',
             'charges' => 'required|Array',
+            'products' => 'required|Array',
+            'payment_condition' => 'required',
+            'purchase_concept_id' => 'required',
+            'observation' => 'required',
+            'uso_cfdi' => 'required',
+            'metodo_pago' => 'required',
+            'forma_pago' => 'required',
             'updated_by' => 'required'
         ], []);
 
         if ($validate->fails()) {
             return $this->sendResponseBadRequest($validate->errors()->first());
         }
-
-        $updated = $purchase_order->update($request->all());
-        if (!$updated) {
-            return $this->sendResponseBadRequest("Error en la Actualizacion");
+        if ($request['estatus.key'] == 'denegar') {
+            $estatus = Estatus::where('key', Estatus::ESTATUS_PENDIENTE)->first();
+            $purchase_order->estatus()->associate($estatus);
+            $purchase_order->save();
         }
-        $charges = $request->get('charges', []);
-        $syncCharges = [];
-        foreach ($charges as $key => $value) {
-            if ($value) {
-                $pivot =  [
-                    'department_id' => $value['depto_id'],
-                    'percent' => $value['percent']
-                ];
-                $syncCharges[$value['agency_id']] =  $pivot;
+        DB::transaction(
+            function () use ($purchase_order, $request) {
+                $updated = $purchase_order->update($request->all());
+                if (!$updated) {
+                    return $this->sendResponseBadRequest("Error en la Actualizacion");
+                }
+                $purchase_order->refresh();
+                $syncCharges = [];
+                $syncProducts = [];
+                if ($charges = $request->get('charges', [])) {
+                    foreach ($charges as $key => $value) {
+                        if ($value) {
+                            $pivot =  [
+                                'department_id' => $value['depto_id'],
+                                'percent' => $value['percent']
+                            ];
+                            $syncCharges[$value['agency_id']] =  $pivot;
+                        }
+                    }
+                }
+                if ($products = $request->get('products', [])) {
+                    foreach ($products as $product => $value) {
+                        if ($value) {
+                            $pivotProducts =  [
+                                'unit_id' => $value['unit_id'],
+                                'description' => $value['description'],
+                                'qty' => $value['qty'],
+                                'price' => $value['price'],
+                                'discount' => $value['discount'],
+                                'subtotal' => $value['subtotal']
+                            ];
+                            $syncProducts[$value['concept_product_id']] =  $pivotProducts;
+                        }
+                    }
+                }
+                $purchase_order->detailPurchase()->sync($syncProducts);
+                $purchase_order->chargeAgency()->sync($syncCharges);
+                return $this->sendResponseUpdated();
             }
-        }
-        $purchase_order->chargeAgency()->sync($syncCharges);
-
-        return $this->sendResponseUpdated();
+        );
     }
 
     /**
@@ -226,19 +283,10 @@ class PurchaseOrderController extends AdminController
 
     public function print(PurchaseOrder $purchaseOrder)
     {
-
-        // $pdf = App::make('dompdf.wrapper');
-        // $pdf->loadView('pdf.purchase', compact('purchaseOrder'));
-        // return $pdf->stream();
-
-        $data = $purchaseOrder->load('supplier');
-        // dd($data);
+        $data = $purchaseOrder->load(['supplier', 'ship', 'elaborated']);
         $pdf = \PDF::loadView('pdf.purchase', compact('data'));
         return $pdf->stream();
-
-        // return view('pdf.purchase', compact('purchaseOrder'));
     }
-
     public function updateEstatus(Request $request, PurchaseOrder $purchase_order)
     {
         $request['updated_by'] = Auth::user()->id;
@@ -252,8 +300,6 @@ class PurchaseOrderController extends AdminController
         }
         $estatus = Estatus::where('key', $request['estatus_key'])->first();
         $request['estatus_id'] = $estatus->id;
-        // if ($request['estatus_key'] == 'verificado')
-        //     $request['authorization_token'] = $this->purchaseOrderRepository->generateAutorizationToken($purchaseOrder);
         if ($request['estatus_key'] == Estatus::ESTATUS_AUTORIZADO)
             $request['authorization_date'] = Carbon::now();
         if ($request['estatus_key'] == Estatus::ESTATUS_DENGAR)
@@ -267,115 +313,5 @@ class PurchaseOrderController extends AdminController
         $purchase_order->save();
         // $purchase_order->elaborated->notify(new PurchaseOrderUpdatedNotification($purchase_order->refresh()));
         return $this->sendResponseUpdated([], 'Estatus Actualizado');
-    }
-
-    public function validInvoicePurchaseOrder(Request $request, PurchaseOrder $purchase_order)
-    {
-
-        $request->validate([
-            'file' => 'required|mimes:xml|max:2048',
-        ]);
-
-        $xml = simplexml_load_file($request->file);
-        $ns = $xml->getNamespaces(true);
-        $xml->registerXPathNamespace('c', $ns['cfdi']);
-        $xml->registerXPathNamespace('t', $ns['tfd']);
-        $data_xml = array();
-        $valid_invoice = false;
-
-        if ($ns['cfdi'] && $ns['tfd']) {
-
-            foreach ($xml->xpath('//cfdi:Comprobante//cfdi:Emisor')[0]->attributes() as $Emisor => $value) {
-                $data_xml[$Emisor . "_Emisor"] = $value;
-            }
-            foreach ($xml->xpath('//cfdi:Comprobante')[0]->attributes() as $Comprobante => $value) {
-                $data_xml[$Comprobante] = $value;
-            }
-            foreach ($xml->xpath('//t:TimbreFiscalDigital')[0]->attributes() as $TimbreFiscalDigital => $value) {
-                $data_xml[$TimbreFiscalDigital] = $value;
-            }
-            foreach ($xml->xpath('//cfdi:Comprobante//cfdi:Receptor')[0]->attributes() as $Receptor => $value) {
-                $data_xml[$Receptor . "_Receptor"] = $value;
-            }
-
-            $date_xml = Carbon::parse($data_xml['Fecha'][0]);
-            $authorization_date = Carbon::parse($purchase_order->authorization_date);
-            // dd(
-            //     $data_xml,
-            //     $data_xml['Rfc_Emisor'][0],
-            //     $data_xml['Fecha'][0],
-            //     Carbon::parse($data_xml['Fecha'][0]),
-            //     $data_xml['Total'][0],
-            //     $data_xml['MetodoPago'][0],
-            //     $data_xml['FormaPago'][0],
-            //     $data_xml['UsoCFDI_Receptor'][0],
-            //     $purchase_order->supplier->rfc,
-            //     $purchase_order->total,
-            //     $purchase_order->metodo_pago,
-            //     $purchase_order->uso_cfdi,
-            //     $purchase_order->forma_pago,
-            //     $purchase_order->authorization_date,
-            //     $date_xml->gt($authorization_date),
-            //     $date_xml->lt($authorization_date),
-            // );
-            $valid_invoice = ($date_xml->gt($authorization_date)) &&
-                ($purchase_order->supplier->rfc == $data_xml['Rfc_Emisor'][0]) &&
-                ($purchase_order->uso_cfdi == $data_xml['UsoCFDI_Receptor'][0]) &&
-                ($purchase_order->metodo_pago == $data_xml['MetodoPago'][0]) &&
-                ($purchase_order->forma_pago == $data_xml['FormaPago'][0]) &&
-                ($purchase_order->total == $data_xml['Total'][0]);
-
-            if ($valid_invoice) {
-                return $this->sendResponseOk(compact('data_xml', 'valid_invoice'), 'El XML Valido');
-            } else {
-                return $this->sendResponse(compact('data_xml', 'valid_invoice'), 'Factura no es Valida');
-            }
-        } else {
-            return $this->sendResponseBadRequest('El XML debe ser un CFDI');
-        }
-    }
-    public function storeInvoicePurchase(Request $request, PurchaseOrder $purchase_order)
-    {
-        $request->validate([
-            'file' => 'required|mimes:xml|max:2048',
-        ]);
-        $xml = simplexml_load_file($request->file);
-        $ns = $xml->getNamespaces(true);
-        $xml->registerXPathNamespace('c', $ns['cfdi']);
-        $xml->registerXPathNamespace('t', $ns['tfd']);
-        $data_xml = array();
-        if ($ns['cfdi'] && $ns['tfd']) {
-            foreach ($xml->xpath('//cfdi:Comprobante//cfdi:Emisor')[0]->attributes() as $Emisor => $value) {
-                $data_xml[$Emisor . "_Emisor"] = $value;
-            }
-            foreach ($xml->xpath('//cfdi:Comprobante')[0]->attributes() as $Comprobante => $value) {
-                $data_xml[$Comprobante] = $value;
-            }
-            foreach ($xml->xpath('//t:TimbreFiscalDigital')[0]->attributes() as $TimbreFiscalDigital => $value) {
-                $data_xml[$TimbreFiscalDigital] = $value;
-            }
-            foreach ($xml->xpath('//cfdi:Comprobante//cfdi:Receptor')[0]->attributes() as $Receptor => $value) {
-                $data_xml[$Receptor . "_Receptor"] = $value;
-            }
-        }
-
-        $payload = [
-            'folio' => $data_xml['Folio'][0],
-            'serie' => $data_xml['Serie'][0],
-            'invoice_date' => $data_xml['Fecha'][0],
-            'folio_fiscal' => $data_xml['UUID'][0],
-            'amount' => $data_xml['Total'][0],
-            'currency' => $data_xml['Moneda'][0],
-            'owner_id' => Auth::user()->id,
-
-        ];
-        $estatus = Estatus::where('key', Estatus::ESTATUS_FACTURADO)->first();
-        $purchase_order->updated_by = Auth::user()->id;
-        $invoice_purchase = $purchase_order->invoice()->create($payload);
-        $purchase_order->estatus()->associate($estatus);
-        $purchase_order->save();
-
-        $message = 'Factura Registrada con Exito!';
-        return $this->sendResponseUpdated(compact('invoice_purchase'), $message);
     }
 }

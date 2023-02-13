@@ -8,9 +8,10 @@
         outlined
         dense
         prepend-icon="mdi-magnify"
-        label="Buscar"
+        label="Buscar Nombre o SKU"
         class="mr-3"
         hide-details
+        clearable
       ></v-text-field>
       <v-btn
         v-if="$gate.allow('isAdmin', 'products')"
@@ -22,6 +23,7 @@
       </v-btn>
       <v-spacer />
       <table-header-buttons
+        :updateSearchPanel="updateSearchPanel"
         :reloadTable="reloadTable"
         :exportTable="exportTable"
       ></table-header-buttons>
@@ -37,12 +39,82 @@
       caption
       dense
     >
+      <template v-slot:top>
+        <search-panel
+          :rightDrawer="rightDrawer"
+          @cancelSearch="cancelSearch"
+          @resetFilter="resetFilter"
+        >
+          <v-form ref="formFilter">
+            <v-row class="mr-2 offset-1 overline" dense>
+              <v-col cols="12">
+                <v-text-field
+                  v-model="filters.sku"
+                  prepend-icon="mdi-magnify"
+                  label="Filtrar por SKU"
+                  clearable
+                  filled
+                  dense
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12">
+                <v-select
+                  v-model="filters.category_id"
+                  :items="options.category"
+                  item-value="id"
+                  item-text="name"
+                  prepend-icon="mdi-magnify"
+                  label="Filtrar por Categoria"
+                  clearable
+                  filled
+                  dense
+                ></v-select>
+              </v-col>
+              <v-col cols="12">
+                <v-select
+                  v-model="filters.model_id"
+                  :items="options.model"
+                  item-value="id"
+                  item-text="name"
+                  prepend-icon="mdi-magnify"
+                  label="Filtrar por Modelos"
+                  clearable
+                  filled
+                  dense
+                ></v-select>
+              </v-col>
+              <v-col cols="12">
+                <v-select
+                  v-model="filters.agency_id"
+                  :items="options.agency"
+                  item-value="id"
+                  item-text="title"
+                  prepend-icon="mdi-magnify"
+                  label="Filtrar por Ubicacion (Sucursal)"
+                  clearable
+                  filled
+                  dense
+                ></v-select>
+              </v-col>
+              <!-- <v-col cols="12">
+                <v-switch
+                  v-model="filters.is_active"
+                  label="Activos"
+                ></v-switch>
+              </v-col> -->
+              <!-- <v-col cols="12">
+                <v-switch v-model="filters.is_usado" label="Usados"></v-switch>
+              </v-col> -->
+            </v-row>
+          </v-form>
+        </search-panel>
+      </template>
+
       <template #[`header.qty`]="{ header }">
         <span v-if="$router.currentRoute.name != 'products.index'">
           {{ header.text }}
         </span>
       </template>
-
       <template #[`item.name`]="{ item }">
         <div class="text-uppercase font-weight-bold">{{ item.name }}</div>
         <div class="caption text--secondary">SKU: {{ item.sku }}</div>
@@ -122,6 +194,26 @@
               outlined
               dense
             />
+            <v-select
+              v-model.number="form.brand_id"
+              :items="options.brands"
+              item-text="name"
+              item-value="id"
+              label="Marca"
+              :rules="[(v) => !!v || 'Es Requerido']"
+              outlined
+              dense
+            />
+            <v-select
+              v-model.number="form.supplier_id"
+              :items="options.suppliers"
+              item-text="name"
+              item-value="id"
+              label="Proveedor"
+              :rules="[(v) => !!v || 'Es Requerido']"
+              outlined
+              dense
+            />
 
             <v-text-field
               v-model="form.name"
@@ -179,7 +271,7 @@
               />
             </div>
             <v-currency-field
-              v-model="form.price_1"
+              v-model.number="form.price_1"
               :default-value="form.price_1"
               label="Precio Lista"
               prefix="$"
@@ -190,7 +282,7 @@
               dense
             />
             <v-currency-field
-              v-model="form.price_2"
+              v-model.number="form.price_2"
               :default-value="form.price_2"
               label="Precio Costo"
               prefix="$"
@@ -201,7 +293,7 @@
               dense
             />
             <v-currency-field
-              v-model="form.price_3"
+              v-model.number="form.price_3"
               :default-value="form.price_3"
               label="Precio Financiamiento"
               prefix="$"
@@ -228,8 +320,9 @@
 </template>
 <script>
 import TableHeaderButtons from "../../components/shared/TableHeaderButtons.vue";
+import SearchPanel from "@admin/components/shared/SearchPanel.vue";
 export default {
-  components: { TableHeaderButtons },
+  components: { TableHeaderButtons, SearchPanel },
   name: "ProductsList",
   props: {
     filters: {
@@ -238,7 +331,12 @@ export default {
       default: () => {
         return {
           search: "",
-          active: null,
+          name: '',
+          sku: '',
+          category_id: null,
+          model_id: null,
+          is_active: null,
+          is_usado: null,
         };
       },
     },
@@ -261,7 +359,6 @@ export default {
           text: "Nombre Producto",
           value: "name",
           align: "left",
-          sortable: false,
         },
         {
           text: "Categoria",
@@ -279,7 +376,6 @@ export default {
           text: "Precio Lista",
           value: "price_1",
           align: "left",
-          sortable: false,
         },
         {
           text: "Activo",
@@ -312,6 +408,8 @@ export default {
         product_category_id: null,
         product_model_id: null,
         agency_id: null,
+        brand_id: null,
+        supplier_id: null,
         name: "",
         description: "",
         sku: "",
@@ -330,14 +428,14 @@ export default {
         itemsPerPage: 10,
         page: 1,
       },
-      // filters: {
-      //   search: "",
-      //   active: null,
-      // },
       options: {
         category: [],
+        model: [],
         agency: [],
+        brands: [],
+        suppliers: [],
       },
+      showSearchPanel: false,
     };
   },
   watch: {
@@ -372,6 +470,14 @@ export default {
       );
       return category.length > 0 ? category[0].models : [];
     },
+    rightDrawer: {
+      get() {
+        return this.showSearchPanel;
+      },
+      set(_showSearchPanel) {
+        this.showSearchPanel = _showSearchPanel;
+      },
+    },
   },
   methods: {
     reloadTable() {
@@ -382,9 +488,10 @@ export default {
 
       let params = {
         ..._this.filters,
-        order_sort: _this.pagination.sortDesc[0] ? "asc" : "desc",
         order_by: _this.pagination.sortBy[0] || "id",
         search: _this.filters.search,
+        order_sort: _this.pagination.sortDesc[0] ? "asc" : "desc",
+        order_by: _this.pagination.sortBy[0] || "id",
         page: _this.pagination.page,
         per_page: _this.pagination.itemsPerPage,
       };
@@ -468,6 +575,8 @@ export default {
         _this.editedId = item.id;
         _this.form.product_category_id = item.product_category_id;
         _this.form.product_model_id = item.product_model_id;
+        _this.form.brand_id = item.brand_id;
+        _this.form.supplier_id = item.supplier_id;
         _this.form.agency_id = item.agency_id;
         _this.form.name = item.name;
         _this.form.description = item.description;
@@ -553,6 +662,18 @@ export default {
     select(product) {
       const _this = this;
       _this.$eventBus.$emit("PRODUCT_SELECTED", product);
+    },
+    cancelSearch() {
+      this.showSearchPanel = false;
+    },
+    updateSearchPanel() {
+      this.rightDrawer = !this.rightDrawer;
+    },
+    resetFilter() {
+      const _this = this;
+      _this.$refs.formFilter.reset();
+      _this.pagination.itemsPerPage = 10;
+      _this.pagination.page = 1;
     },
   },
 };

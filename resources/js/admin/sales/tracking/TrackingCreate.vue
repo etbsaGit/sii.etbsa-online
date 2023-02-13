@@ -1,6 +1,6 @@
 <template>
   <v-card>
-    <v-card-title class="grey lighten-4">
+    <v-card-title>
       <v-icon left>mdi-file</v-icon> Levantar un Seguimiento
 
       <!-- <v-btn :disabled="!valid" color="primary" @click="save">
@@ -36,6 +36,7 @@ export default {
         prospect_id: null,
         title: null,
         reference: null,
+        product: null,
         price: null,
         currency: 1,
         currency_id: 1,
@@ -58,29 +59,34 @@ export default {
   methods: {
     async save() {
       if (!this.$refs.form.$refs.form.validate()) return;
-      const self = this;
-      self.isLoading = true;
+      const _this = this;
+      _this.isLoading = true;
+
+      // const params = {
+      //   ..._this.form,
+      //   reference: _this.reference.name,
+      // };
 
       await axios
         .post("/admin/tracking", this.form)
         .then(function (response) {
-          self.$store.commit("showSnackbar", {
+          _this.$store.commit("showSnackbar", {
             message: response.data.message,
             color: "success",
             duration: 3000,
           });
 
           // reset
-          self.isLoading = false;
-          self.$emit("success");
+          _this.isLoading = false;
+          _this.$emit("success");
           // self.$router.push({ name: "tracking.list" });
         })
         .catch(function (error) {
-          self.isLoading = false;
-          self.$store.commit("hideLoader");
+          _this.isLoading = false;
+          _this.$store.commit("hideLoader");
 
           if (error.response) {
-            self.$store.commit("showSnackbar", {
+            _this.$store.commit("showSnackbar", {
               message: error.response.data.message,
               color: "error",
               duration: 3000,

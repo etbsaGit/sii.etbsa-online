@@ -2,6 +2,7 @@
 
 namespace App\Components\Purchase\Models;
 
+use App\Components\Common\Models\Estatus;
 use Illuminate\Database\Eloquent\Model;
 
 class Invoice extends Model
@@ -18,6 +19,10 @@ class Invoice extends Model
         return $this->morphTo();
     }
 
+    public function estatus()
+    {
+        return $this->belongsTo(Estatus::class, 'estatus_id');
+    }
     public function complementos()
     {
         return $this->belongsToMany(InvoiceComplemento::class, 'invoice_complemento_pivot_table', 'invoice_id');

@@ -27,9 +27,12 @@ class PurchaseOrderRepository extends BaseRepository
             'supplier:id,business_name,rfc',
             'elaborated.profiable:id,name,last_name,agency_id',
             'elaborated.profiable.agency:id,title',
-            'estatus:id,title,key', 'purchase_concept:id,name',
+            'estatus:id,title,key',
+            'purchase_concept:id,name',
             'chargeAgency',
             'chargeDepartment',
+            // 'ship',
+            // 'detailPurchase',
         ], function ($query) use ($params) {
             $query->where(function ($query) use ($params) {
                 $query->search($params['search'] ?? '')
@@ -40,16 +43,16 @@ class PurchaseOrderRepository extends BaseRepository
         });
     }
 
-    public function generateAutorizationToken($purchaseOrder)
-    {
-        $token = 'AAG-';
-        $sucursal = explode(' ', $purchaseOrder->sucursal->title);
-        foreach ($sucursal as $suc) {
-            $token .= substr($suc, 0, 3);
-        }
-        $token .=
-            '-' . date('y') . '/' .  str_pad($purchaseOrder->id, 4, '0', STR_PAD_LEFT);
+    // public function generateAutorizationToken($purchaseOrder)
+    // {
+    //     $token = 'AAG-';
+    //     $sucursal = explode(' ', $purchaseOrder->sucursal->title);
+    //     foreach ($sucursal as $suc) {
+    //         $token .= substr($suc, 0, 3);
+    //     }
+    //     $token .=
+    //         '-' . date('y') . '/' .  str_pad($purchaseOrder->id, 4, '0', STR_PAD_LEFT);
 
-        return $token;
-    }
+    //     return $token;
+    // }
 }

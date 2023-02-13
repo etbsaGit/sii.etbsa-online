@@ -2,6 +2,7 @@
 
 namespace App\Components\Common\Models;
 
+use App\Components\Purchase\Models\Invoice;
 use Illuminate\Database\Eloquent\Model;
 use  App\Components\Tracking\Models\TrackingProspect;
 
@@ -16,7 +17,7 @@ class Estatus extends Model
     const ESTATUS_RECIBIDO = 'recibido';
     const ESTATUS_ENVIADA = 'enviada';
     const ESTATUS_VERIFICADO = 'verificado';
-    const ESTATUS_FACTURADO = 'facturado';
+    const ESTATUS_PROGRAMAR_PAGO = 'programar_pago';
     const ESTATUS_POR_PAGAR = 'por_pagar';
     const ESTATUS_PAGADA = 'pagada';
     const ESTATUS_DENGAR = 'denegar';
@@ -54,5 +55,10 @@ class Estatus extends Model
     public function tracking()
     {
         return $this->hasMany(TrackingProspect::class, 'id');
+    }
+
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class, 'estatus_id', 'id');
     }
 }

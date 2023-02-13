@@ -344,7 +344,7 @@ export default {
         //   { text: "Autorizados", value: "autorizado" },
         //   { text: "Verificados", value: "verificado" },
         //   { text: "Rechazados", value: "denegar" },
-        //   { text: "Facturados", value: "facturado" },
+        //   { text: "Facturados", value: "programar_pago" },
         //   { text: "Todos", value: "todos" },
         // ],
       },
