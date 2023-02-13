@@ -14,7 +14,7 @@ export const purchases = [
         component: require("@admin/purchases/orders/Create").default,
       },
       {
-        path: "edit",
+        path: ":purchaseId/edit",
         name: "purchase.edit",
         component: require("@admin/purchases/orders/Edit").default,
         props: true,

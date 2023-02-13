@@ -335,7 +335,8 @@ class TrackingProspectController extends AdminController
                 return ['id' => $i->id, 'title' => $i->title];
             });
         }
-        $categories = DB::table('cat_sales_category')->get(['id', 'title', 'key']);
+        // $categories = DB::table('cat_sales_category')->get(['id', 'title', 'key']);
+        $categories = DB::table('cat_product_category')->get(['id', 'name']);
         $currency = DB::table('currency')->get(['id', 'name']);
         $prospects = Prospect::with('township')->get()->map->only('id', 'full_name', 'email', 'company', 'rfc', 'town', 'phone', 'township');
         return $this->sendResponseOk(compact('agencies', 'departments', 'prospects', 'currency', 'categories'));

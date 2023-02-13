@@ -20,6 +20,11 @@ class Supplier extends Model
         return $this->belongsTo(Township::class, 'township_id');
     }
 
+    public function products()
+    {
+        return $this->hasMany(SupplierProduct::class, "supplier_product_id", "id");
+    }
+
     /**
      * serializes concept attribute on the fly before saving to database
      *

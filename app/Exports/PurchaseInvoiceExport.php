@@ -6,9 +6,11 @@ use Maatwebsite\Excel\Concerns\Exportable;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithTitle;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class PurchaseInvoiceExport implements FromView, ShouldAutoSize, WithTitle
+class PurchaseInvoiceExport implements FromView, ShouldAutoSize, WithTitle, WithStyles
 {
 
     use Exportable;
@@ -35,5 +37,10 @@ class PurchaseInvoiceExport implements FromView, ShouldAutoSize, WithTitle
     public function title(): string
     {
         return 'FacturasXPagar';
+    }
+
+    public function styles(Worksheet $sheet)
+    {
+        $sheet->getStyle('A1')->getAlignment()->setWrapText(true);
     }
 }

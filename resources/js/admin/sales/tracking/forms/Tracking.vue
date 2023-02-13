@@ -29,28 +29,11 @@
             <span>Registrar Nuevo</span>
           </v-tooltip>
         </template>
-        <template v-slot:item="{item}">
-           <v-list-item-content>
-              <v-list-item-title v-html="item.full_name" />
-              <v-list-item-subtitle v-html="item.phone" />
-            </v-list-item-content>
-          <!-- <v-list-item-content>
-            <v-list-item-title v-text="data.item.full_name" />
-            <v-list-item-subtitle
-              v-text="`${data.item.company || ''} ${data.item.rfc || ''}`"
-            />
-            <v-list-item-subtitle
-              v-text="`Tel: ${data.item.phone} ${data.item.email || ''}`"
-            />
-            <v-list-item-subtitle
-              v-text="
-                `${data.item.township ? data.item.township.name : ''} ${
-                  data.item.township ? data.item.township.estate.name : ''
-                }`
-              "
-            />
-            <v-list-item-subtitle v-text="data.item.town" />
-          </v-list-item-content> -->
+        <template v-slot:item="{ item }">
+          <v-list-item-content>
+            <v-list-item-title v-html="item.full_name" />
+            <v-list-item-subtitle v-html="item.phone" />
+          </v-list-item-content>
         </template>
       </v-autocomplete>
       <v-autocomplete
@@ -107,14 +90,16 @@
         v-model="form.title"
         :items="options.categories"
         label="CATEGORIA INTERES:"
-        placeholder="describir o seleccionar un opcion"
+        placeholder="Describir o seleccionar un opcion"
+        item-text="name"
+        item-value="name"
         filled
         outlined
         dense
         :rules="rules"
-      ></v-select>
+      >
+      </v-select>
       <v-text-field
-        v-if="form.title != 'Tractores' || editing"
         v-model="form.reference"
         label="REFERENCIA:"
         placeholder="Alguna Referencia del Producto de interes"
@@ -124,8 +109,9 @@
         clearable
         class="title"
         :rules="rules"
-      ></v-text-field>
-      <v-row v-else-if="!editing" no-gutters>
+      >
+      </v-text-field>
+      <!-- <v-row no-gutters>
         <v-col cols="4">
           <v-autocomplete
             v-model="selectModel"
@@ -138,8 +124,8 @@
             dense
             clearable
             :rules="[(v) => (!!v && v.length > 0) || 'Campo Requerido']"
-          ></v-autocomplete
-        ></v-col>
+          ></v-autocomplete>
+        </v-col>
         <v-col cols="8">
           <v-select
             v-model="selectConfig"
@@ -154,9 +140,9 @@
             prepend-icon="mdi-cogs"
             return-object
             :rules="[(v) => !!v.text || 'Campo Requerido']"
-          ></v-select
-        ></v-col>
-      </v-row>
+          ></v-select>
+        </v-col>
+      </v-row> -->
       <v-row align="center" wrap>
         <v-col cols="12" md="6">
           <v-text-field
@@ -223,7 +209,7 @@
 
 <script>
 import Tractors from "@admin/sales/tracking/resources/agricola.json";
-import Categories from "@admin/sales/tracking/resources/categories.json";
+// import Categories from "@admin/sales/tracking/resources/categories.json";
 export default {
   name: "TrackingForm",
   props: {
@@ -251,7 +237,7 @@ export default {
       selectModel: null,
       selectConfig: { hint: "" },
       options: {
-        categories: Categories,
+        categories: [],
         prospects: [],
         agencies: [],
         departments: [],
@@ -335,6 +321,7 @@ export default {
           self.options.agencies = Data.agencies;
           self.options.departments = Data.departments;
           self.options.prospects = Data.prospects;
+          self.options.categories = Data.categories;
           (cb || Function)();
         });
     },

@@ -198,7 +198,7 @@
           Crear Orden de Compra
         </v-btn>
       </v-toolbar>
-      <dialog-component
+      <!-- <dialog-component
         :show="dialogEdit"
         @close="dialogEdit = false"
         fullscreen
@@ -206,7 +206,7 @@
         :title="formTitle"
       >
         <edit-purchase v-if="dialogEdit" :purchaseId="editedId"></edit-purchase>
-      </dialog-component>
+      </dialog-component> -->
     </template>
     <template v-slot:[`item.actions`]="{ item }">
       <v-menu offset-x transition="slide-x-transition" rounded="r-xl">
@@ -217,7 +217,9 @@
         </template>
         <v-list shaped dense>
           <v-list-item-group>
-            <v-list-item @click="editItem(item)">
+            <v-list-item
+              :to="{ name: 'purchase.edit', params: { purchaseId: item.id } }"
+            >
               <v-list-item-icon>
                 <v-icon class="blue--text">mdi-information-outline</v-icon>
               </v-list-item-icon>
@@ -235,7 +237,7 @@
                 <v-icon class="blue--text">mdi-printer</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title>Imprimir Vista Previa</v-list-item-title>
+                <v-list-item-title>Dercargar OC PDF</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
             <v-list-item
@@ -260,9 +262,7 @@
     <template v-slot:[`item.supplier.business_name`]="{ item }">
       <v-list-item dense>
         <div class="d-flex flex-column">
-          <span
-            class="d-block font-weight-semibold text--primary text-truncate"
-          >
+          <span class="d-block font-weight-semibold text--primary text-wrap">
             {{ item.supplier.business_name }}
           </span>
           <small>{{ item.supplier.rfc }}</small>
@@ -359,6 +359,7 @@ import Create from "./Create.vue";
 import EditPurchase from "./Edit.vue";
 
 export default {
+  name: "PurchaseOrderList",
   components: {
     Create,
     SearchPanel,
@@ -386,7 +387,6 @@ export default {
       {
         text: "Proveedor",
         value: "supplier.business_name",
-
         fixed: true,
       },
       {
@@ -398,7 +398,7 @@ export default {
       { text: "Concepto Compra", value: "purchase_concept.name", width: 200 },
       {
         text: "Articulos",
-        value: "concepts.length",
+        value: "detail_purchase.length",
         align: "center",
         sortable: false,
       },
@@ -417,7 +417,7 @@ export default {
       uso_cfdi: null,
       metodo_pago: null,
       forma_pago: null,
-      estatus: "todos",
+      estatus: "pendiente",
       date_range: null,
     },
     options: {
@@ -428,26 +428,26 @@ export default {
       usoCFDI: [],
       formaPago: [],
       estatus: [
-        { text: "Pendientes", value: "pendiente" },
-        { text: "Rechazados", value: "denegar" },
-        { text: "Autorizados", value: "autorizado" },
-        { text: "Verificados", value: "verificado" },
-        { text: "Enviadas", value: "enviado" },
-        { text: "Facturados", value: "facturado" },
-        { text: "Por Pagar", value: "por_pagar" },
-        { text: "Pagadas", value: "pagada" },
         { text: "Todos", value: "todos" },
+        { text: "Nueva Creacion", value: "pendiente" },
+        { text: "Rechazados", value: "denegar" },
+        { text: "Verificados", value: "verificado" },
+        { text: "Autorizados", value: "autorizado" },
+        { text: "Por Facturar", value: "por_facturar" },
+        { text: "Programar Pago", value: "programar_pago" },
+        { text: "Pendiente de Pago", value: "por_pagar" },
+        { text: "Pagadas", value: "pagada" },
       ],
     },
     colors: {
       pendiente: "blue",
-      autorizado: "orange",
       denegar: "red",
       verificado: "purple",
-      facturado: "green",
-      por_pagar: "pink",
-      pagada: "cyan",
-      enviado: "brown darken-4",
+      autorizado: "orange",
+      por_facturar: "black",
+      programar_pago: "pink",
+      por_pagar: "brow darken-2",
+      pagada: "cry",
     },
     totalItems: 0,
     pagination: {
@@ -524,7 +524,7 @@ export default {
     async markAsSend(item) {
       const _this = this;
       let payload = {
-        estatus_key: "enviado",
+        estatus_key: "por_facturar",
       };
       await axios
         .post(`/admin/purchase-order/update-estatus/${item.id}`, payload)
@@ -556,16 +556,16 @@ export default {
     },
     canPrint(estatus_key) {
       let estatus = {
-        verificado: true,
-        facturado: true,
+        autorizado: true,
+        programar_pago: true,
         pagada: true,
-        enviado: true,
+        por_facturar: true,
       };
       return estatus[estatus_key] ?? false;
     },
     canMarkAsSend(estatus_key) {
       let estatus = {
-        verificado: true,
+        autorizado: true,
       };
       return estatus[estatus_key] ?? false;
     },

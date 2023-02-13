@@ -41,7 +41,7 @@ export default {
     return {
       valid: true,
       form: {
-        alias: null,
+        code_equip: null,
         business_name: null,
         rfc: null,
         address: null,

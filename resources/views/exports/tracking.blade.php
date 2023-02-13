@@ -25,7 +25,7 @@
             <tr>
                 <td>{{ $item->id }}</td>
                 <td>{{ $item->prospect->full_name }}</td>
-                <td>{{ $item->prospect }}</td>
+                <td>{{ $item->prospect->phone }}</td>
                 <td>{{ $item->title ?? 'S/A' }}</td>
                 <td>{{ $item->reference ?? 'S/A' }}</td>
                 <td>{{ '$' . $item->price ?? 'S/A' }}</td>

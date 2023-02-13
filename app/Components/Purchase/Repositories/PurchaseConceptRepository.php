@@ -21,7 +21,7 @@ class PurchaseConceptRepository extends BaseRepository
      */
     public function list($params)
     {
-        return $this->get($params, ['usocfdi'], function ($query) use ($params) {
+        return $this->get($params, ['usocfdi', 'purchaseType'], function ($query) use ($params) {
             // $query->where(function ($query) use ($params) {
             //     $query->search($params['search'] ?? '');
             // });

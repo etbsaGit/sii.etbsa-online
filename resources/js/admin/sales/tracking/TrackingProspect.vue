@@ -53,7 +53,7 @@
           <v-tabs color="deep-purple accent-3" right>
             <v-tab>Actividades</v-tab>
             <v-tab>Cotizaciones</v-tab>
-            <v-tab>Mensajes</v-tab>
+            <v-tab>Mensajes de Apoyo</v-tab>
 
             <v-tab-item>
               <tracking-activity

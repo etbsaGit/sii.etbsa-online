@@ -242,14 +242,12 @@
           ></tracking-prospect>
         </dialog-component>
 
-        <v-dialog v-model="dialogs.create" scrollable max-width="600">
+        <v-dialog v-model="dialogs.create" scrollable max-width="700">
           <v-card flat>
-            <v-toolbar flat dense height="24">
-              <v-spacer />
-              <v-icon small color="red" @click="dialogs.create = false"
-                >mdi-close</v-icon
-              >
-            </v-toolbar>
+            <v-spacer />
+            <v-icon color="red" @click="dialogs.create = false"
+              >mdi-close</v-icon
+            >
             <tracking-create
               v-if="dialogs.create"
               @success="(dialogs.create = false), reset()"

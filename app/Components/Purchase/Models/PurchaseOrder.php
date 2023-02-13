@@ -9,6 +9,7 @@ use App\Components\Common\Models\Estatus;
 use App\Components\Common\Models\Agency;
 use App\Components\Common\Models\CatFormaPago;
 use App\Components\Common\Models\CatMetodoPago;
+use App\Components\Common\Models\CatUnitSat;
 use App\Components\Common\Models\CatUsoCfdi;
 use App\Components\Common\Models\Department;
 use App\Components\Common\Models\Document;
@@ -19,6 +20,7 @@ class PurchaseOrder extends Model
 {
     protected $table = 'purchase_orders';
     protected $guarded = ['id'];
+    protected $appends = ['products', 'charges'];
 
     // protected $with = [
     //     'estatus', 'elaborated', 'supplier:id,business_name,rfc'
@@ -27,6 +29,10 @@ class PurchaseOrder extends Model
     public function estatus()
     {
         return $this->belongsTo(Estatus::class, 'estatus_id');
+    }
+    public function type()
+    {
+        return $this->belongsTo(PurchaseType::class, 'purchase_type_id');
     }
 
     public function elaborated()
@@ -94,70 +100,51 @@ class PurchaseOrder extends Model
             ->as('charge');
     }
 
-    /**
-     * serializes concept attribute on the fly before saving to database
-     *
-     * @param $concepts
-     */
-    public function setConceptsAttribute($concepts)
+    public function detailPurchase()
     {
-        $this->attributes['concepts'] = serialize($concepts);
+        return $this->belongsToMany(PurchaseConceptProduct::class, 'purchase_pivot_detail_products', 'purchase_order_id', 'concept_product_id')
+            ->withPivot('description', 'unit_id', 'qty', 'price', 'discount', 'subtotal')
+            ->as('detail');
     }
+
     public function setChargesAttribute($charges)
     {
         $this->attributes['charges'] = serialize($charges);
     }
 
-    /**
-     * unserializes concepts attribute before spitting out from database
-     *
-     * @return mixed
-     */
-    public function getConceptsAttribute()
-    {
-        if (empty($this->attributes['concepts']) || is_null($this->attributes['concepts'])) {
-            return [];
-        }
-
-        return unserialize($this->attributes['concepts']);
-    }
     public function getChargesAttribute()
     {
         if (empty($this->attributes['charges']) || is_null($this->attributes['charges'])) {
             return [];
         }
-
-        // return unserialize($this->attributes['charges']);
         $charges = unserialize($this->attributes['charges']);
-
         return array_map(function ($item) {
             return [
-                // 'agency' => Agency::find($item['agency_id'])->get(['id', 'code', 'title']),
-                // 'department' => Department::find($item['depto_id'])->get(['id', 'title']),
                 'agency' => \DB::table('agencies')->where('id', '=', $item['agency_id'])->get(['id', 'code', 'title'])->toArray()[0],
                 'department' => \DB::table('departments')->where('id', '=', $item['depto_id'])->get(['id', 'title'])->toArray()[0],
                 'percent' => $item['percent']
             ];
         }, $charges);
     }
-    // public function getChargeAttribute()
-    // {
-    //     if (empty($this->attributes['charges']) || is_null($this->attributes['charges'])) {
-    //         return [];
-    //     }
 
-    //     $charges = unserialize($this->attributes['charges']);
-
-    //     return array_map(function ($item) {
-    //         return [
-    //             // 'agency' => Agency::find($item['agency_id'])->get(['id', 'code', 'title']),
-    //             // 'department' => Department::find($item['depto_id'])->get(['id', 'title']),
-    //             'agency' => \DB::table('agencies')->where('id', '=', $item['agency_id'])->get(['id', 'code', 'title'])->toArray()[0],
-    //             'department' => \DB::table('departments')->where('id', '=', $item['depto_id'])->get(['id', 'title'])->toArray()[0],
-    //             'percent' => $item['percent']
-    //         ];
-    //     }, $charges);
-    // }
+    public function getProductsAttribute()
+    {
+        $detail = collect($this->detailPurchase);
+        return $detail->map(function ($item) {
+            return [
+                'group' => [
+                    'id' => $item->id,
+                    'name' => $item->name
+                ],
+                'unit' =>  CatUnitSat::where('id', '=', $item->detail->unit_id)->first(),
+                'description' => $item->detail->description,
+                'qty' => $item->detail->qty,
+                'price' => $item->detail->price,
+                'discount' => $item->detail->discount,
+                'subtotal' => $item->detail->subtotal,
+            ];
+        });
+    }
 
     public function scopeSearch($query, String $search)
     {
@@ -202,7 +189,9 @@ class PurchaseOrder extends Model
             $query->whereHas('formapago', function ($query) use ($formaPago) {
                 return $query->where('clave', $formaPago);
             });
-        })->when($filters['estatus'] ?? null, function ($query, $estatus) {
+        });
+
+        $query->when($filters['estatus'] ?? null, function ($query, $estatus) {
             if ($estatus !== "todos") {
                 $query->whereHas('estatus', function ($query) use ($estatus) {
                     $query->where('key', Helpers::commasToArray($estatus));
@@ -227,17 +216,19 @@ class PurchaseOrder extends Model
         $query->when($filters['date_range'] ?? null, function ($query, $dates) use ($estatus) {
             if ($estatus == "todos" || $estatus == "pendiente")
                 return $query->whereBetween('created_at', [$dates[0], $dates[1]]);
-            if ($estatus == "autorizada" || $estatus == 'verificada')
+            if ($estatus == "autorizado" || $estatus == 'verificado')
                 return $query->whereBetween('authorization_date', [$dates[0], $dates[1]]);
-            if ($estatus == "enviada")
+            if ($estatus == "por_facturar")
                 return $query->whereBetween('updated_at', [$dates[0], $dates[1]]);
-            if ($estatus == "facturada")
+            if ($estatus == "programar_pago")
                 return $query->whereHas('invoice', function ($query) use ($dates) {
-                    return $query->whereBetween('invoice_date', [$dates[0], $dates[1]]);
+                    return $query->whereNull('date_to_pay')
+                        ->whereBetween('invoice_date', [$dates[0], $dates[1]]);
                 });
             if ($estatus == "por_pagar")
                 return $query->whereHas('invoice', function ($query) use ($dates) {
-                    return $query->whereBetween('date_to_pay', [$dates[0], $dates[1]]);
+                    return $query->whereNull('payment_date')
+                        ->whereBetween('date_to_pay', [$dates[0], $dates[1]]);
                 });
             if ($estatus == "pagada")
                 return $query->whereHas('invoice', function ($query) use ($dates) {
@@ -264,3 +255,28 @@ class PurchaseOrder extends Model
         );
     }
 }
+
+
+/**
+ * serializes concept attribute on the fly before saving to database
+ *
+ * @param $concepts
+ */
+// public function setConceptsAttribute($concepts)
+// {
+//     $this->attributes['concepts'] = serialize($concepts);
+// }
+
+/**
+ * unserializes concepts attribute before spitting out from database
+ *
+ * @return mixed
+ */
+    // public function getConceptsAttribute()
+    // {
+    //     if (empty($this->attributes['concepts']) || is_null($this->attributes['concepts'])) {
+    //         return [];
+    //     }
+
+    //     return unserialize($this->attributes['concepts']);
+    // }

@@ -10,8 +10,9 @@
                 <v-list-item-subtitle
                   class="text-wrap"
                   style="max-width: 200px;"
+                  v-text="form.metodo_pago.description"
                 >
-                  {{ form.metodo_pago.description }}
+                  <!-- {{ form.metodo_pago.description || "" }} -->
                 </v-list-item-subtitle>
               </v-list-item-content>
             </td>
@@ -26,13 +27,14 @@
                 <v-list-item-subtitle
                   class="text-wrap"
                   style="max-width: 200px;"
+                  v-text="form.uso_cfdi.description"
                 >
-                  {{ form.uso_cfdi.description }}
+                  <!-- {{ form.uso_cfdi.description || "" }} -->
                 </v-list-item-subtitle>
               </v-list-item-content>
             </td>
             <td class="text-right" style="width: 50px;">
-              {{ form.uso_cfdi.clave }}
+              {{ form.uso_cfdi.clave || "" }}
             </td>
           </tr>
           <tr>
@@ -42,13 +44,14 @@
                 <v-list-item-subtitle
                   class="text-wrap"
                   style="max-width: 200px;"
+                  v-text="form.forma_pago.description"
                 >
-                  {{ form.forma_pago.description }}
+                  <!-- {{ form.forma_pago.description || "" }} -->
                 </v-list-item-subtitle>
               </v-list-item-content>
             </td>
             <td class="text-right" style="width: 50px;">
-              {{ form.forma_pago.clave }}
+              {{ form.forma_pago.clave || "" }}
             </td>
           </tr>
         </tbody>
@@ -182,6 +185,27 @@ export default {
       return [];
     },
   },
+  data() {
+    return {
+      valid: true,
+      editedIndex: -1,
+      // form: {
+      //   uso_cfdi: "",
+      //   metodo_pago: "",
+      //   forma_pago: "",
+      // },
+      formDefault: {
+        uso_cfdi: "",
+        metodo_pago: "",
+        forma_pago: "",
+      },
+      options: {
+        usoCFDI: [],
+        metodoPago: [],
+        formaPago: [],
+      },
+    };
+  },
   mounted() {
     this.loadOptions();
   },
@@ -199,6 +223,11 @@ export default {
           clave: "99",
           description: "Por definir",
         };
+      }else{
+        this.form.forma_pago = {
+          clave: "03",
+          description: "Transferencia electronica de fondos"
+        }
       }
       this.form.metodo_pago_id = value.clave;
     },
@@ -227,65 +256,20 @@ export default {
       },
     },
   },
-  data() {
-    return {
-      valid: true,
-      editedIndex: -1,
-      // form: {
-      //   uso_cfdi: "",
-      //   metodo_pago: "",
-      //   forma_pago: "",
-      // },
-      formDefault: {
-        uso_cfdi: "",
-        metodo_pago: "",
-        forma_pago: "",
-      },
-      options: {
-        usoCFDI: [],
-        metodoPago: [],
-        formaPago: [],
-      },
-    };
-  },
+
   methods: {
     async loadOptions(cb) {
       const _this = this;
       await axios
         .get("/admin/purchase-order/resources/options")
         .then(function (response) {
-          let { usoCFDI, metodoPago, formaPago } = response.data.data;
+          let { metodoPago, formaPago } = response.data.data;
           _this.options.metodoPago = metodoPago;
           _this.options.usoCFDI = _this.usocfdi;
           _this.options.formaPago = formaPago;
         });
     },
-    editItem(item) {
-      this.editedIndex = this.items.indexOf(item);
-      this.form = Object.assign({}, item);
-      this.Dialog = true;
-    },
-    deleteItem(item) {
-      const _this = this;
-      _this.$store.commit("showDialog", {
-        type: "confirm",
-        title: "Confimacion de eliminacion",
-        message: "¿Estás seguro de que quieres eliminar este registro?",
-        okCb: () => {
-          _this.editedIndex = _this.items.indexOf(item);
-          _this.items.splice(_this.editedIndex, 1);
-        },
-        cancelCb: () => {
-          console.log("CANCEL");
-        },
-      });
-    },
     saveItem() {
-      // if (this.editedIndex > -1) {
-      //   Object.assign(this.items[this.editedIndex], this.form);
-      // } else {
-      //   this.items.push(this.form);
-      // }
       this.Dialog = false;
     },
   },

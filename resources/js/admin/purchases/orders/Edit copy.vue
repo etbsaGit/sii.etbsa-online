@@ -2,10 +2,7 @@
   <v-card flat>
     <v-card-title class="overline">
       <v-icon left>mdi-file-document</v-icon> Acciones
-      <v-chip label small>
-        Estatus:
-        {{ form.estatus.title }}
-      </v-chip>
+
       <v-spacer></v-spacer>
       <v-btn class="ml-2" color="blue" @click="dialogMessages = true" dark>
         Mensajes <v-icon right>mdi-forum</v-icon>
@@ -18,7 +15,7 @@
         @click="updatePurchase"
         dark
       >
-        Guardar
+        Guardar Cambios
         <v-icon right>mdi-content-save</v-icon>
       </v-btn>
 
@@ -53,7 +50,7 @@
       </v-btn>
 
       <!-- <v-btn
-        v-if="form.estatus.key == 'enviado'"
+        v-if="form.estatus.key == 'por_facturar'"
         class="ml-2"
         color="indigo"
         @click="dialogInvoice = true"
@@ -150,6 +147,12 @@
         </v-date-picker>
       </v-dialog> -->
     </v-card-title>
+    <v-card-subtitle>
+      Estatus:
+      <v-chip label>
+        {{ form.estatus.title }}
+      </v-chip>
+    </v-card-subtitle>
 
     <v-divider></v-divider>
     <v-card-text>
@@ -320,7 +323,7 @@
                 </v-col>
               </v-row>
               <!-- Invoices Table -->
-              <v-row v-if="showInvoiceInfo || form.estatus.key == 'enviado'">
+              <v-row v-if="InvoiceTableShow">
                 <v-col cols="12">
                   <invoice-table
                     :purchase-id="purchaseId"
@@ -350,6 +353,8 @@
                   @close="dialogAddCharge = false"
                   :items.sync="form.charges"
                   :read-only="ReadOnly"
+                  :agencies="options.agencies"
+                  :departments="options.departments"
                 ></purchase-charge-table>
               </v-card-text>
               <v-card-title>
@@ -380,23 +385,6 @@
                   :form.sync="form.amounts"
                 ></purchase-amounts-table>
               </v-card-text>
-              <!-- <template v-if="showInvoiceInfo || form.estatus.key == 'enviado'">
-                <v-card-title>
-                  Factura Relacionada
-                  <v-spacer></v-spacer>
-                  <v-btn icon @click="dialogInvoice = true">
-                    <v-icon color="blue">mdi-pencil</v-icon>
-                  </v-btn>
-                </v-card-title>
-                <v-card-text class="px-0">
-                  <purchase-invoice-payment-table
-                    :dialogForm="dialogInvoice"
-                    @close="dialogInvoice = false"
-                    :purchase-id="purchaseId"
-                    :form="form.invoice_info"
-                  ></purchase-invoice-payment-table>
-                </v-card-text>
-              </template> -->
             </v-card>
           </v-col>
         </v-row>
@@ -422,7 +410,7 @@ import ImportCsvComponent from "../../components/ImportCsvComponent.vue";
 import PurchaseOrderMessages from "../components/PurchaseOrderMessages.vue";
 import PurchaseAmountsTable from "./PurchaseAmountsTable.vue";
 import PurchaseChargeTable from "./PurchaseChargeTable.vue";
-import PurchaseConceptTable from "./PurchaseConceptTable.vue";
+import PurchaseConceptTable from "./PurchaseProductsTable.vue";
 import PurchaseInvoicePaymentTable from "./PurchaseInvoicePaymentTable.vue";
 import PurchaseInvoiceTable from "./PurchaseInvoiceTable.vue";
 import InvoiceTable from "./InvoiceTable.vue";
@@ -476,9 +464,17 @@ export default {
         },
         amounts: {
           subtotal: 0,
-          with_tax: false,
           tax: 0,
           discount: 0,
+          with_tax: false,
+          with_iva_retenido: false,
+          tax_iva_retenido: 0,
+          with_isr: false,
+          tax_isr: 0,
+          with_retencion_cedular: false,
+          tax_retencion_cedular: 0,
+          with_retencion_125: false,
+          tax_retencion_125: 0,
           total: 0,
         },
         check_tax: false,
@@ -503,15 +499,16 @@ export default {
           autorizado: "orange",
           denegar: "red",
           verificado: "purple",
-          facturado: "green",
+          programar_pago: "green",
           por_pagar: "pink",
           pagada: "cyan",
-          enviado: "brown darken-4",
+          por_facturar: "brown darken-4",
         },
       },
       options: {
         suppliers: [],
         agencies: [],
+        departments: [],
         purchase_concept: [],
       },
     };
@@ -524,7 +521,6 @@ export default {
       { label: "Detalle", name: "" },
     ]);
     _this.loadPurchaseEdit();
-    // _this.$eventBus.$on("CHANGE_ESTATUS", () => {
     _this.$eventBus.$on("ORDERS_REFRESH", () => {
       _this.loadPurchaseEdit();
     });
@@ -547,8 +543,7 @@ export default {
     },
     canAutorize() {
       let estatus = {
-        pendiente: true,
-        denegar: true,
+        verificado: true,
       };
       if (this.$gate.allow("authorizePurchase", "compras")) {
         return !!this.form.estatus ? !!estatus[this.form.estatus.key] : false;
@@ -570,7 +565,8 @@ export default {
     },
     canVerify() {
       let estatus = {
-        autorizado: true,
+        pendiente: true,
+        denegar: true,
       };
       if (this.$gate.allow("validPurchase", "compras")) {
         return !!this.form.estatus ? !!estatus[this.form.estatus.key] : false;
@@ -578,17 +574,18 @@ export default {
         return false;
       }
     },
-    showInvoiceInfo() {
+    InvoiceTableShow() {
       let estatus = {
-        facturado: true,
+        programar_pago: true,
         por_pagar: true,
         pagada: true,
+        por_facturar: true,
       };
       return !!this.form.estatus ? !!estatus[this.form.estatus.key] : false;
     },
     canShedulePaymentDate() {
       let estatus = {
-        facturado: true,
+        programar_pago: true,
         por_pagar: true,
       };
       if (this.$gate.allow("shedulePaymentDate", "compras")) {
@@ -611,8 +608,8 @@ export default {
       //  $gate.allow('authorizePurchase', 'compras')
       let estatus = {
         validado: true,
-        enviado: true,
-        facturado: true,
+        por_facturar: true,
+        programar_pago: true,
         por_pagar: true,
         pagada: true,
       };
@@ -646,7 +643,14 @@ export default {
       let payload = {
         supplier_id: _this.form.supplier.id,
         concepts: _this.form.concepts,
-        charges: _this.form.charges,
+        estatus: _this.form.estatus,
+        charges: _this.form.charges.map((item) => {
+          return {
+            agency_id: item.agency.id,
+            depto_id: item.department.id,
+            percent: item.percent,
+          };
+        }),
         metodo_pago: _this.form.invoice.metodo_pago_id,
         uso_cfdi: _this.form.invoice.uso_cfdi_id,
         forma_pago: _this.form.invoice.forma_pago_id,
@@ -657,6 +661,14 @@ export default {
         subtotal: _this.form.amounts.subtotal,
         with_tax: _this.form.amounts.with_tax,
         tax: _this.form.amounts.tax,
+        with_isr: _this.form.amounts.with_isr,
+        tax_isr: _this.form.amounts.tax_isr,
+        with_iva_retenido: _this.form.amounts.with_iva_retenido,
+        tax_iva_retenido: _this.form.amounts.tax_iva_retenido,
+        with_retencion_cedular: _this.form.amounts.with_retencion_cedular,
+        tax_retencion_cedular: _this.form.amounts.tax_retencion_cedular,
+        with_retencion_125: _this.form.amounts.with_retencion_125,
+        tax_retencion_125: _this.form.amounts.tax_retencion_125,
         discount: _this.form.amounts.discount,
         total: _this.form.amounts.total,
       };
@@ -729,9 +741,15 @@ export default {
       await axios
         .get("/admin/purchase-order/resources/options")
         .then(function (response) {
-          let { suppliers, agencies, purchase_concept } = response.data.data;
+          let {
+            suppliers,
+            agencies,
+            departments,
+            purchase_concept,
+          } = response.data.data;
           _this.options.suppliers = suppliers;
           _this.options.agencies = agencies;
+          _this.options.departments = departments;
           _this.options.purchase_concept = purchase_concept;
         });
     },

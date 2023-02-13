@@ -89,7 +89,7 @@
 
         .invoice-box table tr.details td {
             padding-bottom: 8px;
-            font-size: 10pt;
+            font-size: 8pt;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -98,7 +98,7 @@
 
         .invoice-box table tr.item td {
             border-bottom: 1px solid #eee;
-            font-size: 10pt
+            font-size: 8pt
         }
 
         .invoice-box table tr.item.last td {
@@ -108,6 +108,8 @@
         .invoice-box table tr.total td:nth-child(2) {
             border-top: 2px solid #eee;
             font-weight: bold;
+            font-size: 8pt;
+            line-height: inherit;
         }
 
         @media only screen and (max-width: 600px) {
@@ -208,7 +210,7 @@
 
         .swiss {
             max-width: 600px;
-            opacity: 0.07;
+            opacity: 0.03;
         }
 
         .full-height {
@@ -228,17 +230,16 @@
         .position-ref {
             position: relative;
         }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
     </style>
 </head>
 
 <body>
-
     <header>
-        {{-- <div class="title">EQUIPOS Y TRACTORES DEL BAJIO , S.A. DE C.V</div>
-        <div>Carretera Panamericana Celaya - Salamanca Km. 61</div>
-        <div>1ra Fracc. crespo C.P. 38120 Celaya, Gto.</div>
-        <div>Tel. 461-614-23-23, 461-614-23-24, 461-614-23-25</div>
-        <div class="subtitle">R.F.C.: ETB-860812-I23</div> --}}
         <div class="flex-center position-ref full-height">
             <div class="content">
                 <div class="title m-b-md align-center" style="margin-top: 400px">
@@ -268,17 +269,13 @@
         <table cellpadding="0" cellspacing="0">
             {{-- <tr class="top"> --}}
             <tr>
-                <td colspan="6">
+                <td colspan="7">
                     <table>
                         <tr>
                             <td class="title">
                                 <img src="{{ public_path() . '/img/etbsa-logo-corporativo-dark.jpeg' }}"
                                     style="width: 100%; max-width: 189px; height: 100px;" />
                             </td>
-                            {{-- <td style="max-width: 100px">
-                                Sucursal ETBSA : {{ $data->sucursal->title }}<br />
-                                Domicilio: {{ $data->sucursal->address }}<br />
-                            </td> --}}
                             <td>
                                 ORDEN DE COMPRA: # {{ str_pad($data->id, 5, '0', STR_PAD_LEFT) }}<br />
                                 Fecha: {{ $data->authorization_date }}<br />
@@ -289,17 +286,23 @@
             </tr>
 
             <tr class="information">
-                <td colspan="6">
+                <td colspan="7">
                     <table>
                         <tr>
-                            <td colspan="6">
-                                Equipos y Tractores del Bajio SA de CV<br />
+                            <td colspan="7">
+                                Equipos y Tractores del Bajio<br />
                                 Carr. Panamericana Celaya - Salamanca Km. 61<br />
                                 1ra Fracc. crespo C.P. 38120 Celaya, Gto.<br />
-                                R.F.C.: ETB-860812-I23
+                                R.F.C.: ETB-860812-I23<br /><br>
+                                Sucursal Embarque: <b>{{ $data->ship->title }}</b><br>
+                                Realizo: <b>{{ $data->elaborated->name }}</b> <br>
+                                Cargos A:
+                                @foreach ($data->chargeAgency as $agency)
+                                    <b>{{ $agency->title }}</b>,
+                                @endforeach
                             </td>
 
-                            <td colspan="6">
+                            <td colspan="7">
                                 Proveedor:<br />
                                 {{ $data->supplier->business_name }}<br />
                                 {{ $data->supplier->rfc }}<br />
@@ -311,111 +314,121 @@
             </tr>
 
             <tr class="heading">
-                <td>Datos Factura</td>
-                <td colspan="5"></td>
-            </tr>
-
-            <tr class="details">
-                <td>Metodo de Pago</td>
-                <td colspan="4">({{ $data->metodopago->description }})</td>
-                <td style="text-align: center">{{ $data->metodopago->clave }} </td>
+                <td>Datos de Facturacion</td>
+                <td colspan="6"></td>
             </tr>
             <tr class="details">
-                <td>USO DE CFDI</td>
-                <td colspan="4">({{ $data->usocfdi->description }})</td>
-                <td style="text-align: center">{{ $data->usocfdi->clave }} </td>
+                <td colspan="6">
+                    Metodo de Pago:
+                    <b>{{ $data->metodopago->clave }} </b>
+                    ({{ $data->metodopago->description }})
+                </td>
             </tr>
             <tr class="details">
-                <td>Forma de Pago</td>
-                <td colspan="4">({{ $data->formapago->description }})</td>
-                <td style="text-align: center">{{ $data->formapago->clave }} </td>
+                <td colspan="6">
+                    USO DE CFDI:
+                    <b>{{ $data->usocfdi->clave }} </b>
+                    ({{ $data->usocfdi->description }})
+                </td>
+            </tr>
+            <tr class="details">
+                <td colspan="6">
+                    Forma de Pago:
+                    <b>{{ $data->formapago->clave }} </b>
+                    ({{ $data->formapago->description }})
+                </td>
             </tr>
 
             <tr class="heading">
-                {{-- <td>cargo</td> --}}
-                <td>Producto</td>
+                <td>Grupo Articulo</td>
+                <td>Descripcion</td>
+                <td>Clave Unidad</td>
                 <td>Cantidad</td>
-                <td>unidad</td>
                 <td>precio unit.</td>
                 <td>Descuento</td>
                 <td>importe</td>
 
             </tr>
-            @foreach ($data->concepts as $concept)
-                <tr class="item" style="font-size: 8pt;">
-                    {{-- <td>{{ ($concept['department'] ?? '') . ' ' . ($concept['user'] ?? '') }} --}}
-                    {{-- </td> --}}
-                    <td style="width: 300px; ">
-                        <div>
-                            <b>{{ $concept['name'] }}</b>
-                        </div>
-                        <div>
-                            {{ $concept['description'] }}
-                        </div>
-                    </td>
-                    <td style="text-align: left;">
-                        {{ $concept['quantity'] }}
-                    </td>
-                    <td style="text-align: left;">
-                        {{ $concept['unit'] }}
-                    </td>
-                    <td style="text-align: right">
-                        {{ '$ ' . number_format($concept['price'], 2, '.', ',') }}
-                    </td>
-                    <td style="text-align: right">
-                        {{ '$ ' . number_format($concept['discount'] ?? 0, 2, '.', ',') . '' }}
-                    </td>
-                    <td style="text-align: right">
-                        {{ '$ ' . number_format($concept['quantity'] * $concept['price'] - $concept['discount'], 2, '.', ',') }}
-                    </td>
+            @foreach ($data->products as $product)
+                <tr class="item">
+                    <td>{{ $product['group']['name'] }}</td>
+                    <td>{{ $product['description'] }}</td>
+                    <td>{{ $product['unit']->name }} - {{ $product['unit']->clave }}</td>
+                    <td style="text-align: center">{{ $product['qty'] }}</td>
+                    <td style="text-align: right">{{ '$ ' . number_format($product['price'], 2, '.', ',') }}</td>
+                    <td style="text-align: right">{{ '$ ' . number_format($product['discount'], 2, '.', ',') }}</td>
+                    <td style="text-align: right">{{ '$ ' . number_format($product['subtotal'], 2, '.', ',') }}</td>
                 </tr>
             @endforeach
 
 
             <tr class="item">
-                <td colspan="6"></td>
+                <td colspan="7"></td>
             </tr>
-            <tr class="total" style="text-align: right">
-                <td colspan="4">Subtotal: </td>
-                <td colspan="2" style="text-align: right">{{ '$ ' . number_format($data->subtotal, 2, '.', ',') }}
+            <tr class="item">
+                <td colspan="5" style="text-align: right">Subtotal: </td>
+                <td colspan="2">{{ '$ ' . number_format($data->subtotal, 2, '.', ',') }}
                 </td>
             </tr>
-            <tr class="total" style="text-align: right">
-                <td colspan="4">Descuento: </td>
-                <td colspan="2">{{ '$ ' . number_format($data->discount, 2, '.', ',') }}</td>
-            </tr>
-            <tr class="total" style="text-align: right">
-                <td colspan="4">IVA: </td>
+            <tr class="item" style="text-align: right">
+                <td colspan="5">IVA: </td>
                 <td colspan="2">{{ '$ ' . number_format($data->tax, 2, '.', ',') }}</td>
             </tr>
-            <tr class="total" style="text-align: right">
-                <td colspan="4">Total: </td>
+            <tr class="item" style="text-align: right">
+                <td colspan="5">ISR: </td>
+                <td colspan="2">{{ '$ ' . number_format($data->tax_isr, 2, '.', ',') }}</td>
+            </tr>
+            <tr class="item" style="text-align: right">
+                <td colspan="5">IVA Retenido: </td>
+                <td colspan="2">{{ '$ ' . number_format($data->tax_iva_retenido, 2, '.', ',') }}</td>
+            </tr>
+            <tr class="item" style="text-align: right">
+                <td colspan="5">Retencion Cedular: </td>
+                <td colspan="2">{{ '$ ' . number_format($data->tax_retencion_cedular, 2, '.', ',') }}</td>
+            </tr>
+            <tr class="item" style="text-align: right">
+                <td colspan="5">Retencion 1.25%: </td>
+                <td colspan="2">{{ '$ ' . number_format($data->tax_retencion_125, 2, '.', ',') }}</td>
+            </tr>
+            <tr class="item" style="text-align: right">
+                <td colspan="5">Flete: </td>
+                <td colspan="2">{{ '$ ' . number_format($data->tax_flete, 2, '.', ',') }}</td>
+            </tr>
+            <tr class="item" style="text-align: right">
+                <td colspan="5">Descuento: </td>
+                <td colspan="2">{{ '$ ' . number_format($data->discount, 2, '.', ',') }}</td>
+            </tr>
+            <tr class="item" style="text-align: right">
+                <td colspan="5">Total: </td>
                 <td colspan="2">{{ '$ ' . number_format($data->total, 2, '.', ',') }}</td>
             </tr>
         </table>
         <table>
-            {{-- <tr class="heading">
+            <tr class="heading">
                 <td>Observacion</td>
                 <td colspan="5"></td>
             </tr>
-            <tr class="details">
-                <td colspan="6" style="text-align: left">{{ $data->observation }} </td>
-            </tr> --}}
+            <tr class="item">
+                <td colspan="6">
+                    {{ $data->observation }}
+                </td>
+            </tr>
             <tr class="heading">
                 <td>Nota</td>
                 <td colspan="5"></td>
             </tr>
-            <tr class="details">
-                <td colspan="6" style="text-align: left">{{ $data->note }} </td>
+            <tr class="item">
+                <td colspan="6">{{ $data->note }} </td>
             </tr>
             <tr class="details">
                 <td colspan="6" style="text-align: left; font-size: 8pt;">
-                    Atencion Proveedor si tu Factura NO Coincide con los Requisitos Fiscales>de esta Orden compra <br>
+                    Atencion Proveedor si tu Factura NO Coincide con los Requisitos Fiscales de esta Orden compra <br>
                     NO sera programada para Pago<br><br>
-                    *Poner en copia al/los correos:<br>
+                    *Poner en copia al/los correos:
                     @foreach ($data->chargeAgency as $agency)
-                        {{ $agency->email }}<br>
+                        {{ $agency->email }},
                     @endforeach
+                    sanchezblanca@etbsa.com.mx
                 </td>
             </tr>
         </table>

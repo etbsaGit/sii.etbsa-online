@@ -3,7 +3,7 @@
     <v-row dense class="overline elevation-2 pa-2 mb-4">
       <v-col cols="12">
         <p class="text-14 mb-1">
-          Prospecto
+          Seleccione a un Prospecto
         </p>
         <v-autocomplete
           v-model="form.prospect_id"
@@ -17,6 +17,7 @@
           clearable
           outlined
           dense
+          filled
         >
           <template v-slot:prepend-item>
             <v-list dense color="grey lighten-3">
@@ -43,129 +44,61 @@
         <v-autocomplete
           v-model="form.title"
           :items="options.categories"
-          item-value="key"
-          item-text="title"
+          item-value="name"
+          item-text="name"
           placeholder="Seleccionar"
           :rules="[(v) => !!v || 'Es Requerido']"
           hide-details
           outlined
+          filled
           dense
-        ></v-autocomplete>
+        >
+        </v-autocomplete>
       </v-col>
-      <!--  -->
-
-      <template v-if="form.title == 'tractores'">
-        <v-col cols="12">
-          <p class="text-14 mb-1">
-            Modelo Tractor
-          </p>
-          <v-combobox
-            v-model="selectModel"
-            :items="models"
-            label="Modelo Tractor:"
-            placeholder="Seleccione Modelo"
-            required
-            outlined
-            filled
-            dense
-            clearable
-            hide-details
-            :rules="[(v) => (!!v && v.length > 0) || 'Campo Requerido']"
-          ></v-combobox
-        ></v-col>
-        <v-col cols="12">
-          <p class="text-14 mb-1">
-            Configuracion Modelo
-          </p>
-          <v-select
-            v-model="selectConfig"
-            :items="TractorConfigurations"
-            :hint="selectConfig.hint"
-            placeholder="Elija una Configuracion"
-            persistent-hint
-            filled
-            outlined
-            required
-            dense
-            prepend-icon="mdi-cogs"
-            return-object
-            :rules="[(v) => !!v.text || 'Campo Requerido']"
-          ></v-select
-        ></v-col>
-      </template>
-
-      <template v-else-if="form.title == 'implementos'">
-        <v-col cols="12">
-          <p class="text-14 mb-1">
-            Tipo Implemento
-          </p>
-          <v-combobox
-            v-model="selectModel"
-            :items="tiposImplementos"
-            label="Modelo Implemento:"
-            placeholder="Seleccione Modelo"
-            required
-            outlined
-            filled
-            dense
-            clearable
-            hide-details
-            :rules="[(v) => (!!v && v.length > 0) || 'Campo Requerido']"
-          ></v-combobox
-        ></v-col>
-        <v-col cols="12">
-          <p class="text-14 mb-1">
-            Configuracion Modelo
-          </p>
-          <v-select
-            v-model="selectConfig"
-            :items="ImplementoConfigurations"
-            :hint="selectConfig.hint"
-            placeholder="Elija una Configuracion"
-            persistent-hint
-            filled
-            outlined
-            required
-            dense
-            prepend-icon="mdi-cogs"
-            return-object
-            :rules="[(v) => !!v.text || 'Campo Requerido']"
-          ></v-select
-        ></v-col>
-      </template>
-
-      <v-col cols="12" v-else>
+      <v-col cols="12">
         <p class="text-14 mb-1">
           Producto a Cotizar
         </p>
-        <v-text-field
-          v-model="form.reference"
-          placeholder="Describa lo que se va a Cotizar"
+        <v-combobox
+          v-model="form.product"
+          :items="options.products"
+          item-value="name"
+          item-text="name"
+          placeholder="Buscar por Nombre o SKU"
           :rules="[(v) => !!v || 'Es Requerido']"
+          :filter="customFilterProducts"
           hide-details
+          return-object
           outlined
+          filled
           dense
-        ></v-text-field>
+        >
+          <template v-slot:item="{ item }">
+            <v-list-item-title v-html="item.name"></v-list-item-title>
+            <v-list-item-subtitle v-html="item.sku"></v-list-item-subtitle>
+            <v-list-item-subtitle>
+              {{ item.price_1 | money }}{{ item.currency.name }}
+            </v-list-item-subtitle>
+          </template>
+        </v-combobox>
       </v-col>
-
-      <!--  -->
-
-      <v-col cols="12">
+      <v-col cols="8">
         <p class="text-14 mb-1">
-          Precio a tratar
+          Valor del Lead
         </p>
         <v-text-field
-          v-model="form.price"
+          v-model.number="form.price"
           placeholder="0.00"
           :rules="[(v) => !!v || 'Es Requerido']"
           type="number"
           prefix="$"
           hide-details
           outlined
+          filled
           dense
         ></v-text-field>
       </v-col>
-      <v-col cols="12">
+      <v-col cols="4">
         <p class="text-14 mb-1">
           Tipo de Moneda
         </p>
@@ -179,12 +112,13 @@
           :rules="[(v) => !!v || 'Es Requerido']"
           hide-details
           outlined
+          filled
           dense
         ></v-select>
       </v-col>
     </v-row>
-    <v-row dense class="overline elevation-2 pa-2">
-      <v-col cols="12">
+    <v-row dense>
+      <v-col cols="12" md="6">
         <p class="text-14 mb-1">
           Origen de Prospeccion
         </p>
@@ -195,10 +129,11 @@
           :rules="[(v) => !!v || 'Es Requerido']"
           hide-details
           outlined
+          filled
           dense
         ></v-select>
       </v-col>
-      <v-col cols="12">
+      <v-col cols="12" md="6">
         <p class="text-14 mb-1">
           Condicion de Pago
         </p>
@@ -208,12 +143,13 @@
           placeholder="Placeholder"
           hide-details
           outlined
+          filled
           dense
         ></v-select>
       </v-col>
       <v-col cols="12">
         <p class="text-14 mb-1">
-          Etapa
+          Etapa del LEAD
         </p>
         <v-select
           v-model="form.assertiveness"
@@ -222,6 +158,7 @@
           prepend-inner-icon="mdi-circle-slice-2"
           hide-details
           outlined
+          filled
           dense
         >
           <template v-slot:item="data">
@@ -237,8 +174,8 @@
         </v-select>
       </v-col>
     </v-row>
-    <v-row dense class="overline elevation-2 pa-2">
-      <v-col cols="12">
+    <v-row dense>
+      <v-col cols="12" md="6">
         <p class="text-14 mb-1">
           Sucursal
         </p>
@@ -250,8 +187,11 @@
           placeholder="Seleccionar"
           hide-details
           outlined
+          filled
           dense
         ></v-select>
+      </v-col>
+      <v-col cols="12" md="6">
         <p class="text-14 mb-1">
           Departamento
         </p>
@@ -263,10 +203,13 @@
           placeholder="Seleccionar"
           hide-details
           outlined
+          filled
           dense
         ></v-select>
+      </v-col>
+      <v-col cols="12">
         <p class="text-14 mb-1">
-          Vendedor Sugerido
+          Vendedor Asigando
         </p>
         <v-autocomplete
           v-model="form.attended_by"
@@ -277,12 +220,13 @@
           placeholder="Seleccionar"
           hide-details
           outlined
+          filled
           dense
         ></v-autocomplete>
       </v-col>
       <v-col cols="12">
         <p class="text-14 mb-1">
-          Motivo del Segumiento
+          Motivo del LEAD
         </p>
         <v-textarea
           v-model="form.description_topic"
@@ -315,8 +259,6 @@
 <script>
 import ProspectCreate from "../prospect/ProspectCreate.vue";
 import Assertiveness from "@admin/sales/tracking/resources/assertiveness.json";
-import Tractors from "@admin/sales/tracking/resources/agricola.json";
-import Implementos from "@admin/sales/tracking/resources/implementos.json";
 export default {
   components: { ProspectCreate },
   name: "TrackingForm",
@@ -333,10 +275,11 @@ export default {
       selectModel: null,
       selectConfig: { hint: "" },
       options: {
-        tractors: Tractors,
-        implementos: Implementos,
+        // tractors: Tractors,
+        // implementos: Implementos,
         prospects: [],
         agencies: [],
+        products: [],
         departments: [],
         sellers: [],
         payment_conditions: [
@@ -362,15 +305,21 @@ export default {
     "form.department_id": function (v) {
       if (!!this.form.agency_id && v) this.loadSellers(() => {});
     },
-    selectModel: function () {
-      this.form.reference = null;
-      this.form.price = null;
-      this.selectConfig = { hint: "" };
+    "form.title": function (category_name) {
+      const _this = this;
+      this.form.product = null;
+      this.loadProductsByCategory(() => {});
     },
-    selectConfig: function ({ price, currency, text }) {
-      this.form.reference = text;
-      this.form.price = price;
-      this.form.currency_id = currency == "MXN" ? 1 : 2;
+    "form.product": function (v) {
+      if (v != null && typeof v != "string") {
+        this.form.reference = v.name;
+        this.form.price = v.price_1;
+        this.form.currency_id = v.currency.id;
+      } else {
+        this.form.reference = v;
+        this.form.price = null;
+        this.form.currency_id = null;
+      }
     },
   },
   computed: {
@@ -382,65 +331,65 @@ export default {
         return true;
       }
     },
-    tipos() {
-      return [...new Set(this.options.tractors.map((item) => item.Tipo))];
-    },
-    tiposImplementos() {
-      return [
-        ...new Set(this.options.implementos.map((item) => item.Categoria)),
-      ];
-    },
-    models() {
-      const filter = this.options.tractors.filter(
-        (word) => word.Tipo === "Tractor"
-      );
-      return [...new Set(filter.map((item) => `${item.Modelo}`))];
-    },
-    ImplementoConfigurations() {
-      const result = [];
-      const map = new Map();
-      const filter = this.options.implementos.filter(
-        (item) => `${item.Categoria}` === this.selectModel
-      );
-      for (const item of filter) {
-        console.log(item.Precio);
-        result.push({
-          text: `${item.Categoria} ${item.Modelo}`,
-          price: item.Precio,
-          currency: "MXN",
-          hint: `${item.Modelo}`,
-        });
-      }
-      console.log(result);
-      return result;
-    },
-    TractorConfigurations() {
-      const result = [];
-      const map = new Map();
-      const filter = this.options.tractors.filter(
-        (item) => `${item.Modelo}` === this.selectModel
-      );
-      for (const item of filter) {
-        if (!map.has(this.configuracion(item))) {
-          map.set(this.configuracion(item), true); // set any value to Map
-          result.push({
-            text: this.configuracion(item).trim(),
-            price: item.Precio,
-            currency: item["Tipo Moneda"],
-            hint: `${item.Modelo} ${item.field4} ${
-              item["Traccion Sencilla"] === "SI" ? "Traccion Sencilla | " : ""
-            } ${item["Doble Traccion"] === "SI" ? "Doble Traccion | " : ""} ${
-              item["Power Reverser"] === "SI" ? "Power Reverser | " : ""
-            } ${item.Creeper === "SI" ? "Creeper | " : ""} ${
-              item["Con Cabina"] === "SI" ? "Con Cabina | " : ""
-            } ${item["Cabina Premium"] === "SI" ? "Cabina Premium | " : ""} ${
-              item["Doble rodado"] === "SI" ? "Doble rodado | " : ""
-            } ${item.Ams === "SI" ? "AMS Incluido | " : ""}`.trim(),
-          });
-        }
-      }
-      return result;
-    },
+    // tipos() {
+    //   return [...new Set(this.options.tractors.map((item) => item.Tipo))];
+    // },
+    // tiposImplementos() {
+    //   return [
+    //     ...new Set(this.options.implementos.map((item) => item.Categoria)),
+    //   ];
+    // },
+    // models() {
+    //   const filter = this.options.tractors.filter(
+    //     (word) => word.Tipo === "Tractor"
+    //   );
+    //   return [...new Set(filter.map((item) => `${item.Modelo}`))];
+    // },
+    // ImplementoConfigurations() {
+    //   const result = [];
+    //   const map = new Map();
+    //   const filter = this.options.implementos.filter(
+    //     (item) => `${item.Categoria}` === this.selectModel
+    //   );
+    //   for (const item of filter) {
+    //     console.log(item.Precio);
+    //     result.push({
+    //       text: `${item.Categoria} ${item.Modelo}`,
+    //       price: item.Precio,
+    //       currency: "MXN",
+    //       hint: `${item.Modelo}`,
+    //     });
+    //   }
+    //   console.log(result);
+    //   return result;
+    // },
+    // TractorConfigurations() {
+    //   const result = [];
+    //   const map = new Map();
+    //   const filter = this.options.tractors.filter(
+    //     (item) => `${item.Modelo}` === this.selectModel
+    //   );
+    //   for (const item of filter) {
+    //     if (!map.has(this.configuracion(item))) {
+    //       map.set(this.configuracion(item), true); // set any value to Map
+    //       result.push({
+    //         text: this.configuracion(item).trim(),
+    //         price: item.Precio,
+    //         currency: item["Tipo Moneda"],
+    //         hint: `${item.Modelo} ${item.field4} ${
+    //           item["Traccion Sencilla"] === "SI" ? "Traccion Sencilla | " : ""
+    //         } ${item["Doble Traccion"] === "SI" ? "Doble Traccion | " : ""} ${
+    //           item["Power Reverser"] === "SI" ? "Power Reverser | " : ""
+    //         } ${item.Creeper === "SI" ? "Creeper | " : ""} ${
+    //           item["Con Cabina"] === "SI" ? "Con Cabina | " : ""
+    //         } ${item["Cabina Premium"] === "SI" ? "Cabina Premium | " : ""} ${
+    //           item["Doble rodado"] === "SI" ? "Doble rodado | " : ""
+    //         } ${item.Ams === "SI" ? "AMS Incluido | " : ""}`.trim(),
+    //       });
+    //     }
+    //   }
+    //   return result;
+    // },
   },
   methods: {
     async loadOptions() {
@@ -478,6 +427,19 @@ export default {
           _this.$store.commit("hideLoader");
         });
     },
+    async loadProductsByCategory(cb) {
+      const _this = this;
+
+      let params = {
+        category_name: _this.form.title,
+        paginate: "no",
+      };
+
+      await axios.get("/admin/products", { params }).then((response) => {
+        _this.options.products = response.data.data.data;
+        (cb || Function)();
+      });
+    },
     customFilter(item, queryText, itemText) {
       const textName = item.full_name.toLowerCase();
       const textPhone = item.phone.toLowerCase();
@@ -485,6 +447,15 @@ export default {
 
       return (
         textName.indexOf(searchText) > -1 || textPhone.indexOf(searchText) > -1
+      );
+    },
+    customFilterProducts(item, queryText, itemText) {
+      const textName = item.name.toLowerCase();
+      const textSku = item.sku.toLowerCase();
+      const searchText = queryText.toLowerCase();
+
+      return (
+        textName.indexOf(searchText) > -1 || textSku.indexOf(searchText) > -1
       );
     },
     configuracion(item) {

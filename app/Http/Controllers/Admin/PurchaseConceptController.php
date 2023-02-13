@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Components\Common\Models\CatUsoCfdi;
 use App\Components\Purchase\Models\PurchaseConcept;
+use App\Components\Purchase\Models\PurchaseType;
 use App\Components\Purchase\Repositories\PurchaseConceptRepository;
 use Illuminate\Http\Request;
 
@@ -42,7 +43,8 @@ class PurchaseConceptController extends AdminController
     public function create()
     {
         $uso_cfdi = CatUsoCfdi::all();
-        return $this->sendResponseOk(compact('uso_cfdi'));
+        $purchase_types = PurchaseType::all('id', 'name');
+        return $this->sendResponseOk(compact('uso_cfdi', 'purchase_types'));
     }
 
     /**

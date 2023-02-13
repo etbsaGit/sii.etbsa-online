@@ -184,6 +184,36 @@ class SinglePageController extends AdminController
                         'route_name' => 'products.category.index',
                         'visible' => true,
                     ]),
+                    new MenuItem([
+                        'group_requirements' => [],
+                        'permission_requirements' => ['product.admin'],
+                        'label' => 'Marcas y Proveedores',
+                        'nav_type' => MenuItem::$NAV_TYPE_NAV,
+                        'icon' => 'mdi-shape',
+                        'route_type' => 'vue',
+                        'route_name' => 'products.brands.index',
+                        'visible' => true,
+                    ]),
+                    new MenuItem([
+                        'group_requirements' => ['Super User'],
+                        'permission_requirements' => ['product.admin'],
+                        'label' => 'Catageorias Productos',
+                        'nav_type' => MenuItem::$NAV_TYPE_NAV,
+                        'icon' => 'mdi-shape',
+                        'route_type' => 'vue',
+                        'route_name' => 'products.categories.index',
+                        'visible' => true,
+                    ]),
+                    new MenuItem([
+                        'group_requirements' => ['Super User'],
+                        'permission_requirements' => ['product.admin'],
+                        'label' => 'Atributos y Caracteristicas',
+                        'nav_type' => MenuItem::$NAV_TYPE_NAV,
+                        'icon' => 'mdi-shape',
+                        'route_type' => 'vue',
+                        'route_name' => 'products.attributes.index',
+                        'visible' => true,
+                    ]),
                 ]
             ]),
             new MenuItem([
@@ -306,7 +336,7 @@ class SinglePageController extends AdminController
                     ]),
                     new MenuItem([
                         'group_requirements' => ['Compras', 'Super User'],
-                        'permission_requirements' => [],
+                        'permission_requirements' => ['compras.admin'],
                         'label' => 'Facturas por Pagar',
                         'nav_type' => MenuItem::$NAV_TYPE_NAV,
                         'icon' => 'mdi-file',
@@ -316,7 +346,7 @@ class SinglePageController extends AdminController
                     ]),
                     new MenuItem([
                         'group_requirements' => ['Compras', 'Super User'],
-                        'permission_requirements' => [],
+                        'permission_requirements' => ['proveedor.crear'],
                         'label' => 'Proveedores',
                         'nav_type' => MenuItem::$NAV_TYPE_NAV,
                         'icon' => 'mdi-account-box-multiple-outline',
@@ -326,7 +356,7 @@ class SinglePageController extends AdminController
                     ]),
                     new MenuItem([
                         'group_requirements' => ['Compras', 'Super User'],
-                        'permission_requirements' => [],
+                        'permission_requirements' => ['compras.admin'],
                         'label' => 'Conceptos Compras',
                         'nav_type' => MenuItem::$NAV_TYPE_NAV,
                         'icon' => 'mdi-account-box-multiple-outline',

@@ -5,6 +5,10 @@
     :items="items"
     :options.sync="pagination"
     :server-items-length="totalItems"
+    :single-expand="true"
+    show-selectitem-key="folio"
+    show-expand
+    item-key="folio"
     show-select
     calculate-widths
     fixed-header
@@ -12,6 +16,60 @@
     dense
     class="blue--text text-uppercase text-truncate"
   >
+    <template v-slot:expanded-item="{ headers, item }">
+      <td :colspan="headers.length" class="pa-0">
+        <v-simple-table dense class="elevation-2 ma-1">
+          <template v-slot:default>
+            <tbody>
+              <tr>
+                <td class="caption">
+                  Orden de Compra:
+                </td>
+                <td class="d-flex align-center">
+                  <v-btn
+                    dark
+                    small
+                    color="primary"
+                    :to="{
+                      name: 'purchase.edit',
+                      params: { purchaseId: item.invoiceable.id },
+                    }"
+                  >
+                    #{{ item.invoiceable.id.toString().padStart(5, 0) }}
+                    <v-icon right>mdi-eye-outline</v-icon>
+                  </v-btn>
+                </td>
+              </tr>
+              <tr>
+                <td class="caption">
+                  Concepto de Compra:
+                </td>
+                <td class="d-flex align-center">
+                  {{ item.invoiceable.purchase_concept.name }}
+                </td>
+              </tr>
+              <tr>
+                <td class="caption">Cargos:</td>
+                <td class="d-flex align-center">
+                  <v-chip-group active-class="primary--text" column>
+                    <v-chip
+                      v-for="(tag, index) in item.invoiceable.charges"
+                      :key="`${tag.agency}-${index}`"
+                      class="overline"
+                      dark
+                      small
+                    >
+                      {{ tag.agency.title }} - {{ tag.department.title }} -
+                      {{ tag.percent }}%
+                    </v-chip>
+                  </v-chip-group>
+                </td>
+              </tr>
+            </tbody>
+          </template>
+        </v-simple-table>
+      </td>
+    </template>
     <template v-slot:top>
       <search-panel
         :rightDrawer="rightDrawer"
@@ -232,9 +290,9 @@
             </v-btn>
           </v-date-picker>
         </v-dialog>
-        <!-- btn Prg Pago -->
+        <!-- btn Programar Fecha de Pago -->
         <v-dialog
-          v-if="selected.length > 0 && filters.estatus == 'facturado'"
+          v-if="selected.length > 0 && filters.estatus == 'programar_pago'"
           ref="dialog_pay"
           v-model="dialogDayToPayment"
           :return-value.sync="date_to_pay"
@@ -270,24 +328,44 @@
             </v-btn>
           </v-date-picker>
         </v-dialog>
+        <!-- Btn Reset Programacion de Pago -->
+        <v-btn
+          v-if="selected.length > 0 && filters.estatus == 'por_pagar'"
+          color="red"
+          class="ml-2"
+          dark
+          @click="resetDateToPayment"
+        >
+          Resetiar fecha de Programacion de Pago
+        </v-btn>
+        <!-- Brn Reset de Fecha de Pago -->
+        <v-btn
+          v-if="selected.length > 0 && filters.estatus == 'pagada'"
+          color="red"
+          class="ml-2"
+          dark
+          @click="resetDatePayment"
+        >
+          Resetiar fecha de Pago
+        </v-btn>
       </v-toolbar>
     </template>
     <template v-slot:[`item.folio`]="{ item }">
       <v-list-item dense class="pa-0 caption">
-        <v-list-item-content class="pa-0 caption text-wrap">
+        <v-list-item-content class="pa-0 text-wrap">
+          <v-list-item-subtitle class="button">
+            {{ item.folio }}-{{ item.serie }}
+          </v-list-item-subtitle>
           <v-list-item-title class="caption">
             {{ item.folio_fiscal }}
           </v-list-item-title>
-          <v-list-item-subtitle class="caption">
-            {{ item.folio }}{{ item.serie }}
-          </v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
     </template>
     <template v-slot:[`item.invoiceable.supplier`]="{ value }">
-      <v-list-item dense class="pa-0 caption">
+      <v-list-item dense class="pa-0 caption" style="min-width: 200px;">
         <v-list-item-content class="pa-0 caption">
-          <v-list-item-title class="caption">
+          <v-list-item-title class="font-weight-bold caption text-wrap">
             {{ value.business_name }}
           </v-list-item-title>
           <v-list-item-subtitle>
@@ -296,11 +374,8 @@
         </v-list-item-content>
       </v-list-item>
     </template>
-    <template v-slot:[`item.invoiceable.id`]="{ value }">
-      <span> #{{ value.toString().padStart(5, 0) }} </span>
-    </template>
     <template v-slot:[`item.amount`]="{ value }">
-      {{ value | currency }}
+      <span class="font-weight-bold"> {{ value | currency }} MXN </span>
     </template>
     <template v-slot:[`item.invoiceable.estatus`]="{ value }">
       <v-chip
@@ -312,38 +387,8 @@
         {{ value.title }}
       </v-chip>
     </template>
-
-    <template v-slot:[`item.cargos`]="{ item }">
-      <v-dialog transition="dialog-bottom-transition" width="600">
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn text v-bind="attrs" v-on="on">
-            Ver <v-icon right>mdi-eye</v-icon>
-          </v-btn>
-        </template>
-        <template v-slot:default>
-          <v-sheet elevation="10" rounded="xl">
-            <v-sheet class="pa-3 blue title" rounded="t-xl">
-              Cargos a Sucursal
-            </v-sheet>
-            <div class="pa-4">
-              <v-chip-group active-class="primary--text" column>
-                <v-chip
-                  v-for="(tag, index) in item.invoiceable.charges"
-                  :key="`${tag.agency}-${index}`"
-                  class="overline"
-                  dark
-                >
-                  {{ tag.agency.title }} - {{ tag.department.title }} -
-                  {{ tag.percent }}%
-                </v-chip>
-              </v-chip-group>
-            </div>
-          </v-sheet>
-        </template>
-      </v-dialog>
-    </template>
     <template v-slot:[`item.invoice_date`]="{ value }">
-      {{ $appFormatters.formatDate(value, "l") }}
+      {{ $appFormatters.formatDate(value, "L") }}
     </template>
     <template v-slot:[`item.date_to_pay`]="{ value }">
       {{ $appFormatters.formatDate(value, "l") }}
@@ -365,6 +410,8 @@ export default {
     DialogComponent,
   },
   data: () => ({
+    expanded: [],
+    singleExpand: false,
     valid: true,
     modalDateRange: false,
     selected: [],
@@ -376,7 +423,7 @@ export default {
     headers: [
       // { text: "", value: "actions", sortable: false },
       {
-        text: "Folio",
+        text: "Folio Fiscal",
         align: "left",
         sortable: false,
         value: "folio",
@@ -387,30 +434,17 @@ export default {
         value: "invoiceable.supplier",
         fixed: true,
       },
-      {
-        text: "Orden de Compra",
-        value: "invoiceable.id",
-        fixed: true,
-      },
-      {
-        text: "Cargos",
-        value: "cargos",
-        fixed: true,
-        sortable: false,
-      },
-      { text: "Concepto", value: "invoiceable.purchase_concept.name" },
-      // {
-      //   text: "Productos",
-      //   value: "invoiceable.concepts.length",
-      //   align: "center",
-      //   sortable: false,
-      // },
       { text: "Importe", value: "amount", align: "right" },
-      // { text: "Realizado por", value: "invoiceable.elaborated" },
-      { text: "Estatus", value: "invoiceable.estatus", align: "center" },
+      {
+        text: "Condicion (Dias)",
+        value: "invoiceable.payment_condition",
+        align: "center",
+      },
       { text: "Fecha Factura", value: "invoice_date", align: "center" },
       { text: "Pagar el", value: "date_to_pay", align: "center" },
       { text: "Pagada el", value: "payment_date", align: "center" },
+      { text: "Estatus", value: "invoiceable.estatus", align: "center" },
+      { text: "", value: "data-table-expand" },
     ],
     items: [],
     search: null,
@@ -433,16 +467,16 @@ export default {
       usoCFDI: [],
       formaPago: [],
       estatus: [
-        { text: "Facturados", value: "facturado" },
+        { text: "Todo", value: "todos" },
+        { text: "Programar Pago", value: "programar_pago" },
         { text: "Pendiente de Pago", value: "por_pagar" },
-        { text: "Pagadas", value: "pagada" },
-        { text: "Todos", value: "todos" },
+        { text: "Facturas Pagadas", value: "pagada" },
       ],
     },
     colors: {
       por_pagar: "pink",
       pagada: "cyan",
-      facturado: "indigo",
+      programar_pago: "indigo",
     },
     totalItems: 0,
     pagination: {
@@ -577,6 +611,47 @@ export default {
       });
       this.selected = [];
     },
+
+    async resetDateToPayment() {
+      const _this = this;
+
+      let payload = {
+        date_to_pay: _this.date_to_pay,
+      };
+      _this.selected.forEach(async (element) => {
+        await axios
+          .post(
+            `/admin/purchase-invoice/reset_date_to_payment/${element.id}`,
+            payload
+          )
+          .then(function (response) {
+            _this.$store.commit("showSnackbar", {
+              message: response.data.message,
+              color: "success",
+              duration: 3000,
+            });
+            _this.date_to_pay = "";
+            _this.payment_date = "";
+            _this.reloadTable();
+          })
+          .catch(function (error) {
+            _this.$store.commit("hideLoader");
+            if (error.response) {
+              _this.$store.commit("showSnackbar", {
+                message: error.response.data.message,
+                color: "error",
+                duration: 3000,
+              });
+              return false;
+            } else if (error.request) {
+              console.log(error.request);
+            } else {
+              console.log("Error", error.message);
+            }
+          });
+      });
+      this.selected = [];
+    },
     async updateDatePayment() {
       const _this = this;
 
@@ -587,6 +662,48 @@ export default {
         //
         await axios
           .post(`/admin/purchase-invoice/date_payment/${element.id}`, payload)
+          .then(function (response) {
+            _this.$store.commit("showSnackbar", {
+              message: response.data.message,
+              color: "success",
+              duration: 3000,
+            });
+            _this.date_to_pay = "";
+            _this.payment_date = "";
+            _this.reloadTable();
+          })
+          .catch(function (error) {
+            _this.$store.commit("hideLoader");
+            if (error.response) {
+              _this.$store.commit("showSnackbar", {
+                message: error.response.data.message,
+                color: "error",
+                duration: 3000,
+              });
+              return false;
+            } else if (error.request) {
+              console.log(error.request);
+            } else {
+              console.log("Error", error.message);
+            }
+          });
+        //
+      });
+      _this.selected = [];
+    },
+    async resetDatePayment() {
+      const _this = this;
+
+      let payload = {
+        payment_date: _this.payment_date,
+      };
+      _this.selected.forEach(async (element) => {
+        //
+        await axios
+          .post(
+            `/admin/purchase-invoice/reset_date_payment/${element.id}`,
+            payload
+          )
           .then(function (response) {
             _this.$store.commit("showSnackbar", {
               message: response.data.message,

@@ -2,6 +2,17 @@
   <v-form ref="form" v-model="valid" lazy-validation>
     <v-row>
       <v-col cols="12">
+        <v-select
+          v-model="reason"
+          :items="options.reason_discart"
+          label="Motivo de Perdida"
+          placeholder="Seleccioanr Motivo"
+          hide-details
+          outlined
+          dense
+        ></v-select>
+      </v-col>
+      <v-col cols="12">
         <v-textarea
           v-model="form.message"
           label="comentario"
@@ -46,11 +57,22 @@ export default {
         estatus: "finalizado",
         message: null,
       },
-      // options: {
-      //   type_contacted: ["Llamada", "Visita Campo", "En Agencia"],
-      //   condition: ["Por definir", "Contado", "Financiamiento", "Renta"],
-      //   assertiveness: Assertiveness,
-      // },
+      reason: "",
+      options: {
+        reason_discart: [
+          "Por Precio",
+          "Se fue a la Competencia",
+          "No Interesado",
+          "Sin Respuesta",
+          "Descistio la Compra",
+          "Falta de documentacion",
+          "Rechazo de Credito",
+          "Falta de Fondos",
+          "Seguimiento Duplicado",
+          "Sin STOCK",
+          "Otro Motivo",
+        ],
+      },
     };
   },
   methods: {
@@ -59,6 +81,7 @@ export default {
       if (!_this.$refs.form.validate()) return;
       let payload = {
         ..._this.form,
+        message: `${_this.reason}: ${_this.form.message}`,
         last_assertiveness: _this.form.assertiveness,
         last_price: _this.form.price,
         last_currency: _this.form.currency,
