@@ -127,15 +127,15 @@
                         <tr>
                             <td>
                                 Equipos y Tractores del Bajio SA de CV<br />
-                                Vendedor: {{ $data->tracking->assigned->name }}<br />
-                                Email: {{ $data->tracking->assigned->email }}
+                                Vendedor: {{ $data->tracking->attended->name }}<br />
+                                Email: {{ $data->tracking->attended->email }}
 
                             </td>
 
                             <td>
                                 Cliente: {{ $data->tracking->prospect->full_name }}<br />
-                                Telefono: {{ $data->tracking->prospect->phone }}
-                                {{ $data->tracking->prospect->company }}<br />
+                                Telefono: {{ $data->tracking->prospect->phone }}<br />
+                                {{ $data->tracking->prospect->company }}
                             </td>
                         </tr>
                     </table>
@@ -202,15 +202,12 @@
                 <td colspan="6" style="text-align: left">{{ $data->observation }} </td>
             </tr>
             <tr class="details">
-                <td colspan="6" style="text-align: left; font-size: 8pt;">
-                    Los Precios de los Productos pueden varias sin Previo Aviso <br>
+                <td colspan="6" style="text-align: left; font-size: 10pt;">
+                    *Los Precios de los Productos pueden varias sin Previo Aviso <br>
+                    *Solo con Disponibilidad en Inventario
                 </td>
             </tr>
-            <tr class="details">
-                <td colspan="6" style="text-align: left; font-size: 8pt;">
-                    Solo con Disponibilidad de Inventario <br>
-                </td>
-            </tr>
+
         </table>
     </div>
 </body>
