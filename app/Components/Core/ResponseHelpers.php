@@ -101,7 +101,7 @@ trait ResponseHelpers
      * @param array $headers
      * @return \Illuminate\Http\Response
      */
-    public function sendResponseDeleted(string $message = "Regsitro Eliminado.", array $headers = [])
+    public function sendResponseDeleted(string $message = "Registro Eliminado.", array $headers = [])
     {
         return $this->sendResponse([], $message, 200, $headers);
     }
