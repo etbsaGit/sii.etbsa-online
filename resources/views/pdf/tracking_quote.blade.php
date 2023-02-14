@@ -11,7 +11,7 @@
         .invoice-box {
             margin: auto;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
-            font-size: 14px;
+            font-size: 10pt;
             font-family: 'Raleway', 'sans-serif';
             color: #555;
             line-height: normal;
@@ -37,8 +37,8 @@
         }
 
         .invoice-box table tr.top table td.title {
-            font-size: 45px;
-            line-height: 45px;
+            font-size: 10pt;
+            line-height: 10px;
             color: #333;
         }
 
@@ -154,9 +154,9 @@
                     <td>
                         {{ $product->sku }}<br />
                     </td>
-                    <td>
+                    <td style="text-align: justify">
                         {{ $product->name }}<br />
-                        {{ $product->description }}
+                        <span style="font-size: 8pt;">{{ $product->description }}</span>
                     </td>
                     <td style="text-align: center">{{ $product->quotation->quantity }}</td>
                     <td>${{ number_format($product->quotation->price_unit, 2, '.', ',') }} {{ $data->currency->name }}
@@ -204,6 +204,11 @@
             <tr class="details">
                 <td colspan="6" style="text-align: left; font-size: 8pt;">
                     Los Precios de los Productos pueden varias sin Previo Aviso <br>
+                </td>
+            </tr>
+            <tr class="details">
+                <td colspan="6" style="text-align: left; font-size: 8pt;">
+                    Solo con Disponibilidad de Inventario <br>
                 </td>
             </tr>
         </table>
