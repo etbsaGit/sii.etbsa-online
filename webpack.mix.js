@@ -13,7 +13,7 @@ const mix = require("laravel-mix");
 
 mix
   .vue()
-  .js("resources/js/admin/admin.js", "public/js")
+  .js("resources/js/admin.js", "public/js")
   .sass("resources/sass/admin.scss", "public/css")
   .sass("resources/sass/front.scss", "public/css")
   .copyDirectory("resources/img", "public/img")
