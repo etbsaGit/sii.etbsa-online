@@ -10,7 +10,7 @@
           :items="options.prospects"
           item-text="full_name"
           item-value="id"
-          placeholder="Buscar por Nombre | Telefono:"
+          placeholder="Buscar por Nombre o Telefono o Razon social"
           :rules="[(v) => !!v || 'Es Requerido']"
           :filter="customFilter"
           hide-details
@@ -20,13 +20,13 @@
           filled
         >
           <template v-slot:prepend-item>
-            <v-list dense color="grey lighten-3">
+            <v-list dense color="green lighten-3 overline">
               <v-list-item @click="dialog = true">
                 <v-list-item-content>
-                  <v-list-item-title v-text="'Registar Nuevo Propecto'" />
+                  <v-list-item-title v-text="'REGISTRAR un Nuevo Prospecto'" />
                 </v-list-item-content>
                 <v-list-item-action>
-                  <v-icon>mdi-account-plus</v-icon>
+                  <v-icon color="blue">mdi-account-plus</v-icon>
                 </v-list-item-action>
               </v-list-item>
             </v-list>
@@ -34,6 +34,7 @@
           <template v-slot:item="{ item }">
             <v-list-item-title v-html="item.full_name"></v-list-item-title>
             <v-list-item-subtitle v-html="item.phone"></v-list-item-subtitle>
+            <v-list-item-subtitle v-html="item.company"></v-list-item-subtitle>
           </template>
         </v-autocomplete>
       </v-col>
@@ -443,10 +444,13 @@ export default {
     customFilter(item, queryText, itemText) {
       const textName = item.full_name.toLowerCase();
       const textPhone = item.phone.toLowerCase();
+      const textCompany = item.company ? item.company.toLowerCase() : "";
       const searchText = queryText.toLowerCase();
 
       return (
-        textName.indexOf(searchText) > -1 || textPhone.indexOf(searchText) > -1
+        textName.indexOf(searchText) > -1 ||
+        textPhone.indexOf(searchText) > -1 ||
+        textCompany.indexOf(searchText) > -1
       );
     },
     customFilterProducts(item, queryText, itemText) {
