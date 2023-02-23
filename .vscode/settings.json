@@ -1,0 +1,7 @@
+{
+    "volar.format.initialIndent": {
+    "typescriptreact": false,
+        "html": true
+    },
+    "volar.inlayHints.eventArgumentInInlineHandlers": true
+}
