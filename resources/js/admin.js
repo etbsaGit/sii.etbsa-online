@@ -1,17 +1,14 @@
-require("../bootstrap");
+require("./bootstrap");
 
 import Vue from "vue";
-import vuetify from "../plugins/vuetify"; // path to vuetify export
-import App from "./App";
-import router from "./router";
+import vuetify from "~/plugins/vuetify"; // path to vuetify export
+import App from "@admin/App";
+import router from "~/router";
 
 import VueProgressBar from "vue-progressbar";
 import PortalVue from "portal-vue";
 import Gate from "~/common/Gate";
 import { VueMaskDirective } from "v-mask";
-// import "~/plugins/lodash";
-// import Vuetify from "vuetify";
-// import es from "vuetify/es5/locale/es";
 
 import store from "~/common/Store";
 import eventBus from "~/common/Event";

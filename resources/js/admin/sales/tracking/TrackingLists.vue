@@ -11,6 +11,7 @@
       dense
     >
       <!-- ToTable -->
+      
       <template #top>
         <search-panel
           :rightDrawer="rightDrawer"
@@ -46,16 +47,30 @@
               <v-autocomplete
                 v-model="filters.prospect"
                 :items="options.prospects"
-                label="Filtro Prospecto:"
-                prepend-icon="mdi-filter-variant"
                 item-text="full_name"
                 item-value="id"
+                label="Filtrar Prospecto"
+                placeholder="Buscar por Nombre o Telefono o Razon Social"
+                prepend-icon="mdi-filter-variant"
+                :filter="customFilter"
                 hide-details
                 clearable
                 multiple
                 filled
                 dense
-              ></v-autocomplete>
+              >
+                <template v-slot:item="{ item }">
+                  <v-list-item-title
+                    v-html="item.full_name"
+                  ></v-list-item-title>
+                  <v-list-item-subtitle
+                    v-html="item.phone"
+                  ></v-list-item-subtitle>
+                  <v-list-item-subtitle
+                    v-html="item.company"
+                  ></v-list-item-subtitle>
+                </template>
+              </v-autocomplete>
               <v-autocomplete
                 v-model="filters.agencies"
                 :items="options.agencies"
@@ -306,12 +321,13 @@
           <td>
             <div class="d-flex flex-column py-2">
               <v-autocomplete
-                class="d-block font-weight-semibold text--primary text-truncate"
                 v-model="filters.prospect"
                 :items="options.prospects"
                 item-text="full_name"
                 item-value="id"
-                placeholder="Buscar"
+                placeholder="Buscar por Nombre | Telefono:"
+                :rules="[(v) => !!v || 'Es Requerido']"
+                :filter="customFilter"
                 hide-details
                 clearable
                 multiple
@@ -319,7 +335,19 @@
                 outlined
                 filled
                 dense
-              ></v-autocomplete>
+              >
+                <template v-slot:item="{ item }">
+                  <v-list-item-title
+                    v-html="item.full_name"
+                  ></v-list-item-title>
+                  <v-list-item-subtitle
+                    v-html="item.phone"
+                  ></v-list-item-subtitle>
+                  <v-list-item-subtitle
+                    v-html="item.company"
+                  ></v-list-item-subtitle>
+                </template>
+              </v-autocomplete>
             </div>
           </td>
           <td>
@@ -873,6 +901,18 @@ export default {
           duration: 3000,
         });
       });
+    },
+    customFilter(item, queryText, itemText) {
+      const textName = item.full_name.toLowerCase();
+      const textPhone = item.phone.toLowerCase();
+      const textCompany = item.company ? item.company.toLowerCase() : "";
+      const searchText = queryText.toLowerCase();
+
+      return (
+        textName.indexOf(searchText) > -1 ||
+        textPhone.indexOf(searchText) > -1 ||
+        textCompany.indexOf(searchText) > -1
+      );
     },
   },
 };

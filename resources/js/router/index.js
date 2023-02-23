@@ -2,7 +2,7 @@ import Vue from "vue";
 import Router from "vue-router";
 import store from "~/common/Store";
 
-import { admin } from "@admin/router/admin";
+import { admin } from  "./admin";
 
 Vue.use(Router);
 

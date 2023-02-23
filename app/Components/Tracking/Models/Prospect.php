@@ -2,9 +2,10 @@
 
 namespace App\Components\Tracking\Models;
 
+use App\Components\Common\Models\Estate;
 use App\Components\User\Models\User;
 use Illuminate\Database\Eloquent\Model;
-use  App\Components\Common\Models\Township;
+use App\Components\Common\Models\Township;
 
 class Prospect extends Model
 {
@@ -12,7 +13,19 @@ class Prospect extends Model
     protected $primaryKey = 'id';
     protected $with = ['township'];
 
-    protected $fillable = ['full_name', 'phone', 'registered_by', 'email', 'rfc', 'town', 'township_id', 'is_moral', 'company'];
+    protected $fillable = [
+        'full_name',
+        'phone',
+        'email',
+        'address',
+        'town',
+        'is_moral',
+        'rfc',
+        'company',
+        'estate_id',
+        'township_id',
+        'registered_by',
+    ];
     protected $appends = ['tracking_count'];
 
     /**
@@ -33,6 +46,12 @@ class Prospect extends Model
     {
         return $this->hasMany(TrackingProspect::class, 'prospect_id');
     }
+
+    public function estate()
+    {
+        return $this->belongsTo(Estate::class, 'estate_id');
+    }
+
     public function township()
     {
         return $this->belongsTo(Township::class, 'township_id');
@@ -44,8 +63,6 @@ class Prospect extends Model
             return $q->where('key', 'activo');
         })->count();
     }
-
-
 
     public function scopeSearch($query, String $search)
     {
