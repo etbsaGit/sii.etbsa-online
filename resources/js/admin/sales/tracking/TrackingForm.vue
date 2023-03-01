@@ -2,9 +2,7 @@
   <v-form v-model="valid" ref="form" lazy-validation>
     <v-row dense class="overline elevation-2 pa-2 mb-4">
       <v-col cols="12">
-        <p class="text-14 mb-1">
-          Seleccione a un Prospecto
-        </p>
+        <p class="text-14 mb-1">Seleccione a un Prospecto</p>
         <v-autocomplete
           v-model="form.prospect_id"
           :items="options.prospects"
@@ -23,7 +21,9 @@
             <v-list dense color="green lighten-3 overline">
               <v-list-item @click="dialog = true">
                 <v-list-item-content>
-                  <v-list-item-title v-text="'REGISTRAR un Nuevo Prospecto'" />
+                  <v-list-item-title
+                    >REGISTRAR un Nuevo Prospecto</v-list-item-title
+                  >
                 </v-list-item-content>
                 <v-list-item-action>
                   <v-icon color="blue">mdi-account-plus</v-icon>
@@ -32,16 +32,14 @@
             </v-list>
           </template>
           <template v-slot:item="{ item }">
-            <v-list-item-title v-html="item.full_name"></v-list-item-title>
-            <v-list-item-subtitle v-html="item.phone"></v-list-item-subtitle>
-            <v-list-item-subtitle v-html="item.company"></v-list-item-subtitle>
+            <v-list-item-title> {{ item.full_name }} </v-list-item-title>
+            <v-list-item-subtitle> {{ item.phone }} </v-list-item-subtitle>
+            <v-list-item-subtitle> {{ item.company }} </v-list-item-subtitle>
           </template>
         </v-autocomplete>
       </v-col>
       <v-col cols="12">
-        <p class="text-14 mb-1">
-          Categoria del Seguimiento
-        </p>
+        <p class="text-14 mb-1">Categoria del Seguimiento</p>
         <v-autocomplete
           v-model="form.title"
           :items="options.categories"
@@ -57,9 +55,7 @@
         </v-autocomplete>
       </v-col>
       <v-col cols="12">
-        <p class="text-14 mb-1">
-          Producto a Cotizar
-        </p>
+        <p class="text-14 mb-1">Producto a Cotizar</p>
         <v-combobox
           v-model="form.product"
           :items="options.products"
@@ -75,8 +71,8 @@
           dense
         >
           <template v-slot:item="{ item }">
-            <v-list-item-title v-html="item.name"></v-list-item-title>
-            <v-list-item-subtitle v-html="item.sku"></v-list-item-subtitle>
+            <v-list-item-title>{{ item.name }}</v-list-item-title>
+            <v-list-item-subtitle>{{ item.sku }}</v-list-item-subtitle>
             <v-list-item-subtitle>
               {{ item.price_1 | money }}{{ item.currency.name }}
             </v-list-item-subtitle>
@@ -84,9 +80,7 @@
         </v-combobox>
       </v-col>
       <v-col cols="8">
-        <p class="text-14 mb-1">
-          Valor del Lead
-        </p>
+        <p class="text-14 mb-1">Valor del Lead</p>
         <v-text-field
           v-model.number="form.price"
           placeholder="0.00"
@@ -100,9 +94,7 @@
         ></v-text-field>
       </v-col>
       <v-col cols="4">
-        <p class="text-14 mb-1">
-          Tipo de Moneda
-        </p>
+        <p class="text-14 mb-1">Tipo de Moneda</p>
         <v-select
           v-model="form.currency_id"
           :items="options.currency"
@@ -120,9 +112,7 @@
     </v-row>
     <v-row dense>
       <v-col cols="12" md="6">
-        <p class="text-14 mb-1">
-          Origen de Prospeccion
-        </p>
+        <p class="text-14 mb-1">Origen de Prospeccion</p>
         <v-select
           v-model="form.first_contact"
           :items="options.origin"
@@ -135,9 +125,7 @@
         ></v-select>
       </v-col>
       <v-col cols="12" md="6">
-        <p class="text-14 mb-1">
-          Condicion de Pago
-        </p>
+        <p class="text-14 mb-1">Condicion de Pago</p>
         <v-select
           v-model="form.tracking_condition"
           :items="options.payment_conditions"
@@ -149,9 +137,7 @@
         ></v-select>
       </v-col>
       <v-col cols="12">
-        <p class="text-14 mb-1">
-          Etapa del LEAD
-        </p>
+        <p class="text-14 mb-1">Etapa del LEAD</p>
         <v-select
           v-model="form.assertiveness"
           :items="options.assertiveness"
@@ -162,13 +148,13 @@
           filled
           dense
         >
-          <template v-slot:item="data">
+          <template v-slot:item="{ item }">
             <v-list-item-content>
-              <v-list-item-title v-text="data.item.text"></v-list-item-title>
+              <v-list-item-title> {{ item.text }} </v-list-item-title>
             </v-list-item-content>
             <v-list-item-action>
-              <v-chip small dark :color="data.item.color">
-                {{ data.item.value | percent }}
+              <v-chip small dark :color="item.color">
+                {{ item.value | percent }}
               </v-chip>
             </v-list-item-action>
           </template>
@@ -177,9 +163,7 @@
     </v-row>
     <v-row dense>
       <v-col cols="12" md="6">
-        <p class="text-14 mb-1">
-          Sucursal
-        </p>
+        <p class="text-14 mb-1">Sucursal</p>
         <v-select
           v-model="form.agency_id"
           :items="options.agencies"
@@ -193,9 +177,7 @@
         ></v-select>
       </v-col>
       <v-col cols="12" md="6">
-        <p class="text-14 mb-1">
-          Departamento
-        </p>
+        <p class="text-14 mb-1">Departamento</p>
         <v-select
           v-model="form.department_id"
           :items="options.departments"
@@ -209,9 +191,7 @@
         ></v-select>
       </v-col>
       <v-col cols="12">
-        <p class="text-14 mb-1">
-          Vendedor Asigando
-        </p>
+        <p class="text-14 mb-1">Vendedor Asigando</p>
         <v-autocomplete
           v-model="form.attended_by"
           :disabled="availableSeller"
@@ -226,9 +206,7 @@
         ></v-autocomplete>
       </v-col>
       <v-col cols="12">
-        <p class="text-14 mb-1">
-          Motivo del LEAD
-        </p>
+        <p class="text-14 mb-1">Motivo del LEAD</p>
         <v-textarea
           v-model="form.description_topic"
           :rules="[(v) => !!v || 'Es requrido']"
@@ -398,13 +376,8 @@ export default {
       await axios
         .get("/admin/tracking/sales_history/resources")
         .then(function (response) {
-          let {
-            agencies,
-            departments,
-            prospects,
-            currency,
-            categories,
-          } = response.data.data;
+          let { agencies, departments, prospects, currency, categories } =
+            response.data.data;
           _this.options.agencies = agencies;
           _this.options.departments = departments;
           _this.options.prospects = prospects;
@@ -441,7 +414,7 @@ export default {
         (cb || Function)();
       });
     },
-    customFilter(item, queryText, itemText) {
+    customFilter({ item, queryText }) {
       const textName = item.full_name.toLowerCase();
       const textPhone = item.phone.toLowerCase();
       const textCompany = item.company ? item.company.toLowerCase() : "";
@@ -453,7 +426,7 @@ export default {
         textCompany.indexOf(searchText) > -1
       );
     },
-    customFilterProducts(item, queryText, itemText) {
+    customFilterProducts({ item, queryText }) {
       const textName = item.name.toLowerCase();
       const textSku = item.sku.toLowerCase();
       const searchText = queryText.toLowerCase();
