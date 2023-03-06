@@ -1,21 +1,18 @@
 <template>
   <v-card>
     <v-card-title class="grey lighten-4">
-      <v-icon left>mdi-file</v-icon> Editar Segumiento
+      <v-icon left>mdi-file</v-icon> Editar Seguimiento
       <v-spacer></v-spacer>
       <v-btn :disabled="!valid" color="primary" @click="update">
-        Editar Seguimiento Folio {{ propTrackingId.toString().padStart(5, 0) }}
+        Editar Seguimiento Folio: #{{
+          propTrackingId.toString().padStart(5, 0)
+        }}
       </v-btn>
     </v-card-title>
     <v-divider></v-divider>
     <v-card-text>
       <tracking-form ref="form" :form.sync="form"></tracking-form>
     </v-card-text>
-    <!-- <v-card-actions>
-      <v-btn :disabled="!valid" color="primary" @click="update">
-        Crear Seguimiento
-      </v-btn>
-    </v-card-actions> -->
   </v-card>
 </template>
 
@@ -45,6 +42,23 @@ export default {
         first_contact: null,
         description_topic: null,
         tracking_condition: null,
+      },
+      form: {
+        prospect_id: null,
+        title: null,
+        reference: null,
+        product: null,
+        price: null,
+        currency: 1,
+        currency_id: 1,
+        agency_id: null,
+        department_id: null,
+        seller_id: null,
+        attended_by: null,
+        assertiveness: 0.01,
+        tracking_condition: "Por definir",
+        first_contact: "Online",
+        description_topic: null,
       },
     };
   },

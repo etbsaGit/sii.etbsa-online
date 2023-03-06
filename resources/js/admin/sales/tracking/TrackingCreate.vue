@@ -1,13 +1,5 @@
 <template>
-  <v-card>
-    <v-card-title>
-      <v-icon left>mdi-file</v-icon> Levantar un Seguimiento
-
-      <!-- <v-btn :disabled="!valid" color="primary" @click="save">
-        Guardar
-      </v-btn> -->
-    </v-card-title>
-    <v-divider></v-divider>
+  <v-card flat>
     <v-card-text>
       <tracking-form ref="form" :form.sync="form"></tracking-form>
     </v-card-text>
