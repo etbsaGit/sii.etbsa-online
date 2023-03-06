@@ -11,7 +11,7 @@
       dense
     >
       <!-- ToTable -->
-      
+
       <template #top>
         <search-panel
           :rightDrawer="rightDrawer"
@@ -60,15 +60,13 @@
                 dense
               >
                 <template v-slot:item="{ item }">
-                  <v-list-item-title
-                    v-html="item.full_name"
-                  ></v-list-item-title>
-                  <v-list-item-subtitle
-                    v-html="item.phone"
-                  ></v-list-item-subtitle>
-                  <v-list-item-subtitle
-                    v-html="item.company"
-                  ></v-list-item-subtitle>
+                  <v-list-item-title> {{ item.full_name }} </v-list-item-title>
+                  <v-list-item-subtitle>
+                    {{ item.phone }}
+                  </v-list-item-subtitle>
+                  <v-list-item-subtitle>
+                    {{ item.company }}
+                  </v-list-item-subtitle>
                 </template>
               </v-autocomplete>
               <v-autocomplete
@@ -122,10 +120,9 @@
               >
                 <template #item="data">
                   <v-list-item-content>
-                    <v-list-item-title
-                      class="overline"
-                      v-text="data.item.text"
-                    ></v-list-item-title>
+                    <v-list-item-title class="overline">
+                      {{ data.item.text }}
+                    </v-list-item-title>
                   </v-list-item-content>
                   <v-list-item-action>
                     <v-btn :color="data.item.color">
@@ -233,31 +230,35 @@
             Nuevo Seguimiento
             <v-icon small right>mdi-plus-box</v-icon>
           </v-btn>
-          <!-- <v-btn
-            color="primary"
-            class="ml-2"
-            @click="dialogCreateStepper = !dialogCreateStepper"
-          >
-            Nuevo Seguimiento
-            <v-icon small right>mdi-plus-box</v-icon>
-          </v-btn> -->
         </v-toolbar>
 
         <!-- Dialog -->
         <dialog-component
           :show="dialogs.show"
           @close="(dialogs.show = false), (dialogs.id = null)"
+          title="Detalle Seguimiento"
           fullscreen
           closeable
-          title="Detalle Seguimiento"
         >
           <tracking-prospect
             v-if="dialogs.show && dialogs.id"
             :propTrackingId="dialogs.id"
           ></tracking-prospect>
         </dialog-component>
+        <dialog-component
+          :show="dialogs.create"
+          @close="dialogs.create = false"
+          title="Crear Nuevo Seguimiento"
+          fullscreen
+          closeable
+        >
+          <tracking-create
+            v-if="dialogs.create"
+            @success="(dialogs.create = false), reset()"
+          ></tracking-create>
+        </dialog-component>
 
-        <v-dialog v-model="dialogs.create" scrollable max-width="700">
+        <!-- <v-dialog v-model="dialogs.create" scrollable max-width="700">
           <v-card flat>
             <v-spacer />
             <v-icon color="red" @click="dialogs.create = false"
@@ -268,7 +269,7 @@
               @success="(dialogs.create = false), reset()"
             ></tracking-create>
           </v-card>
-        </v-dialog>
+        </v-dialog> -->
       </template>
 
       <!-- body.prepend -->
@@ -337,15 +338,13 @@
                 dense
               >
                 <template v-slot:item="{ item }">
-                  <v-list-item-title
-                    v-html="item.full_name"
-                  ></v-list-item-title>
-                  <v-list-item-subtitle
-                    v-html="item.phone"
-                  ></v-list-item-subtitle>
-                  <v-list-item-subtitle
-                    v-html="item.company"
-                  ></v-list-item-subtitle>
+                  <v-list-item-title> {{ item.full_name }} </v-list-item-title>
+                  <v-list-item-subtitle>
+                    {{ item.phone }}
+                  </v-list-item-subtitle>
+                  <v-list-item-subtitle>
+                    {{ item.company }}
+                  </v-list-item-subtitle>
                 </template>
               </v-autocomplete>
             </div>
@@ -404,10 +403,9 @@
             >
               <template #item="data">
                 <v-list-item-content>
-                  <v-list-item-title
-                    class="overline"
-                    v-text="data.item.text"
-                  ></v-list-item-title>
+                  <v-list-item-title class="overline">
+                    {{ data.item.text }}
+                  </v-list-item-title>
                 </v-list-item-content>
                 <v-list-item-action>
                   <v-btn :color="data.item.color" dark>
@@ -477,7 +475,7 @@
         <div class="d-flex flex-column">
           <span
             class="d-block font-weight-bold text--primary text-wrap"
-            style="min-width: 200px;"
+            style="min-width: 200px"
           >
             {{ item.reference }}
           </span>
@@ -562,7 +560,7 @@
               :color="getAssertiveness(item.assertiveness).color"
               v-bind="attrs"
               v-on="on"
-              style="width: 75px;"
+              style="width: 75px"
             >
               <template #default="{ value }">
                 <strong> {{ Math.ceil(value) }}% </strong>

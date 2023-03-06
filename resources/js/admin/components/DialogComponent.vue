@@ -11,7 +11,9 @@
         <v-btn icon dark @click="close()">
           <v-icon>mdi-close</v-icon>
         </v-btn>
-        <v-toolbar-title v-text="title" class="white--text title" />
+        <v-toolbar-title class="white--text title">
+          {{ title }}
+        </v-toolbar-title>
         <v-spacer></v-spacer>
         <v-toolbar-items class="align-center">
           <slot name="actions"></slot>
@@ -20,7 +22,7 @@
       <v-card-text class="pt-4">
         <slot></slot>
       </v-card-text>
-      <div style="flex: 1 1 auto;"></div>
+      <div style="flex: 1 1 auto"></div>
     </v-card>
   </modal>
 </template>
