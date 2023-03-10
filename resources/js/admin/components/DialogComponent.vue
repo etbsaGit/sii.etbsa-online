@@ -55,7 +55,7 @@ export default {
   },
   computed: {
     maxHeight() {
-      const height = this.$vuetify.breakpoint.mobile ? "100vh" : "100vh";
+      const height = this.$vuetify.breakpoint.mobile ? "100vh" : "80vh";
       return `calc(${height} - ${this.$vuetify.application.top}px)`;
     },
   },
