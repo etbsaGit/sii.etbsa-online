@@ -127,15 +127,19 @@
                         <tr>
                             <td>
                                 Equipos y Tractores del Bajio SA de CV<br />
-                                Vendedor: {{ $data->tracking->attended->name }}<br />
-                                Email: {{ $data->tracking->attended->email }}
+                                Carr. Panamericana Celaya-Salamanca Km 61.<br />
+                                1a. Fracc. de Crespo. Celaya, Gto. C.P. 38120<br />
+                                (461) 614.23.23/24/25<br />
+                                www.etbsa.com.mx<br />
 
                             </td>
 
                             <td>
-                                Cliente: {{ $data->tracking->prospect->full_name }}<br />
+                                Atencion a: {{ $data->tracking->prospect->full_name }}<br />
                                 Telefono: {{ $data->tracking->prospect->phone }}<br />
-                                {{ $data->tracking->prospect->company }}
+                                {{ $data->tracking->prospect->company }} <br><br>
+                                Vendedor: {{ $data->tracking->attended->name }}<br />
+                                Email: {{ $data->tracking->attended->email }}
                             </td>
                         </tr>
                     </table>
@@ -195,16 +199,19 @@
 
         <table>
             <tr class="heading">
-                <td>Observacion Vendedor</td>
+                <td>Nota del Vendedor</td>
                 <td colspan="5"></td>
             </tr>
             <tr class="details">
-                <td colspan="6" style="text-align: left">{{ $data->observation }} </td>
+                <td colspan="5" style="text-align: left">{{ $data->observation }} </td>
             </tr>
             <tr class="details">
-                <td colspan="6" style="text-align: left; font-size: 10pt;">
-                    *Los Precios de los Productos pueden varias sin Previo Aviso <br>
-                    *Solo con Disponibilidad en Inventario
+                <td colspan="5" style="text-align: left; font-size: 10pt;">
+                    *Los precios de los productos pueden varias sin previo aviso <br>
+                    *Solo con Disponibilidad en Inventario <br>
+                    *La presente cotización tiene una vigencia de 30 días a partir de la fecha de expedición de la
+                    misma<br><br>
+                    Sin otro en particular de momento, quedo a sus órdenes para cualquier duda o aclaración.
                 </td>
             </tr>
 

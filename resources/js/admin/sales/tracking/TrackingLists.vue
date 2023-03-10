@@ -257,6 +257,19 @@
             @success="(dialogs.create = false), reset()"
           ></tracking-create>
         </dialog-component>
+        <dialog-component
+          :show="dialogs.quote"
+          @close="dialogs.quote = false"
+          title="Cotizaciones"
+          fullscreen
+          closeable
+        >
+          <tracking-quote-component
+            v-if="dialogs.quote && dialogs.id"
+            :key="dialogs.id"
+            :tracking-id="dialogs.id"
+          ></tracking-quote-component>
+        </dialog-component>
 
         <!-- <v-dialog v-model="dialogs.create" scrollable max-width="700">
           <v-card flat>
@@ -443,6 +456,18 @@
                 </v-list-item-content>
               </v-list-item>
               <v-list-item
+                @click="(dialogs.id = item.id), (dialogs.quote = true)"
+              >
+                <v-list-item-icon>
+                  <v-icon class="blue--text" left>
+                    mdi-information-outline
+                  </v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-item-title>Cotizaciones</v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+              <v-list-item
                 v-if="$gate.allow('isGerente', 'tracking')"
                 @click="resetToActive(item.id)"
               >
@@ -453,7 +478,7 @@
                   <v-list-item-title>Regresar como Activo</v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
-              <v-list-item
+              <!-- <v-list-item
                 :href="`/admin/tracking/${item.id}/resources/print`"
                 target="_blank"
               >
@@ -463,7 +488,7 @@
                 <v-list-item-content>
                   <v-list-item-title>PDF</v-list-item-title>
                 </v-list-item-content>
-              </v-list-item>
+              </v-list-item> -->
             </v-list-item-group>
           </v-list>
         </v-menu>
@@ -587,6 +612,7 @@ import SearchPanel from "@admin/components/shared/SearchPanel.vue";
 import TableHeaderButtons from "@admin/components/shared/TableHeaderButtons.vue";
 import DialogComponent from "@admin/components/DialogComponent.vue";
 import TrackingCreate from "./TrackingCreate.vue";
+import TrackingQuoteComponent from "@admin/sales/tracking/components/TrackingQuoteComponent.vue";
 
 export default {
   components: {
@@ -596,6 +622,7 @@ export default {
     TableHeaderButtons,
     DialogComponent,
     TrackingCreate,
+    TrackingQuoteComponent,
   },
   data() {
     return {
@@ -603,6 +630,7 @@ export default {
       showSearchPanel: false,
       dialogs: {
         create: false,
+        quote: false,
         show: false,
         id: null,
       },

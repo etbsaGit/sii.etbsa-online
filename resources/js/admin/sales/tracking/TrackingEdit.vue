@@ -31,19 +31,6 @@ export default {
     return {
       valid: true,
       form: {
-        price: null,
-        title: null,
-        currency: null,
-        reference: null,
-        agency_id: null,
-        prospect_id: null,
-        attended_by: null,
-        department_id: null,
-        first_contact: null,
-        description_topic: null,
-        tracking_condition: null,
-      },
-      form: {
         prospect_id: null,
         title: null,
         reference: null,
@@ -70,9 +57,16 @@ export default {
     async update() {
       if (!this.$refs.form.$refs.form.validate()) return;
       const _this = this;
+      let payload = {
+        ..._this.form,
+        reference:
+          typeof _this.form.product != "string"
+            ? _this.form.product.name
+            : _this.form.product,
+      };
       await axios
-        .put("/admin/tracking/" + _this.propTrackingId, _this.form)
-        .then(function (response) {
+        .put("/admin/tracking/" + _this.propTrackingId, payload)
+        .then(function(response) {
           _this.$store.commit("showSnackbar", {
             message: response.data.message,
             color: "success",
@@ -85,7 +79,7 @@ export default {
 
           // _this.$router.go(-1);
         })
-        .catch(function (error) {
+        .catch(function(error) {
           _this.$store.commit("hideLoader");
 
           if (error.response) {
@@ -105,15 +99,18 @@ export default {
       const _this = this;
       await axios
         .get("/admin/tracking/" + _this.propTrackingId + "/edit")
-        .then(function (response) {
-          _this.form = { ...response.data.data };
+        .then(function(response) {
+          let Data = response.data.data;
+          // _this.form = { ...response.data.data };
+          _this.form = { ...Data };
+          // _this.form.product.name = Data.reference;
           _this.$store.commit("showSnackbar", {
             message: response.data.message,
             color: "success",
             duration: 3000,
           });
         })
-        .catch(function (error) {
+        .catch(function(error) {
           _this.$store.commit("hideLoader");
 
           if (error.response) {
