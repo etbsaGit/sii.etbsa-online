@@ -7,11 +7,13 @@ use App\Components\Common\Models\Estatus;
 use App\Components\RRHH\Models\Employee;
 use App\Components\Tracking\Models\Prospect;
 use App\Components\Tracking\Models\TrackingProspect;
+use App\Components\Tracking\Models\TrackingQuote;
 use App\Components\Tracking\Repositories\TrackingRepository;
 use App\Components\User\Models\User;
 use App\Notifications\TrackingAssigned;
 use App\Notifications\TrackingNewHistorical;
 use Auth;
+use Barryvdh\DomPDF\PDF;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -23,6 +25,7 @@ class TrackingProspectController extends AdminController
      * @var ProspectRepository
      */
     private $trackingRepository;
+    private $trackingQuote;
 
     /**
      * ProspectController constructor.
@@ -106,10 +109,10 @@ class TrackingProspectController extends AdminController
             return $this->sendResponseBadRequest($validate->errors()->first());
         }
 
-        DB::transaction(function () use ($request) {
+
+        return DB::transaction(function () use ($request) {
             $request['registered_by'] = Auth::user()->id;
             $request['assigned_by'] = Auth::user()->id;
-            $request['date_next_tracking'] = Carbon::now()->addDays(15);
             $currency_name = Currency::where('id', $request['currency_id'])->first();
 
             /** @var Prospect $tracking */
@@ -126,20 +129,48 @@ class TrackingProspectController extends AdminController
             $tracking->refresh();
 
 
+            // $request['date_next_tracking'] = Carbon::now()->addDays(15);
+            $date_next_lead = $request->get('date_next_tracking', Carbon::now()->addDays(15));
             $tracking->historical()->create([
                 'message' => 'Llamar para dar Seguimiento',
                 'last_price' => $request['price'],
                 'last_currency' => $currency_name->name,
                 'type_contacted' => 'Llamada',
                 'user_id' => $request['attended_by'],
-                'date_next_tracking' =>  $request['date_next_tracking'],
+                'date_next_tracking' =>  $date_next_lead,
                 'last_assertiveness' => $request['assertiveness'],
             ]);
 
-            // $tracking->attended->notify(new TrackingAssigned($tracking));
-        });
+            if ($request['withQuote']) {
+                $request['date_due'] = Carbon::now()->addDays(30);
+                $quotation
+                    = $tracking->quotation()->create($request->all());
+                if ($products = $request->get('products', [])) {
+                    foreach ($products as $product => $value) {
+                        if ($value) {
+                            $quotation->products()->attach(
+                                $value['id'],
+                                [
+                                    'price_unit' => $value['price'],
+                                    'quantity' => $value['qty'],
+                                    'currency' => $value['currency']['name'],
+                                    'subtotal' => $value['subtotal']
+                                ]
+                            );
+                        }
+                    }
+                }
+                // $data = $quotation->load('tracking', 'products', 'currency');
+                // $pdf = PDF::loadView('pdf.tracking_quote', compact('data'));
+                // return $this->sendResponse($data, 'SHOW PDF');
+                $quotation->refresh();
+                // return  redirect()->route('tracking-quote.print', ['quote' => $quotation->id]);
+                return $this->sendResponseCreated(compact('quotation'), 'Se Registro Nuevo Seguimiento Con su Cotizacion');
+            }
 
-        return $this->sendResponseCreated([], 'Se Registro Nuevo Seguimiento');
+            // $tracking->attended->notify(new TrackingAssigned($tracking));
+            return $this->sendResponseCreated(compact('tracking'), 'Se Registro Nuevo Seguimiento');
+        });
     }
 
     /**
@@ -257,6 +288,7 @@ class TrackingProspectController extends AdminController
             'description_topic',
             'tracking_condition',
             'currency_id',
+            'date_next_tracking'
         );
 
         if (!$tracking) {

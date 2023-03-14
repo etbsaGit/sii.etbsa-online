@@ -112,9 +112,10 @@
                             </td>
 
                             <td>
-                                Folio #: {{ $data->id }}<br />
-                                Creada: {{ $data->created_at }}<br />
-                                Vence: {{ $data->date_due }}
+                                Cotizacion: # {{ str_pad($data->id, 5, '0', STR_PAD_LEFT) }}<br />
+                                LEAD: # {{ str_pad($data->tracking->id, 5, '0', STR_PAD_LEFT) }}<br />
+                                Creacion: {{ $data->created_at }}<br />
+                                Vencimiento: {{ $data->date_due }}
                             </td>
                         </tr>
                     </table>
@@ -148,8 +149,8 @@
             <tr class="heading">
                 <td>SKU</td>
                 <td>Producto</td>
-                <td>Cantidad</td>
-                <td>Precio Unitario</td>
+                <td>Cant.</td>
+                <td>Precio U.</td>
                 <td>Subtotal</td>
             </tr>
 
@@ -171,9 +172,9 @@
             @endforeach
 
 
-            <tr class="item">
+            {{-- <tr class="item">
                 <td colspan="5"></td>
-            </tr>
+            </tr> --}}
             <tr class="total" style="text-align: right">
                 <td colspan="3">Subtotal: </td>
                 <td colspan="2" style="text-align: right">{{ '$ ' . number_format($data->subtotal, 2, '.', ',') }}
@@ -184,14 +185,17 @@
                 <td colspan="3">IVA: </td>
                 <td colspan="2">{{ number_format($data->tax, 2, '.', ',') * 100 }}%</td>
             </tr>
-            <tr class="total" style="text-align: right">
-                <td colspan="3">Descuento: </td>
-                <td colspan="2">{{ '$ ' . number_format($data->discount, 2, '.', ',') }}
-                    {{ $data->currency->name }} </td>
-            </tr>
+            @if ($data->discount > 0)
+                <tr class="total" style="text-align: right">
+                    <td colspan="3">Descuento: </td>
+                    <td colspan="2">{{ '$ ' . number_format($data->discount, 2, '.', ',') }}
+                        {{ $data->currency->name }} </td>
+                </tr>
+            @endif
             <tr class="total" style="text-align: right">
                 <td colspan="3">Total: </td>
-                <td colspan="2">{{ '$ ' . number_format($data->total, 2, '.', ',') }} {{ $data->currency->name }}
+                <td colspan="2" style="font-size: 16pt">{{ '$ ' . number_format($data->total, 2, '.', ',') }}
+                    {{ $data->currency->name }}
                 </td>
             </tr>
 
@@ -205,13 +209,41 @@
             <tr class="details">
                 <td colspan="5" style="text-align: left">{{ $data->observation }} </td>
             </tr>
-            <tr class="details">
+            {{-- <tr class="details">
                 <td colspan="5" style="text-align: left; font-size: 10pt;">
                     *Los precios de los productos pueden varias sin previo aviso <br>
                     *Solo con Disponibilidad en Inventario <br>
                     *La presente cotización tiene una vigencia de 30 días a partir de la fecha de expedición de la
                     misma<br><br>
                     Sin otro en particular de momento, quedo a sus órdenes para cualquier duda o aclaración.
+                </td>
+            </tr> --}}
+            <tr class="details">
+                <td colspan="5"
+                    style="text-align: left; font-size: 7pt; font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; font-style: italic;text-align: justify">
+                    Costos de Envío / Flete se definen de acuerdo a la zona <b>**NO INCLUIDO EN EL PRECIO
+                        PUBLICADO**</b>,
+                    El costo del producto puede variar sin previo aviso, favor de verificar con nosotros antes de
+                    apartar.
+                    <b>**ETBSA Nunca le Solicitara que deposite dinero sin antes haber visto la Maquinaria**</b>,
+                    ETBSA realiza todas las operaciones y tramites de venta de Maquinaria, dentro de sus instalaciones
+                    oficiales, las ubicaciones las puede consultar en la pagina oficial
+                    <a href="https://www.etbsa.com.mx/"> www.etbsa.com.mx </a> <br>
+                    <b>
+                        **La presente cotización tiene una vigencia de 30 días a partir de la fecha de expedición de la
+                        misma**
+                    </b>
+                </td>
+            </tr>
+
+            <tr class="details">
+                <td colspan="5">
+                    <div style="text-align: center; font-size: 10pt;">
+                        <br>
+                        <br>
+                        __________________________________________________<br>
+                        NOMBRE Y FIRMA DEL GERENTE QUE AUTORIZA
+                    </div>
                 </td>
             </tr>
 

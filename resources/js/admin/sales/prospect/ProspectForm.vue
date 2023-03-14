@@ -51,8 +51,8 @@
       <v-col cols="12">
         <v-textarea
           v-model="form.town"
-          label="Nombre Racho/comunidad "
-          placeholder="Comunidad o Rancho"
+          label="Domicilio:"
+          placeholder="(Comunidad o Rancho)"
           height="100"
           outlined
           filled
@@ -126,6 +126,7 @@ export default {
   methods: {
     submit() {
       if (!this.$refs.form.validate()) return;
+      this.$eventBus.$emit("PROSPECT-FORM-SUBMIT");
       this.$emit("submit");
     },
   },

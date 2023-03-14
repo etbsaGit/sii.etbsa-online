@@ -15,8 +15,9 @@ class TrackingProspect extends Model
     protected $table = 'tracking_prospect';
     protected $primaryKey = 'id';
 
+    // 'currency'
     protected $fillable = [
-        'title', 'reference', 'description_topic', 'price', 'currency', 'currency_id',
+        'title', 'reference', 'description_topic', 'price', 'currency_id',
         'category_id', 'registered_by', 'prospect_id', 'customer_id', 'estatus_id', 'assigned_by', 'attended_by',
         'agency_id', 'department_id',  'first_contact', 'assertiveness', 'tracking_condition', 'invoice',
         'date_next_tracking', 'date_lost_sale', 'date_won_sale', 'date_invoice'
@@ -74,6 +75,11 @@ class TrackingProspect extends Model
     public function historical()
     {
         return $this->hasMany(TrackingHistoricalProspect::class, 'tracking_id', 'id');
+    }
+
+    public function quotation()
+    {
+        return $this->hasMany(TrackingQuote::class, 'tracking_id', 'id');
     }
 
     public function getHistoricalCountAttribute()
