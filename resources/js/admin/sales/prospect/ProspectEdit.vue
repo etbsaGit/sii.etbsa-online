@@ -36,6 +36,7 @@ export default {
             color: "success",
             duration: 3000,
           });
+          _this.$emit("success");
         })
         .catch(function (error) {
           _this.$store.commit("hideLoader");

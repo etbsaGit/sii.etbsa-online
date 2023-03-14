@@ -114,6 +114,9 @@
         <span v-if="$router.currentRoute.name != 'products.index'">
           {{ header.text }}
         </span>
+        <span v-else>
+          Ultimo Cambio
+        </span>
       </template>
       <template #[`item.name`]="{ item }">
         <div class="text-uppercase font-weight-bold">{{ item.name }}</div>
@@ -140,6 +143,9 @@
           dense
           reverse
         ></v-text-field>
+        <span v-else>
+          {{ $appFormatters.formatDate(item.updated_at, "MMM YYYY") }}
+        </span>
       </template>
       <template #[`item.action`]="{ item }">
         <td v-if="$router.currentRoute.name != 'products.index'">
@@ -331,8 +337,8 @@ export default {
       default: () => {
         return {
           search: "",
-          name: '',
-          sku: '',
+          name: "",
+          sku: "",
           category_id: null,
           model_id: null,
           is_active: null,

@@ -219,7 +219,7 @@ class SinglePageController extends AdminController
             new MenuItem([
                 'group_requirements' => ['GERENTE', 'DIRECCION', 'Vendedor', 'Super User'],
                 'permission_requirements' => [],
-                'label' => 'Ventas',
+                'label' => 'CRM',
                 'nav_type' => MenuItem::$NAV_TYPE_NAV,
                 'icon' => 'mdi-store',
                 'visible' => true,

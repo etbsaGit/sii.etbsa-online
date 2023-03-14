@@ -28,7 +28,7 @@ export default {
         prospect_id: null,
         title: null,
         reference: null,
-        product: null,
+        // product: null,
         price: null,
         currency: 1,
         currency_id: 1,
@@ -38,8 +38,16 @@ export default {
         attended_by: null,
         assertiveness: 0.01,
         tracking_condition: "Por definir",
+        date_next_tracking: null,
         first_contact: "Online",
         description_topic: null,
+        withQuote: false,
+        subtotal: 0,
+        discount: 0,
+        tax: 0,
+        total: 0,
+        currency: null,
+        products: [],
       },
     };
   },
@@ -59,16 +67,30 @@ export default {
       //   reference: _this.reference.name,
       // };
 
+      let payload = {
+        ..._this.form,
+        price: _this.form.withQuote ? _this.form.total : _this.form.price,
+        currency: _this.form.currency.name,
+      };
+      // console.log(payload);
+
       await axios
-        .post("/admin/tracking", this.form)
+        .post("/admin/tracking", payload)
         .then(function (response) {
           _this.$store.commit("showSnackbar", {
             message: response.data.message,
             color: "success",
             duration: 3000,
           });
-
           // reset
+          if (!!response.data.data.quotation) {
+            let idQuote = response.data.data.quotation.id;
+            window.open(
+              `${LSK_APP.APP_URL}/admin/quote/${idQuote}/print`,
+              "_blank",
+              "noreferrer"
+            );
+          }
           _this.isLoading = false;
           _this.$emit("success");
           // self.$router.push({ name: "tracking.list" });

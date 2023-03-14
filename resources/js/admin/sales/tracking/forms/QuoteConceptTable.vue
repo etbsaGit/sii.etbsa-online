@@ -12,11 +12,12 @@
       <template v-slot:[`item.name`]="{ item }">
         <v-list-item dense class="pa-0">
           <v-list-item-content>
-            <v-list-item-title class="title overline" v-text="item.name" />
-            <v-list-item-subtitle
-              class="title overline"
-              v-text="`SKU: ${item.sku}`"
-            />
+            <v-list-item-title class="title overline">
+              {{ item.name }}
+            </v-list-item-title>
+            <v-list-item-subtitle class="title overline">
+              SKU: {{ item.sku }}
+            </v-list-item-subtitle>
             <div
               v-text="item.description"
               class="overflow-auto"
@@ -26,7 +27,52 @@
         </v-list-item>
       </template>
       <template v-slot:[`item.price`]="{ item, value }">
-        <span class="font-weight-medium">
+        <!-- v-if="!$gate.allow('assignSeller', 'tracking')" -->
+
+        <!-- $gate.allow('isGerente', 'tracking') -->
+        <v-edit-dialog
+          v-if="$gate.allow('isGerente', 'tracking')"
+          :return-value.sync="item.price"
+          @save="saveSnack(item)"
+          @cancel="cancelSnack"
+          @open="openSnack"
+          @close="closeSnack"
+          save-text="Guardar"
+          cancel-text="Cancelar"
+          persistent
+          large
+        >
+          <v-text-field
+            :value="item.price"
+            outlined
+            dense
+            hide-details
+            reverse
+            single-line
+            class="py-1"
+            suffix="$"
+            :prefix="item.currency.name"
+            readonly
+          ></v-text-field>
+          <template v-slot:input>
+            <div class="mt-4 text-h6">
+              Actualizar Precio
+            </div>
+            <v-text-field
+              v-model.number="item.price"
+              suffix="$"
+              :prefix="item.currency.name"
+              type="number"
+              label="Edit"
+              hide-details
+              single-line
+              counter
+              autofocus
+              outlined
+            ></v-text-field>
+          </template>
+        </v-edit-dialog>
+        <span v-else class="font-weight-medium">
           {{ value | money }} {{ item.currency.name }}
         </span>
       </template>
@@ -45,22 +91,22 @@
           cancel-text="Cancelar"
         >
           <v-text-field
-            readonly
-            outlined
-            dense
             :value="item.qty"
             style="max-width: 50px;"
-            hide-details
-            reverse
-            single-line
             class="py-1"
+            hide-details
+            single-line
+            readonly
+            outlined
+            reverse
+            dense
           ></v-text-field>
           <template v-slot:input>
             <div class="mt-4 text-h6">
               Actualizar Cantidad
             </div>
             <v-text-field
-              v-model="item.qty"
+              v-model.number="item.qty"
               label="Edit"
               hide-details
               single-line
@@ -167,7 +213,7 @@ export default {
           align: "center",
           width: "120px",
         },
-        { text: "Precio U.", value: "price", align: "right", width: "120px" },
+        { text: "Precio U.", value: "price", align: "right", width: "220px" },
         {
           text: "Subtotal",
           value: "subtotal",
