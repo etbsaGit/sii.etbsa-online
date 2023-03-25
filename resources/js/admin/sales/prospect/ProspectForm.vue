@@ -86,6 +86,30 @@
           dense
         />
       </v-col>
+      <v-col cols="12" md="6">
+        <!-- <p class="text-14 mb-1">Segmentacion Prospecto</p> -->
+        <v-select
+          v-model="form.segmentacion"
+          :items="['Chico', 'Mediano', 'Grande', 'Agroindustrial', 'Jardinero']"
+          label="Segmentacion Cliente"
+          :rules="[(v) => !!v || 'Es Requerido']"
+          outlined
+          filled
+          dense
+        ></v-select>
+      </v-col>
+      <v-col cols="12" md="6">
+        <!-- <p class="text-14 mb-1">Capacidad Tecnologia</p> -->
+        <v-select
+          v-model="form.capacidad_tech"
+          :items="['Baja', 'Mediana', 'Alta', 'Experto']"
+          label="Capacidad de Tecnologia"
+          :rules="[(v) => !!v || 'Es Requerido']"
+          outlined
+          filled
+          dense
+        ></v-select>
+      </v-col>
     </v-row>
 
     <v-btn block type="submit" color="primary" :disabled="!valid">

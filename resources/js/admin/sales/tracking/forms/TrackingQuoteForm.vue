@@ -1,72 +1,109 @@
 <template>
   <v-card flat class="grey lighten-3" min-height="80vh">
-    <v-card-text>
-      <quote-concept-table
-        :dialogForm="dialog"
-        @edit="dialog = true"
-        @close="dialog = false"
-        :items.sync="form.products"
-      ></quote-concept-table>
-    </v-card-text>
-    <v-card-actions>
-      <v-btn text color="blue" @click="dialog = true">
-        <v-icon left>mdi-plus</v-icon> Agregar Producto
-      </v-btn>
-    </v-card-actions>
-    <v-col cols="12">
-      <v-simple-table class="grey lighten-3">
-        <tr class="py-3">
-          <td>Subtotal:</td>
-          <th class="text-right pr-2">
-            {{ Subtotal | money }} {{ Currency.currency.name }}
-          </th>
-        </tr>
-        <tr class="py-3">
-          <td>IVA:</td>
-          <th class="d-flex justify-end mb-3">
-            <v-checkbox v-model="CheckedTax" hide-details class="shrink mr-2">
-              <template v-slot:label>
-                <div>Con IVA: {{ form.tax | percent }}</div>
-              </template>
-            </v-checkbox>
-          </th>
-        </tr>
-        <tr class="py-3">
-          <td>Descuento:</td>
-          <th class="d-flex justify-end">
-            <v-text-field
-              v-model="form.discount"
-              type="number"
-              outlined
-              suffix="$"
-              hide-details
-              :prefix="Currency.currency.name"
-              reverse
-              style="max-width: 200px;"
-              dense
-            ></v-text-field>
-          </th>
-        </tr>
-        <tr>
-          <v-divider class="my-2" />
-        </tr>
-        <tr>
-          <td>Total:</td>
-          <th class="text-right pr-2 text-h4">
-            {{ Total | money }} {{ Currency.currency.name }}
-          </th>
-        </tr>
-      </v-simple-table>
-    </v-col>
-    <v-col cols="12">
-      <v-textarea
-        v-model="form.observation"
-        label="Nota de Vendedor"
-        outlined
-        filled
-        hide-details
-      ></v-textarea>
-    </v-col>
+    <v-row dense>
+      <v-col cols="12" md="8">
+        <v-card class="ma-4">
+          <v-card-text>
+            <quote-concept-table
+              :dialogForm="dialog"
+              @edit="dialog = true"
+              @close="dialog = false"
+              :items.sync="form.products"
+              :paymentCondition="form.payment_condition"
+              @payment="(v) => (form.payment_condition = v)"
+            ></quote-concept-table>
+          </v-card-text>
+          <v-card-actions>
+            <v-btn text color="blue" @click="ShowProducts">
+              <v-icon left>mdi-plus</v-icon> Agregar Producto
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-col>
+      <v-col cols="12" md="4">
+        <v-subheader class="title">Resumen</v-subheader>
+        <v-simple-table class="elevation-2 pa-4 mx-3 overline">
+          <tr class="py-3">
+            <td>Subtotal:</td>
+            <th class="text-right pr-2 text-h5">
+              {{ Subtotal | money }} {{ Currency.name }}
+            </th>
+          </tr>
+          <tr class="py-3">
+            <td>IVA:</td>
+            <th class="d-flex justify-end mb-3">
+              <v-checkbox v-model="CheckedTax" hide-details class="shrink mr-2">
+                <template v-slot:label>
+                  <span>{{ form.tax | percent }}</span>
+                </template>
+              </v-checkbox>
+            </th>
+          </tr>
+          <tr>
+            <td>T.C.</td>
+            <th class="d-flex justify-end">
+              <v-currency-field
+                v-model.number="form.exchange_value"
+                :default-value="form.exchange_value"
+                placeholder="0.00"
+                :rules="[(v) => !!v || 'Es Requerido']"
+                type="number"
+                suffix="$"
+                prefix="MXN"
+                style="max-width: 200px;"
+                hide-details
+                readonly
+                outlined
+                filled
+                dense
+                reverse
+              ></v-currency-field>
+            </th>
+          </tr>
+          <tr class="py-3" v-if="$gate.allow('isGerente', 'tracking')">
+            <td>Descuento:</td>
+            <th class="d-flex justify-end">
+              <v-currency-field
+                v-model="form.discount"
+                :default-value="form.discount"
+                type="number"
+                outlined
+                suffix="$"
+                hide-details
+                :prefix="Currency.name"
+                reverse
+                style="max-width: 200px;"
+                dense
+              ></v-currency-field>
+            </th>
+          </tr>
+          <tr>
+            <v-divider class="my-2" />
+          </tr>
+          <tr>
+            <td>Total:</td>
+            <th class="text-right pr-2 text-h4">
+              {{ Total | money }} {{ Currency.name }}
+            </th>
+          </tr>
+          <tr v-if="Currency.id === 2">
+            <td>Total MXN:</td>
+            <th class="text-right pr-2 text-h4">
+              {{ (Total * form.exchange_value) | money }} MXN
+            </th>
+          </tr>
+        </v-simple-table>
+        <v-col cols="12">
+          <v-textarea
+            v-model="form.observation"
+            label="Nota de Vendedor"
+            outlined
+            filled
+            hide-details
+          ></v-textarea>
+        </v-col>
+      </v-col>
+    </v-row>
   </v-card>
 </template>
 <script>
@@ -82,20 +119,17 @@ export default {
   data: () => ({
     dialog: false,
     dialogDelete: false,
-    // checkedTax: false,
+    exchange_value: 1,
   }),
 
   computed: {
-    formTitle() {
-      // return this.editedIndex === -1 ? "New Item" : "Edit Item";
-    },
     Currency() {
       const _this = this;
-      let currency = { currency: { name: "" } };
+      let _currency = { currency: { id: 1, name: "MXN" } };
       if (_this.form.products.length > 0) {
-        currency = _this.form.products.values().next().value;
+        _currency = _this.form.products.values().next().value;
       }
-      return (_this.form.currency = currency);
+      return (_this.form.currency = _currency.currency);
     },
     CheckedTax: {
       get() {
@@ -123,9 +157,6 @@ export default {
   },
 
   watch: {
-    // checkedTax(val) {
-    //   val ? (this.form.tax = 0.16) : (this.form.tax = 0);
-    // },
     dialog(val) {
       val || this.close();
     },
@@ -135,6 +166,14 @@ export default {
     dialogDelete(val) {
       val || this.closeDelete();
     },
+    Currency: function (v) {
+      const _this = this;
+      if (v.id === 2) {
+        _this.form.exchange_value = _this.exchange_value;
+      } else {
+        _this.form.exchange_value = 1;
+      }
+    },
   },
 
   mounted() {
@@ -142,7 +181,15 @@ export default {
   },
 
   methods: {
-    initialize() {},
+    async initialize() {
+      const _this = this;
+      await axios
+        .get("/admin/tracking/sales_history/resources")
+        .then(function (response) {
+          let { exchange_value } = response.data.data;
+          _this.exchange_value = exchange_value;
+        });
+    },
     loadFormQouteInfo() {
       // console.log(this.TrackingQuoteId);
     },
@@ -178,6 +225,16 @@ export default {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
       });
+    },
+    ShowProducts() {
+      const _this = this;
+      return _this.form.payment_condition !== "por_definir"
+        ? (_this.dialog = true)
+        : _this.$store.commit("showSnackbar", {
+            message: "Seleccionar una Condicion de Pago",
+            color: "warning",
+            duration: 3000,
+          });
     },
   },
 };

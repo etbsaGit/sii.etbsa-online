@@ -58,7 +58,7 @@ class TrackingQuoteController extends AdminController
             return $this->sendResponseBadRequest($validate->errors()->first());
         }
         $quotation = null;
-        DB::transaction(function () use ($request, $quotation) {
+        return DB::transaction(function () use ($request, $quotation) {
             $request['date_due'] = Carbon::now()->addDays(30);
             $request['currency_id'] = $request['currency.id'];
 
@@ -78,9 +78,8 @@ class TrackingQuoteController extends AdminController
                     }
                 }
             }
+            return $this->sendResponseCreated($quotation, 'Cotizacion Creada');
         });
-
-        return $this->sendResponseCreated($quotation, 'Cotizacion Creada');
     }
 
     public function show(TrackingQuote $quote)
@@ -102,7 +101,7 @@ class TrackingQuoteController extends AdminController
             return $this->sendResponseBadRequest($validate->errors()->first());
         }
 
-        DB::transaction(function () use ($quote, $request) {
+        return DB::transaction(function () use ($quote, $request) {
             $this->trackingQuoteRepository->update($quote->id, $request->all());
             $quote->refresh();
             $syncConcept = [];
@@ -120,8 +119,8 @@ class TrackingQuoteController extends AdminController
                 }
                 $quote->products()->sync($syncConcept);
             }
+            return $this->sendResponseCreated($quote, 'Cotizacion Actualizada');
         });
-        return $this->sendResponseCreated($quote, 'Cotizacion Actualizada');
     }
 
 

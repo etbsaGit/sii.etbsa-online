@@ -28,16 +28,16 @@ export default {
         prospect_id: null,
         title: null,
         reference: null,
-        // product: null,
-        price: null,
+        price: 0,
         currency: 1,
         currency_id: 1,
+        exchange_value: 1,
         agency_id: null,
         department_id: null,
         seller_id: null,
         attended_by: null,
         assertiveness: 0.01,
-        tracking_condition: "Por definir",
+        tracking_condition: "por_definir",
         date_next_tracking: null,
         first_contact: "Online",
         description_topic: null,
@@ -59,20 +59,21 @@ export default {
   methods: {
     async save() {
       if (!this.$refs.form.$refs.form.validate()) return;
+      if (this.form.withQuote && this.form.products.length == 0)
+        return this.$store.commit("showSnackbar", {
+          message: "Aun no Agrega una Partida",
+          color: "warning",
+          duration: 3000,
+        });
       const _this = this;
       _this.isLoading = true;
-
-      // const params = {
-      //   ..._this.form,
-      //   reference: _this.reference.name,
-      // };
-
+      // console.log("Currency", _this.form.currency.name);
       let payload = {
         ..._this.form,
         price: _this.form.withQuote ? _this.form.total : _this.form.price,
-        currency: _this.form.currency.name,
+        // currency: _this.form.currency.name,
+        payment_condition: _this.form.tracking_condition,
       };
-      // console.log(payload);
 
       await axios
         .post("/admin/tracking", payload)

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Components\Common\Models\Currency;
 use App\Components\Common\Models\Estatus;
+use App\Components\Common\Models\ExchangeRates;
 use App\Components\RRHH\Models\Employee;
 use App\Components\Tracking\Models\Prospect;
 use App\Components\Tracking\Models\TrackingProspect;
@@ -115,6 +116,11 @@ class TrackingProspectController extends AdminController
             $request['assigned_by'] = Auth::user()->id;
             $currency_name = Currency::where('id', $request['currency_id'])->first();
 
+            $date_next_lead = $request->get('date_next_tracking', Carbon::now()->addDays(15));
+            if (empty($date_next_lead) || is_null($date_next_lead)) {
+                $date_next_lead = Carbon::now()->addDays(15);
+                $request['date_next_tracking'] = Carbon::now()->addDays(15);
+            }
             /** @var Prospect $tracking */
             $created = $this->trackingRepository->create($request->all());
             $tracking = $this->trackingRepository->find($created->id);
@@ -128,9 +134,6 @@ class TrackingProspectController extends AdminController
             $tracking->save();
             $tracking->refresh();
 
-
-            // $request['date_next_tracking'] = Carbon::now()->addDays(15);
-            $date_next_lead = $request->get('date_next_tracking', Carbon::now()->addDays(15));
             $tracking->historical()->create([
                 'message' => 'Llamar para dar Seguimiento',
                 'last_price' => $request['price'],
@@ -371,7 +374,8 @@ class TrackingProspectController extends AdminController
         $categories = DB::table('cat_product_category')->get(['id', 'name']);
         $currency = DB::table('currency')->get(['id', 'name']);
         $prospects = Prospect::with('township')->get()->map->only('id', 'full_name', 'email', 'company', 'rfc', 'town', 'phone', 'township');
-        return $this->sendResponseOk(compact('agencies', 'departments', 'prospects', 'currency', 'categories'));
+        $exchange_value = ExchangeRates::latest()->first()->value;
+        return $this->sendResponseOk(compact('agencies', 'departments', 'prospects', 'currency', 'categories', 'exchange_value'));
     }
 
 

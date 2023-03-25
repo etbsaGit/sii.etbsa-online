@@ -29,6 +29,11 @@ export const products = [
         name: "products.attributes.index",
         component: require("@admin/products/attributes/Index").default,
       },
+      {
+        path: "exchanges",
+        name: "products.exchanges.index",
+        component: require("@admin/products/exchanges/Index").default,
+      },
     ],
   },
 ];

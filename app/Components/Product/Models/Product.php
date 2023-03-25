@@ -5,18 +5,23 @@ namespace App\Components\Product\Models;
 use App\Components\Common\Models\Agency;
 use App\Components\Common\Models\Currency;
 use Illuminate\Database\Eloquent\Model;
+use PhpParser\Node\Expr\Cast\Double;
 
 class Product extends Model
 {
     protected $table = 'products';
     protected $fillable = [
         'product_category_id', 'product_model_id', 'brand_id', 'supplier_id', 'name', 'description', 'agency_id', 'sku',
-        'active', 'is_usado', 'is_dollar', 'currency_id', 'price_1', 'price_2', 'price_3'
+        'active', 'is_usado', 'is_dollar', 'currency_id',
+        'price_1', 'price_2', 'price_3',
+        'price_4', 'price_5', 'price_6',
+        'price_7', 'price_8', 'price_9',
     ];
 
     const PRODUCT_QTY = 1;
     const PRODUCT_DISCOUNT = 0;
     const PRODUCT_INCOME = 0;
+    const PRODUCT_PRICE = 0;
     protected $appends = ['type', 'qty', 'discount'];
 
     public function scopeSearch($query, String $search)
@@ -48,6 +53,8 @@ class Product extends Model
             $query->whereHas('agency', function ($query) use ($agency_id) {
                 return $query->where('id', $agency_id);
             });
+        })->when($params['category_name'] ?? null, function ($query, $category) {
+            $query->Categoryname($category);
         });
     }
 
@@ -59,6 +66,33 @@ class Product extends Model
                 $query->whereHas('category', function ($query) use ($category_name) {
                     return $query->where('name', $category_name);
                 });
+            }
+        );
+    }
+
+    public function scopePriceType($query, string $price_type)
+    {
+        $price = "price_1";
+        $prices = array(
+            'price_1' => "precio_lista",
+            'price_2' => "contado",
+            'price_3' => "jdf_2y",
+            'price_4' => "jdf_5y",
+            'price_5' => "precio_expo",
+            'price_6' => "por_volumen",
+            'price_7' => "renta_1",
+            'price_8' => "renta_2",
+            'price_9' => "renta_3",
+        );
+
+        $price = array_search($price_type, $prices);
+        $query->when(
+            $price ?? null,
+            function ($query, $price) {
+                return $query->selectRaw("*," . $price . " As suggested_price")->where($price, '>', 0);
+            },
+            function ($query) {
+                return $query->selectRaw("*,price_1 As suggested_price");
             }
         );
     }
@@ -94,6 +128,7 @@ class Product extends Model
     {
         return $this::PRODUCT_DISCOUNT;
     }
+
     public function getIncomeAttribute()
     {
         $cost = $this->price_2;

@@ -1,5 +1,21 @@
 <template>
   <v-card flat>
+    <v-card-title>
+      <v-spacer></v-spacer>
+      <v-select
+        v-model="Payment"
+        :items="optionsPaymentcondition"
+        label="Condicion de Pago"
+        placeholder="Placeholder"
+        class="py-2"
+        style="max-width: 250px;"
+        hide-details
+        outlined
+        dense
+      ></v-select>
+      <!-- :disabled="items.length > 0" -->
+      <!-- <v-btn color="red" text @click="items = []">Borrar Productos</v-btn> -->
+    </v-card-title>
     <v-data-table
       :headers="headers"
       :items="items"
@@ -42,8 +58,9 @@
           persistent
           large
         >
-          <v-text-field
+          <v-currency-field
             :value="item.price"
+            :default-value="item.price"
             outlined
             dense
             hide-details
@@ -53,15 +70,16 @@
             suffix="$"
             :prefix="item.currency.name"
             readonly
-          ></v-text-field>
+          ></v-currency-field>
           <template v-slot:input>
             <div class="mt-4 text-h6">
               Actualizar Precio
             </div>
-            <v-text-field
+            <v-currency-field
               v-model.number="item.price"
-              suffix="$"
-              :prefix="item.currency.name"
+              :default-value="item.price"
+              prefix="$"
+              :suffix="item.currency.name"
               type="number"
               label="Edit"
               hide-details
@@ -69,7 +87,7 @@
               counter
               autofocus
               outlined
-            ></v-text-field>
+            ></v-currency-field>
           </template>
         </v-edit-dialog>
         <span v-else class="font-weight-medium">
@@ -129,14 +147,20 @@
         </div>
       </template>
     </v-data-table>
-    <v-dialog v-model="Dialog" max-width="1200px">
+    <v-dialog v-model="Dialog" max-width="90%">
       <v-card>
         <v-card-title>
           <span class="text-h5">{{ Title }} Productos</span>
         </v-card-title>
         <v-card-text>
           <v-container>
-            <products-list></products-list>
+            <products-list
+              v-if="Dialog"
+              :Filters="{
+                price_type: Payment,
+                category_id: Category_id,
+              }"
+            ></products-list>
           </v-container>
         </v-card-text>
       </v-card>
@@ -154,12 +178,41 @@
 </template>
 <script>
 import ProductsList from "../../../products/product/Index.vue";
+
+const _paymentCondition = [
+  { text: "Por Definir", value: "por_definir", type_price: "" },
+  { text: "P. Lista", value: "precio_lista", type_price: "price_1" },
+  { text: "Contado", value: "contado", type_price: "price_2" },
+  { text: "JDF 2 años", value: "jdf_2y", type_price: "price_3" },
+  { text: "JDF 5 años", value: "jdf_5y", type_price: "price_4" },
+  { text: "Expo", value: "precio_expo", type_price: "price_5" },
+  { text: "Precio Volumen", value: "por_volumen", type_price: "price_6" },
+  { text: "Arrendamiento", value: "renta_1", type_price: "price_7" },
+  { text: "Arrendamiento 2 meses", value: "renta_2", type_price: "price_8" },
+  { text: "Arrendamiento +3 meses", value: "renta_3", type_price: "price_9" },
+];
+
 export default {
   components: { ProductsList },
   name: "QuoteConceptTable",
   props: {
     dialogForm: {
       default: false,
+    },
+    paymentCondition: {
+      default: "por_definir",
+    },
+    Category_id: {
+      type: Number | String,
+      require: false,
+      default: null,
+    },
+    optionsPaymentcondition: {
+      type: Array,
+      default: () => {
+        return _paymentCondition;
+      },
+      require: false,
     },
     items: {
       type: Array,
@@ -191,6 +244,27 @@ export default {
           return this.$emit("edit");
         }
       },
+    },
+    Payment: {
+      get() {
+        return this.paymentCondition;
+      },
+      set(v) {
+        this.$emit("payment", v);
+        this.$nextTick(() => {});
+      },
+    },
+  },
+  watch: {
+    Payment(v, old) {
+      console.log(v, old);
+      const _this = this;
+      let price_type =
+        _paymentCondition.find((p) => p.value == v).type_price ?? "";
+      _this.items.forEach((product) => {
+        product.price = product.prices[price_type] ?? product.price;
+        product.subtotal = product.qty * product.price;
+      });
     },
   },
   data() {
@@ -232,9 +306,6 @@ export default {
     });
   },
   methods: {
-    Amount(item) {
-      return item.qty * item.price - item.discount;
-    },
     saveSnack(product) {
       product.subtotal = product.price * product.qty;
       this.snack = true;
@@ -303,16 +374,37 @@ export default {
     addItem(item) {
       const _this = this;
       let concept = {};
-      const { id, name, sku, description, price_1, qty, currency } = item;
+      const {
+        price_1,
+        price_2,
+        price_3,
+        price_4,
+        price_5,
+        price_6,
+        price_7,
+        price_8,
+        price_9,
+      } = item;
 
-      concept.id = id;
-      concept.name = name;
-      concept.sku = sku;
-      concept.qty = qty;
-      concept.description = description;
-      concept.price = price_1;
-      concept.currency = currency;
-      concept.subtotal = qty * price_1;
+      concept.id = item.id;
+      concept.name = item.name;
+      concept.sku = item.sku;
+      concept.description = item.description;
+      concept.price = item.suggested_price;
+      concept.prices = {
+        price_1,
+        price_2,
+        price_3,
+        price_4,
+        price_5,
+        price_6,
+        price_7,
+        price_8,
+        price_9,
+      };
+      concept.qty = item.qty;
+      concept.currency = item.currency;
+      concept.subtotal = item.qty * item.suggested_price;
 
       _this.items.push(concept);
       _this.$store.commit("showSnackbar", {
