@@ -78,10 +78,11 @@ class TrackingQuote extends Model
             "renta_1" => "Arrendamiento",
             "renta_2" => "Arrendamiento 2 meses",
             "renta_3" => "Arrendamiento +3 meses",
+            "credito_30d" => "Credito 30 dias",
         ];
         if ($this->payment_condition) {
             # code...
-            return $label[$this->payment_condition];
+            return $label[$this->payment_condition] ?? $label["por_definir"];
         } else {
             return $label["por_definir"];
         }

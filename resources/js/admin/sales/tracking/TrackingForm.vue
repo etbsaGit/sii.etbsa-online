@@ -123,7 +123,7 @@
       <v-col cols="12" md="6" class="d-flex align-stretch">
         <v-card class="mx-auto" width="inherit">
           <div class="d-flex">
-            <v-subheader>DATOS DEL LEAD:</v-subheader>
+            <v-subheader>DATOS DEL Seguimiento:</v-subheader>
             <v-spacer />
             <template v-if="form.withQuote != undefined">
               <v-switch
@@ -137,7 +137,7 @@
           <v-divider> </v-divider>
           <v-card-text class="pt-0">
             <v-col cols="12" class="px-0">
-              <p class="text-14 mb-1">Categoria de LEAD</p>
+              <p class="text-14 mb-1">Categoria de Seguimiento</p>
               <v-autocomplete
                 v-model="form.title"
                 :items="options.categories"
@@ -153,7 +153,7 @@
               </v-autocomplete>
             </v-col>
             <v-col cols="12" class="px-0">
-              <p class="text-14 mb-1">Titulo del LEAD</p>
+              <p class="text-14 mb-1">Nombre o Referencia del Seguimiento</p>
               <v-text-field
                 v-model="form.reference"
                 placeholder="Buscar por Nombre o SKU"
@@ -218,7 +218,7 @@
 
             <v-row>
               <v-col cols="12" md="6">
-                <p class="text-14 mb-1">Origen del Lead</p>
+                <p class="text-14 mb-1">Origen del Seguimiento</p>
                 <v-select
                   v-model="form.first_contact"
                   :items="options.origin"
@@ -422,12 +422,12 @@
       <v-col cols="12" md="6" class="d-flex align-stretch">
         <v-card class="mx-auto" width="inherit">
           <div class="d-flex">
-            <v-subheader>ETAPA Y DESCRIPCION DEL LEAD:</v-subheader>
+            <v-subheader>ETAPA Y DESCRIPCION DEL Seguimiento:</v-subheader>
           </div>
           <v-divider> </v-divider>
           <v-card-text class="pt-0">
             <v-col cols="12" class="px-0">
-              <p class="text-14 mb-1">Etapa del LEAD</p>
+              <p class="text-14 mb-1">Etapa del Seguimiento</p>
               <v-select
                 v-model="form.assertiveness"
                 :items="options.assertiveness"
@@ -550,6 +550,7 @@ const _paymentCondition = [
   { text: "Arrendamiento", value: "renta_1", config: [6, 15] },
   { text: "Arrendamiento 2 meses", value: "renta_2", config: [15] },
   { text: "Arrendamiento +3 meses", value: "renta_3", config: [15] },
+  { text: "Credito 30 Dias", value: "credito_30d", config: [5] },
 ];
 
 export default {

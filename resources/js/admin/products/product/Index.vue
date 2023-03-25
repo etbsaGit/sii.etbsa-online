@@ -285,6 +285,7 @@
               v-model="form.description"
               label="Descripcion"
               type="text"
+              :rules="[(v) => !!v || 'Es Requerido']"
               outlined
               dense
             />
@@ -292,6 +293,7 @@
               v-model="form.sku"
               label="SKU"
               type="text"
+              :rules="[(v) => !!v || 'Es Requerido']"
               outlined
               dense
             />
@@ -328,6 +330,7 @@
                 dense
               />
             </div>
+
             <v-currency-field
               v-model.number="form.price_1"
               :default-value="form.price_1"
@@ -335,7 +338,7 @@
               prefix="$"
               :suffix="form.is_dollar ? 'USD' : 'MXN'"
               type="number"
-              :rules="[(v) => !!v || 'Es Requerido']"
+              :rules="[(v) => !!v || 'Es Requerido o Poner Valor en Cero']"
               outlined
               dense
             />
@@ -346,7 +349,7 @@
               prefix="$"
               :suffix="form.is_dollar ? 'USD' : 'MXN'"
               type="number"
-              :rules="[(v) => !!v || 'Es Requerido']"
+              :rules="[(v) => !!v || 'Es Requerido o Poner Valor en Cero']"
               outlined
               dense
             />
@@ -357,6 +360,7 @@
               prefix="$"
               :suffix="form.is_dollar ? 'USD' : 'MXN'"
               type="number"
+              :rules="[(v) => !!v || 'Es Requerido o Poner Valor en Cero']"
               outlined
               dense
             />
@@ -367,6 +371,7 @@
               prefix="$"
               :suffix="form.is_dollar ? 'USD' : 'MXN'"
               type="number"
+              :rules="[(v) => !!v || 'Es Requerido o Poner Valor en Cero']"
               outlined
               dense
             />
@@ -377,6 +382,7 @@
               prefix="$"
               :suffix="form.is_dollar ? 'USD' : 'MXN'"
               type="number"
+              :rules="[(v) => !!v || 'Es Requerido o Poner Valor en Cero']"
               outlined
               dense
             />
@@ -387,6 +393,7 @@
               prefix="$"
               :suffix="form.is_dollar ? 'USD' : 'MXN'"
               type="number"
+              :rules="[(v) => !!v || 'Es Requerido o Poner Valor en Cero']"
               outlined
               dense
             />
@@ -397,6 +404,7 @@
               prefix="$"
               :suffix="form.is_dollar ? 'USD' : 'MXN'"
               type="number"
+              :rules="[(v) => !!v || 'Es Requerido o Poner Valor en Cero']"
               outlined
               dense
             />
@@ -407,6 +415,7 @@
               prefix="$"
               :suffix="form.is_dollar ? 'USD' : 'MXN'"
               type="number"
+              :rules="[(v) => !!v || 'Es Requerido o Poner Valor en Cero']"
               outlined
               dense
             />
@@ -417,6 +426,18 @@
               prefix="$"
               :suffix="form.is_dollar ? 'USD' : 'MXN'"
               type="number"
+              :rules="[(v) => !!v || 'Es Requerido o Poner Valor en Cero']"
+              outlined
+              dense
+            />
+            <v-currency-field
+              v-model.number="form.price_10"
+              :default-value="form.price_10"
+              label="Precio Credito 30 dias"
+              prefix="$"
+              :suffix="form.is_dollar ? 'USD' : 'MXN'"
+              type="number"
+              :rules="[(v) => !!v || 'Es Requerido o Poner Valor en Cero']"
               outlined
               dense
             />
@@ -545,6 +566,30 @@ export default {
         price_7: 0,
         price_8: 0,
         price_9: 0,
+        price_10: 0,
+      },
+      formDefault: {
+        product_category_id: null,
+        product_model_id: null,
+        agency_id: null,
+        brand_id: null,
+        supplier_id: null,
+        name: "",
+        description: "",
+        sku: "",
+        active: false,
+        is_usado: false,
+        is_dollar: false,
+        price_1: 0,
+        price_2: 0,
+        price_3: 0,
+        price_4: 0,
+        price_5: 0,
+        price_6: 0,
+        price_7: 0,
+        price_8: 0,
+        price_9: 0,
+        price_10: 0,
       },
       rules: {},
       items: [],
@@ -572,6 +617,7 @@ export default {
         { text: "Arrendamiento", value: "renta_1" },
         { text: "Arrendamiento 2 meses", value: "renta_2" },
         { text: "Arrendamiento +3 meses", value: "renta_3" },
+        { text: "Credito 30 dias", value: "credito_30d" },
       ],
       showSearchPanel: false,
     };
@@ -700,9 +746,10 @@ export default {
       const _this = this;
       _this.dialog = true;
       _this.editedId = -1;
+      _this.$refs.form.reset();
+      _this.$refs.form.resetValidation();
       setTimeout(() => {
-        _this.$refs.form.reset();
-        _this.$refs.form.resetValidation();
+        _this.form = { ...this.formDefault };
       }, 1000);
     },
     editItem(item) {
@@ -731,7 +778,8 @@ export default {
         _this.form.price_7 = item.price_7;
         _this.form.price_8 = item.price_8;
         _this.form.price_9 = item.price_9;
-      }, 500);
+        _this.form.price_10 = item.price_10;
+      }, 1000);
     },
     async submit() {
       const _this = this;
