@@ -16,13 +16,15 @@ class TrackingQuote extends Model
         'date_due',
         'tracking_id',
         'currency_id',
+        'exchange_value',
         'subtotal',
         'tax',
         'discount',
         'total',
+        'payment_condition',
         'observation',
     ];
-    protected $appends = [];
+    protected $appends = ['label_payment'];
 
 
     public function tracking()
@@ -61,5 +63,27 @@ class TrackingQuote extends Model
                 });
             }
         );
+    }
+
+    public function getLabelPaymentAttribute()
+    {
+        $label = [
+            "por_definir" => "Por Definir",
+            "precio_lista" => "P. Lista",
+            "contado" => "Contado",
+            "jdf_2y" => "JDF 2 años",
+            "jdf_5y" => "JDF 5 años",
+            "precio_expo" => "Expo",
+            "por_volumen" => "Precio Volumen",
+            "renta_1" => "Arrendamiento",
+            "renta_2" => "Arrendamiento 2 meses",
+            "renta_3" => "Arrendamiento +3 meses",
+        ];
+        if ($this->payment_condition) {
+            # code...
+            return $label[$this->payment_condition];
+        } else {
+            return $label["por_definir"];
+        }
     }
 }

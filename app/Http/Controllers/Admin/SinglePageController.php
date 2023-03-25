@@ -55,26 +55,6 @@ class SinglePageController extends AdminController
                 'route_name' => 'files',
                 'visible' => false,
             ]),
-            // new MenuItem([
-            //     'group_requirements' => [],
-            //     'permission_requirements' => ['superuser'],
-            //     'label' => 'Cotizador',
-            //     'nav_type' => MenuItem::$NAV_TYPE_NAV,
-            //     'icon' => 'mdi-file-compare',
-            //     'route_type' => 'vue',
-            //     'route_name' => 'quote',
-            //     'visible' => false,
-            // ]),
-            // new MenuItem([
-            //     'group_requirements' => ['Flotilla', 'Super User'],
-            //     'permission_requirements' => [],
-            //     'label' => 'Flotilla',
-            //     'nav_type' => MenuItem::$NAV_TYPE_NAV,
-            //     'icon' => 'mdi-car',
-            //     'route_type' => 'vue',
-            //     'route_name' => 'vehicle.list',
-            //     'visible' => true,
-            // ]),
             new MenuItem([
                 'group_requirements' => ['Flotilla', 'Super User'],
                 'permission_requirements' => [],
@@ -115,16 +95,6 @@ class SinglePageController extends AdminController
                     ]),
                 ]
             ]),
-            // new MenuItem([
-            //     'group_requirements' => ['GERENTE', 'DIRECCION', 'Vendedor', 'Super User'],
-            //     'permission_requirements' => [],
-            //     'label' => 'Seguimiento Prospectos',
-            //     'nav_type' => MenuItem::$NAV_TYPE_NAV,
-            //     'icon' => 'mdi-store',
-            //     'route_type' => 'vue',
-            //     'route_name' => 'tracking.list',
-            //     'visible' => true,
-            // ]),
             new MenuItem([
                 'group_requirements' => ['Super User'],
                 'permission_requirements' => [],
@@ -197,6 +167,16 @@ class SinglePageController extends AdminController
                     new MenuItem([
                         'group_requirements' => ['Super User'],
                         'permission_requirements' => ['product.admin'],
+                        'label' => 'Tipo de Cambio',
+                        'nav_type' => MenuItem::$NAV_TYPE_NAV,
+                        'icon' => 'mdi-currency-usd',
+                        'route_type' => 'vue',
+                        'route_name' => 'products.exchanges.index',
+                        'visible' => true,
+                    ]),
+                    new MenuItem([
+                        'group_requirements' => ['Super User'],
+                        'permission_requirements' => ['product.admin'],
                         'label' => 'Catageorias Productos',
                         'nav_type' => MenuItem::$NAV_TYPE_NAV,
                         'icon' => 'mdi-shape',
@@ -244,16 +224,7 @@ class SinglePageController extends AdminController
                         'route_name' => 'tracking.diary',
                         'visible' => true,
                     ]),
-                    // new MenuItem([
-                    //     'group_requirements' => ['Super User'],
-                    //     'permission_requirements' => [],
-                    //     'label' => 'Pedidos*',
-                    //     'nav_type' => MenuItem::$NAV_TYPE_NAV,
-                    //     'icon' => 'mdi-book-multiple',
-                    //     'route_type' => 'vue',
-                    //     'route_name' => 'sale-orders.list',
-                    //     'visible' => true,
-                    // ]),
+
                     new MenuItem([
                         'group_requirements' => ['GERENTE', 'DIRECCION', 'Vendedor', 'Super User'],
                         'permission_requirements' => [],
@@ -406,46 +377,7 @@ class SinglePageController extends AdminController
                     // ]),
                 ]
             ]),
-            // new MenuItem([
-            //     'group_requirements' => ['Super User'],
-            //     'permission_requirements' => [],
-            //     'label' => 'TI',
-            //     'nav_type' => MenuItem::$NAV_TYPE_NAV,
-            //     'icon' => 'mdi-server',
-            //     'visible' => true,
-            //     'children' => [
-            //         new MenuItem([
-            //             'group_requirements' => ['Super User'],
-            //             'permission_requirements' => [],
-            //             'label' => 'Inventario',
-            //             'nav_type' => MenuItem::$NAV_TYPE_NAV,
-            //             'icon' => 'mdi-account-multiple-check',
-            //             'route_type' => 'vue',
-            //             'route_name' => 'system.list',
-            //             'visible' => true,
-            //         ]),
-            //         new MenuItem([
-            //             'group_requirements' => ['Super User'],
-            //             'permission_requirements' => [],
-            //             'label' => 'Dispositivos',
-            //             'nav_type' => MenuItem::$NAV_TYPE_NAV,
-            //             'icon' => 'mdi-desktop-tower-monitor',
-            //             'route_type' => 'vue',
-            //             'route_name' => 'system.list',
-            //             'visible' => true,
-            //         ]),
-            //     ]
-            // ]),
-            // new MenuItem([
-            //     'group_requirements' => [],
-            //     'permission_requirements' => ['superuser'],
-            //     'label' => 'Configuracion',
-            //     'nav_type' => MenuItem::$NAV_TYPE_NAV,
-            //     'icon' => 'mdi-settings',
-            //     'route_type' => 'vue',
-            //     'route_name' => 'settings',
-            //     'visible' => false,
-            // ]),
+
             new MenuItem([
                 'nav_type' => MenuItem::$NAV_TYPE_DIVIDER,
             ]),

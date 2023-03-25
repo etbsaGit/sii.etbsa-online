@@ -147,6 +147,11 @@
                 </td>
             </tr>
             <tr class="heading">
+                <td colspan="6" style="text-transform: uppercase;">
+                    Condicion de Pago: {{ $data->label_payment }}
+                </td>
+            </tr>
+            <tr class="heading">
                 <td>SKU</td>
                 <td>Producto</td>
                 <td>Cant.</td>
@@ -171,10 +176,6 @@
                 </tr>
             @endforeach
 
-
-            {{-- <tr class="item">
-                <td colspan="5"></td>
-            </tr> --}}
             <tr class="total" style="text-align: right">
                 <td colspan="3">Subtotal: </td>
                 <td colspan="2" style="text-align: right">{{ '$ ' . number_format($data->subtotal, 2, '.', ',') }}
@@ -185,6 +186,13 @@
                 <td colspan="3">IVA: </td>
                 <td colspan="2">{{ number_format($data->tax, 2, '.', ',') * 100 }}%</td>
             </tr>
+            @if ($data->currency->name == 'USD')
+                <tr class="total" style="text-align: right">
+                    <td colspan="3">T.C.: </td>
+                    <td colspan="2">{{ '$ ' . number_format($data->exchange_value, 2, '.', ',') }}
+                        {{ $data->currency->name }} </td>
+                </tr>
+            @endif
             @if ($data->discount > 0)
                 <tr class="total" style="text-align: right">
                     <td colspan="3">Descuento: </td>
@@ -193,15 +201,25 @@
                 </tr>
             @endif
             <tr class="total" style="text-align: right">
-                <td colspan="3">Total: </td>
-                <td colspan="2" style="font-size: 16pt">{{ '$ ' . number_format($data->total, 2, '.', ',') }}
+                <td colspan="3">Total {{ $data->currency->name }}: </td>
+                <td colspan="2" style="font-size: 12pt">{{ '$ ' . number_format($data->total, 2, '.', ',') }}
                     {{ $data->currency->name }}
                 </td>
             </tr>
+            @if ($data->currency->name == 'USD')
+                <tr class="total" style="text-align: right">
+                    <td colspan="3">Total M.N.: </td>
+                    <td colspan="2" style="font-size: 12pt">
+                        {{ '$ ' . number_format($data->total * $data->exchange_value, 2, '.', ',') }}
+                        MXN
+                    </td>
+                </tr>
+            @endif
 
         </table>
 
         <table>
+
             <tr class="heading">
                 <td>Nota del Vendedor</td>
                 <td colspan="5"></td>

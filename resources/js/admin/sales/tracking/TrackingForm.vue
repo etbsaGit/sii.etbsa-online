@@ -21,11 +21,8 @@
               outlined
               dense
               filled
+              class="overline"
             >
-              <!-- @change="
-                (id) =>
-                  (selectedProspect = options.prospects.find((e) => e.id == id))
-              " -->
               <template v-slot:append-outer>
                 <v-btn
                   v-if="!$vuetify.breakpoint.mobile"
@@ -52,9 +49,13 @@
                 </v-list>
               </template>
               <template v-slot:item="{ item }">
-                <v-list-item-title> {{ item.full_name }} </v-list-item-title>
-                <v-list-item-subtitle> {{ item.phone }} </v-list-item-subtitle>
-                <v-list-item-subtitle>
+                <v-list-item-title class="overline">
+                  {{ item.full_name }}
+                </v-list-item-title>
+                <v-list-item-subtitle class="overline">
+                  {{ item.phone }}
+                </v-list-item-subtitle>
+                <v-list-item-subtitle class="overline">
                   {{ item.company }}
                 </v-list-item-subtitle>
               </template>
@@ -62,7 +63,6 @@
             <v-subheader class="pl-0">DATOS DEL PROSPECTO</v-subheader>
             <v-divider></v-divider>
             <v-scroll-y-transition mode="out-in">
-              <!-- v-if="!selectedProspect" -->
               <div
                 v-if="!SelectedProspect"
                 class="text-h6 grey--text text--lighten-1 font-weight-light"
@@ -137,7 +137,7 @@
           <v-divider> </v-divider>
           <v-card-text class="pt-0">
             <v-col cols="12" class="px-0">
-              <p class="text-14 mb-1">Categoria del LEAD</p>
+              <p class="text-14 mb-1">Categoria de LEAD</p>
               <v-autocomplete
                 v-model="form.title"
                 :items="options.categories"
@@ -165,33 +165,13 @@
                 dense
               >
               </v-text-field>
-              <!-- <v-combobox
-                v-model="form.product"
-                :items="options.products"
-                item-value="name"
-                item-text="name"
-                placeholder="Buscar por Nombre o SKU"
-                :rules="[(v) => !!v || 'Es Requerido']"
-                clearable
-                hide-details
-                outlined
-                filled
-                dense
-              >
-                <template v-slot:item="{ item }">
-                  <v-list-item-title>{{ item.name }}</v-list-item-title>
-                  <v-list-item-subtitle>{{ item.sku }}</v-list-item-subtitle>
-                  <v-list-item-subtitle>
-                    {{ item.price_1 | money }}{{ item.currency.name }}
-                  </v-list-item-subtitle>
-                </template>
-              </v-combobox> -->
             </v-col>
             <v-row v-if="!form.withQuote">
-              <v-col cols="12" md="8">
-                <p class="text-14 mb-1">Valor del Lead</p>
-                <v-text-field
+              <v-col cols="12" md="4" v-show="false">
+                <p class="text-14 mb-1">Valor Estimado</p>
+                <v-currency-field
                   v-model.number="form.price"
+                  :default-value="form.price"
                   placeholder="0.00"
                   :rules="[(v) => !!v || 'Es Requerido']"
                   type="number"
@@ -200,12 +180,12 @@
                   outlined
                   filled
                   dense
-                ></v-text-field>
+                ></v-currency-field>
               </v-col>
-              <v-col cols="12" md="4">
+              <v-col cols="12" md="4" v-show="false">
                 <p class="text-14 mb-1">Moneda</p>
                 <v-select
-                  v-model="form.currency_id"
+                  v-model.number="form.currency_id"
                   :items="options.currency"
                   item-value="id"
                   item-text="name"
@@ -217,7 +197,25 @@
                   dense
                 ></v-select>
               </v-col>
+              <v-col cols="12" md="4" v-show="false">
+                <p class="text-14 mb-1">T.C.</p>
+                <v-currency-field
+                  v-model.number="form.exchange_value"
+                  :default-value="form.exchange_value"
+                  placeholder="0.00"
+                  :rules="[(v) => !!v || 'Es Requerido']"
+                  type="number"
+                  prefix="$"
+                  hide-details
+                  readonly
+                  outlined
+                  filled
+                  dense
+                  disabled
+                ></v-currency-field>
+              </v-col>
             </v-row>
+
             <v-row>
               <v-col cols="12" md="6">
                 <p class="text-14 mb-1">Origen del Lead</p>
@@ -232,11 +230,11 @@
                   dense
                 ></v-select>
               </v-col>
-              <v-col cols="12" md="6">
+              <v-col cols="12" md="6" v-if="!form.withQuote">
                 <p class="text-14 mb-1">Condicion de Pago</p>
                 <v-select
                   v-model="form.tracking_condition"
-                  :items="options.payment_conditions"
+                  :items="PaymentConditionConfig"
                   placeholder="Placeholder"
                   hide-details
                   outlined
@@ -249,6 +247,7 @@
         </v-card>
       </v-col>
     </v-row>
+
     <v-scroll-y-transition mode="out-in">
       <v-row v-if="form.withQuote" class="overline">
         <v-col cols="12" class="d-flex align-stretch">
@@ -260,10 +259,6 @@
           >
             <div class="d-flex">
               <v-subheader>Partidas a Cotizar:</v-subheader>
-              <v-spacer />
-              <v-btn text color="blue" @click="dialogQuote = true" class="ma-2">
-                <v-icon left>mdi-plus</v-icon> Agregar Producto
-              </v-btn>
             </div>
             <v-card-text>
               <quote-concept-table
@@ -271,10 +266,14 @@
                 @edit="dialogQuote = true"
                 @close="dialogQuote = false"
                 :items.sync="form.products"
+                :paymentCondition="form.tracking_condition"
+                :Category_id="Category ? Category.id : null"
+                @payment="(v) => (v ? (form.tracking_condition = v) : '')"
+                :optionsPaymentcondition="PaymentConditionConfig"
               ></quote-concept-table>
             </v-card-text>
             <v-card-actions>
-              <v-btn text color="blue" @click="dialogQuote = true">
+              <v-btn text color="blue" @click="ShowProducts">
                 <v-icon left>mdi-plus</v-icon> Agregar Producto
               </v-btn>
             </v-card-actions>
@@ -302,19 +301,42 @@
                   </th>
                 </tr>
                 <tr class="py-3">
+                  <td>T.C.:</td>
+                  <th class="d-flex justify-end">
+                    <v-currency-field
+                      v-model.number="form.exchange_value"
+                      :default-value="form.exchange_value"
+                      placeholder="0.00"
+                      :rules="[(v) => !!v || 'Es Requerido']"
+                      style="max-width: 250px;"
+                      prefix="MXN"
+                      type="number"
+                      suffix="$"
+                      reverse
+                      hide-details
+                      readonly
+                      outlined
+                      filled
+                      dense
+                    ></v-currency-field>
+                  </th>
+                </tr>
+                <tr class="py-3" v-if="$gate.allow('isGerente', 'tracking')">
                   <td>Descuento:</td>
                   <th class="d-flex justify-end">
-                    <v-text-field
+                    <v-currency-field
                       v-model="form.discount"
+                      :default-value="form.discount"
                       type="number"
                       outlined
                       suffix="$"
                       hide-details
                       :prefix="Currency.name"
                       reverse
-                      style="max-width: 200px;"
+                      class="py-2"
+                      style="max-width: 250px;"
                       dense
-                    ></v-text-field>
+                    ></v-currency-field>
                   </th>
                 </tr>
                 <tr>
@@ -326,12 +348,19 @@
                     {{ Total | money }} {{ Currency.name }}
                   </th>
                 </tr>
+                <tr v-if="form.currency_id === 2">
+                  <td>Total MXN:</td>
+                  <th class="text-right pr-2 text-h4">
+                    {{ (Total * form.exchange_value) | money }} MXN
+                  </th>
+                </tr>
               </v-simple-table>
             </v-col>
           </v-card>
         </v-col>
       </v-row>
     </v-scroll-y-transition>
+
     <v-row dense class="overline mb-4">
       <v-col cols="12" md="6" class="d-flex align-stretch">
         <v-card class="mx-auto" width="inherit">
@@ -509,6 +538,20 @@ import ProspectCreate from "../prospect/ProspectCreate.vue";
 import ProspectEdit from "../prospect/ProspectEdit.vue";
 import QuoteConceptTable from "./forms/QuoteConceptTable.vue";
 import Assertiveness from "@admin/sales/tracking/resources/assertiveness.json";
+
+const _paymentCondition = [
+  { text: "Por Definir", value: "por_definir", config: [] },
+  { text: "P. Lista", value: "precio_lista", config: [5, 6, 11, 14, 16] },
+  { text: "Contado", value: "contado", config: [1, 2, 3, 10, 5, 6, 11, 16] },
+  { text: "JDF 2 años", value: "jdf_2y", config: [1, 2, 3, 10] },
+  { text: "JDF 5 años", value: "jdf_5y", config: [1] },
+  { text: "Expo", value: "precio_expo", config: [1, 5] },
+  { text: "Precio Volumen", value: "por_volumen", config: [5, 14] },
+  { text: "Arrendamiento", value: "renta_1", config: [6, 15] },
+  { text: "Arrendamiento 2 meses", value: "renta_2", config: [15] },
+  { text: "Arrendamiento +3 meses", value: "renta_3", config: [15] },
+];
+
 export default {
   components: {
     ProspectCreate,
@@ -526,48 +569,31 @@ export default {
   data() {
     return {
       //
+      valid: true,
       dialogQuote: false,
       modal: false,
-      editedItem: {
-        subtotal: 0,
-        discount: 0,
-        tax: 0.16,
-        total: 0,
-        currency: null,
-        products: [],
-      },
-      //
-      selectedProspect: null,
-      valid: true,
       dialog: false,
       dialogEdit: false,
-      selectModel: null,
-      selectConfig: { hint: "" },
       options: {
-        // tractors: Tractors,
-        // implementos: Implementos,
         prospects: [],
         agencies: [],
         products: [],
         departments: [],
         sellers: [],
-        payment_conditions: [
-          "Por definir",
-          "Financiamiento",
-          "Contado",
-          "Renta",
-        ],
+        price_types: _paymentCondition,
+        // payment_conditions: {
+        //   TRACTORES: ["Contado", "JDF 2 años", "JDF 5 años", "Expo"],
+        //   IMPLEMENTOS: ["Contado", "JDF 2 años"],
+        // },
         origin: ["Online", "Visita en Agencia", "Visita de Campo"],
         categories: [],
         currency: [],
+        exchange_value: 1,
         assertiveness: Assertiveness,
       },
     };
   },
   mounted() {
-    // this.$eventBus.$on(["PROSPECT-FORM-SUBMIT"], () => {
-    //   this.loadOptions();
-    // });
     this.loadOptions();
   },
   watch: {
@@ -581,41 +607,14 @@ export default {
       const _this = this;
       _this.form.products = [];
     },
-    // "form.title": function(category_name) {
-    //   const _this = this;
-    //   if (_this.form.reference) {
-    //     _this.form.product = {
-    //       name: _this.form.reference,
-    //       price_1: _this.form.price,
-    //       currency: {
-    //         id: _this.form.currency_id,
-    //       },
-    //     };
-    //   } else {
-    //     _this.form.product = null;
-    //   }
-    //   _this.loadProductsByCategory(() => {});
-    // },
-    // "form.product": {
-    //   handler(v) {
-    //     const _this = this;
-    //     console.log("before", v);
-    //     if (v != null && typeof v != "string") {
-    //       console.log("watch product object", v);
-    //       _this.form.reference = v.name;
-    //       _this.form.price = v.price_1;
-    //       _this.form.currency_id = v.currency.id;
-    //     } else {
-    //       console.log("watch product string", v);
-    //       _this.form.reference = v;
-    //       _this.form.price = null;
-    //       _this.form.currency_id = null;
-    //     }
-    //   },
-    //   deep: true,
-    //   flush: "post",
-    //   immediate: true,
-    // },
+    "form.currency_id": function (v) {
+      const _this = this;
+      if (v === 2) {
+        _this.form.exchange_value = _this.options.exchange_value;
+      } else {
+        _this.form.exchange_value = 1;
+      }
+    },
   },
   computed: {
     SelectedProspect() {
@@ -634,7 +633,29 @@ export default {
         return true;
       }
     },
-    //
+    Category() {
+      const _this = this;
+      if (_this.form.title) {
+        return _this.options.categories.find((c) => c.name == _this.form.title);
+      } else {
+        return null;
+      }
+    },
+    PaymentConditionConfig() {
+      const _this = this;
+      let Default = [{ text: "Por Definir", value: "por_definir" }];
+      let result = [];
+      if (_this.form.title) {
+        let category = _this.options.categories.find(
+          (c) => c.name == _this.form.title
+        );
+        const even = (e) => e == category.id;
+        result = _this.options.price_types.filter((option) =>
+          option.config.some(even)
+        );
+      }
+      return Default.concat(result);
+    },
     Currency() {
       const _this = this;
       let currency = { currency: { id: 1, name: "MXN" } };
@@ -655,9 +676,14 @@ export default {
     Subtotal: {
       get() {
         const _this = this;
-        return (_this.form.subtotal = _this.form.products
-          .map((item) => parseFloat(item.subtotal))
-          .reduce((acc, crr) => acc + crr, 0));
+        return (_this.form.subtotal = _this.form.products.reduce(
+          (acc, crr) => (acc += parseFloat(crr.subtotal)),
+          0
+        ));
+        // .map((item) => parseFloat(item.subtotal))
+      },
+      set(v) {
+        console.log(v, "SET Subtotal");
       },
     },
     Total: {
@@ -669,6 +695,16 @@ export default {
     },
   },
   methods: {
+    ShowProducts() {
+      const _this = this;
+      return _this.form.tracking_condition !== "por_definir"
+        ? (_this.dialogQuote = true)
+        : _this.$store.commit("showSnackbar", {
+            message: "Seleccionar una Condicion de Pago",
+            color: "warning",
+            duration: 3000,
+          });
+    },
     async loadOptions() {
       const _this = this;
       await axios
@@ -680,12 +716,14 @@ export default {
             prospects,
             currency,
             categories,
+            exchange_value,
           } = response.data.data;
           _this.options.agencies = agencies;
           _this.options.departments = departments;
           _this.options.prospects = prospects;
           _this.options.currency = currency;
           _this.options.categories = categories;
+          _this.options.exchange_value = exchange_value;
         });
     },
     async loadSellers(cb) {
@@ -724,15 +762,6 @@ export default {
 
       return (
         textName.indexOf(searchText) > -1 || textPhone.indexOf(searchText) > -1
-      );
-    },
-    customFilterProducts({ item, queryText }) {
-      const textName = item.name.toLowerCase();
-      const textSku = item.sku.toLowerCase();
-      const searchText = queryText.toLowerCase();
-
-      return (
-        textName.indexOf(searchText) > -1 || textSku.indexOf(searchText) > -1
       );
     },
   },

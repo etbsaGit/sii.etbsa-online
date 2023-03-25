@@ -18,12 +18,12 @@
             </v-card-title>
 
             <v-card-text class="grey-lighten-2">
-              <quote-form :form.sync="editedItem"></quote-form>
+              <quote-form ref="form" :form.sync="editedItem"></quote-form>
             </v-card-text>
 
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn color="blue darken-1" dark @click="close">
+              <v-btn color="red darken-1" dark @click="close">
                 Cancelar
               </v-btn>
               <v-btn color="blue darken-1" text @click="save">
@@ -107,6 +107,7 @@ export default {
         sortable: false,
         value: "id",
       },
+      { text: "Condicion de Pago", value: "payment_condition" },
       { text: "Total", value: "total" },
       { text: "Num. Partidas", value: "products", align: "center" },
       { text: "F. Creacion", value: "updated_at", align: "end" },
@@ -122,14 +123,18 @@ export default {
       total: 0,
       currency: null,
       products: [],
+      exchange_value: 1,
+      payment_condition: "por_definir",
     },
-    form: {
+    editedItemDefault: {
       subtotal: 0,
       discount: 0,
       tax: 0.16,
       total: 0,
       currency: null,
       products: [],
+      exchange_value: 1,
+      payment_condition: "por_definir",
     },
   }),
 
@@ -229,7 +234,7 @@ export default {
 
     close() {
       this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.form);
+        this.editedItem = Object.assign({}, this.editedItemDefault);
         this.editedIndex = -1;
       });
       this.dialog = false;
@@ -237,7 +242,7 @@ export default {
 
     closeDelete() {
       this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.form);
+        this.editedItem = Object.assign({}, this.editedItemDefault);
         this.editedIndex = -1;
       });
       this.dialogDelete = false;
@@ -245,9 +250,15 @@ export default {
 
     async save() {
       const _this = this;
+      if (this.editedItem.products.length == 0)
+        return this.$store.commit("showSnackbar", {
+          message: "Aun no Agrega una Partida",
+          color: "warning",
+          duration: 3000,
+        });
       let payload = {
         ..._this.editedItem,
-        currency: _this.editedItem.currency.currency,
+        // currency: _this.editedItem.currency,
         tracking_id: _this.TrackingId,
       };
 
@@ -260,6 +271,14 @@ export default {
               color: "success",
               duration: 3000,
             });
+            if (!!response.data.data) {
+              let idQuote = response.data.data.id;
+              window.open(
+                `${LSK_APP.APP_URL}/admin/quote/${idQuote}/print`,
+                "_blank",
+                "noreferrer"
+              );
+            }
             _this.$eventBus.$emit("EDIT_QUOTE");
           })
           .catch(function (error) {
@@ -287,6 +306,14 @@ export default {
               color: "success",
               duration: 3000,
             });
+            if (!!response.data.data) {
+              let idQuote = response.data.data.id;
+              window.open(
+                `${LSK_APP.APP_URL}/admin/quote/${idQuote}/print`,
+                "_blank",
+                "noreferrer"
+              );
+            }
             _this.$eventBus.$emit("CREATE_QUOTE");
           })
           .catch(function (error) {

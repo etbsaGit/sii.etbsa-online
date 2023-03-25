@@ -24,6 +24,8 @@ class Prospect extends Model
         'company',
         'estate_id',
         'township_id',
+        'segmentacion',
+        'capacidad_tech',
         'registered_by',
     ];
     protected $appends = ['tracking_count'];

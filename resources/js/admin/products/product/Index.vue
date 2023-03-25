@@ -4,7 +4,7 @@
       <v-icon left x-large>mdi-tractor</v-icon>Lista de Productos
       <v-spacer></v-spacer>
       <v-text-field
-        v-model="filters.search"
+        v-model="filter.search"
         outlined
         dense
         prepend-icon="mdi-magnify"
@@ -48,36 +48,44 @@
           <v-form ref="formFilter">
             <v-row class="mr-2 offset-1 overline" dense>
               <v-col cols="12">
-                <v-text-field
-                  v-model="filters.sku"
-                  prepend-icon="mdi-magnify"
-                  label="Filtrar por SKU"
-                  clearable
-                  filled
-                  dense
-                ></v-text-field>
-              </v-col>
-              <v-col cols="12">
                 <v-select
-                  v-model="filters.category_id"
+                  v-model="filter.category_id"
                   :items="options.category"
                   item-value="id"
                   item-text="name"
                   prepend-icon="mdi-magnify"
                   label="Filtrar por Categoria"
+                  hide-details
+                  outlined
                   clearable
                   filled
                   dense
+                  :disabled="!($router.currentRoute.name === 'products.index')"
                 ></v-select>
               </v-col>
               <v-col cols="12">
+                <v-text-field
+                  v-model="filter.sku"
+                  prepend-icon="mdi-magnify"
+                  label="Filtrar por SKU"
+                  hide-details
+                  outlined
+                  clearable
+                  filled
+                  dense
+                ></v-text-field>
+              </v-col>
+
+              <v-col cols="12">
                 <v-select
-                  v-model="filters.model_id"
+                  v-model="filter.model_id"
                   :items="options.model"
                   item-value="id"
                   item-text="name"
                   prepend-icon="mdi-magnify"
                   label="Filtrar por Modelos"
+                  hide-details
+                  outlined
                   clearable
                   filled
                   dense
@@ -85,26 +93,70 @@
               </v-col>
               <v-col cols="12">
                 <v-select
-                  v-model="filters.agency_id"
+                  v-model="filter.agency_id"
                   :items="options.agency"
                   item-value="id"
                   item-text="title"
                   prepend-icon="mdi-magnify"
                   label="Filtrar por Ubicacion (Sucursal)"
+                  hide-details
+                  outlined
                   clearable
                   filled
                   dense
                 ></v-select>
               </v-col>
-              <!-- <v-col cols="12">
-                <v-switch
-                  v-model="filters.is_active"
-                  label="Activos"
-                ></v-switch>
-              </v-col> -->
-              <!-- <v-col cols="12">
-                <v-switch v-model="filters.is_usado" label="Usados"></v-switch>
-              </v-col> -->
+              <v-col
+                cols="12"
+                v-if="$router.currentRoute.name === 'products.index'"
+              >
+                <v-select
+                  v-model="filter.desactive"
+                  :items="[
+                    { text: 'Con', value: 'with' },
+                    { text: 'Solamente', value: 'only' },
+                  ]"
+                  prepend-icon="mdi-check-circle"
+                  label="Productos No activos"
+                  hide-details
+                  clearable
+                  outlined
+                  filled
+                  dense
+                ></v-select>
+              </v-col>
+              <v-col cols="12">
+                <v-select
+                  v-model="filter.is_usado"
+                  :items="[
+                    { text: 'Con', value: 'with' },
+                    { text: 'Solamente', value: 'only' },
+                  ]"
+                  prepend-icon="mdi-magnify"
+                  label="Productos Usados"
+                  hide-details
+                  clearable
+                  outlined
+                  filled
+                  dense
+                ></v-select>
+              </v-col>
+              <v-col
+                cols="12"
+                v-if="$router.currentRoute.name == 'products.index'"
+              >
+                <v-select
+                  v-model="filter.price_type"
+                  :items="price_types"
+                  prepend-icon="mdi-magnify"
+                  label="Forma de Pago"
+                  hide-details
+                  clearable
+                  outlined
+                  filled
+                  dense
+                ></v-select>
+              </v-col>
             </v-row>
           </v-form>
         </search-panel>
@@ -122,8 +174,8 @@
         <div class="text-uppercase font-weight-bold">{{ item.name }}</div>
         <div class="caption text--secondary">SKU: {{ item.sku }}</div>
       </template>
-      <template #[`item.price_1`]="{ item }">
-        {{ item.price_1 | money }} {{ item.is_dollar ? "USD" : "MXN" }}
+      <template #[`item.suggested_price`]="{ item }">
+        {{ item.suggested_price | money }} {{ item.is_dollar ? "USD" : "MXN" }}
       </template>
       <template #[`item.active`]="{ value }">
         <v-icon :color="value ? 'green' : 'grey'">mdi-check-circle</v-icon>
@@ -290,7 +342,7 @@
             <v-currency-field
               v-model.number="form.price_2"
               :default-value="form.price_2"
-              label="Precio Costo"
+              label="Precio Contado"
               prefix="$"
               :suffix="form.is_dollar ? 'USD' : 'MXN'"
               type="number"
@@ -301,7 +353,67 @@
             <v-currency-field
               v-model.number="form.price_3"
               :default-value="form.price_3"
-              label="Precio Financiamiento"
+              label="Precio Financiamiento a 2 años"
+              prefix="$"
+              :suffix="form.is_dollar ? 'USD' : 'MXN'"
+              type="number"
+              outlined
+              dense
+            />
+            <v-currency-field
+              v-model.number="form.price_4"
+              :default-value="form.price_4"
+              label="Precio Financiamiento a 5 años"
+              prefix="$"
+              :suffix="form.is_dollar ? 'USD' : 'MXN'"
+              type="number"
+              outlined
+              dense
+            />
+            <v-currency-field
+              v-model.number="form.price_5"
+              :default-value="form.price_5"
+              label="Precio EXPO"
+              prefix="$"
+              :suffix="form.is_dollar ? 'USD' : 'MXN'"
+              type="number"
+              outlined
+              dense
+            />
+            <v-currency-field
+              v-model.number="form.price_6"
+              :default-value="form.price_6"
+              label="Precio por Volumen"
+              prefix="$"
+              :suffix="form.is_dollar ? 'USD' : 'MXN'"
+              type="number"
+              outlined
+              dense
+            />
+            <v-currency-field
+              v-model.number="form.price_7"
+              :default-value="form.price_7"
+              label="Precio Renta/Arrendamiento 1 mes"
+              prefix="$"
+              :suffix="form.is_dollar ? 'USD' : 'MXN'"
+              type="number"
+              outlined
+              dense
+            />
+            <v-currency-field
+              v-model.number="form.price_8"
+              :default-value="form.price_8"
+              label="Precio Renta/Arrendamiento 2 meses"
+              prefix="$"
+              :suffix="form.is_dollar ? 'USD' : 'MXN'"
+              type="number"
+              outlined
+              dense
+            />
+            <v-currency-field
+              v-model.number="form.price_9"
+              :default-value="form.price_9"
+              label="Precio Renta/Arrendamiento 3 meses"
               prefix="$"
               :suffix="form.is_dollar ? 'USD' : 'MXN'"
               type="number"
@@ -331,9 +443,8 @@ export default {
   components: { TableHeaderButtons, SearchPanel },
   name: "ProductsList",
   props: {
-    filters: {
+    Filters: {
       type: Object,
-      require: false,
       default: () => {
         return {
           search: "",
@@ -343,8 +454,11 @@ export default {
           model_id: null,
           is_active: null,
           is_usado: null,
+          desactive: null,
+          price_type: null,
         };
       },
+      require: false,
     },
   },
   mounted() {
@@ -379,8 +493,8 @@ export default {
           sortable: false,
         },
         {
-          text: "Precio Lista",
-          value: "price_1",
+          text: "Precio Sugerido",
+          value: "suggested_price",
           align: "left",
         },
         {
@@ -425,15 +539,21 @@ export default {
         price_1: 0,
         price_2: 0,
         price_3: 0,
+        price_4: 0,
+        price_5: 0,
+        price_6: 0,
+        price_7: 0,
+        price_8: 0,
+        price_9: 0,
       },
       rules: {},
       items: [],
-      options: {},
       totalItems: 0,
       pagination: {
         itemsPerPage: 10,
         page: 1,
       },
+      filter: { ...this.Filters },
       options: {
         category: [],
         model: [],
@@ -441,6 +561,18 @@ export default {
         brands: [],
         suppliers: [],
       },
+      price_types: [
+        { text: "Por Definir", value: "por_definir" },
+        { text: "P. Lista", value: "precio_lista" },
+        { text: "Contado", value: "contado" },
+        { text: "JDF 2 años", value: "jdf_2y" },
+        { text: "JDF 5 años", value: "jdf_5y" },
+        { text: "Expo", value: "precio_expo" },
+        { text: "Precio Volumen", value: "por_volumen" },
+        { text: "Arrendamiento", value: "renta_1" },
+        { text: "Arrendamiento 2 meses", value: "renta_2" },
+        { text: "Arrendamiento +3 meses", value: "renta_3" },
+      ],
       showSearchPanel: false,
     };
   },
@@ -451,11 +583,11 @@ export default {
       }, 700),
       deep: true,
     },
-    filters: {
+    filter: {
       handler: _.debounce(function (v) {
         this.pagination.page = 1;
         this.loadProducts(() => {});
-      }, 700),
+      }, 1000),
       deep: true,
     },
     dialog(val) {
@@ -493,9 +625,9 @@ export default {
       const _this = this;
 
       let params = {
-        ..._this.filters,
+        ..._this.filter,
         order_by: _this.pagination.sortBy[0] || "id",
-        search: _this.filters.search,
+        search: _this.filter.search,
         order_sort: _this.pagination.sortDesc[0] ? "asc" : "desc",
         order_by: _this.pagination.sortBy[0] || "id",
         page: _this.pagination.page,
@@ -514,7 +646,7 @@ export default {
       const _this = this;
 
       let params = {
-        ..._this.filters,
+        ..._this.filter,
         paginate: "no",
       };
 
@@ -571,7 +703,7 @@ export default {
       setTimeout(() => {
         _this.$refs.form.reset();
         _this.$refs.form.resetValidation();
-      }, 500);
+      }, 1000);
     },
     editItem(item) {
       const _this = this;
@@ -593,6 +725,12 @@ export default {
         _this.form.price_1 = item.price_1;
         _this.form.price_2 = item.price_2;
         _this.form.price_3 = item.price_3;
+        _this.form.price_4 = item.price_4;
+        _this.form.price_5 = item.price_5;
+        _this.form.price_6 = item.price_6;
+        _this.form.price_7 = item.price_7;
+        _this.form.price_8 = item.price_8;
+        _this.form.price_9 = item.price_9;
       }, 500);
     },
     async submit() {

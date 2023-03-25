@@ -11,8 +11,6 @@
 |
  */
 
-use Barryvdh\Reflection\DocBlock\Tag\ReturnTag;
-use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\DB;
 
 Route::get('/', 'Front\\HomeController@index')->name('front.home');
