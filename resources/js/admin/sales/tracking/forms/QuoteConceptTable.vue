@@ -191,6 +191,7 @@ const _paymentCondition = [
   { text: "Arrendamiento 2 meses", value: "renta_2", type_price: "price_8" },
   { text: "Arrendamiento +3 meses", value: "renta_3", type_price: "price_9" },
   { text: "Credito 30 Dias", value: "credito_30d", type_price: "price_10" },
+  { text: "Arrendadoras", value: "arrendadoras", type_price: "price_11" },
 ];
 
 export default {
@@ -386,6 +387,7 @@ export default {
         price_8,
         price_9,
         price_10,
+        price_11,
       } = item;
 
       concept.id = item.id;
@@ -404,6 +406,7 @@ export default {
         price_8,
         price_9,
         price_10,
+        price_11,
       };
       concept.qty = item.qty;
       concept.currency = item.currency;
