@@ -441,6 +441,17 @@
               outlined
               dense
             />
+            <v-currency-field
+              v-model.number="form.price_11"
+              :default-value="form.price_11"
+              label="Precio a Arrendadoras"
+              prefix="$"
+              :suffix="form.is_dollar ? 'USD' : 'MXN'"
+              type="number"
+              :rules="[(v) => !!v || 'Es Requerido o Poner Valor en Cero']"
+              outlined
+              dense
+            />
           </v-form>
           <div class="d-flex"></div>
         </v-card-text>
@@ -567,6 +578,7 @@ export default {
         price_8: 0,
         price_9: 0,
         price_10: 0,
+        price_11: 0,
       },
       formDefault: {
         product_category_id: null,
@@ -590,6 +602,7 @@ export default {
         price_8: 0,
         price_9: 0,
         price_10: 0,
+        price_11: 0,
       },
       rules: {},
       items: [],
@@ -618,6 +631,7 @@ export default {
         { text: "Arrendamiento 2 meses", value: "renta_2" },
         { text: "Arrendamiento +3 meses", value: "renta_3" },
         { text: "Credito 30 dias", value: "credito_30d" },
+        { text: "Arrendadoras", value: "arrendadoras" },
       ],
       showSearchPanel: false,
     };
@@ -779,6 +793,7 @@ export default {
         _this.form.price_8 = item.price_8;
         _this.form.price_9 = item.price_9;
         _this.form.price_10 = item.price_10;
+        _this.form.price_11 = item.price_11;
       }, 1000);
     },
     async submit() {

@@ -551,6 +551,7 @@ const _paymentCondition = [
   { text: "Arrendamiento 2 meses", value: "renta_2", config: [15] },
   { text: "Arrendamiento +3 meses", value: "renta_3", config: [15] },
   { text: "Credito 30 Dias", value: "credito_30d", config: [5] },
+  { text: "Arrendadoras", value: "arrendadoras", config: [6] },
 ];
 
 export default {

@@ -15,7 +15,8 @@ class Product extends Model
         'active', 'is_usado', 'is_dollar', 'currency_id',
         'price_1', 'price_2', 'price_3',
         'price_4', 'price_5', 'price_6',
-        'price_7', 'price_8', 'price_9', 'price_10'
+        'price_7', 'price_8', 'price_9',
+        'price_10', 'price_11'
     ];
 
     const PRODUCT_QTY = 1;
@@ -84,6 +85,7 @@ class Product extends Model
             'price_8' => "renta_2",
             'price_9' => "renta_3",
             'price_10' => "credito_30d",
+            'price_11' => "arrendadoras",
         );
 
         $price = array_search($price_type, $prices);
