@@ -2,20 +2,20 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\components\NT\Models\AmsComparative;
-use App\Components\NT\Repositories\AmsComparativeRepository;
+use App\Components\NT\Models\AmsComparativo;
+use App\Components\NT\Repositories\AmsComparativoRepository;
 use Auth;
 use Illuminate\Http\Request;
 
-class AmsComparativeController extends AdminController
+class AmsComparativoController extends AdminController
 {
+    private $amsComparativoRepository;
 
-    private $amsComparativeRepository;
-
-    public function __construct(AmsComparativeRepository $amsComparativeRepository)
+    public function __construct(AmsComparativoRepository $amsComparativoRepository)
     {
-        $this->amsComparativeRepository = $amsComparativeRepository;
+        $this->amsComparativoRepository = $amsComparativoRepository;
     }
+
     /**
      * Display a listing of the resource.
      *
@@ -23,17 +23,8 @@ class AmsComparativeController extends AdminController
      */
     public function index()
     {
-        $data = $this->amsComparativeRepository->list(request()->all());
+        $data = $this->amsComparativoRepository->list(request()->all());
         return $this->sendResponseOk($data);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
     }
 
     /**
@@ -49,7 +40,7 @@ class AmsComparativeController extends AdminController
         if ($validate->fails()) {
             return $this->sendResponseBadRequest($validate->errors()->first());
         }
-        $ams_comparative = $this->amsComparativeRepository->create($request->all());
+        $ams_comparative = $this->amsComparativoRepository->create($request->all());
         if (!$ams_comparative) {
             return $this->sendResponseBadRequest("Failed create.");
         }
@@ -57,35 +48,13 @@ class AmsComparativeController extends AdminController
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  \App\NT\AmsComparative  $ams_comparative
-     * @return \Illuminate\Http\Response
-     */
-    public function show(AmsComparative $ams_comparative)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\NT\AmsComparative  $ams_comparative
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(AmsComparative $ams_comparative)
-    {
-        return $this->sendResponseOk($ams_comparative);
-    }
-
-    /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\NT\AmsComparative  $ams_comparative
+     * @param  \App\Components\NT\Models\AmsComparativo  $ams_comparative
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, AmsComparative $ams_comparative)
+    public function update(Request $request, AmsComparativo $ams_comparative)
     {
         $request['updated_by'] = Auth::user()->id;
         $validate = validator($request->all(), []);
@@ -102,14 +71,16 @@ class AmsComparativeController extends AdminController
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\NT\AmsComparative  $ams_comparative
+     * @param  \App\Components\NT\Models\AmsComparativo  $ams_comparative
      * @return \Illuminate\Http\Response
      */
-    public function destroy(AmsComparative $ams_comparative)
+    public function destroy(AmsComparativo $ams_comparative)
     {
         $ams_comparative->delete();
         return $this->sendResponseDeleted();
     }
+
+    // Logica de Negocio para mostrar el Resultado
 
     public function preview(Request $request)
     {
@@ -171,17 +142,17 @@ class AmsComparativeController extends AdminController
         ));
     }
 
-    public function print(AmsComparative $ams_comparative)
-    {
-        $pdf = \PDF::loadView('pdf.ams_comparative', compact(
-            'data',
-            'table_without_ams',
-            'table_with_ams',
-            'table_diff',
-            'table_save'
-        ));
-        return $pdf->stream();
-    }
+    // public function print(AmsComparativo $ams_comparative)
+    // {
+    //     $pdf = \PDF::loadView('pdf.ams_comparative', compact(
+    //         'data',
+    //         'table_without_ams',
+    //         'table_with_ams',
+    //         'table_diff',
+    //         'table_save'
+    //     ));
+    //     return $pdf->stream();
+    // }
 
     public function ResultAradoWithoutAms($equip = [],  $data = [])
     {
@@ -639,11 +610,4 @@ class AmsComparativeController extends AdminController
             'payments_semestral' => $paymentSemestral,
         ];
     }
-
-    /**
-     * Constantes
-     * Diesel sin AMS = Diesel Presparacion
-     * Diesel con AMS = Diesel Preparacion * .9
-     * 
-     */
 }

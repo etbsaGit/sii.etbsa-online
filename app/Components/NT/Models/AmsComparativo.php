@@ -1,11 +1,11 @@
 <?php
 
-namespace App\components\NT\Models;
+namespace App\Components\NT\Models;
 
 use App\Components\User\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
-class AmsComparative extends Model
+class AmsComparativo extends Model
 {
     protected $table = 'ams_comparatives';
     protected $fillable = [
