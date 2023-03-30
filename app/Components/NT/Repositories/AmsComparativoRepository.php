@@ -3,11 +3,11 @@
 namespace App\Components\NT\Repositories;
 
 use App\Components\Core\BaseRepository;
-use App\components\NT\Models\AmsComparative;
+use App\Components\NT\Models\AmsComparativo;
 
-class AmsComparativeRepository extends BaseRepository
+class AmsComparativoRepository extends BaseRepository
 {
-    public function __construct(AmsComparative $model)
+    public function __construct(AmsComparativo $model)
     {
         parent::__construct($model);
     }
