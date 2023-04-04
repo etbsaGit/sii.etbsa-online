@@ -71,6 +71,7 @@ export default {
       ],
       units: [
         "Discos",
+        "Rejas",
         "Surcos",
         "Timones",
         "Cuchillas",

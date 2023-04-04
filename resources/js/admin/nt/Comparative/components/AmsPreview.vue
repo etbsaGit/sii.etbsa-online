@@ -3,9 +3,7 @@
     <v-banner single-line class="d-print-inline">
       <v-img src="../img/etbsa-logo-agricola.png" width="200"></v-img>
       <template v-slot:actions>
-        <v-btn color="primary" text>
-          Comparativo AMS
-        </v-btn>
+        <v-btn color="primary" text> Comparativo AMS </v-btn>
       </template>
     </v-banner>
     <v-card-text>
@@ -34,75 +32,45 @@
           </caption>
           <thead>
             <tr>
-              <th class="text-left">
-                Equipo
-              </th>
-              <th class="text-left">
-                Nombre
-              </th>
-              <th class="text-left">
-                Parametros
-              </th>
-              <th class="text-left">
-                Ancho Corte
-              </th>
-              <th class="text-left">
-                Vel. Kms
-              </th>
-              <th class="text-left">
-                HA x Dia
-              </th>
-              <th class="text-left">
-                Diesel x Dia
-              </th>
-              <th class="text-left">
-                Precio Diesel
-              </th>
-              <th class="text-left">
-                Total Diesel
-              </th>
-              <th class="text-left">
-                Costo Diesel x HA
-              </th>
-              <th class="text-left">
-                Operador x HA
-              </th>
-              <th class="text-left">
-                Servicio x HA
-              </th>
-              <th class="text-left">
-                Llantas x HA
-              </th>
-              <th class="text-left">
-                Seguro x HA
-              </th>
-              <th class="text-left">
-                Depreciacion x HA
-              </th>
-              <th class="text-left">
-                Costo Total x HA
-              </th>
+              <th class="text-left">Equipo</th>
+              <th class="text-left">Nombre</th>
+              <th class="text-left">Parametros</th>
+              <th class="text-left">Ancho Corte</th>
+              <th class="text-left">Vel. Kms</th>
+              <th class="text-left">HA x Dia</th>
+              <th class="text-left">Diesel x Dia</th>
+              <th class="text-left">Precio Diesel</th>
+              <th class="text-left">Total Diesel</th>
+              <th class="text-left">Costo Diesel x HA</th>
+              <th class="text-left">Operador x HA</th>
+              <th class="text-left">Servicio x HA</th>
+              <th class="text-left">Llantas x HA</th>
+              <th class="text-left">Seguro x HA</th>
+              <th class="text-left">Depreciacion x HA</th>
+              <th class="text-left">Costo Total x HA</th>
             </tr>
           </thead>
           <tbody class="caption">
             <tr
-              v-for="({
-                ancho_corte,
-                costo_diesel_x_ha,
-                costo_x_ha,
-                depreciacion,
-                diesel_precio,
-                diesel_total,
-                diesel_x_dia,
-                equipment,
-                ha_x_dia,
-                llantas_x_ha,
-                operador_x_ha,
-                seguro_x_ha,
-                servicio_x_ha,
-                velocidad_km,
-              },
-              index) in tableWithoutAms"
+              v-for="(
+                {
+                  ancho_corte,
+                  costo_diesel_x_ha,
+                  costo_x_ha,
+                  depreciacion,
+                  diesel_precio,
+                  diesel_total,
+                  diesel_x_dia,
+                  equipment,
+                  ha_x_dia,
+                  llantas_x_ha,
+                  operador_x_ha,
+                  seguro_x_ha,
+                  servicio_x_ha,
+                  velocidad_km,
+                },
+                index
+              ) in tableWithoutAms"
               :key="index"
             >
               <td>{{ equipment.category }}</td>
@@ -136,75 +104,45 @@
           </caption>
           <thead>
             <tr>
-              <th class="text-left">
-                Equipo
-              </th>
-              <th class="text-left">
-                Nombre
-              </th>
-              <th class="text-left">
-                Parametros
-              </th>
-              <th class="text-left">
-                Ancho Corte
-              </th>
-              <th class="text-left">
-                Vel. Kms
-              </th>
-              <th class="text-left">
-                HA x Dia
-              </th>
-              <th class="text-left">
-                Diesel x Dia
-              </th>
-              <th class="text-left">
-                Precio Diesel
-              </th>
-              <th class="text-left">
-                Total Diesel
-              </th>
-              <th class="text-left">
-                Costo Diesel x HA
-              </th>
-              <th class="text-left">
-                Operador x HA
-              </th>
-              <th class="text-left">
-                Servicio x HA
-              </th>
-              <th class="text-left">
-                Llantas x HA
-              </th>
-              <th class="text-left">
-                Seguro x HA
-              </th>
-              <th class="text-left">
-                Depreciacion x HA
-              </th>
-              <th class="text-left">
-                Costo Total x HA
-              </th>
+              <th class="text-left">Equipo</th>
+              <th class="text-left">Nombre</th>
+              <th class="text-left">Parametros</th>
+              <th class="text-left">Ancho Corte</th>
+              <th class="text-left">Vel. Kms</th>
+              <th class="text-left">HA x Dia</th>
+              <th class="text-left">Diesel x Dia</th>
+              <th class="text-left">Precio Diesel</th>
+              <th class="text-left">Total Diesel</th>
+              <th class="text-left">Costo Diesel x HA</th>
+              <th class="text-left">Operador x HA</th>
+              <th class="text-left">Servicio x HA</th>
+              <th class="text-left">Llantas x HA</th>
+              <th class="text-left">Seguro x HA</th>
+              <th class="text-left">Depreciacion x HA</th>
+              <th class="text-left">Costo Total x HA</th>
             </tr>
           </thead>
           <tbody class="caption">
             <tr
-              v-for="({
-                ancho_corte,
-                costo_diesel_x_ha,
-                costo_x_ha,
-                depreciacion,
-                diesel_precio,
-                diesel_total,
-                diesel_x_dia,
-                equipment,
-                ha_x_dia,
-                llantas_x_ha,
-                operador_x_ha,
-                seguro_x_ha,
-                servicio_x_ha,
-                velocidad_km,
-              },
-              index) in tableWithAms"
+              v-for="(
+                {
+                  ancho_corte,
+                  costo_diesel_x_ha,
+                  costo_x_ha,
+                  depreciacion,
+                  diesel_precio,
+                  diesel_total,
+                  diesel_x_dia,
+                  equipment,
+                  ha_x_dia,
+                  llantas_x_ha,
+                  operador_x_ha,
+                  seguro_x_ha,
+                  servicio_x_ha,
+                  velocidad_km,
+                },
+                index
+              ) in tableWithAms"
               :key="index"
             >
               <td>{{ equipment.category }}</td>
@@ -239,50 +177,32 @@
                 <template v-slot:default>
                   <thead>
                     <tr>
-                      <th class="text-left">
-                        Equipo
-                      </th>
-                      <th class="text-left">
-                        Nombre
-                      </th>
-                      <th class="text-left">
-                        Costo X HA S/AMS
-                      </th>
-                      <th class="text-left">
-                        Costo X HA C/AMS
-                      </th>
-                      <th class="text-left">
-                        Diferencia
-                      </th>
-                      <th class="text-left">
-                        Porcentaje %
-                      </th>
-                      <th class="text-left">
-                        No. HAs
-                      </th>
-                      <th class="text-left">
-                        Ahorro
-                      </th>
-                      <th class="text-left">
-                        Pasadas
-                      </th>
-                      <th class="text-left">
-                        Total Ahorro
-                      </th>
+                      <th class="text-left">Equipo</th>
+                      <th class="text-left">Nombre</th>
+                      <th class="text-left">Costo X HA S/AMS</th>
+                      <th class="text-left">Costo X HA C/AMS</th>
+                      <th class="text-left">Diferencia</th>
+                      <th class="text-left">Porcentaje %</th>
+                      <th class="text-left">No. HAs</th>
+                      <th class="text-left">Ahorro</th>
+                      <th class="text-left">Pasadas</th>
+                      <th class="text-left">Total Ahorro</th>
                     </tr>
                   </thead>
                   <tbody class="caption">
                     <tr
-                      v-for="({
-                        equipment,
-                        percent_diff,
-                        save,
-                        total_cost_with_ams,
-                        total_cost_without_ams,
-                        total_diff,
-                        total_save,
-                      },
-                      index) in tableDiffAms"
+                      v-for="(
+                        {
+                          equipment,
+                          percent_diff,
+                          save,
+                          total_cost_with_ams,
+                          total_cost_without_ams,
+                          total_diff,
+                          total_save,
+                        },
+                        index
+                      ) in tableDiffAms"
                       :key="index"
                     >
                       <td>{{ equipment.category }}</td>

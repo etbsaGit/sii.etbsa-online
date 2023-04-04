@@ -96,7 +96,7 @@ class SinglePageController extends AdminController
                 ]
             ]),
             new MenuItem([
-                'group_requirements' => ['Super User'],
+                'group_requirements' => ['Super User', 'NT'],
                 'permission_requirements' => [],
                 'label' => 'NT',
                 'nav_type' => MenuItem::$NAV_TYPE_NAV,
@@ -104,7 +104,7 @@ class SinglePageController extends AdminController
                 'visible' => true,
                 'children' => [
                     new MenuItem([
-                        'group_requirements' => ['Super User'],
+                        'group_requirements' => [],
                         'permission_requirements' => [],
                         'label' => 'Comparativos AMS',
                         'nav_type' => MenuItem::$NAV_TYPE_NAV,
@@ -114,7 +114,7 @@ class SinglePageController extends AdminController
                         'visible' => true,
                     ]),
                     new MenuItem([
-                        'group_requirements' => ['Super User'],
+                        'group_requirements' => [],
                         'permission_requirements' => [],
                         'label' => 'AMS Equipos',
                         'nav_type' => MenuItem::$NAV_TYPE_NAV,
