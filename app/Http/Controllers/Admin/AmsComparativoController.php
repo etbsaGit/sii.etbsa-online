@@ -48,6 +48,17 @@ class AmsComparativoController extends AdminController
     }
 
     /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  \App\Components\NT\Models\AmsComparativo  $ams_comparative
+     * @return \Illuminate\Http\Response
+     */
+    public function edit(AmsComparativo $ams_comparative)
+    {
+        return $this->sendResponseOk($ams_comparative);
+    }
+
+    /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -594,7 +605,7 @@ class AmsComparativoController extends AdminController
             return $sum;
         });
         $totalSaveYear = $cycle * $totalSaveCycle;
-        $returnInvestment = round((($amsValue / $totalSaveYear) * 12) * 30, 2);
+        $returnInvestment = round((($amsValue / ($totalSaveYear * 2)) * 12), 2);
         $saveXHa = round($totalSaveYear / $data['hectares'], 2);
         $engache = round($amsValue * .44, 2);
         $paymentSemestral = round(($amsValue * .6) / 4, 2);
