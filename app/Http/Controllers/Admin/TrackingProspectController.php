@@ -345,8 +345,7 @@ class TrackingProspectController extends AdminController
 
     public function diaryTrackings()
     {
-
-        $d = $this->trackingRepository->diaryTracking();
+        $d = $this->trackingRepository->diaryTracking(request()->all());
         $colors = [
             'green darken-4',
             'grey darken-1',
