@@ -37,8 +37,8 @@
                 <td>{{ $item->registered->name ?? 'S/A' }}</td>
                 <td>{{ $item->estatus->title ?? 'S/A' }}</td>
                 <td>{{ $item->first_contact ?? 'S/A' }}</td>
-                <td>{{ $item->updated_at ?? 'S/A' }}</td>
-                <td>{{ $item->created_at ?? 'S/A' }}</td>
+                <td>{{ \Carbon\Carbon::parse($item->updated_at)->format('d/m/Y g:i:s') ?? 'S/A' }}</td>
+                <td>{{ \Carbon\Carbon::parse($item->created_at)->format('d/m/Y g:i:s')  ?? 'S/A' }}</td>
                 <td>{{ $item->historical->last()->message ?? '' }}</td>
             </tr>
         @endforeach
