@@ -24,7 +24,8 @@ class TrackingRepository extends BaseRepository
         return $this->get(
             $params,
             [
-                'estatus', 'prospect:id,full_name,company,phone',
+                'estatus',
+                'prospect:id,full_name,company,phone',
                 'agency:id,title',
                 'department:id,title',
                 'attended.profiable:id,name,last_name,agency_id',
@@ -47,23 +48,26 @@ class TrackingRepository extends BaseRepository
             }
         );
     }
-    public function diaryTracking()
+    public function diaryTracking($params)
     {
         return $this->get(
             ['paginate' => 'no'],
             [],
-            function ($query) {
+            function ($query) use ($params) {
+                $query->where(function ($query) use ($params) {
+                    $query->filter($params);
+                });
                 $query->whereHas('historical')
                     ->where(function ($query) {
-                        $query->whereIn('estatus_id', [1]);
-                    })
+                            $query->whereIn('estatus_id', [1]);
+                        })
                     ->when(Auth::user()->isSuperUser(), function ($query) {
-                        return $query;
-                    }, function ($query) {
-                        $query->where(function ($query) {
-                            $query->filterForManagers(Auth::user());
-                        });
+                            return $query;
+                        }, function ($query) {
+                    $query->where(function ($query) {
+                        $query->filterForManagers(Auth::user());
                     });
+                });
                 return $query;
             }
         );
