@@ -1,5 +1,9 @@
 {
+<<<<<<< HEAD
     "/js/admin.js": "/js/admin.js?id=5311a81303b7300af9f4",
+=======
+    "/js/admin.js": "/js/admin.js?id=d6dd5b848b0831e22597",
+>>>>>>> master
     "/js/manifest.js": "/js/manifest.js?id=87a3c34b9a71fb5b95b2",
     "/css/front.css": "/css/front.css?id=a1a3ac8e427d0e7b7d59",
     "/css/admin.css": "/css/admin.css?id=a1a3ac8e427d0e7b7d59",
