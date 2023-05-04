@@ -274,7 +274,7 @@ export default {
             if (!!response.data.data) {
               let idQuote = response.data.data.id;
               window.open(
-                `${LSK_APP.APP_URL}/admin/quote/${idQuote}/print`,
+                `/admin/quote/${idQuote}/print`,
                 "_blank",
                 "noreferrer"
               );
@@ -309,7 +309,7 @@ export default {
             if (!!response.data.data) {
               let idQuote = response.data.data.id;
               window.open(
-                `${LSK_APP.APP_URL}/admin/quote/${idQuote}/print`,
+                `/admin/quote/${idQuote}/print`,
                 "_blank",
                 "noreferrer"
               );

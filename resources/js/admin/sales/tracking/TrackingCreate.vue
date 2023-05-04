@@ -87,7 +87,7 @@ export default {
           if (!!response.data.data.quotation) {
             let idQuote = response.data.data.quotation.id;
             window.open(
-              `${LSK_APP.APP_URL}/admin/quote/${idQuote}/print`,
+              `/admin/quote/${idQuote}/print`,
               "_blank",
               "noreferrer"
             );

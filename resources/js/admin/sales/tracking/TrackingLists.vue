@@ -254,7 +254,7 @@
         >
           <tracking-create
             v-if="dialogs.create"
-            @success="(dialogs.create = false), reset()"
+            @success="(dialogs.create = false)"
           ></tracking-create>
         </dialog-component>
         <dialog-component
@@ -900,11 +900,11 @@ export default {
           }
         });
     },
-    reset() {
-      this.$eventBus.$emit("NOTIFICATION");
-      this.filters.dates = [];
-      this.$refs.formSearch.reset();
-    },
+    // reset() {
+    //   this.$eventBus.$emit("NOTIFICATION");
+    //   this.filters.dates = [];
+    //   this.$refs.formSearch.reset();
+    // },
     resetToActive(id) {
       const self = this;
       axios
