@@ -2,7 +2,7 @@
   <div class="component-wrap">
     <!-- form -->
     <v-card>
-      <v-card-title> <v-icon>vpn_key</v-icon> Create Permission </v-card-title>
+      <v-card-title> <v-icon left>mdi-key</v-icon> Create Permission </v-card-title>
       <v-divider class="mb-2"></v-divider>
       <v-form v-model="valid" ref="permissionFormAdd" lazy-validation>
         <v-container grid-list-md>

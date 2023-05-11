@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Components\Purchase\Models\PurchaseConceptProduct;
 use App\Components\Purchase\Repositories\PurchaseConceptProductRepository;
 use Illuminate\Http\Request;
 
@@ -21,6 +22,16 @@ class PurchaseConceptProductController extends AdminController
     public function index()
     {
         $data = $this->purchaseConceptProductRepository->list(request()->all());
+        $data->setCollection(
+            $data->getCollection()->transform(function ($model) {
+                return [
+                    'id' => $model->id,
+                    'name' => $model->name,
+                    'purchase_concept' => $model->purchaseConcept->name,
+                    'purchase_concept_type' => $model->purchaseConcept->purchaseType->name,
+                ];
+            })
+        )->toArray();
         $options = $this->purchaseConceptProductRepository->options();
         return $this->sendResponseOk(compact('data', 'options'));
     }
@@ -32,7 +43,8 @@ class PurchaseConceptProductController extends AdminController
      */
     public function create()
     {
-        //
+        $options = $this->purchaseConceptProductRepository->options();
+        return $this->sendResponseOk(compact('options'));
     }
 
     /**
@@ -83,7 +95,7 @@ class PurchaseConceptProductController extends AdminController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, ProductModel $model)
+    public function update(Request $request, PurchaseConceptProduct $model)
     {
         $validate = validator($request->all(), []);
         if ($validate->fails()) {

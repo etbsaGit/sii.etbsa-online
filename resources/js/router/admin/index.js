@@ -8,6 +8,7 @@ import { rrhh } from "~/router/admin/rrhh";
 import { customers } from "~/router/admin/customers";
 import { nt } from "~/router/admin/nt";
 import { products } from "~/router/admin/products";
+import { cargosInternos } from "~/router/admin/cargosInternos";
 
 export const admin = [
   ...sales,
@@ -19,5 +20,6 @@ export const admin = [
   ...rrhh,
   ...customers,
   ...nt,
-  ...products
+  ...products,
+  ...cargosInternos,
 ];

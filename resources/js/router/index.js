@@ -2,9 +2,10 @@ import Vue from "vue";
 import Router from "vue-router";
 import store from "~/common/Store";
 
-import { admin } from  "./admin";
+import { admin } from "./admin";
 
 Vue.use(Router);
+
 
 const router = new Router({
   scrollBehavior: () => ({ y: 0 }),
@@ -17,6 +18,17 @@ const router = new Router({
       name: "dashboard",
       path: "/dashboard",
       component: require("@admin/dashboard/Home").default,
+
+      // meta: {
+      //   authorize: {
+      //     policy: 'view-dashboard'
+      //   }
+      // }
+      // meta: {
+      //   middleware: auth,
+      //   groups: "Vendedor",
+      //   permissions: "clientes.list",
+      // },
     },
     {
       name: "quote",
@@ -49,6 +61,21 @@ const router = new Router({
 
 router.beforeEach((to, from, next) => {
   store.commit("showLoader");
+  if (to.meta.middleware) {
+    const middleware = Array.isArray(to.meta.middleware)
+      ? to.meta.middleware
+      : [to.meta.middleware];
+
+    const context = {
+      from,
+      next,
+      router,
+      to,
+    };
+    const nextMiddleware = nextFactory(context, middleware, 1);
+
+    return middleware[0]({ ...context, next: nextMiddleware });
+  }
   next();
 });
 
@@ -57,5 +84,33 @@ router.afterEach((to, from) => {
     store.commit("hideLoader");
   }, 1000);
 });
+
+function nextFactory(context, middleware, index) {
+  const subsequentMiddleware = middleware[index];
+  // If no subsequent Middleware exists,
+  // the default `next()` callback is returned.
+  if (!subsequentMiddleware) return context.next;
+
+  return (...parameters) => {
+    // Run the default Vue Router `next()` callback first.
+    context.next(...parameters);
+    // Then run the subsequent Middleware with a new
+    // `nextMiddleware()` callback.
+    const nextMiddleware = nextFactory(context, middleware, index + 1);
+    subsequentMiddleware({ ...context, next: nextMiddleware });
+  };
+}
+
+function auth({ to, next, router }) {
+  store.commit("hideLoader");
+  if (
+    !this.$gates.hasAnyRole(to.meta.groups) ||
+    !this.$gates.hasAnyPermission(to.meta.permissions)
+  ) {
+    return router.back();
+  }
+
+  return next();
+}
 
 export default router;

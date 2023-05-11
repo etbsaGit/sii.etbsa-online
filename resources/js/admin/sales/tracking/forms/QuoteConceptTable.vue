@@ -1,6 +1,32 @@
 <template>
   <v-card flat>
-    <v-card-title>
+    <v-card-title v-if="Category_id == null">
+      <v-autocomplete
+        v-model="select_category_id"
+        :items="options.categories"
+        item-value="id"
+        item-text="name"
+        placeholder="Seleccionar"
+        hide-details
+        outlined
+        filled
+        dense
+      >
+      </v-autocomplete>
+      <v-spacer></v-spacer>
+      <v-select
+        v-model="Payment"
+        :items="PaymentConditionConfig"
+        label="Condicion de Pago"
+        placeholder="Placeholder"
+        class="py-2"
+        style="max-width: 250px"
+        hide-details
+        outlined
+        dense
+      ></v-select>
+    </v-card-title>
+    <v-card-title v-else>
       <v-spacer></v-spacer>
       <v-select
         v-model="Payment"
@@ -8,13 +34,11 @@
         label="Condicion de Pago"
         placeholder="Placeholder"
         class="py-2"
-        style="max-width: 250px;"
+        style="max-width: 250px"
         hide-details
         outlined
         dense
       ></v-select>
-      <!-- :disabled="items.length > 0" -->
-      <!-- <v-btn color="red" text @click="items = []">Borrar Productos</v-btn> -->
     </v-card-title>
     <v-data-table
       :headers="headers"
@@ -37,7 +61,7 @@
             <div
               v-text="item.description"
               class="overflow-auto"
-              style="width: 120px;"
+              style="width: 120px"
             />
           </v-list-item-content>
         </v-list-item>
@@ -72,9 +96,7 @@
             readonly
           ></v-currency-field>
           <template v-slot:input>
-            <div class="mt-4 text-h6">
-              Actualizar Precio
-            </div>
+            <div class="mt-4 text-h6">Actualizar Precio</div>
             <v-currency-field
               v-model.number="item.price"
               :default-value="item.price"
@@ -110,7 +132,7 @@
         >
           <v-text-field
             :value="item.qty"
-            style="max-width: 50px;"
+            style="max-width: 50px"
             class="py-1"
             hide-details
             single-line
@@ -120,9 +142,7 @@
             dense
           ></v-text-field>
           <template v-slot:input>
-            <div class="mt-4 text-h6">
-              Actualizar Cantidad
-            </div>
+            <div class="mt-4 text-h6">Actualizar Cantidad</div>
             <v-text-field
               v-model.number="item.qty"
               label="Edit"
@@ -158,7 +178,7 @@
               v-if="Dialog"
               :Filters="{
                 price_type: Payment,
-                category_id: Category_id,
+                category_id: Category,
               }"
             ></products-list>
           </v-container>
@@ -169,9 +189,7 @@
       {{ snackText }}
 
       <template v-slot:action="{ attrs }">
-        <v-btn v-bind="attrs" text @click="snack = false">
-          Close
-        </v-btn>
+        <v-btn v-bind="attrs" text @click="snack = false"> Close </v-btn>
       </template>
     </v-snackbar>
   </v-card>
@@ -180,18 +198,18 @@
 import ProductsList from "../../../products/product/Index.vue";
 
 const _paymentCondition = [
-  { text: "Por Definir", value: "por_definir", type_price: "" },
-  { text: "P. Lista", value: "precio_lista", type_price: "price_1" },
-  { text: "Contado", value: "contado", type_price: "price_2" },
-  { text: "JDF 2 años", value: "jdf_2y", type_price: "price_3" },
-  { text: "JDF 5 años", value: "jdf_5y", type_price: "price_4" },
-  { text: "Expo", value: "precio_expo", type_price: "price_5" },
-  { text: "Precio Volumen", value: "por_volumen", type_price: "price_6" },
-  { text: "Arrendamiento", value: "renta_1", type_price: "price_7" },
-  { text: "Arrendamiento 2 meses", value: "renta_2", type_price: "price_8" },
-  { text: "Arrendamiento +3 meses", value: "renta_3", type_price: "price_9" },
-  { text: "Credito 30 Dias", value: "credito_30d", type_price: "price_10" },
-  { text: "Arrendadoras", value: "arrendadoras", type_price: "price_11" },
+  { text: "Por Definir", value: "por_definir", config: [] },
+  { text: "P. Lista", value: "precio_lista", config: [5, 6, 11, 14, 16] },
+  { text: "Contado", value: "contado", config: [1, 2, 3, 10, 5, 6, 11, 16] },
+  { text: "JDF 2 años", value: "jdf_2y", config: [1, 2, 3, 10] },
+  { text: "JDF 5 años", value: "jdf_5y", config: [1] },
+  { text: "Expo", value: "precio_expo", config: [1, 5] },
+  { text: "Precio Volumen", value: "por_volumen", config: [5, 14] },
+  { text: "Arrendamiento", value: "renta_1", config: [6, 15] },
+  { text: "Arrendamiento 2 meses", value: "renta_2", config: [15] },
+  { text: "Arrendamiento +3 meses", value: "renta_3", config: [15] },
+  { text: "Credito 30 Dias", value: "credito_30d", config: [5] },
+  { text: "Arrendadoras", value: "arrendadoras", config: [6] },
 ];
 
 export default {
@@ -256,6 +274,21 @@ export default {
         this.$nextTick(() => {});
       },
     },
+    Category() {
+      return this.Category_id ? this.Category_id : this.select_category_id;
+    },
+    PaymentConditionConfig() {
+      const _this = this;
+      let Default = [{ text: "Por Definir", value: "por_definir" }];
+      let result = [];
+      if (_this.select_category_id) {
+        const even = (e) => e == _this.select_category_id;
+        result = _this.options.price_types.filter((option) =>
+          option.config.some(even)
+        );
+      }
+      return Default.concat(result);
+    },
   },
   watch: {
     Payment(v, old) {
@@ -271,6 +304,8 @@ export default {
   },
   data() {
     return {
+      select_category_id: null,
+      options: { categories: [], price_types: _paymentCondition },
       valid: true,
       snack: false,
       snackColor: "",
@@ -306,8 +341,19 @@ export default {
     _this.$eventBus.$on(["PRODUCT_SELECTED"], (product) => {
       _this.productSelected(product);
     });
+    this.loadOptions();
   },
   methods: {
+    async loadOptions() {
+      const _this = this;
+      await axios
+        .get("/admin/tracking/sales_history/resources")
+        .then(function (response) {
+          let { categories } = response.data.data;
+
+          _this.options.categories = categories;
+        });
+    },
     saveSnack(product) {
       product.subtotal = product.price * product.qty;
       this.snack = true;

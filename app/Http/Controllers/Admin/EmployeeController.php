@@ -39,14 +39,20 @@ class EmployeeController extends AdminController
     public function create()
     {
         //resources form
+        // ->whereNull('profiable_id')
+        $users = DB::table('users')->get(['id', 'email', 'name']);
         $agencies = DB::table('agencies')->get(['id', 'code', 'title']);
         $departments = DB::table('departments')->get(['id', 'title']);
         $direct_boss = Employee::all('id', 'name', 'last_name');
-        return $this->sendResponseOk(compact(
-            'agencies',
-            'departments',
-            'direct_boss',
-        ), "list Resources orders ok.");
+        return $this->sendResponseOk(
+            compact(
+                'agencies',
+                'departments',
+                'direct_boss',
+                'users',
+            ),
+            "list Resources orders ok."
+        );
     }
 
     /**
@@ -83,7 +89,7 @@ class EmployeeController extends AdminController
     /**
      * Display the specified resource.
      *
-     * @param  \App\Employee  $employee
+     * @param  \App\Components\RRHH\Models\Employee  $employee
      * @return \Illuminate\Http\Response
      */
     public function show(Employee $employee)
@@ -111,19 +117,19 @@ class EmployeeController extends AdminController
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Employee  $employee
+     * @param  \App\Components\RRHH\Models\Employee  $employee
      * @return \Illuminate\Http\Response
      */
     public function edit(Employee $employee)
     {
-        return $this->sendResponseOk($employee);
+        return $this->sendResponseOk($employee->load('user'));
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Employee  $employee
+     * @param  \App\Components\RRHH\Models\Employee  $employee
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Employee $employee)
@@ -144,13 +150,16 @@ class EmployeeController extends AdminController
             }
             $employee->update(['photo_path' => $request->file('photo')->store('avatares/' . $employee->id, 's3')]);
         }
+        if ($request->has('user_id')) {
+            return $this->assignedUser($employee, User::find($request->user_id));
+        }
         return $this->sendResponseUpdated($updated);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Employee  $employee
+     * @param  \App\Components\RRHH\Models\Employee  $employee
      * @return \Illuminate\Http\Response
      */
     public function destroy(Employee $employee)
@@ -161,9 +170,10 @@ class EmployeeController extends AdminController
 
     public function assignedUser(Employee $employee, User $user)
     {
+
         if ($employee->user) {
             $employee->user->profiable()->dissociate();
-            $employee->user->save();
+            // $employee->user->save();
         }
         $user->profiable()->associate($employee);
         $user->save();
@@ -179,8 +189,11 @@ class EmployeeController extends AdminController
     public function options()
     {
         $users = DB::table('users')->whereNull('profiable_id')->get(['id', 'name', 'email']);
-        return $this->sendResponseOk(compact(
-            'users',
-        ), "list Resources orders ok.");
+        return $this->sendResponseOk(
+            compact(
+                'users',
+            ),
+            "list Resources orders ok."
+        );
     }
 }

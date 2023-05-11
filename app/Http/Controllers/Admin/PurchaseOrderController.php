@@ -44,26 +44,43 @@ class PurchaseOrderController extends AdminController
 
     public function resources()
     {
-        $suppliers = Supplier::with([])->get()->map->only('id', 'business_name', 'rfc', 'phone', 'email', 'credit_days');
+        $suppliers = Supplier::with([])->get()->map->only(['id', 'business_name', 'rfc', 'phone', 'email', 'credit_days']);
         $agencies = DB::table('agencies')->get(['id', 'code', 'title']);
         $departments = DB::table('departments')->get(['id', 'title']);
         $metodoPago = DB::table('cat_metodo_pago')->get(['clave', 'description']);
         $usoCFDI = DB::table('cat_uso_cfdi')->get(['clave', 'description']);
         $formaPago = DB::table('cat_forma_pago')->get(['clave', 'description']);
         $unitSat = DB::table('cat_unit_sat')->get(['id', 'clave', 'name', 'type']);
-        $purchase_concept = PurchaseConcept::all();
-        $purchase_types = PurchaseType::with('purchaseConcept')->get();
-        return $this->sendResponseOk(compact(
-            'suppliers',
-            'agencies',
-            'departments',
-            'metodoPago',
-            'usoCFDI',
-            'formaPago',
-            'unitSat',
-            'purchase_concept',
-            'purchase_types'
-        ), "list Resources orders ok.");
+        $purchase_concept = PurchaseConcept::with('usocfdi', 'purchaseType', 'conceptProduct')->get();
+        // $purchase_types = PurchaseType::with('purchaseConcept')->get();
+        $purchase_types = PurchaseType::with('purchaseConcept')->get()->transform(function ($model) {
+            return [
+                'id' => $model->id,
+                'name' => $model->name,
+                'purchase_concept' => $model->purchaseConcept->map(function ($item) {
+                    return [
+                        'id' => $item->id,
+                        'name' => $item->name,
+                        'concept_product' => $item->conceptProduct->map->only('id', 'name'),
+                        'usocfdi' => $item->usocfdi->map->only('id', 'clave', 'description')
+                    ];
+                }),
+            ];
+        });
+        return $this->sendResponseOk(
+            compact(
+                'suppliers',
+                'agencies',
+                'departments',
+                'metodoPago',
+                'usoCFDI',
+                'formaPago',
+                'unitSat',
+                'purchase_concept',
+                'purchase_types'
+            ),
+            "list Resources orders ok."
+        );
     }
 
 
@@ -240,18 +257,18 @@ class PurchaseOrderController extends AdminController
                 if ($charges = $request->get('charges', [])) {
                     foreach ($charges as $key => $value) {
                         if ($value) {
-                            $pivot =  [
+                            $pivot = [
                                 'department_id' => $value['depto_id'],
                                 'percent' => $value['percent']
                             ];
-                            $syncCharges[$value['agency_id']] =  $pivot;
+                            $syncCharges[$value['agency_id']] = $pivot;
                         }
                     }
                 }
                 if ($products = $request->get('products', [])) {
                     foreach ($products as $product => $value) {
                         if ($value) {
-                            $pivotProducts =  [
+                            $pivotProducts = [
                                 'unit_id' => $value['unit_id'],
                                 'description' => $value['description'],
                                 'qty' => $value['qty'],
@@ -259,7 +276,7 @@ class PurchaseOrderController extends AdminController
                                 'discount' => $value['discount'],
                                 'subtotal' => $value['subtotal']
                             ];
-                            $syncProducts[$value['concept_product_id']] =  $pivotProducts;
+                            $syncProducts[$value['concept_product_id']] = $pivotProducts;
                         }
                     }
                 }

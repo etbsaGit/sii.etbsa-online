@@ -37,6 +37,7 @@
     "v-currency-field": "^3.1.1",
     "v-mask": "^2.2.4",
     "vue-currency-filter": "^5.2.0",
+    "vue-gates": "^2.1.2",
     "vue-progressbar": "^0.7.5",
     "vue-router": "^3.5.1",
     "vue-spinner": "^1.0.4",

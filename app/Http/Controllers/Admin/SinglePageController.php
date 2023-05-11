@@ -288,6 +288,36 @@ class SinglePageController extends AdminController
                 ]
             ]),
             new MenuItem([
+                'group_requirements' => ['Super User', 'Vendedor'],
+                'permission_requirements' => [],
+                'label' => 'Cargos Internos',
+                'nav_type' => MenuItem::$NAV_TYPE_NAV,
+                'icon' => 'mdi-account-group-outline',
+                'visible' => true,
+                'children' => [
+                    new MenuItem([
+                        'group_requirements' => ['Super User'],
+                        'permission_requirements' => [],
+                        'label' => 'Crear Solicitud C.I.',
+                        'nav_type' => MenuItem::$NAV_TYPE_NAV,
+                        'icon' => 'mdi-new-box',
+                        'route_type' => 'vue',
+                        'route_name' => 'cargos_internos.create',
+                        'visible' => true,
+                    ]),
+                    new MenuItem([
+                        'group_requirements' => ['Super User', 'Vendedor'],
+                        'permission_requirements' => [],
+                        'label' => 'Solicitudes C.I.',
+                        'nav_type' => MenuItem::$NAV_TYPE_NAV,
+                        'icon' => 'mdi-format-list-bulleted',
+                        'route_type' => 'vue',
+                        'route_name' => 'cargos_internos.index',
+                        'visible' => true,
+                    ]),
+                ]
+            ]),
+            new MenuItem([
                 'group_requirements' => ['Compras', 'Super User'],
                 'permission_requirements' => [],
                 'label' => 'Compras',
@@ -339,14 +369,14 @@ class SinglePageController extends AdminController
             ]),
             new MenuItem([
                 'group_requirements' => ['Super User', 'Vendedor'],
-                'permission_requirements' => [],
+                'permission_requirements' => ['clientes.list'],
                 'label' => 'Clientes',
                 'nav_type' => MenuItem::$NAV_TYPE_NAV,
                 'icon' => 'mdi-account-group',
                 'visible' => true,
                 'children' => [
                     new MenuItem([
-                        'group_requirements' => ['Super User'],
+                        'group_requirements' => ['Super User', 'Vendedor'],
                         'permission_requirements' => ['clientes.list'],
                         'label' => 'Lista Clientes',
                         'nav_type' => MenuItem::$NAV_TYPE_NAV,

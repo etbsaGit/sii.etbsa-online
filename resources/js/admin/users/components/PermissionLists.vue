@@ -5,7 +5,7 @@
       <div class="d-flex flex-row">
         <div class="flex-grow-1 pa-2">
           <v-text-field
-            prepend-icon="search"
+            prepend-icon="mdi-magnify"
             label="Filter By Permission Title"
             v-model="filters.title"
           ></v-text-field>
@@ -16,7 +16,7 @@
             class="primary lighten-1"
           >
             New Permission
-            <v-icon right>add</v-icon>
+            <v-icon right>mdi-plus</v-icon>
           </v-btn>
         </div>
       </div>
@@ -25,29 +25,49 @@
 
     <!-- groups table -->
     <v-data-table
-      hide-default-header
       v-bind:headers="headers"
       :options.sync="pagination"
       :items="items"
       :server-items-length="totalItems"
       class="elevation-1"
     >
-      <template v-slot:header="{ props: { headers } }">
+      <template #[`item.action`]="{ item }">
+        <div class="text-center">
+          <v-btn
+            @click="
+              $router.push({
+                name: 'users.permissions.edit',
+                params: { id: item.id },
+              })
+            "
+            class="ma-2"
+            outlined
+            small
+            color="info"
+          >
+            <v-icon>mdi-pencil</v-icon>
+          </v-btn>
+          <v-btn @click="trash(item)" class="ma-2" outlined small color="red">
+            <v-icon>mdi-delete</v-icon>
+          </v-btn>
+        </div>
+      </template>
+      <!-- <template v-slot:header="{ props: { headers } }">
         <thead>
           <tr>
-            <th v-for="header in headers">
-              <span v-if="header.value == 'key'"
-                ><v-icon>mdi-vpn_key</v-icon> {{ header.text }}</span
-              >
-              <span v-else-if="header.value == 'created_at'"
-                ><v-icon>mdi-date_range</v-icon> {{ header.text }}</span
-              >
+            <th v-for="header in headers" :key="header.value">
+              <span v-if="header.value == 'key'"></span>
+                <v-icon>mdi-vpn_key</v-icon> {{ header.text }}
+              </span>
+              <span v-else-if="header.value == 'created_at'">
+                <v-icon>mdi-date_range</v-icon> {{ header.text }}
+              </span>
               <span v-else>{{ header.text }}</span>
             </th>
           </tr>
         </thead>
-      </template>
-      <template v-slot:body="{ items }">
+      </template> -->
+      <!-- <template v-slot:body="{ items }">
         <tbody>
           <tr v-for="item in items" :key="item.id">
             <td>
@@ -61,7 +81,7 @@
                   "
                   class="ma-2"
                   outlined
-                  fab
+                  
                   small
                   color="info"
                 >
@@ -71,7 +91,7 @@
                   @click="trash(item)"
                   class="ma-2"
                   outlined
-                  fab
+                  
                   small
                   color="red"
                 >
@@ -85,7 +105,7 @@
             <td>{{ $appFormatters.formatDate(item.created_at) }}</td>
           </tr>
         </tbody>
-      </template>
+      </template> -->
     </v-data-table>
   </div>
 </template>
@@ -95,8 +115,8 @@ export default {
   data() {
     return {
       headers: [
-        { text: "Action", value: false, align: "left", sortable: false },
-        { text: "Title", value: "name", align: "left", sortable: false },
+        { text: "Action", value: "action", align: "left", sortable: false },
+        { text: "Title", value: "title", align: "left", sortable: false },
         { text: "Key", value: "key", align: "left", sortable: false },
         {
           text: "Description",

@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Components\CargosInternos\Models\CargosInternos;
+use App\Observers\CargosInternosObserver;
 use Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider;
 use Illuminate\Support\ServiceProvider;
 
@@ -14,7 +16,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        CargosInternos::observe(CargosInternosObserver::class);
     }
 
     /**

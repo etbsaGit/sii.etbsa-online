@@ -27,8 +27,8 @@
       dense
     >
       <template #[`item.purchase_concept`]="{ item }">
-        <div>{{ item.purchase_concept.name }}</div>
-        <div>{{ item.purchase_concept.purchase_type.name }}</div>
+        <div>{{ item.purchase_concept }}</div>
+        <div>{{ item.purchase_concept_type }}</div>
       </template>
       <template #[`item.action`]="{ item }">
         <v-icon right class="green--text" @click="editItem(item)">
@@ -57,13 +57,16 @@
               item-value="id"
               item-text="name"
               label="Concepto de Compra"
+              :rules="[(v) => !!v || 'Es Requerido']"
             >
               <template v-slot:selection="{ item }">
                 <span>{{ item.name }} | {{ item.purchase_type.name }}</span>
               </template>
               <template v-slot:item="{ item }">
-                <v-list-item-title v-text="item.name" />
-                <v-list-item-subtitle v-html="item.purchase_type.name" />
+                <v-list-item-title> {{ item.name }} </v-list-item-title>
+                <v-list-item-subtitle>
+                  {{ item.purchase_type.name }}
+                </v-list-item-subtitle>
               </template>
             </v-select>
           </v-form>
@@ -139,7 +142,12 @@ export default {
       },
     };
   },
-
+  mounted() {
+    this.$eventBus.$on(["SAVE_PURCHASE_CONCEPT"], () => {
+      console.log("on SAVE_PURCHASE_CONCEPT");
+      this.loadOptions();
+    });
+  },
   watch: {
     pagination: {
       handler: _.debounce(function (v) {
@@ -166,6 +174,17 @@ export default {
     },
   },
   methods: {
+    async loadOptions() {
+      const _this = this;
+      await axios
+        .get("/admin/purchase-concept-products/create")
+        .then((response) => {
+          console.log(response.data.data.options);
+          _this.options = response.data.data.options;
+
+          (cb || Function)();
+        });
+    },
     async loadPurchaseConceptProducts(cb) {
       const _this = this;
 
@@ -201,6 +220,8 @@ export default {
       this.dialog = false;
       this.$nextTick(() => {
         this.editedId = -1;
+        this.$refs.form.reset();
+        this.$refs.form.resetValidation();
       });
     },
     closeDelete() {
@@ -213,8 +234,6 @@ export default {
     create() {
       this.dialog = true;
       this.editedId = -1;
-      this.$refs.form.reset();
-      this.$refs.form.resetValidation();
     },
     editItem(item) {
       this.dialog = true;

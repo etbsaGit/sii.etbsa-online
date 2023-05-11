@@ -79,6 +79,7 @@ export default {
         .get(`/admin/employees/${_this.editItemId}/edit`)
         .then((res) => {
           _this.form = { ...res.data.data };
+          _this.form.user_id = res.data.data.user.id ?? null;
         });
     },
   },

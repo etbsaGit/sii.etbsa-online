@@ -2,9 +2,10 @@
 
 namespace App\Components\Common\Models;
 
+use App\Components\CargosInternos\Models\CargosInternos;
 use App\Components\Purchase\Models\Invoice;
 use Illuminate\Database\Eloquent\Model;
-use  App\Components\Tracking\Models\TrackingProspect;
+use App\Components\Tracking\Models\TrackingProspect;
 
 class Estatus extends Model
 {
@@ -60,5 +61,10 @@ class Estatus extends Model
     public function invoices()
     {
         return $this->hasMany(Invoice::class, 'estatus_id', 'id');
+    }
+
+    public function cargos_internos()
+    {
+        return $this->hasMany(CargosInternos::class, 'estatus_id', 'id');
     }
 }

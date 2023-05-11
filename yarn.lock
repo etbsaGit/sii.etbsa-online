@@ -6536,6 +6536,11 @@ vue-currency-filter@^5.2.0:
   resolved "https://registry.yarnpkg.com/vue-currency-filter/-/vue-currency-filter-5.2.0.tgz#7f9bdf36cc7fb998cfbb3b60072f40b800a8cdfa"
   integrity sha512-31XXEtXLDf3A7mdIAoyEkZTwpti22omp4MjoVKv0ksIC8Gk9RqW5xzeqvubeIlrxACvCPjKNTwqTmUrxFplDHw==
 
+vue-gates@^2.1.2:
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/vue-gates/-/vue-gates-2.1.2.tgz#89d6951ec4a0bb3291fe986fa3bb93c262d3910e"
+  integrity sha512-65IqVyR6KACdPxmOwz61gTLUCZnDU2DxkJmu8OiFM8/cBPBKtsCNe1+R32JcOZjLeIqKKkDS6N7ZY0+xbtVnBQ==
+
 vue-hot-reload-api@^2.3.0:
   version "2.3.4"
   resolved "https://registry.yarnpkg.com/vue-hot-reload-api/-/vue-hot-reload-api-2.3.4.tgz#532955cc1eb208a3d990b3a9f9a70574657e08f2"

@@ -206,6 +206,19 @@
           dense
         />
       </v-col>
+      <v-col cols="12" v-permission="'superuser'">
+        <v-autocomplete
+          v-model="form.user_id"
+          :items="options.users"
+          item-text="email"
+          item-value="id"
+          label="Asociar Usuario:"
+          clearable
+          filled
+          outlined
+          dense
+        />
+      </v-col>
       <v-col cols="12">
         <v-switch v-model="form.active" label="Activo"></v-switch>
       </v-col>
@@ -266,6 +279,7 @@ export default {
         agencies: [],
         departments: [],
         direct_boss: [],
+        users: [],
       },
     };
   },
@@ -279,6 +293,7 @@ export default {
         _this.options.agencies = res.data.data.agencies;
         _this.options.departments = res.data.data.departments;
         _this.options.direct_boss = res.data.data.direct_boss;
+        _this.options.users = res.data.data.users;
       });
     },
   },

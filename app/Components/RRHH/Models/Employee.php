@@ -79,10 +79,11 @@ class Employee extends Model
 
     public function getProfilePhotoUrlAttribute()
     {
-        return $this->photo_path
-            // ? Storage::disk('s3')->put('/', $this->photo_path, 'public')
-            ? Storage::disk('s3')->url($this->photo_path)
-            : $this->defaultProfilePhotoUrl();
+        // return $this->photo_path
+        //     // ? Storage::disk('s3')->put('/', $this->photo_path, 'public')
+        //     ? Storage::disk('s3')->url($this->photo_path)
+        //     : $this->defaultProfilePhotoUrl();
+        return $this->defaultProfilePhotoUrl();
     }
     protected function defaultProfilePhotoUrl()
     {

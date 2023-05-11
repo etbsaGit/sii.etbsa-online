@@ -15,20 +15,22 @@ import eventBus from "~/common/Event";
 import formatters from "~/common/Formatters";
 import AxiosAjaxDetct from "~/common/AxiosAjaxDetect";
 import VueCurrencyFilter from "vue-currency-filter";
+// import VueGates from "vue-gates";
+import "~/common/vue-gate";
 
 import lodash from "lodash";
-import VCurrencyField from 'v-currency-field'
+import VCurrencyField from "v-currency-field";
 
-Vue.use(VCurrencyField, { 
-	locale: 'es-MX',
-	decimalLength: 2,
-	autoDecimalMode: true,
-	min: null,
-	max: null,
-	// defaultValue: 0,
+Vue.use(VCurrencyField, {
+  locale: "es-MX",
+  decimalLength: 2,
+  autoDecimalMode: true,
+  min: null,
+  max: null,
+  // defaultValue: 0,
   valueAsInteger: false,
-  allowNegative: true
-})
+  allowNegative: true,
+});
 
 Vue.prototype._ = lodash;
 
@@ -71,7 +73,9 @@ Vue.use(VueCurrencyFilter, [
     avoidEmptyDecimals: "",
   },
 ]);
-
+// Vue.use(VueGates, {
+//   superRole: "Super User",
+// });
 // Gate
 Vue.prototype.$gate = new Gate();
 // Vue.prototype.$gate = new Gate(window.LSK_APP.AUTH_USER);
@@ -108,6 +112,12 @@ new Vue({
   render: (h) => h(App),
   mounted() {
     const _this = this;
+    this.$gates.setRoles(store.getters["user/groups"]);
+    this.$gates.setPermissions(Object.keys(store.getters["user/permissions"]));
+
+    console.log(this.$gates.getPermissions());
+    console.log(this.$gates.getRoles());
+
     // progress bar top
     AxiosAjaxDetct.init(
       () => {

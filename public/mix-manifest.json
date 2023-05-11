@@ -1,13 +1,13 @@
 {
-    "/js/admin.js": "/js/admin.js?id=e886a8108d6f2b1f20a3",
-    "/js/manifest.js": "/js/manifest.js?id=87a3c34b9a71fb5b95b2",
-    "/css/front.css": "/css/front.css?id=a1a3ac8e427d0e7b7d59",
-    "/css/admin.css": "/css/admin.css?id=a1a3ac8e427d0e7b7d59",
-    "/js/vendor.js": "/js/vendor.js?id=a718ae34e9156a050c25",
-    "/img/camper-swiss-knife.jpg": "/img/camper-swiss-knife.jpg?id=5c0221941533aa89db91",
-    "/img/etbsa-logo-agricola.png": "/img/etbsa-logo-agricola.png?id=8d8b9bd6c2b87a1ca2f5",
-    "/img/etbsa-logo-construccion.png": "/img/etbsa-logo-construccion.png?id=0d12963446bf20b53311",
-    "/img/etbsa-logo-corporativo-dark.jpeg": "/img/etbsa-logo-corporativo-dark.jpeg?id=f4eaafefab8a5bc74940",
-    "/img/etbsa-logo-corporativo.jpeg": "/img/etbsa-logo-corporativo.jpeg?id=295e8e31bab32e202562",
-    "/img/Screenshot.png": "/img/Screenshot.png?id=717b8068a8232807b2e0"
+    "/js/admin.js": "/js/admin.js",
+    "/js/manifest.js": "/js/manifest.js",
+    "/css/front.css": "/css/front.css",
+    "/css/admin.css": "/css/admin.css",
+    "/js/vendor.js": "/js/vendor.js",
+    "/img/camper-swiss-knife.jpg": "/img/camper-swiss-knife.jpg",
+    "/img/etbsa-logo-agricola.png": "/img/etbsa-logo-agricola.png",
+    "/img/etbsa-logo-construccion.png": "/img/etbsa-logo-construccion.png",
+    "/img/etbsa-logo-corporativo-dark.jpeg": "/img/etbsa-logo-corporativo-dark.jpeg",
+    "/img/etbsa-logo-corporativo.jpeg": "/img/etbsa-logo-corporativo.jpeg",
+    "/img/Screenshot.png": "/img/Screenshot.png"
 }

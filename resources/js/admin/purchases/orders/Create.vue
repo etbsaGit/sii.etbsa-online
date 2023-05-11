@@ -328,9 +328,12 @@ export default {
     },
     PurchaseConcept() {
       const _this = this;
-      return _this.options.purchase_types.find(
+      let concept_by_type = _this.options.purchase_types.find(
         (e) => e.id == _this.form.purchase_type_id
-      ).purchase_concept;
+      );
+      return concept_by_type != undefined
+        ? concept_by_type.purchase_concept
+        : [];
     },
     PurchaseConceptProduct() {
       const _this = this;
@@ -464,12 +467,8 @@ export default {
       await axios
         .get("/admin/purchase-order/resources/options")
         .then(function (response) {
-          let {
-            suppliers,
-            agencies,
-            departments,
-            purchase_types,
-          } = response.data.data;
+          let { suppliers, agencies, departments, purchase_types } =
+            response.data.data;
           _this.options.suppliers = suppliers;
           _this.options.agencies = agencies;
           _this.options.departments = departments;

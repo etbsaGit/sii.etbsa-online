@@ -9,7 +9,7 @@ class PurchaseConcept extends Model
 {
     protected $table = 'purchase_concepts';
     protected $guarded = ['id'];
-    protected $with = ['usocfdi', 'purchaseType', 'conceptProduct'];
+    // protected $with = ['usocfdi', 'purchaseType', 'conceptProduct'];
 
 
     public function usocfdi()

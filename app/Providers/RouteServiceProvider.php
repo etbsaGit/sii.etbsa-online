@@ -69,6 +69,7 @@ class RouteServiceProvider extends ServiceProvider
                 require base_path('routes/web/tracking.php');
                 require base_path('routes/web/nt.php');
                 require base_path('routes/web/product.php');
+                require base_path('routes/web/cargosInternos.php');
             });
     }
 
