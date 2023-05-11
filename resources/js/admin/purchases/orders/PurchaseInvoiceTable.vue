@@ -9,14 +9,13 @@
                 <v-list-item-title>Metodo de Pago</v-list-item-title>
                 <v-list-item-subtitle
                   class="text-wrap"
-                  style="max-width: 200px;"
-                  v-text="form.metodo_pago.description"
+                  style="max-width: 200px"
                 >
-                  <!-- {{ form.metodo_pago.description || "" }} -->
+                  {{ form.metodo_pago.description || "" }}
                 </v-list-item-subtitle>
               </v-list-item-content>
             </td>
-            <td class="text-right" style="width: 50px;">
+            <td class="text-right" style="width: 50px">
               {{ form.metodo_pago.clave }}
             </td>
           </tr>
@@ -26,14 +25,13 @@
                 <v-list-item-title>USO CFDI</v-list-item-title>
                 <v-list-item-subtitle
                   class="text-wrap"
-                  style="max-width: 200px;"
-                  v-text="form.uso_cfdi.description"
+                  style="max-width: 200px"
                 >
-                  <!-- {{ form.uso_cfdi.description || "" }} -->
+                  {{ form.uso_cfdi.description || "" }}
                 </v-list-item-subtitle>
               </v-list-item-content>
             </td>
-            <td class="text-right" style="width: 50px;">
+            <td class="text-right" style="width: 50px">
               {{ form.uso_cfdi.clave || "" }}
             </td>
           </tr>
@@ -43,14 +41,13 @@
                 <v-list-item-title>Forma de Pago</v-list-item-title>
                 <v-list-item-subtitle
                   class="text-wrap"
-                  style="max-width: 200px;"
-                  v-text="form.forma_pago.description"
+                  style="max-width: 200px"
                 >
-                  <!-- {{ form.forma_pago.description || "" }} -->
+                  {{ form.forma_pago.description || "" }}
                 </v-list-item-subtitle>
               </v-list-item-content>
             </td>
-            <td class="text-right" style="width: 50px;">
+            <td class="text-right" style="width: 50px">
               {{ form.forma_pago.clave || "" }}
             </td>
           </tr>
@@ -154,9 +151,7 @@
           <!-- <v-btn color="blue darken-1" text @click="Dialog = false">
             Cerrar
           </v-btn> -->
-          <v-btn color="blue darken-1" text @click="saveItem">
-            OK
-          </v-btn>
+          <v-btn color="blue darken-1" text @click="saveItem"> OK </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -223,11 +218,11 @@ export default {
           clave: "99",
           description: "Por definir",
         };
-      }else{
+      } else {
         this.form.forma_pago = {
           clave: "03",
-          description: "Transferencia electronica de fondos"
-        }
+          description: "Transferencia electronica de fondos",
+        };
       }
       this.form.metodo_pago_id = value.clave;
     },

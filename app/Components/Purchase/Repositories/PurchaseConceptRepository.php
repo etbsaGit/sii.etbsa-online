@@ -22,9 +22,9 @@ class PurchaseConceptRepository extends BaseRepository
     public function list($params)
     {
         return $this->get($params, ['usocfdi', 'purchaseType'], function ($query) use ($params) {
-            // $query->where(function ($query) use ($params) {
-            //     $query->search($params['search'] ?? '');
-            // });
+            $query->where(function ($query) use ($params) {
+                $query->search($params['search'] ?? '');
+            });
             return $query;
         });
     }

@@ -32,7 +32,8 @@ class PurchaseConceptProductRepository extends BaseRepository
 
     public function options()
     {
-        $purchase_concept = PurchaseConcept::all();
+        $purchase_concept = PurchaseConcept::with('purchaseType:id,name')->get();
+        ;
         return compact('purchase_concept');
     }
 }

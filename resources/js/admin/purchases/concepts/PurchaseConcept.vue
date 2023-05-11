@@ -10,13 +10,13 @@
     dense
     class="elevation-1 text-uppercase"
   >
-    <template v-slot:top>
+    <template #top>
       <v-toolbar flat>
         <v-toolbar-title>Conceptos de Compra</v-toolbar-title>
         <v-divider class="mx-4" inset vertical></v-divider>
         <v-spacer></v-spacer>
         <v-dialog v-model="dialog" max-width="650px" persistent>
-          <template v-slot:activator="{ on, attrs }">
+          <template #activator="{ on, attrs }">
             <v-btn color="primary" dark class="mb-2" v-bind="attrs" v-on="on">
               Agregar Nuevo Concepto
             </v-btn>
@@ -34,12 +34,8 @@
 
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn color="blue darken-1" text @click="close">
-                Cancel
-              </v-btn>
-              <v-btn color="blue darken-1" text @click="save">
-                Save
-              </v-btn>
+              <v-btn color="blue darken-1" text @click="close"> Cancel </v-btn>
+              <v-btn color="blue darken-1" text @click="save"> Save </v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -100,19 +96,25 @@
           </v-card>
         </v-dialog>
       </v-toolbar>
+      <v-toolbar flat>
+        <v-text-field
+          v-model="search"
+          label="Buscar Nombre Concepto"
+          outlined
+          dense
+          hide-details
+          style="max-width: 350px"
+        ></v-text-field>
+      </v-toolbar>
     </template>
-    <template v-slot:[`item.usocfdi`]="{ item }">
+    <template #[`item.usocfdi`]="{ item }">
       <v-btn rounded color="purple" small dark @click="updateUsoCfdi(item)">
         Configuracion
       </v-btn>
     </template>
-    <template v-slot:[`item.actions`]="{ item }">
-      <v-icon small class="mr-2" @click="editItem(item)">
-        mdi-pencil
-      </v-icon>
-      <v-icon small @click="deleteItem(item)">
-        mdi-delete
-      </v-icon>
+    <template #[`item.actions`]="{ item }">
+      <v-icon small class="mr-2" @click="editItem(item)"> mdi-pencil </v-icon>
+      <v-icon small @click="deleteItem(item)"> mdi-delete </v-icon>
     </template>
   </v-data-table>
 </template>
@@ -141,6 +143,7 @@ export default {
     pagination: {
       rowsPerPage: 10,
     },
+    search: "",
     filters: {
       name: "",
     },
@@ -167,6 +170,24 @@ export default {
   },
 
   watch: {
+    pagination: {
+      handler: _.debounce(function (v) {
+        this.initialize(() => {});
+      }, 700),
+      deep: true,
+    },
+    filters: {
+      handler: _.debounce(function (v) {
+        this.initialize(() => {});
+      }, 700),
+      deep: true,
+    },
+    search: {
+      handler: _.debounce(function (v) {
+        this.initialize(() => {});
+      }, 700),
+      deep: true,
+    },
     dialog(val) {
       val || this.close();
     },
@@ -176,15 +197,15 @@ export default {
     dialogUpdateUsoCfdi(val) {
       val || this.closeUpdateUsoCfdi();
     },
-    "pagination.page": function () {
-      this.initialize(() => {});
-    },
-    "pagination.rowsPerPage": function () {
-      this.initialize(() => {});
-    },
-    "filters.name": _.debounce(function () {
-      this.initialize(() => {});
-    }, 700),
+    // "pagination.page": function () {
+    //   this.initialize(() => {});
+    // },
+    // "pagination.rowsPerPage": function () {
+    //   this.initialize(() => {});
+    // },
+    // "filters.name": _.debounce(function () {
+    //   this.initialize(() => {});
+    // }, 700),
   },
 
   mounted() {
@@ -200,7 +221,7 @@ export default {
       const _this = this;
       let params = {
         ..._this.filters,
-        // search: _this.search,
+        search: _this.search,
         page: _this.pagination.page,
         per_page: _this.pagination.itemsPerPage,
       };
@@ -222,7 +243,6 @@ export default {
     updateUsoCfdi(item) {
       const self = this;
       this.editedItemId = item.id;
-      console.log(item);
       _.each(item.usocfdi, (g) => {
         self.usocfdi[g.id] = true;
       });
@@ -232,7 +252,6 @@ export default {
 
     async updateUsoCfdiItemConfirm() {
       // this.items.splice(this.editedItemId, 1);
-      console.log("Actualiza USO CFDI", this.editedItemId, this.usocfdi);
       const _this = this;
 
       let payload = {
@@ -306,11 +325,11 @@ export default {
       });
     },
 
-    save() {
+    async save() {
       const _this = this;
       if (this.editedItemId != -1) {
         console.log("Editar id", this.editedItemId, this.editedItem);
-        axios
+        await axios
           .put(
             `/admin/purchase-concept/${_this.editedItemId}`,
             _this.editedItem
@@ -322,6 +341,7 @@ export default {
               duration: 3000,
             });
             _this.initialize();
+            _this.$eventBus.$emit("SAVE_PURCHASE_CONCEPT");
           })
           .catch(function (error) {
             _this.$store.commit("hideLoader");
@@ -339,9 +359,7 @@ export default {
             }
           });
       } else {
-        console.log("Create new", this.editedItem);
-        const self = this;
-        axios
+        await axios
           .post("/admin/purchase-concept", _this.editedItem)
           .then(function (response) {
             self.$store.commit("showSnackbar", {
@@ -350,6 +368,7 @@ export default {
               duration: 3000,
             });
             _this.initialize();
+            _this.$eventBus.$emit("SAVE_PURCHASE_CONCEPT");
           })
           .catch(function (error) {
             self.$store.commit("hideLoader");
