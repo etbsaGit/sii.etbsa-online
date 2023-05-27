@@ -114,10 +114,6 @@ new Vue({
     const _this = this;
     this.$gates.setRoles(store.getters["user/groups"]);
     this.$gates.setPermissions(Object.keys(store.getters["user/permissions"]));
-
-    console.log(this.$gates.getPermissions());
-    console.log(this.$gates.getRoles());
-
     // progress bar top
     AxiosAjaxDetct.init(
       () => {

@@ -206,7 +206,7 @@
                     {{ $data->currency->name }}
                 </td>
             </tr>
-            @if ($data->currency->name == 'USD')
+            {{-- @if ($data->currency->name == 'USD')
                 <tr class="total" style="text-align: right">
                     <td colspan="3">Total M.N.: </td>
                     <td colspan="2" style="font-size: 12pt">
@@ -214,7 +214,7 @@
                         MXN
                     </td>
                 </tr>
-            @endif
+            @endif --}}
 
         </table>
 

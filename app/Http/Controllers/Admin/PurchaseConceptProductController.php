@@ -95,13 +95,14 @@ class PurchaseConceptProductController extends AdminController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, PurchaseConceptProduct $model)
+    public function update(Request $request, PurchaseConceptProduct $purchase_concept_product)
     {
         $validate = validator($request->all(), []);
         if ($validate->fails()) {
             return $this->sendResponseBadRequest($validate->errors()->first());
         }
-        $updated = $model->update($request->all());
+        // dd($purchase_concept_product->id,$request->all());
+        $updated = $purchase_concept_product->update($request->all());
         if (!$updated) {
             return $this->sendResponseBadRequest("Failed update.");
         }

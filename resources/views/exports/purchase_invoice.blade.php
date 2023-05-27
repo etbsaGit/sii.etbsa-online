@@ -10,6 +10,7 @@
             <th>Proveedor</th>
             <th>Proveedor RFC</th>
             <th>Concepto</th>
+            <th>Articulos</th>
             <th>Motivo</th>
         </tr>
     </thead>
@@ -17,7 +18,9 @@
         @foreach ($invoice as $item)
             @php
                 $cargo = json_encode($item->invoiceable->charges);
+                $products = json_encode($item->invoiceable->products);
                 $cargos = json_decode($cargo);
+                $partidas = json_decode($products);
             @endphp
             <tr>
                 <td>{{ $item->folio_fiscal }}</td>
@@ -34,6 +37,12 @@
                 <td>{{ $item->invoiceable->supplier->business_name }}</td>
                 <td>{{ $item->invoiceable->supplier->rfc }}</td>
                 <td>{{ $item->invoiceable->purchase_concept->name }}</td>
+                <td>
+                    @foreach ($partidas as $partida)
+                        {{ $partida->description . ' - ' . $partida->group->name }}
+                        <br />
+                    @endforeach
+                </td>
                 <td>
                     {{ $item->invoiceable->observation }}
                 </td>
