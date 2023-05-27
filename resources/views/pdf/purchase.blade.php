@@ -298,7 +298,10 @@
                                 Realizo: <b>{{ $data->elaborated->name }}</b> <br>
                                 Cargos A:
                                 @foreach ($data->chargeAgency as $agency)
-                                    <b>{{ $agency->title }}</b>,
+                                    <b>{{ $agency->title }}</b>-
+                                @endforeach
+                                @foreach ($data->chargeDepartment as $department)
+                                    <b>{{ $department->title }}</b>,
                                 @endforeach
                             </td>
 
@@ -404,15 +407,15 @@
             </tr>
         </table>
         <table>
-            <tr class="heading">
+            {{-- <tr class="heading">
                 <td>Observacion</td>
                 <td colspan="5"></td>
             </tr>
-            <tr class="item">
+            <tr class="item">yarn
                 <td colspan="6">
                     {{ $data->observation }}
                 </td>
-            </tr>
+            </tr> --}}
             <tr class="heading">
                 <td>Nota</td>
                 <td colspan="5"></td>

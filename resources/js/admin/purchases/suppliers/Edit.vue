@@ -19,6 +19,7 @@
         :disabled="!valid"
         @click="updateSupplier"
         block
+        dark
       >
         Guardar
       </v-btn>
@@ -49,6 +50,7 @@ export default {
         phone: null,
         contact: null,
         addresses: null,
+        isActive: 0,
         billing_data: [],
         estate_id: "",
         township_id: "",

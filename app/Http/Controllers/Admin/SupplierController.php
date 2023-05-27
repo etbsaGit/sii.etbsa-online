@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App;
+use App\Components\Requirements\Models\RequirementDocuments;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Auth;
@@ -46,14 +47,16 @@ class SupplierController extends AdminController
      */
     public function store(Request $request)
     {
+        dd($request->all());
 
         $validate = validator($request->all(), [
             'business_name' => 'required|unique:suppliers,business_name',
             'rfc' => 'required|min:12|unique:suppliers,rfc',
         ], [
-            'rfc.unique' => 'El RFC ya existe en un Registro',
-            'rfc.min' => 'RFC debe ser valido'
-        ]);
+                'rfc.unique' => 'El RFC ya existe en un Registro',
+                'rfc.min' => 'RFC debe ser valido'
+            ]);
+
 
         if ($validate->fails()) {
             return $this->sendResponseBadRequest($validate->errors()->first());
@@ -65,7 +68,14 @@ class SupplierController extends AdminController
             return $this->sendResponseBadRequest("Failed to create.");
         }
 
-        return $this->sendResponseCreated($supplier);
+        return $this->sendResponseCreated([$supplier]);
+    }
+
+    public function create()
+    {
+        $requirements = RequirementDocuments::supplirsRequirements()->get(["id", "name", "description"]);
+
+        return $this->sendResponse(compact('requirements'));
     }
 
     /**

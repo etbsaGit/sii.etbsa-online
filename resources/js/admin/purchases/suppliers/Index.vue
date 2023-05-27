@@ -53,10 +53,14 @@
         </dialog-component>
       </v-toolbar>
     </template>
+    <template #[`item.isActive`]="{ value }">
+      <v-icon v-if="value == 1" color="green">mdi-check-circle</v-icon>
+      <v-icon v-else color="grey">mdi-alert-circle</v-icon>
+    </template>
     <template #[`item.actions`]="{ item }">
-      <v-icon @click="editItem(item)">
+      <!-- <v-icon @click="editItem(item)">
         mdi-information-outline
-      </v-icon>
+      </v-icon> -->
       <v-btn
         icon
         :to="{ name: 'suppliers.edit', params: { supplierId: item.id } }"
@@ -93,10 +97,10 @@ export default {
       headers: [
         { value: "actions", align: "center", sortable: false },
         {
-          text: "Alias",
+          text: "Num. Equip",
           align: "start",
           sortable: false,
-          value: "alias",
+          value: "code_equip",
         },
         {
           text: "Proveedor",
@@ -105,8 +109,13 @@ export default {
           value: "business_name",
         },
         { text: "RFC", value: "rfc" },
-        { text: "Telefono", value: "phone" },
-        { text: "Email", value: "email" },
+        {
+          text: "Validado",
+          value: "isActive",
+          align: "center",
+          sortable: false,
+        }
+        // { text: "Email", value: "email", sortable: false },
       ],
       editedId: -1,
       items: [],
@@ -177,7 +186,7 @@ export default {
       };
       await axios
         .get("/admin/suppliers", { params: params })
-        .then(function (response) {
+        .then(function(response) {
           let Response = response.data.data;
           _this.items = Response.data;
           _this.totalItems = Response.total;
@@ -204,7 +213,7 @@ export default {
           document.body.appendChild(link);
           link.click();
         })
-        .catch(function (error) {
+        .catch(function(error) {
           if (error.response) {
             _this.$store.commit("showSnackbar", {
               message: error.response.data.message,
@@ -221,12 +230,12 @@ export default {
   },
   watch: {
     pagination: {
-      handler: _.debounce(function () {
+      handler: _.debounce(function() {
         this.reloadTable();
       }, 999),
       deep: true,
     },
-    search: _.debounce(function (v) {
+    search: _.debounce(function(v) {
       this.reloadTable();
     }, 999),
   },

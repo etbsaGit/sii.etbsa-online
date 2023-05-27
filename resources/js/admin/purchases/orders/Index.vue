@@ -237,7 +237,7 @@
                 <v-icon class="blue--text">mdi-printer</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title>Dercargar OC PDF</v-list-item-title>
+                <v-list-item-title>Descargar OC PDF</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
             <v-list-item

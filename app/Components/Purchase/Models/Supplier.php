@@ -104,6 +104,11 @@ class Supplier extends Model
         return unserialize($this->attributes['giro']);
     }
 
+    public function scopeIsActive($query)
+    {
+        $query->where('isActive', true);
+    }
+
     public function scopeSearch($query, String $search)
     {
         $query->when($search ?? null, function ($query, $search) {
