@@ -53,9 +53,12 @@ class SupplierController extends AdminController
 
         return DB::transaction(function ($result) use ($request) {
             $validate = validator($request->all(), [
+                'code_equip' => 'required|unique:suppliers,code_equip',
                 'business_name' => 'required|unique:suppliers,business_name',
                 'rfc' => 'required|min:12|unique:suppliers,rfc',
             ], [
+                    'code_equip.required' => 'La Clave de Equip es Obligatoria',
+                    'code_equip.unique' => 'La Clave de Equip esta Duplicada',
                     'rfc.unique' => 'El RFC ya existe en un Registro',
                     'rfc.min' => 'RFC debe ser valido'
                 ]);
@@ -95,13 +98,8 @@ class SupplierController extends AdminController
 
     public function edit(Supplier $supplier)
     {
-
-        $requirementsDefault = $this->supplierRepository->getSupplierRequirementDefault();
-        $supplier->documents = $supplier->requirements->isNotEmpty()
-            ? $this->supplierRepository->getSupplierDocuments($supplier)
-            : $requirementsDefault;
+        $supplier->documents = $this->supplierRepository->getSupplierDocuments($supplier);
         unset($supplier->requirements);
-
         return $this->sendResponseOk(compact('supplier'), "Recurso Encontrado");
     }
     /**
@@ -118,12 +116,16 @@ class SupplierController extends AdminController
             $validate = validator(
                 $request->all(),
                 [
+                    'code_equip' =>
+                    ['required', Rule::unique('suppliers')->ignore($supplier->id)],
                     'business_name' =>
                     ['required', Rule::unique('suppliers')->ignore($supplier->id)],
                     'rfc' =>
                     ['required', 'min:12', Rule::unique('suppliers')->ignore($supplier->id)],
                 ],
                 [
+                    'code_equip.required' => 'La Clave de Equip es Obligatoria',
+                    'code_equip.unique' => 'La Clave de Equip esta Duplicada',
                     'rfc.unique' => 'El RFC ya existe en un Registro',
                     'rfc.min' => 'RFC debe ser valido'
                 ]
