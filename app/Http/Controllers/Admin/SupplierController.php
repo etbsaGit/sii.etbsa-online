@@ -51,22 +51,22 @@ class SupplierController extends AdminController
     public function store(Request $request)
     {
 
+        $validate = validator($request->all(), [
+            'code_equip' => 'required|unique:suppliers,code_equip',
+            'business_name' => 'required|unique:suppliers,business_name',
+            'rfc' => 'required|min:12|unique:suppliers,rfc',
+        ], [
+                'code_equip.required' => 'La Clave de Equip es Obligatoria',
+                'code_equip.unique' => 'La Clave de Equip esta Duplicada',
+                'rfc.unique' => 'El RFC ya existe en un Registro',
+                'rfc.min' => 'RFC debe ser valido'
+            ]);
+
+
+        if ($validate->fails()) {
+            return $this->sendResponseBadRequest($validate->errors()->first());
+        }
         return DB::transaction(function ($result) use ($request) {
-            $validate = validator($request->all(), [
-                'code_equip' => 'required|unique:suppliers,code_equip',
-                'business_name' => 'required|unique:suppliers,business_name',
-                'rfc' => 'required|min:12|unique:suppliers,rfc',
-            ], [
-                    'code_equip.required' => 'La Clave de Equip es Obligatoria',
-                    'code_equip.unique' => 'La Clave de Equip esta Duplicada',
-                    'rfc.unique' => 'El RFC ya existe en un Registro',
-                    'rfc.min' => 'RFC debe ser valido'
-                ]);
-
-
-            if ($validate->fails()) {
-                return $this->sendResponseBadRequest($validate->errors()->first());
-            }
 
             $supplier = $this->supplierRepository->create($request->all());
             if (!$supplier) {
@@ -112,27 +112,27 @@ class SupplierController extends AdminController
     public function update(Request $request, Supplier $supplier)
     {
 
+        $validate = validator(
+            $request->all(),
+            [
+                'code_equip' =>
+                ['required', Rule::unique('suppliers')->ignore($supplier->id)],
+                'business_name' =>
+                ['required', Rule::unique('suppliers')->ignore($supplier->id)],
+                'rfc' =>
+                ['required', 'min:12', Rule::unique('suppliers')->ignore($supplier->id)],
+            ],
+            [
+                'code_equip.required' => 'La Clave de Equip es Obligatoria',
+                'code_equip.unique' => 'La Clave de Equip esta Duplicada',
+                'rfc.unique' => 'El RFC ya existe en un Registro',
+                'rfc.min' => 'RFC debe ser valido'
+            ]
+        );
+        if ($validate->fails()) {
+            return $this->sendResponseBadRequest($validate->errors()->first());
+        }
         return DB::transaction(function ($result) use ($request, $supplier) {
-            $validate = validator(
-                $request->all(),
-                [
-                    'code_equip' =>
-                    ['required', Rule::unique('suppliers')->ignore($supplier->id)],
-                    'business_name' =>
-                    ['required', Rule::unique('suppliers')->ignore($supplier->id)],
-                    'rfc' =>
-                    ['required', 'min:12', Rule::unique('suppliers')->ignore($supplier->id)],
-                ],
-                [
-                    'code_equip.required' => 'La Clave de Equip es Obligatoria',
-                    'code_equip.unique' => 'La Clave de Equip esta Duplicada',
-                    'rfc.unique' => 'El RFC ya existe en un Registro',
-                    'rfc.min' => 'RFC debe ser valido'
-                ]
-            );
-            if ($validate->fails()) {
-                return $this->sendResponseBadRequest($validate->errors()->first());
-            }
             $updated = $supplier->update($request->all());
             if (!$updated) {
                 return $this->sendResponseBadRequest("Error en la Actualizacion");
