@@ -26,6 +26,10 @@ class Estatus extends Model
     const ESTATUS_DESPACHADO = 'flotilla.despachado';
     const ESTATUS_EnSERVICIO = 'flotilla.enServicio';
     const ESTATUS_SERVICIO_TERMINADO = 'flotilla.servicio.terminado';
+    const ESTATUS_SIN_DOCUMENTO = 'documento.none';
+    const ESTATUS_DOCUMENTO_VALIDO = 'documento.valido';
+    const ESTATUS_DOCUMENTO_INVALIDO = 'documento.invalido';
+    const ESTATUS_DOCUMENTO_REVICION = 'documento.revicion';
 
 
     /**

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App;
+use App\Components\Common\Models\Estatus;
 use App\Components\Requirements\Models\RequirementDocuments;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Auth;
@@ -11,6 +13,7 @@ use Auth;
 use App\Components\Purchase\Repositories\SupplierRepository;
 use App\Components\Purchase\Models\Supplier;
 use App\Exports\SupplierExport;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class SupplierController extends AdminController
@@ -18,15 +21,15 @@ class SupplierController extends AdminController
     /**
      * @var SupplierRepository
      */
-    private $supllierRepository;
+    private $supplierRepository;
 
     /**
      * UserController constructor.
-     * @param SupplierRepository $supllierRepository
+     * @param SupplierRepository $supplierRepository
      */
-    public function __construct(SupplierRepository $supllierRepository)
+    public function __construct(SupplierRepository $supplierRepository)
     {
-        $this->supllierRepository = $supllierRepository;
+        $this->supplierRepository = $supplierRepository;
     }
     /**
      * Display a listing of the resource.
@@ -35,7 +38,7 @@ class SupplierController extends AdminController
      */
     public function index()
     {
-        $data = $this->supllierRepository->list(request()->all());
+        $data = $this->supplierRepository->list(request()->all());
         return $this->sendResponseOk($data, "list suppliers ok.");
     }
 
@@ -47,95 +50,132 @@ class SupplierController extends AdminController
      */
     public function store(Request $request)
     {
-        dd($request->all());
 
-        $validate = validator($request->all(), [
-            'business_name' => 'required|unique:suppliers,business_name',
-            'rfc' => 'required|min:12|unique:suppliers,rfc',
-        ], [
-                'rfc.unique' => 'El RFC ya existe en un Registro',
-                'rfc.min' => 'RFC debe ser valido'
-            ]);
+        return DB::transaction(function ($result) use ($request) {
+            $validate = validator($request->all(), [
+                'business_name' => 'required|unique:suppliers,business_name',
+                'rfc' => 'required|min:12|unique:suppliers,rfc',
+            ], [
+                    'rfc.unique' => 'El RFC ya existe en un Registro',
+                    'rfc.min' => 'RFC debe ser valido'
+                ]);
 
 
-        if ($validate->fails()) {
-            return $this->sendResponseBadRequest($validate->errors()->first());
-        }
+            if ($validate->fails()) {
+                return $this->sendResponseBadRequest($validate->errors()->first());
+            }
 
-        $supplier = $this->supllierRepository->create($request->all());
+            $supplier = $this->supplierRepository->create($request->all());
+            if (!$supplier) {
+                return $this->sendResponseBadRequest("Failed to create.");
+            }
+            $this->supplierRepository->syncDocuments($supplier, $request->documents);
 
-        if (!$supplier) {
-            return $this->sendResponseBadRequest("Failed to create.");
-        }
+            return $this->sendResponseCreated([$supplier]);
+        });
 
-        return $this->sendResponseCreated([$supplier]);
     }
 
     public function create()
     {
-        $requirements = RequirementDocuments::supplirsRequirements()->get(["id", "name", "description"]);
-
+        $requirements = $this->supplierRepository->getSupplierRequirementDefault();
         return $this->sendResponse(compact('requirements'));
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Supplier  $supplier
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Supplier $supplier)
-    {
-        //
-    }
+    // /**
+    //  * Display the specified resource.
+    //  *
+    //  * @param  \App\Supplier  $supplier
+    //  * @return \Illuminate\Http\Response
+    //  */
+    // public function show(Supplier $supplier)
+    // {
+    //     //
+    // }
 
     public function edit(Supplier $supplier)
     {
-        return $this->sendResponseOk($supplier, "Edit Supplier.");
+
+        $requirementsDefault = $this->supplierRepository->getSupplierRequirementDefault();
+        $supplier->documents = $supplier->requirements->isNotEmpty()
+            ? $this->supplierRepository->getSupplierDocuments($supplier)
+            : $requirementsDefault;
+        unset($supplier->requirements);
+
+        return $this->sendResponseOk(compact('supplier'), "Recurso Encontrado");
     }
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Supplier  $supplier
+     * @param  App\Components\Purchase\Models\Supplier  $supplier
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Supplier $supplier)
     {
 
-        $validate = validator(
-            $request->all(),
-            [
-                'business_name' =>
-                ['required', Rule::unique('suppliers')->ignore($supplier->id)],
-                'rfc' =>
-                ['required', 'min:12', Rule::unique('suppliers')->ignore($supplier->id)],
-            ],
-            [
-                'rfc.unique' => 'El RFC ya existe en un Registro',
-                'rfc.min' => 'RFC debe ser valido'
-            ]
-        );
-        if ($validate->fails()) {
-            return $this->sendResponseBadRequest($validate->errors()->first());
-        }
-
-        $updated = $supplier->update($request->all());
-        if (!$updated) {
-            return $this->sendResponseBadRequest("Error en la Actualizacion");
-        }
-
-        return $this->sendResponseUpdated();
+        return DB::transaction(function ($result) use ($request, $supplier) {
+            $validate = validator(
+                $request->all(),
+                [
+                    'business_name' =>
+                    ['required', Rule::unique('suppliers')->ignore($supplier->id)],
+                    'rfc' =>
+                    ['required', 'min:12', Rule::unique('suppliers')->ignore($supplier->id)],
+                ],
+                [
+                    'rfc.unique' => 'El RFC ya existe en un Registro',
+                    'rfc.min' => 'RFC debe ser valido'
+                ]
+            );
+            if ($validate->fails()) {
+                return $this->sendResponseBadRequest($validate->errors()->first());
+            }
+            $updated = $supplier->update($request->all());
+            if (!$updated) {
+                return $this->sendResponseBadRequest("Error en la Actualizacion");
+            }
+            $supplier->refresh();
+            $syncDocument = [];
+            if ($documents = $request->documents ?? []) {
+                foreach ($documents as $index => $document) {
+                    if ($document) {
+                        $current_path = $supplier->requirements()
+                            ->wherePivot('requirement_documents_id', $document['id'])
+                            ->first()->pivot->file_path ?? null;
+                        $newFile = $document['file'] ?? null;
+                        $pivot = [
+                            'file_path' => !!$newFile ?
+                            $document['file']->store('supplier/id_' . $supplier->id . '/' . $document['key'], 's3')
+                            : $current_path ?? null,
+                            'status_id' => Estatus::where('key', $document['status_key'])->first()->id,
+                            'date_due' => !!$newFile ? Carbon::now()->addMonths(3) : $document['date_due'] ?? null,
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ];
+                        // delete old file if exists and if has new File or if status document is none
+                        if ((Storage::disk('s3')->exists($current_path) && !!$newFile) || $document['status_key'] == 'documento.none') {
+                            Storage::disk('s3')->delete($current_path);
+                            $pivot['file_path'] = null;
+                        }
+                        $syncDocument[$document['id']] = $pivot;
+                    }
+                }
+                $supplier->requirements()->sync($syncDocument);
+            }
+            return $this->sendResponseUpdated();
+        });
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Supplier  $supplier
+     * @param  App\Components\Purchase\Models\Supplier  $supplier
      * @return \Illuminate\Http\Response
      */
     public function destroy(Supplier $supplier)
     {
-        //
+        $supplier->delete();
+        return $this->sendResponseDeleted();
     }
 }

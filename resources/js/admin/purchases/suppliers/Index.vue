@@ -105,7 +105,6 @@ export default {
         {
           text: "Proveedor",
           align: "start",
-          sortable: false,
           value: "business_name",
         },
         { text: "RFC", value: "rfc" },
@@ -129,7 +128,7 @@ export default {
   },
   mounted() {
     const _this = this;
-    _this.reloadTable();
+    // _this.reloadTable();
     _this.$eventBus.$on(["SUPPLIER_REFRESH"], () => {
       _this.reloadTable();
     });
@@ -179,8 +178,8 @@ export default {
       const _this = this;
       let params = {
         search: _this.search,
-        order_sort: _this.pagination.sortDesc[0] ? "desc" : "asc",
-        order_by: _this.pagination.sortBy[0] || "business_name",
+        order_sort: _this.pagination.sortDesc[0] ? "asc" : "desc",
+        order_by: _this.pagination.sortBy[0] || "id",
         page: _this.pagination.page,
         per_page: _this.pagination.itemsPerPage,
       };

@@ -51,6 +51,12 @@ export default class PurchasePolicy {
     }
     return user["proveedor.editar"] === 1;
   }
+  static auditDocument(user) {
+    if (this.isAdmin(user)) {
+      return true;
+    }
+    return user["documentos.auditor"] === 1;
+  }
 
   static activeSupplier(user) {
     if (this.isAdmin(user)) {

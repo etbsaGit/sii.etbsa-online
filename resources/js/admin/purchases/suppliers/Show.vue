@@ -153,7 +153,7 @@ export default {
             color: "success",
             duration: 3000,
           });
-          _this.$eventBus.$emit("SUPPLIER_REFRESH");
+          // _this.$eventBus.$emit("SUPPLIER_REFRESH");
         })
         .catch(function (error) {
           _this.$store.commit("hideLoader");

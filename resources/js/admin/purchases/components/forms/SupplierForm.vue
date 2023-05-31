@@ -33,6 +33,7 @@
           <v-col cols="12">
             <v-text-field
               v-model="form.business_name"
+              :rules="[(v) => !!v || 'Es Requerido']"
               label="Razon Social:"
               outlined
               dense
@@ -41,8 +42,6 @@
           <v-col cols="12" md="6">
             <v-text-field
               v-model="form.phone"
-              v-mask="'(###)###-##-##'"
-              placeholder="(###)###-##-##"
               hint="Numero 10 digitos"
               label="Telefono:"
               outlined
@@ -109,6 +108,7 @@
             <v-select
               v-model="form.credit_days"
               label="Condicion de Pago:"
+              :rules="[(v) => !!v || 'Es Requerido']"
               outlined
               :items="[
                 { text: 'Contado', value: 5 },
@@ -217,7 +217,7 @@
             </v-expansion-panel-header>
             <v-expansion-panel-content>
               <v-simple-table
-                v-show="form.contacts.length > 0"
+                v-show="form.contacts && form.contacts.length > 0"
                 class="text-uppercase mt-3"
                 dense
               >
@@ -256,7 +256,7 @@
                     <v-text-field
                       v-model="contact.name"
                       label="Nombre contacto (obligatorio)"
-                      :rules="[rules.required]"
+                      :rules="[(v) => !!v || 'Es Requerido']"
                       outlined
                       dense
                     ></v-text-field
@@ -265,10 +265,10 @@
                     <v-text-field
                       v-model="contact.phone"
                       label="Telefono (obligatorio)"
-                      v-mask="'(###)###-##-## Ext: ###'"
+                     
                       placeholder="(###)###-##-## Ext: ###"
                       hint="Numero 10 digitos"
-                      :rules="[rules.requred, rules.counter]"
+                      :rules="[(v) => !!v || 'Es Requerido']"
                       outlined
                       dense
                     ></v-text-field>

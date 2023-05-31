@@ -15,11 +15,11 @@ class CreateRequireablesTable extends Migration
     {
         Schema::create('requireables', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('requeriement_document_id');
-            $table->foreignId('requireables_document_id');
-            $table->string('requireables_document_type');
+            $table->foreignId('requirement_documents_id');
+            $table->foreignId('requireable_id');
+            $table->string('requireable_type');
             
-            $table->string('file_path');
+            $table->string('file_path')->nullable();
             $table->date('date_due')->nullable();
             $table->foreignId('status_id')->nullable();
 

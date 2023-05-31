@@ -44,7 +44,8 @@ class PurchaseOrderController extends AdminController
 
     public function resources()
     {
-        $suppliers = Supplier::with([])->get()->map->only(['id', 'business_name', 'rfc', 'phone', 'email', 'credit_days']);
+        $suppliers = Supplier::with([])->get()->map->only(['id', 'code_equip', 'business_name', 'rfc', 'phone', 'email', 'credit_days']);
+        // $suppliers = Supplier::IsActive()->get()->map->only(['id', 'code_equip', 'business_name', 'rfc', 'phone', 'email', 'credit_days']);
         $agencies = DB::table('agencies')->get(['id', 'code', 'title']);
         $departments = DB::table('departments')->get(['id', 'title']);
         $metodoPago = DB::table('cat_metodo_pago')->get(['clave', 'description']);
@@ -52,7 +53,6 @@ class PurchaseOrderController extends AdminController
         $formaPago = DB::table('cat_forma_pago')->get(['clave', 'description']);
         $unitSat = DB::table('cat_unit_sat')->get(['id', 'clave', 'name', 'type']);
         $purchase_concept = PurchaseConcept::with('usocfdi', 'purchaseType', 'conceptProduct')->get();
-        // $purchase_types = PurchaseType::with('purchaseConcept')->get();
         $purchase_types = PurchaseType::with('purchaseConcept')->get()->transform(function ($model) {
             return [
                 'id' => $model->id,
@@ -92,27 +92,27 @@ class PurchaseOrderController extends AdminController
      */
     public function store(Request $request)
     {
-        $validate = validator($request->all(), [
-            'supplier_id' => 'required',
-            'subtotal' => 'required',
-            'discount' => 'required',
-            'total' => 'required',
-            'charges' => 'required|Array',
-            'products' => 'required|Array',
-            'payment_condition' => 'required',
-            'purchase_concept_id' => 'required',
-            'observation' => 'required',
-            'uso_cfdi' => 'required',
-            'metodo_pago' => 'required',
-            'forma_pago' => 'required',
-        ], []);
 
-        if ($validate->fails()) {
-            return $this->sendResponseBadRequest($validate->errors()->first());
-        }
-
-        DB::transaction(
+        return DB::transaction(
             function () use ($request) {
+                $validate = validator($request->all(), [
+                    'supplier_id' => 'required',
+                    'subtotal' => 'required',
+                    'discount' => 'required',
+                    'total' => 'required',
+                    'charges' => 'required|Array',
+                    'products' => 'required|Array',
+                    'payment_condition' => 'required',
+                    'purchase_concept_id' => 'required',
+                    'observation' => 'required',
+                    'uso_cfdi' => 'required',
+                    'metodo_pago' => 'required',
+                    'forma_pago' => 'required',
+                ], []);
+
+                if ($validate->fails()) {
+                    return $this->sendResponseBadRequest($validate->errors()->first());
+                }
                 $request['created_by'] = Auth::user()->id;
                 $purchasesOrder = $this->purchaseOrderRepository->create($request->all());
 
@@ -151,7 +151,7 @@ class PurchaseOrderController extends AdminController
                     }
                 }
                 $purchasesOrder->refresh();
-                return $this->sendResponseCreated($purchasesOrder);
+                return $this->sendResponseCreated([$purchasesOrder]);
             }
         );
 
@@ -162,13 +162,13 @@ class PurchaseOrderController extends AdminController
     /**
      * Display the specified resource.
      *
-     * @param  \App\PurchaseOrder  $purchaseOrder
+     * @param  App\Components\Purchase\Models\PurchaseOrder  $purchaseOrder
      * @return \Illuminate\Http\Response
      */
-    public function show(PurchaseOrder $purchaseOrder)
-    {
-        //
-    }
+    // public function show(PurchaseOrder $purchaseOrder)
+    // {
+    //     //
+    // }
 
     public function edit(PurchaseOrder $purchase_order)
     {
@@ -215,38 +215,38 @@ class PurchaseOrderController extends AdminController
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\PurchaseOrder  $purchaseOrder
+     * @param  App\Components\Purchase\Models\PurchaseOrder  $purchaseOrder
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, PurchaseOrder $purchase_order)
     {
-        $request['updated_by'] = Auth::user()->id;
-        $validate = validator($request->all(), [
-            'supplier_id' => 'required',
-            'subtotal' => 'required',
-            'discount' => 'required',
-            'total' => 'required',
-            'charges' => 'required|Array',
-            'products' => 'required|Array',
-            'payment_condition' => 'required',
-            'purchase_concept_id' => 'required',
-            'observation' => 'required',
-            'uso_cfdi' => 'required',
-            'metodo_pago' => 'required',
-            'forma_pago' => 'required',
-            'updated_by' => 'required'
-        ], []);
-
-        if ($validate->fails()) {
-            return $this->sendResponseBadRequest($validate->errors()->first());
-        }
-        if ($request['estatus.key'] == 'denegar') {
-            $estatus = Estatus::where('key', Estatus::ESTATUS_PENDIENTE)->first();
-            $purchase_order->estatus()->associate($estatus);
-            $purchase_order->save();
-        }
-        DB::transaction(
+        return DB::transaction(
             function () use ($purchase_order, $request) {
+                $request['updated_by'] = Auth::user()->id;
+                $validate = validator($request->all(), [
+                    'supplier_id' => 'required',
+                    'subtotal' => 'required',
+                    'discount' => 'required',
+                    'total' => 'required',
+                    'charges' => 'required|Array',
+                    'products' => 'required|Array',
+                    'payment_condition' => 'required',
+                    'purchase_concept_id' => 'required',
+                    'observation' => 'required',
+                    'uso_cfdi' => 'required',
+                    'metodo_pago' => 'required',
+                    'forma_pago' => 'required',
+                    'updated_by' => 'required'
+                ], []);
+
+                if ($validate->fails()) {
+                    return $this->sendResponseBadRequest($validate->errors()->first());
+                }
+                if ($request['estatus.key'] == 'denegar') {
+                    $estatus = Estatus::where('key', Estatus::ESTATUS_PENDIENTE)->first();
+                    $purchase_order->estatus()->associate($estatus);
+                    $purchase_order->save();
+                }
                 $updated = $purchase_order->update($request->all());
                 if (!$updated) {
                     return $this->sendResponseBadRequest("Error en la Actualizacion");
@@ -290,12 +290,13 @@ class PurchaseOrderController extends AdminController
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\PurchaseOrder  $purchaseOrder
+     * @param  App\Components\Purchase\Models\PurchaseOrder $purchaseOrder
      * @return \Illuminate\Http\Response
      */
     public function destroy(PurchaseOrder $purchaseOrder)
     {
-        //
+        $purchaseOrder->delete();
+        return $this->sendResponseDeleted();
     }
 
     public function print(PurchaseOrder $purchaseOrder)
