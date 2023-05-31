@@ -17,10 +17,13 @@
                   item-text="business_name"
                   item-value="id"
                   label="Proveedor:"
-                  placeholder="Buscar por Nombre | RFC | Email"
+                  placeholder="Buscar por #Equip | Nombre | RFC | Email"
                   persistent-placeholder
                   persistent-hint
-                  :hint="`RFC: ${form.supplier.rfc || ''}`"
+                  :hint="
+                    `RFC: ${form.supplier.rfc || ''} 
+                    #Equip ${form.supplier.code_equip || ''}`
+                  "
                   :filter="customFilter"
                   :rules="[(v) => !!v || 'Es Requerido']"
                   return-object
@@ -29,9 +32,21 @@
                   dense
                 >
                   <template v-slot:item="{ item }">
-                    <v-list-item-title v-text="item.business_name" />
-                    <v-list-item-subtitle v-html="item.rfc" />
-                    <v-list-item-subtitle v-html="item.email" />
+                    <v-list-item-content>
+                      <v-list-item-title
+                        class="text-uppercase font-weight-bold"
+                      >
+                        {{ item.business_name }}
+                      </v-list-item-title>
+                      <v-list-item-subtitle class="text-subtitle-2">
+                        {{
+                          `#Equip:${item.code_equip || "S/R"}  RFC:${item.rfc}`
+                        }}
+                      </v-list-item-subtitle>
+                      <v-list-item-subtitle>
+                        {{ item.email }}
+                      </v-list-item-subtitle>
+                    </v-list-item-content>
                   </template>
                 </v-autocomplete>
               </v-card-title>
@@ -90,40 +105,10 @@
                   </v-col>
                 </v-row>
               </v-card-text>
-              <!-- <template v-if="!!PurchaseConceptProduct"> -->
               <v-card-title class="pt-0">
                 Articulos
                 <v-spacer></v-spacer>
-                <!-- <v-dialog transition="dialog-top-transition" max-width="600">
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn icon v-bind="attrs" v-on="on">
-                      <v-icon>mdi-file-import-outline</v-icon>
-                    </v-btn>
-                  </template>
-                  <template v-slot:default="dialog">
-                    <v-card>
-                      <v-card-title
-                        class="white--text primary title text-uppercase"
-                      >
-                        Importar Articulos
-                      </v-card-title>
-                      <v-container fluid>
-                        <import-csv-component
-                          v-if="dialog.value"
-                          @input="inputImportCsv"
-                          :map-fields="mapFields"
-                          loadBtnText="Cargar CSV"
-                          submitBtnText="Importar"
-                          :callback="loadImportCb"
-                          :catch="loadImportCatch"
-                        ></import-csv-component>
-                      </v-container>
-                      <v-card-actions class="justify-end">
-                        <v-btn text @click="dialog.value = false">Cerrar</v-btn>
-                      </v-card-actions>
-                    </v-card>
-                  </template>
-                </v-dialog> -->
+
                 <v-btn icon @click="form.products = []">
                   <v-icon color="red">mdi-delete-empty-outline</v-icon>
                 </v-btn>
@@ -137,14 +122,12 @@
                   :SupplierIdProp="form.supplier.id"
                   :ConceptProductProp="PurchaseConceptProduct"
                 ></purchase-products-table>
-                <!-- :ConceptProductProp="PurchaseConceptProduct" -->
               </v-card-text>
               <v-card-actions>
                 <v-btn text color="blue" @click="dialogSupplierProducts = true">
                   <v-icon left>mdi-plus</v-icon> Agregar Articulo o Servicio
                 </v-btn>
               </v-card-actions>
-              <!-- </template> -->
             </v-card>
             <v-card flat>
               <v-row dense>
@@ -303,8 +286,10 @@ export default {
         agencies: [],
         departments: [],
         payment_condition: [
+          { text: "Contado", value: 5 },
           { text: "8 Dias", value: 8 },
           { text: "15 Dias", value: 15 },
+          { text: "25 Dias", value: 25 },
           { text: "30 Dias", value: 30 },
           { text: "60 Dias", value: 60 },
           { text: "90 Dias", value: 90 },
@@ -437,7 +422,7 @@ export default {
       };
       await axios
         .post("/admin/purchase-order", payload)
-        .then(function (response) {
+        .then(function(response) {
           _this.$store.commit("showSnackbar", {
             message: response.data.message,
             color: "success",
@@ -446,7 +431,7 @@ export default {
           _this.$eventBus.$emit("ORDERS_REFRESH");
           _this.$router.go(-1);
         })
-        .catch(function (error) {
+        .catch(function(error) {
           _this.$store.commit("hideLoader");
           if (error.response) {
             _this.$store.commit("showSnackbar", {
@@ -466,9 +451,13 @@ export default {
       const _this = this;
       await axios
         .get("/admin/purchase-order/resources/options")
-        .then(function (response) {
-          let { suppliers, agencies, departments, purchase_types } =
-            response.data.data;
+        .then(function(response) {
+          let {
+            suppliers,
+            agencies,
+            departments,
+            purchase_types,
+          } = response.data.data;
           _this.options.suppliers = suppliers;
           _this.options.agencies = agencies;
           _this.options.departments = departments;
@@ -494,12 +483,16 @@ export default {
       console.log("Dialog closed");
     },
     customFilter(item, queryText, itemText) {
-      const textName = item.business_name.toLowerCase();
-      const textRfc = item.rfc.toLowerCase();
-      const textEmail = item.email.toLowerCase();
+      const textEquip = item.code_equip ? item.code_equip.toLowerCase() : "";
+      const textName = item.business_name
+        ? item.business_name.toLowerCase()
+        : "";
+      const textRfc = item.rfc ? item.rfc.toLowerCase() : "";
+      const textEmail = item.email ? item.email.toLowerCase() : "";
       const searchText = queryText.toLowerCase();
 
       return (
+        textEquip.indexOf(searchText) > -1 ||
         textName.indexOf(searchText) > -1 ||
         textRfc.indexOf(searchText) > -1 ||
         textEmail.indexOf(searchText) > -1

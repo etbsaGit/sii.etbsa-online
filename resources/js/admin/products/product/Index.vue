@@ -231,7 +231,7 @@
           {{ formTitle }}
         </v-toolbar>
         <v-card-text class="pt-4">
-          <v-form ref="form" v-model="valid" lazy-validation>
+          <v-form ref="formProduct" v-model="valid" lazy-validation>
             <v-select
               v-model="form.product_category_id"
               :items="options.category"
@@ -760,9 +760,9 @@ export default {
       const _this = this;
       _this.dialog = true;
       _this.editedId = -1;
-      _this.$refs.form.reset();
-      _this.$refs.form.resetValidation();
       setTimeout(() => {
+        _this.$refs.formProduct.reset
+        _this.$refs.formProduct.resetValidation();
         _this.form = { ...this.formDefault };
       }, 1000);
     },
@@ -770,7 +770,7 @@ export default {
       const _this = this;
       _this.dialog = true;
       setTimeout(() => {
-        _this.$refs.form.resetValidation();
+        _this.$refs.formProduct.resetValidation();
         _this.editedId = item.id;
         _this.form.product_category_id = item.product_category_id;
         _this.form.product_model_id = item.product_model_id;
@@ -798,7 +798,7 @@ export default {
     },
     async submit() {
       const _this = this;
-      if (!this.$refs.form.validate()) {
+      if (!_this.$refs.formProduct.validate()) {
         return;
       }
       let payload = {
@@ -809,8 +809,7 @@ export default {
         currency_id: !!_this.form.is_dollar ? 2 : 1,
       };
       if (_this.editedId === -1) {
-        //create
-        console.log("Store", this.form);
+        // console.log("Store", this.form);
         await axios
           .post("/admin/products", payload)
           .then((response) => {

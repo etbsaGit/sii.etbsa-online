@@ -4,6 +4,15 @@
       <v-icon class="mr-2">mdi-account-edit</v-icon> Editar Informacion
       Proveedor
       <v-spacer></v-spacer>
+      <v-btn
+        v-if="$gate.allow('editSupplier', 'compras')"
+        color="primary"
+        :disabled="!valid"
+        @click="updateSupplier"
+        dark
+      >
+        Guardar
+      </v-btn>
     </v-card-title>
     <v-card-text>
       <supplier-form
@@ -41,19 +50,28 @@ export default {
     return {
       valid: true,
       supplier: {
-        id: null,
-        code_equip: null,
-        business_name: null,
-        rfc: null,
-        address: null,
-        email: null,
-        phone: null,
-        contact: null,
-        addresses: null,
-        isActive: 0,
-        billing_data: [],
+        code_equip: "",
+        business_name: "",
+        rfc: "",
+        address: "",
+        email: "",
+        phone: "",
         estate_id: "",
         township_id: "",
+        observation: "",
+        credit_days: "",
+        credit_limit: 0,
+        observation: "",
+        isActive: 0,
+        contacts: [],
+        giro: [],
+        documents: [],
+        billing_data: {
+          bank: "",
+          account: "",
+          clabe: "",
+          agency: "",
+        },
       },
     };
   },
@@ -71,17 +89,23 @@ export default {
     async updateSupplier() {
       if (!this.$refs.form.$refs.formSupplier.validate()) return;
       const _this = this;
-      await axios
-        .put(`/admin/suppliers/${_this.supplierId}`, _this.supplier)
-        .then(function (response) {
-          _this.$store.commit("showSnackbar", {
-            message: response.data.message,
-            color: "success",
-            duration: 3000,
-          });
-          _this.$eventBus.$emit("SUPPLIER_REFRESH");
+      const formData = _this.createFormDataFromObject(_this.supplier);
+      return await axios
+        .post(`/admin/suppliers/${_this.supplierId}`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         })
-        .catch(function (error) {
+        .then(function(response) {
+          _this.loadSupplierEdit(() => {
+            _this.$store.commit("showSnackbar", {
+              message: response.data.message,
+              color: "success",
+              duration: 3000,
+            });
+          });
+        })
+        .catch(function(error) {
           _this.$store.commit("hideLoader");
           if (error.response) {
             _this.$store.commit("showSnackbar", {
@@ -98,13 +122,40 @@ export default {
         });
     },
     async loadSupplierEdit(cb) {
-      this.supplier = await axios
-        .get(`/admin/suppliers/${this.supplierId}/edit`)
-        .then((response) => {
-          let Supplier = response.data.data;
-          return { ...Supplier };
-        });
-      (cb || Function)();
+      let { data: response } = await axios.get(
+        `/admin/suppliers/${this.supplierId}/edit`
+      );
+      this.supplier = { ...response.data.supplier };
+      this.$store.commit("showSnackbar", {
+        message: response.message,
+        color: "success",
+        duration: 3000,
+      });
+      cb() || Function;
+    },
+    createFormDataFromObject(obj) {
+      const formData = new FormData();
+      formData.append("_method", "PUT");
+      Object.entries(obj).forEach(([key, value]) => {
+        if (Array.isArray(value)) {
+          value.map((item, index) => {
+            if (typeof item === "object") {
+              for (const [keyA, valueA] of Object.entries(item)) {
+                formData.append(`${key}[${index}][${keyA}]`, valueA ?? "");
+              }
+            } else {
+              formData.append(`${key}[${index}]`, item);
+            }
+          });
+        } else if (value && typeof value === "object") {
+          for (const [keyA, valueA] of Object.entries(value)) {
+            formData.append(`${key}[${keyA}]`, valueA ?? "");
+          }
+        } else {
+          formData.append(`${key}`, value ?? "");
+        }
+      });
+      return formData;
     },
   },
 };

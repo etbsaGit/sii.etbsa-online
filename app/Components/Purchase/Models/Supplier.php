@@ -3,6 +3,7 @@
 namespace App\Components\Purchase\Models;
 
 use App\Components\Common\Models\Township;
+use App\Components\Requirements\Models\RequirementDocuments;
 use Illuminate\Database\Eloquent\Model;
 
 class Supplier extends Model
@@ -26,6 +27,16 @@ class Supplier extends Model
     }
 
     /**
+     * Get all of the requirement for the supplier.
+     */
+    public function requirements()
+    {
+        return $this->morphToMany(RequirementDocuments::class, 'requireable', 'requireables')
+            ->withPivot('file_path', 'date_due', 'status_id')
+            ->withTimestamps();
+    }
+
+    /**
      * serializes concept attribute on the fly before saving to database
      *
      * @param $billing_data
@@ -43,7 +54,12 @@ class Supplier extends Model
     public function getBillingDataAttribute()
     {
         if (empty($this->attributes['billing_data']) || is_null($this->attributes['billing_data'])) {
-            return [];
+            return [
+                'bank' => null,
+                'account' => null,
+                'clabe' => null,
+                'agency' => null
+            ];
         }
 
         return unserialize($this->attributes['billing_data']);
@@ -67,24 +83,7 @@ class Supplier extends Model
 
         return unserialize($this->attributes['contacts']);
     }
-    public function setAddressesAttribute($address)
-    {
-        $this->attributes['addresses'] = serialize($address);
-    }
 
-    /**
-     * unserializes address attribute before spitting out from database
-     *
-     * @return mixed
-     */
-    public function getAddressesAttribute()
-    {
-        if (empty($this->attributes['addresses']) || is_null($this->attributes['addresses'])) {
-            return [];
-        }
-
-        return unserialize($this->attributes['addresses']);
-    }
     public function setGiroAttribute($giro)
     {
         $this->attributes['giro'] = serialize($giro);
@@ -106,14 +105,15 @@ class Supplier extends Model
 
     public function scopeIsActive($query)
     {
-        $query->where('isActive', true);
+        $query->where('isActive', 1);
     }
 
-    public function scopeSearch($query, String $search)
+    public function scopeSearch($query, string $search)
     {
         $query->when($search ?? null, function ($query, $search) {
             $query->where(function ($query) use ($search) {
                 $query->orWhere('business_name', 'like', "%{$search}%")
+                    ->orWhere('code_equip', 'like', "%{$search}%")
                     ->orWhere('rfc', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%")
                     ->orWhere('phone', 'like', "%{$search}%");

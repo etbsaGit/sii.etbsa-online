@@ -8,14 +8,18 @@
       <v-tooltip top>
         <template #activator="{on}">
           <v-list-item-avatar v-on="on">
-            <v-menu left offset-x :disabled="!requirement.file">
+            <v-menu
+              left
+              offset-x
+              :disabled="!$gate.allow('auditDocument', 'compras')"
+            >
               <template v-slot:activator="{ on }">
                 <v-icon
-                  :class="iconStatus[requirement.status].color"
+                  :class="iconStatus[requirement.status_key].color"
                   dark
                   v-on="on"
                 >
-                  {{ iconStatus[requirement.status].icon }}
+                  {{ iconStatus[requirement.status_key].icon }}
                 </v-icon>
               </template>
               <v-list>
@@ -23,16 +27,13 @@
                   <v-list-item
                     v-for="(item, index) in actionsStatus"
                     :key="index"
+                    @click="changeStatusDocument(requirement, item.status_key)"
                   >
                     <v-list-item-icon>
                       <v-icon> {{ item.icon }} </v-icon>
                     </v-list-item-icon>
                     <v-list-item-content>
-                      <v-list-item-title
-                        @click="
-                          changeStatusDocument(requirement, item.status_key)
-                        "
-                      >
+                      <v-list-item-title>
                         {{ item.title }}
                       </v-list-item-title>
                     </v-list-item-content>
@@ -42,7 +43,7 @@
             </v-menu>
           </v-list-item-avatar>
         </template>
-        <span>{{ iconStatus[requirement.status].text }}</span>
+        <span>{{ iconStatus[requirement.status_key].text }}</span>
       </v-tooltip>
 
       <v-list-item-content>
@@ -64,7 +65,7 @@
 
       <v-list-item-action>
         <v-btn
-          v-if="requirement.status != 'success'"
+          v-if="requirement.status_key != 'documento.valido'"
           text
           dark
           icon
@@ -74,12 +75,12 @@
           <v-icon>mdi-upload</v-icon>
         </v-btn>
         <v-btn
-          v-if="requirement.file"
+          v-if="requirement.file || requirement.file_path"
           text
           dark
           icon
           color="blue"
-          @click="showFile(requirement.file)"
+          @click="showFile(requirement)"
         >
           <v-icon> mdi-download</v-icon>
         </v-btn>
@@ -107,15 +108,7 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn
-            color="blue darken-1"
-            text
-            @click="
-              (dialogUpload = false),
-                (requirement.file = null),
-                (requirement.status = 'none')
-            "
-          >
+          <v-btn color="blue darken-1" text @click="closeDialog(requirement)">
             Cancelar
           </v-btn>
           <v-btn
@@ -124,7 +117,7 @@
             @click="uploadDocument(requirement)"
             :disabled="!requirement.file"
           >
-            Guardar
+            Cargar Archivo
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -146,42 +139,43 @@ export default {
     return {
       requirement: {
         file: null,
+        file_path: null,
       },
       dialogUpload: false,
       actionsStatus: [
         {
           title: "Rechazar",
           icon: "mdi-file-alert-outline",
-          status_key: "reject",
+          status_key: "documento.invalido",
         },
         {
           title: "Aprobar",
           icon: "mdi-clipboard-check-outline",
-          status_key: "success",
+          status_key: "documento.valido",
         },
         {
           title: "Eliminar",
           icon: "mdi-clipboard-alert-outline",
-          status_key: "none",
+          status_key: "documento.none",
         },
       ],
       iconStatus: {
-        stand_by: {
+        "documento.revicion": {
           color: "blue",
           icon: "mdi-clock-alert-outline",
           text: "Para Revision",
         },
-        none: {
+        "documento.none": {
           color: "grey",
           icon: "mdi-clipboard-alert-outline",
           text: "Sin Documento",
         },
-        reject: {
+        "documento.invalido": {
           color: "red",
           icon: "mdi-file-alert-outline",
           text: "Documento Invalido",
         },
-        success: {
+        "documento.valido": {
           color: "green",
           icon: "mdi-clipboard-check-outline",
           text: "Aprobado",
@@ -194,32 +188,45 @@ export default {
       this.dialogUpload = true;
       this.requirement = requirement;
     },
-    showFile(file) {
-      const url = URL.createObjectURL(file);
-      window.open(url, "_blank");
+    closeDialog(requirement) {
+      this.dialogUpload = false;
+      if (!requirement.file_path) {
+        requirement.file = null;
+        requirement.status_key = "documento.none";
+      }
+    },
+    showFile(requirement) {
+      if (requirement.file) {
+        const url = URL.createObjectURL(requirement.file);
+        window.open(url, "_blank");
+      } else if (requirement.file_path) {
+        console.log("Abrir Path ", requirement.file_path);
+        window.open(requirement.file_path, "_blank");
+      }
     },
     uploadDocument(document) {
       const currentDate = new Date();
       const limitDate = new Date();
-      limitDate.setDate(currentDate.getMonth() - 1);
+      limitDate.setDate(currentDate.getMonth() - 3);
       if (document.file.lastModifiedDate <= limitDate) {
         this.$store.commit("showSnackbar", {
-          message: "Tiene 1 mes o mas de Antiguedad el Archivo",
+          message: "Tiene 3 mes o mas de Antiguedad el Archivo",
           color: "error",
           duration: 3000,
         });
         document.file = null;
-        document.status = "none";
+        document.status = "documento.none";
         return;
       }
-      document.status = "stand_by";
+      document.status_key = "documento.revicion";
       this.$nextTick(() => {
         this.dialogUpload = false;
       });
     },
+
     changeStatusDocument(document, status_key) {
-      document.status = status_key;
-      if (status_key == "none") document.file = null;
+      document.status_key = status_key;
+      if (status_key == "documento.none") document.file = null;
     },
   },
 };
