@@ -58,18 +58,25 @@ class SupplierRepository extends BaseRepository
 
     public function getSupplierRequirementDefault()
     {
-        return RequirementDocuments::supplirsRequirements()->get(["id", "name", "description", "key"])->map(function ($requirement) {
-            $requirement->status_key = 'documento.none';
-            $requirement->file = null;
-            $requirement->PATH = null;
-            $requirement->file_path = null;
-            return $requirement;
+        return RequirementDocuments::supplirsRequirements()->get(["id", "name", "description", "key"])->transform(function ($item) {
+            return [
+                'id' => $item->id ?? '',
+                'name' => $item->name ?? '',
+                'description' => $item->description ?? '',
+                'key' => $item->key ?? '',
+                'file_path' => '',
+                'PATH' => '',
+                'file' => '',
+                'status_key' => 'documento.none',
+                'date_due' => '',
+            ];
         });
     }
 
     public function getSupplierDocuments(Supplier $supplier)
     {
-        return $supplier->requirements->transform(function ($item) {
+
+        $documents = $supplier->requirements->transform(function ($item) {
             return [
                 'id' => $item->id ?? '',
                 'name' => $item->name ?? '',
@@ -82,5 +89,15 @@ class SupplierRepository extends BaseRepository
                 'date_due' => $item->pivot->date_due ?? '',
             ];
         });
+        $requirements = $this->getSupplierRequirementDefault();
+
+        $mergedCollection = collect($documents)->concat($requirements);
+        $groupedCollection = $mergedCollection->groupBy('id');
+        $uniqueCollection = $groupedCollection->map(function ($items) {
+            return $items->first();
+        });
+
+        return $uniqueCollection->values()->all();
+
     }
 }
