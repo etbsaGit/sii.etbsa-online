@@ -17,11 +17,14 @@ class CreateFilesTable extends Migration
             $table->increments('id');
             $table->string('name');
             $table->unsignedInteger('uploaded_by');
-            $table->unsignedInteger('file_group_id');
+            $table->unsignedInteger('file_group_id')->default(1);
             $table->string('file_type');
             $table->string('extension');
             $table->double('size',19);
             $table->string('path');
+
+            $table->unsignedInteger('fileable_id');
+            $table->string('fileable_type');
             $table->timestamps();
         });
     }

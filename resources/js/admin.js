@@ -1,5 +1,6 @@
 require("./bootstrap");
 
+
 import Vue from "vue";
 import vuetify from "~/plugins/vuetify"; // path to vuetify export
 import App from "@admin/App";

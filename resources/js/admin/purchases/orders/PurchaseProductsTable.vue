@@ -235,7 +235,7 @@ export default {
       type: Number | String,
     },
     ConceptProductProp: {
-      require: false,
+      require: true,
       type: Array,
     },
     dialogForm: {

@@ -53,6 +53,14 @@ class PurchaseOrderController extends AdminController
         $formaPago = DB::table('cat_forma_pago')->get(['clave', 'description']);
         $unitSat = DB::table('cat_unit_sat')->get(['id', 'clave', 'name', 'type']);
         $purchase_concept = PurchaseConcept::with('usocfdi', 'purchaseType', 'conceptProduct')->get();
+        $payment_condition = [
+            ['text' => "Contado", 'value' => 5],
+            ['text' => "8 Dias", 'value' => 8],
+            ['text' => "15 Dias", 'value' => 15],
+            ['text' => "30 Dias", 'value' => 30],
+            ['text' => "60 Dias", 'value' => 60],
+            ['text' => "90 Dias", 'value' => 90],
+        ];
         $purchase_types = PurchaseType::with('purchaseConcept')->get()->transform(function ($model) {
             return [
                 'id' => $model->id,
@@ -77,7 +85,8 @@ class PurchaseOrderController extends AdminController
                 'formaPago',
                 'unitSat',
                 'purchase_concept',
-                'purchase_types'
+                'purchase_types',
+                'payment_condition'
             ),
             "list Resources orders ok."
         );
@@ -92,29 +101,46 @@ class PurchaseOrderController extends AdminController
      */
     public function store(Request $request)
     {
+        // dd(
+        //     'is formdata', $request->is('multipart/form-data'), $request->header('Content-Type'),
+        //     strpos($request->header('Content-Type'), 'multipart/form-data') !== false
+        // );
+        $payload = json_decode($request->input('payload'), true);
+        $files = $request->file('file');
+        // $validate = validator($request->all(), [
+        $validate = validator($payload, [
+            'supplier_id' => 'required',
+            'subtotal' => 'required',
+            'discount' => 'required',
+            'total' => 'required',
+            'charges' => 'required|Array',
+            'products' => 'required|Array',
+            'payment_condition' => 'required',
+            'purchase_concept_id' => 'required',
+            'observation' => 'required',
+            'uso_cfdi' => 'required',
+            'metodo_pago' => 'required',
+            'forma_pago' => 'required',
+        ], []);
 
+        if ($validate->fails()) {
+            return $this->sendResponseBadRequest($validate->errors()->first());
+        }
+
+        if ($request->hasFile('file')) {
+            foreach ($files as $file) {
+                // Validar y guardar cada archivo
+                // dd($file->isValid(), $file, $files);
+            }
+        }
+
+
+
+        // dd($payload, $files, $validate->fails(), $request->all());
         return DB::transaction(
-            function () use ($request) {
-                $validate = validator($request->all(), [
-                    'supplier_id' => 'required',
-                    'subtotal' => 'required',
-                    'discount' => 'required',
-                    'total' => 'required',
-                    'charges' => 'required|Array',
-                    'products' => 'required|Array',
-                    'payment_condition' => 'required',
-                    'purchase_concept_id' => 'required',
-                    'observation' => 'required',
-                    'uso_cfdi' => 'required',
-                    'metodo_pago' => 'required',
-                    'forma_pago' => 'required',
-                ], []);
-
-                if ($validate->fails()) {
-                    return $this->sendResponseBadRequest($validate->errors()->first());
-                }
-                $request['created_by'] = Auth::user()->id;
-                $purchasesOrder = $this->purchaseOrderRepository->create($request->all());
+            function () use ($payload) {
+                $payload['created_by'] = Auth::user()->id;
+                $purchasesOrder = $this->purchaseOrderRepository->create($payload);
 
                 if (!$purchasesOrder) {
                     return $this->sendResponseBadRequest("Failed to create.");
@@ -123,8 +149,7 @@ class PurchaseOrderController extends AdminController
                 $purchasesOrder->estatus()->associate($estatus);
                 $purchasesOrder->save();
 
-                // $charges = $request->get('charges', []);
-                if ($charges = $request->get('charges', [])) {
+                if ($charges = $payload['charges'] ?? []) {
                     foreach ($charges as $key => $value) {
                         # code... 
                         $purchasesOrder->chargeAgency()->attach($value['agency_id'], [
@@ -133,7 +158,7 @@ class PurchaseOrderController extends AdminController
                         ]);
                     }
                 }
-                if ($products = $request->get('products', [])) {
+                if ($products = $payload['products'] ?? []) {
                     foreach ($products as $product => $value) {
                         if ($value) {
                             $purchasesOrder->detailPurchase()->attach(
@@ -154,6 +179,49 @@ class PurchaseOrderController extends AdminController
                 return $this->sendResponseCreated([$purchasesOrder]);
             }
         );
+        // return DB::transaction(
+        //     function () use ($request) {
+        //         $request['created_by'] = Auth::user()->id;
+        //         $purchasesOrder = $this->purchaseOrderRepository->create($request->all());
+
+        //         if (!$purchasesOrder) {
+        //             return $this->sendResponseBadRequest("Failed to create.");
+        //         }
+        //         $estatus = Estatus::where('key', Estatus::ESTATUS_PENDIENTE)->first();
+        //         $purchasesOrder->estatus()->associate($estatus);
+        //         $purchasesOrder->save();
+
+        //         // $charges = $request->get('charges', []);
+        //         if ($charges = $request->get('charges', [])) {
+        //             foreach ($charges as $key => $value) {
+        //                 # code... 
+        //                 $purchasesOrder->chargeAgency()->attach($value['agency_id'], [
+        //                     'department_id' => $value['depto_id'],
+        //                     'percent' => $value['percent']
+        //                 ]);
+        //             }
+        //         }
+        //         if ($products = $request->get('products', [])) {
+        //             foreach ($products as $product => $value) {
+        //                 if ($value) {
+        //                     $purchasesOrder->detailPurchase()->attach(
+        //                         $value['concept_product_id'],
+        //                         [
+        //                             'unit_id' => $value['unit_id'],
+        //                             'description' => $value['description'],
+        //                             'qty' => $value['qty'],
+        //                             'price' => $value['price'],
+        //                             'discount' => $value['discount'],
+        //                             'subtotal' => $value['subtotal']
+        //                         ]
+        //                     );
+        //                 }
+        //             }
+        //         }
+        //         $purchasesOrder->refresh();
+        //         return $this->sendResponseCreated([$purchasesOrder]);
+        //     }
+        // );
 
         // $purchasesOrder->elaborated->notify(new PurchaseOrderCreatedNotification($purchasesOrder->refresh()));
 

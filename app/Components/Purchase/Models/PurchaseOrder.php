@@ -107,6 +107,11 @@ class PurchaseOrder extends Model
             ->as('detail');
     }
 
+    public function files()
+    {
+        return $this->morphMany('App\Components\File\Models\File', 'fileable');
+    }
+
     public function setChargesAttribute($charges)
     {
         $this->attributes['charges'] = serialize($charges);
