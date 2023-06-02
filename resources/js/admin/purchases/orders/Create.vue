@@ -109,8 +109,42 @@
                 Articulos
                 <v-spacer></v-spacer>
 
+                <!-- IMPORT CSV COMPONENT -->
+                <v-dialog transition="dialog-top-transition" max-width="600">
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn text v-bind="attrs" v-on="on" small class="ml-2">
+                      CSV<v-icon right>mdi-file-import-outline</v-icon>
+                    </v-btn>
+                  </template>
+                  <template v-slot:default="dialog">
+                    <v-card>
+                      <v-card-title
+                        class="white--text accent title text-uppercase"
+                      >
+                        Importar Lista Articulos
+                        <v-spacer />
+                        <v-icon large color="red" @click="dialog.value = false">
+                          mdi-close-circle
+                        </v-icon>
+                      </v-card-title>
+                      <v-card-text class="pa-0">
+                        <import-csv-component
+                          v-if="dialog.value"
+                          @input="inputImportCsv"
+                          :map-fields="mapFields"
+                          loadBtnText="Cargar CSV"
+                          submitBtnText="Importar"
+                          :callback="loadImportCb"
+                          :catch="loadImportCatch"
+                        ></import-csv-component>
+                      </v-card-text>
+                    </v-card>
+                  </template>
+                </v-dialog>
+                <!-- END CSV IMPOR COMPONENT -->
+
                 <v-btn icon @click="form.products = []">
-                  <v-icon color="red">mdi-delete-empty-outline</v-icon>
+                  <v-icon color="red">mdi-trash-can</v-icon>
                 </v-btn>
               </v-card-title>
               <v-card-text>
@@ -127,8 +161,58 @@
                 <v-btn text color="blue" @click="dialogSupplierProducts = true">
                   <v-icon left>mdi-plus</v-icon> Agregar Articulo o Servicio
                 </v-btn>
+                <v-spacer />
+                <!-- BTN Adjuntar Cotizacion -->
+                <v-dialog transition="dialog-top-transition" max-width="600">
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn dark color="blue" small v-bind="attrs" v-on="on">
+                      Adjuntar Cotizacion
+                      <v-icon right>mdi-file-pdf-box</v-icon>
+                    </v-btn>
+                  </template>
+                  <template v-slot:default="dialog">
+                    <v-card>
+                      <v-card-title
+                        class="white--text secondary title text-uppercase"
+                      >
+                        Cargar Cotizacion
+                        <v-spacer />
+                        <v-icon large color="red" @click="dialog.value = false">
+                          mdi-close-circle
+                        </v-icon>
+                      </v-card-title>
+                      <v-card-text class="pt-4">
+                        <v-file-input
+                          v-model="form.file"
+                          outlined
+                          placeholder="Seleccionar Archivo"
+                          label="Archvio"
+                          persistent-placeholder
+                          multiple
+                        ></v-file-input>
+                      </v-card-text>
+                      <v-card-actions>
+                        <v-btn
+                          block
+                          dark
+                          color="primary"
+                          @click="dialog.value = false"
+                        >
+                          Adjuntar
+                        </v-btn>
+                      </v-card-actions>
+                    </v-card>
+                  </template>
+                </v-dialog>
+                <!-- END Adjuntar Cotizacion -->
               </v-card-actions>
+              <v-card-text v-if="form.file.length > 0">
+                <purchase-files-list
+                  :files.sync="form.file"
+                ></purchase-files-list>
+              </v-card-text>
             </v-card>
+
             <v-card flat>
               <v-row dense>
                 <v-col cols="12" md="6">
@@ -216,7 +300,7 @@
                 ></purchase-amounts-table>
               </v-card-text>
               <v-card-actions>
-                <v-btn block color="blue" @click="createPurchase" dark>
+                <v-btn block color="blue" @click="store" dark>
                   Crear OC
                 </v-btn>
               </v-card-actions>
@@ -232,6 +316,8 @@ import PurchaseAmountsTable from "./PurchaseAmountsTable.vue";
 import PurchaseChargeTable from "./PurchaseChargeTable.vue";
 import PurchaseProductsTable from "./PurchaseProductsTable.vue";
 import PurchaseInvoiceTable from "./PurchaseInvoiceTable.vue";
+import ImportCsvComponent from "../../components/ImportCsvComponent.vue";
+import PurchaseFilesList from "./PurchaseFilesList.vue";
 export default {
   name: "PurchaseOrderCreate",
   components: {
@@ -239,16 +325,27 @@ export default {
     PurchaseAmountsTable,
     PurchaseChargeTable,
     PurchaseInvoiceTable,
+    ImportCsvComponent,
+    PurchaseFilesList,
   },
   data() {
     return {
-      radios: "Gasto",
+      mapFields: [
+        { key: "name", label: "Grupo Articulo" },
+        { key: "description", label: "Descripcion" },
+        { key: "qty", label: "Cantidad" },
+        { key: "price", label: "Precio U." },
+        { key: "discount", label: "Descuento" },
+        // { key: "unit", label: "Unidad" },
+      ],
+
       validFormInfo: true,
       dialogSupplierProducts: false,
       dialogAddCharge: false,
       dialogConfigInvoice: false,
       dialog: false,
       form: {
+        file: [],
         charges: [],
         products: [],
         invoice: {
@@ -349,7 +446,7 @@ export default {
     },
   },
   methods: {
-    async createPurchase() {
+    async store() {
       if (!this.$refs.form_info.validate()) return;
       if (this.form.products.length <= 0)
         return this.$store.commit("showSnackbar", {
@@ -366,18 +463,22 @@ export default {
       let percent = this.form.charges
         .map((i) => i.percent)
         .reduce((acc, crr) => acc + crr, 0);
-      if (percent != 100)
+      console.log("percenr Cargos", percent);
+      if (percent < 100 || percent > 100)
         return this.$store.commit("showSnackbar", {
           message: "La suma de los Porcentaje de cargos debe ser 100%",
           color: "error",
           duration: 3000,
         });
+
       const _this = this;
+      const formData = new FormData();
+
       let payload = {
         supplier_id: _this.form.supplier.id,
         products: _this.form.products.map((item) => {
           return {
-            concept_product_id: item.group.id,
+            concept_product_id: item.group.id ?? null,
             description: item.description,
             unit_id: item.unit.id,
             unit: item.unit,
@@ -420,8 +521,13 @@ export default {
         tax_flete: _this.form.amounts.tax_flete,
         total: _this.form.amounts.total,
       };
+      _this.form.file.forEach((item) => {
+        formData.append("file[]", item);
+      });
+      formData.append("payload", JSON.stringify(payload));
+
       await axios
-        .post("/admin/purchase-order", payload)
+        .post("/admin/purchase-order", formData)
         .then(function(response) {
           _this.$store.commit("showSnackbar", {
             message: response.data.message,
@@ -464,24 +570,6 @@ export default {
           _this.options.purchase_types = purchase_types;
         });
     },
-    save() {
-      this.snack = true;
-      this.snackColor = "success";
-      this.snackText = "Data saved";
-    },
-    cancel() {
-      this.snack = true;
-      this.snackColor = "error";
-      this.snackText = "Canceled";
-    },
-    open() {
-      this.snack = true;
-      this.snackColor = "info";
-      this.snackText = "Dialog opened";
-    },
-    close() {
-      console.log("Dialog closed");
-    },
     customFilter(item, queryText, itemText) {
       const textEquip = item.code_equip ? item.code_equip.toLowerCase() : "";
       const textName = item.business_name
@@ -498,17 +586,48 @@ export default {
         textEmail.indexOf(searchText) > -1
       );
     },
-    addProducts() {
+    //METHODS CSV IMPORT
+    inputImportCsv: function(csv_import) {
       const _this = this;
-      const item = {
-        name: "",
-        description: "",
-        quantity: 1,
-        unit: { clave: "H87", name: "Pieza" },
-        price: 0,
-        discount: 0,
-      };
-      _this.form.products.push(item);
+      // _this.form.concepts = _this.form.concepts.concat(csv_import);
+      _this.form.products = _this.form.products.concat(
+        csv_import.map((csv) => {
+          let group_product =
+            _this.PurchaseConceptProduct.find((e) => {
+              if (e.name && csv.name)
+                return (
+                  e.name.toLowerCase().replace(/\s+/g, "") ===
+                  csv.name.toLowerCase().replace(/\s+/g, "")
+                );
+            }) ?? {};
+          return {
+            group: group_product,
+            description: csv.description || "",
+            unit: { id: 1, clave: "H87", name: "Pieza" },
+            qty: csv.qty || 1,
+            price: csv.price || 0,
+            discount: !!csv.discount ? csv.discount : 0,
+          };
+        })
+      );
+      _this.$store.commit("showDialog", {
+        type: "accept",
+        icon: "mdi-import",
+        title: "Articulos Importados",
+        message: "Articulos Cargados Correctamente ",
+      });
+    },
+    loadImportCb(response) {
+      const self = this;
+      console.log("importCB", response);
+    },
+    loadImportCatch(response) {
+      this.$store.commit("showDialog", {
+        type: "accept",
+        icon: "warning",
+        title: "Error CSV",
+        message: "Ocurrio un error al importar CSV ",
+      });
     },
   },
 };

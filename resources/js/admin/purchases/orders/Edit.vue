@@ -99,9 +99,21 @@
                   dense
                 >
                   <template v-slot:item="{ item }">
-                    <v-list-item-title v-text="item.business_name" />
-                    <v-list-item-subtitle v-html="item.rfc" />
-                    <v-list-item-subtitle v-html="item.email" />
+                    <v-list-item-content>
+                      <v-list-item-title
+                        class="text-uppercase font-weight-bold"
+                      >
+                        {{ item.business_name }}
+                      </v-list-item-title>
+                      <v-list-item-subtitle class="text-subtitle-2">
+                        {{
+                          `#Equip:${item.code_equip || "S/R"}  RFC:${item.rfc}`
+                        }}
+                      </v-list-item-subtitle>
+                      <v-list-item-subtitle>
+                        {{ item.email }}
+                      </v-list-item-subtitle>
+                    </v-list-item-content>
                   </template>
                 </v-autocomplete>
               </v-card-title>
@@ -174,7 +186,7 @@
                   @edit="dialogSupplierProducts = true"
                   @close="dialogSupplierProducts = false"
                   :items.sync="form.products"
-                  :ConceptProductProp="PurchaseConceptProduct"
+                  :ConceptProductProp.sync="PurchaseConceptProduct"
                 ></purchase-products-table>
               </v-card-text>
               <v-card-actions>
@@ -349,13 +361,7 @@ export default {
         suppliers: [],
         agencies: [],
         departments: [],
-        payment_condition: [
-          { text: "8 Dias", value: 8 },
-          { text: "15 Dias", value: 15 },
-          { text: "30 Dias", value: 30 },
-          { text: "60 Dias", value: 60 },
-          { text: "90 Dias", value: 90 },
-        ],
+        payment_condition: [],
         purchase_concept: [],
         purchase_types: [],
       },
@@ -363,31 +369,32 @@ export default {
   },
   mounted() {
     const _this = this;
-    _this.loadOptions();
-    _this.loadPurchaseEdit();
+    _this.$eventBus.$on("ORDERS_REFRESH", () => {
+      _this.loadPurchaseEdit();
+    });
     _this.$store.commit("setBreadcrumbs", [
       { label: "Ordenes de Compra", to: { name: "purchase.list" } },
       { label: "Detalle", name: "" },
     ]);
-    _this.$eventBus.$on("ORDERS_REFRESH", () => {
-      _this.loadPurchaseEdit();
-    });
+    _this.loadOptions();
+    _this.loadPurchaseEdit();
   },
   computed: {
     PurchaseConcept() {
       const _this = this;
-      return _this.options.purchase_types.find(
-        (e) => e.id == _this.form.purchase_type_id
-      ).purchase_concept;
+      return _this.options.purchase_types.length > 0
+        ? _this.options.purchase_types.find(
+            (e) => e.id === _this.form.purchase_type_id
+          ).purchase_concept
+        : [];
     },
     PurchaseConceptProduct() {
       const _this = this;
-      if (_this.form.purchase_concept != null)
-        return _this.form.purchase_concept.concept_product ?? [];
-    },
-    minHeight() {
-      const height = "82vh";
-      return `calc(${height} - ${this.$vuetify.application.top}px)`;
+      return _this.PurchaseConcept.length > 0
+        ? _this.PurchaseConcept.find(
+            (e) => e.id === _this.form.purchase_concept.id
+          ).concept_product
+        : [];
     },
     canSave() {
       let estatus = {
@@ -408,7 +415,7 @@ export default {
         por_facturar: true,
         por_pagar: true,
       };
-      return estatus[this.form.estatus.key] ?? false;
+      return this.form.estatus ? estatus[this.form.estatus.key] : false;
     },
     canMarkAsSend() {
       let estatus = {
@@ -503,30 +510,18 @@ export default {
   methods: {
     async loadPurchaseEdit() {
       const _this = this;
-      await axios
-        .get(`/admin/purchase-order/${_this.purchaseId}/edit`)
-        .then((res) => {
-          let { purchase } = res.data.data;
-          _this.form = purchase;
-        });
-      this.forUpdate = false;
+      let { data: response } = await axios.get(
+        `/admin/purchase-order/${_this.purchaseId}/edit`
+      );
+      _this.form = response.data.purchase;
+      _this.forUpdate = false;
     },
-    async loadOptions(cb) {
+    async loadOptions() {
       const _this = this;
-      await axios
-        .get("/admin/purchase-order/resources/options")
-        .then(function (response) {
-          let {
-            suppliers,
-            agencies,
-            departments,
-            purchase_types,
-          } = response.data.data;
-          _this.options.suppliers = suppliers;
-          _this.options.agencies = agencies;
-          _this.options.departments = departments;
-          _this.options.purchase_types = purchase_types;
-        });
+      let { data: response } = await axios.get(
+        "/admin/purchase-order/resources/options"
+      );
+      _this.options = { ...response.data };
     },
     async updatePurchase() {
       if (!this.$refs.form_info.validate()) return;
@@ -602,7 +597,7 @@ export default {
       };
       await axios
         .put(`/admin/purchase-order/${_this.purchaseId}`, payload)
-        .then(function (response) {
+        .then(function(response) {
           _this.$store.commit("showSnackbar", {
             message: response.data.message,
             color: "success",
@@ -612,7 +607,7 @@ export default {
           // _this.$eventBus.$emit("ORDERS_REFRESH");
           // _this.$eventBus.$emit("CLOSE_DIALOG");
         })
-        .catch(function (error) {
+        .catch(function(error) {
           _this.$store.commit("hideLoader");
           if (error.response) {
             _this.$store.commit("showSnackbar", {
@@ -638,7 +633,7 @@ export default {
           `/admin/purchase-order/update-estatus/${_this.purchaseId}`,
           payload
         )
-        .then(function (response) {
+        .then(function(response) {
           _this.$store.commit("showSnackbar", {
             message: response.data.message,
             color: "success",
@@ -648,7 +643,7 @@ export default {
           _this.loadPurchaseEdit();
           // _this.$eventBus.$emit("CLOSE_DIALOG");
         })
-        .catch(function (error) {
+        .catch(function(error) {
           _this.$store.commit("hideLoader");
           if (error.response) {
             _this.$store.commit("showSnackbar", {
@@ -673,7 +668,7 @@ export default {
       };
       await axios
         .post(`/admin/purchase-order/store-invoice/${invoice_id}`, payload)
-        .then(function (response) {
+        .then(function(response) {
           _this.$store.commit("showSnackbar", {
             message: response.data.message,
             color: "success",
@@ -681,7 +676,7 @@ export default {
           });
           _this.loadPurchaseEdit();
         })
-        .catch(function (error) {
+        .catch(function(error) {
           _this.$store.commit("hideLoader");
           if (error.response) {
             _this.$store.commit("showSnackbar", {

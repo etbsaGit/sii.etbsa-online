@@ -102,6 +102,11 @@ class File extends Model
         return $this->belongsTo(FileGroup::class,'file_group_id');
     }
 
+    public function fileable()
+    {
+        return $this->morphTo();
+    }
+
     /**
      * get the storage path
      *
