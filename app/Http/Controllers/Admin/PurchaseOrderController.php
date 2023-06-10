@@ -3,9 +3,22 @@
 namespace App\Http\Controllers\Admin;
 
 use App;
+use App\Components\Purchase\Pivots\PurchasePivotCharge;
+use Barryvdh\DomPDF\PDF;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use League\Flysystem\FileNotFoundException;
 use Illuminate\Http\Request;
-use Auth;
+
+use App\Components\Core\Utilities\Helpers;
+use App\Components\File\Services\FileService;
+use App\Components\Purchase\Pivots\PurchasePivotProduct;
+
+use App\Http\Requests\PurchaseOrder\StorePurchaseOrderRequest;
+use App\Http\Requests\PurchaseOrder\UpdatePurchaseOrderRequest;
+use App\Http\Requests\PurchaseOrder\UpdateStatusPurchaseOrderRequest;
+
+use App\Http\Resources\PurchaseOrderCollection;
 
 use App\Components\Purchase\Repositories\PurchaseOrderRepository;
 use App\Components\Purchase\Models\PurchaseOrder;
@@ -13,8 +26,9 @@ use App\Components\Purchase\Models\Supplier;
 use App\Components\Common\Models\Estatus;
 use App\Components\Purchase\Models\PurchaseConcept;
 use App\Components\Purchase\Models\PurchaseType;
-use Barryvdh\DomPDF\PDF;
+
 use Carbon\Carbon;
+use Auth;
 
 class PurchaseOrderController extends AdminController
 {
@@ -22,14 +36,16 @@ class PurchaseOrderController extends AdminController
      * @var PurchaseOrderRepository
      */
     private $purchaseOrderRepository;
+    private $fileService;
 
     /**
      * UserController constructor.
      * @param PurchaseOrderRepository $purchaseOrderRepository
      */
-    public function __construct(PurchaseOrderRepository $purchaseOrderRepository)
+    public function __construct(PurchaseOrderRepository $purchaseOrderRepository, FileService $fileService)
     {
         $this->purchaseOrderRepository = $purchaseOrderRepository;
+        $this->fileService = $fileService;
     }
     /**
      * Display a listing of the resource.
@@ -99,131 +115,99 @@ class PurchaseOrderController extends AdminController
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StorePurchaseOrderRequest $request)
     {
-        // dd(
-        //     'is formdata', $request->is('multipart/form-data'), $request->header('Content-Type'),
-        //     strpos($request->header('Content-Type'), 'multipart/form-data') !== false
-        // );
-        $payload = json_decode($request->input('payload'), true);
-        $files = $request->file('file');
-        // $validate = validator($request->all(), [
-        $validate = validator($payload, [
-            'supplier_id' => 'required',
-            'subtotal' => 'required',
-            'discount' => 'required',
-            'total' => 'required',
-            'charges' => 'required|Array',
-            'products' => 'required|Array',
-            'payment_condition' => 'required',
-            'purchase_concept_id' => 'required',
-            'observation' => 'required',
-            'uso_cfdi' => 'required',
-            'metodo_pago' => 'required',
-            'forma_pago' => 'required',
-        ], []);
-
-        if ($validate->fails()) {
-            return $this->sendResponseBadRequest($validate->errors()->first());
-        }
-
-        if ($request->hasFile('file')) {
-            foreach ($files as $file) {
-                // Validar y guardar cada archivo
-                // dd($file->isValid(), $file, $files);
-            }
-        }
-
-
-
-        // dd($payload, $files, $validate->fails(), $request->all());
         return DB::transaction(
-            function () use ($payload) {
-                $payload['created_by'] = Auth::user()->id;
-                $purchasesOrder = $this->purchaseOrderRepository->create($payload);
+            function () use ($request) {
+                $request['created_by'] = Auth::user()->id;
+                $request['estatus_id'] = Estatus::where('key', Estatus::ESTATUS_PENDIENTE)->first()->id;
+                $purchaseOrder = $this->purchaseOrderRepository->create($request->all());
 
-                if (!$purchasesOrder) {
+                if (!$purchaseOrder) {
                     return $this->sendResponseBadRequest("Failed to create.");
                 }
-                $estatus = Estatus::where('key', Estatus::ESTATUS_PENDIENTE)->first();
-                $purchasesOrder->estatus()->associate($estatus);
-                $purchasesOrder->save();
+                if ($charges = $request->get('charges', [])) {
+                    foreach ($charges as $chargeData) {
+                        $charge = new PurchasePivotCharge($chargeData);
+                        $charge->purchaseOrder()->associate($purchaseOrder);
+                        $charge->save();
+                    }
+                }
+                if ($products = $request['products'] ?? []) {
+                    foreach ($products as $productData) {
+                        $product = new PurchasePivotProduct($productData);
+                        $product->purchaseOrder()->associate($purchaseOrder);
+                        $product->save();
+                    }
+                }
 
-                if ($charges = $payload['charges'] ?? []) {
-                    foreach ($charges as $key => $value) {
-                        # code... 
-                        $purchasesOrder->chargeAgency()->attach($value['agency_id'], [
-                            'department_id' => $value['depto_id'],
-                            'percent' => $value['percent']
-                        ]);
-                    }
-                }
-                if ($products = $payload['products'] ?? []) {
-                    foreach ($products as $product => $value) {
-                        if ($value) {
-                            $purchasesOrder->detailPurchase()->attach(
-                                $value['concept_product_id'],
-                                [
-                                    'unit_id' => $value['unit_id'],
-                                    'description' => $value['description'],
-                                    'qty' => $value['qty'],
-                                    'price' => $value['price'],
-                                    'discount' => $value['discount'],
-                                    'subtotal' => $value['subtotal']
-                                ]
-                            );
+                if ($request->hasFile('file')) {
+                    $files = $request->file('file');
+                    $error = false;
+                    $errorMessage = '';
+                    $fileRecord = null;
+                    foreach ($files as $file) {
+                        // dd($file);
+                        try {
+                            $fileOriginalName = $file->getClientOriginalName();
+                            $filePath = $file->store('purchase_orders/id_' . $purchaseOrder->id . '/quotes', 's3');
+
+                            if (!$filePath) {
+                                $this->addError("Failed to upload.", 400);
+                                return false;
+                            }
+
+                            // other data
+                            $ext = pathinfo(config('filesystems.disks.local.root') . '/' . $filePath, PATHINFO_EXTENSION);
+                            $size = Storage::disk('s3')->getSize($filePath);
+                            $type = Storage::disk('s3')->getMimetype($filePath);
+
+                            $fileData = [
+                                'original_name' => $fileOriginalName,
+                                'path' => $filePath,
+                                'ext' => $ext,
+                                'size' => $size,
+                                'type' => $type,
+                            ];
+                        } catch (FileNotFoundException $e) {
+                            $error = true;
+                            $errorMessage = $e->getMessage();
+                            break;
                         }
+                        if (!$fileData) {
+                            $error = true;
+                            $errorMessage = $this->fileService->getErrors()->first();
+                            break;
+                        }
+                        $fileRecord = $purchaseOrder->files()->create([
+                            'name' => $fileData['original_name'],
+                            'uploaded_by' => Auth::user()->id,
+                            'file_type' => $fileData['type'],
+                            'extension' => $fileData['ext'],
+                            'size' => $fileData['size'],
+                            'path' => $fileData['path'],
+                        ]);
+
+                        if (!$fileRecord) {
+                            if (Storage::disk('s3')->exists($fileData['path'])) {
+                                Storage::disk('s3')->delete($fileData['path']);
+                            }
+                            $error = true;
+                            $errorMessage = "Failed to create record.";
+                            break;
+                        }
+
+                    }
+                    if ($error) {
+                        return $this->sendResponseBadRequest($errorMessage);
                     }
                 }
-                $purchasesOrder->refresh();
-                return $this->sendResponseCreated([$purchasesOrder]);
+
+                $purchaseOrder->refresh();
+                // // TODO: Despachar Evento de nueva creacion enviar Notificacion a las Sucusales y Admons Correpondientes
+                return $this->sendResponseCreated([$purchaseOrder]);
             }
         );
-        // return DB::transaction(
-        //     function () use ($request) {
-        //         $request['created_by'] = Auth::user()->id;
-        //         $purchasesOrder = $this->purchaseOrderRepository->create($request->all());
-
-        //         if (!$purchasesOrder) {
-        //             return $this->sendResponseBadRequest("Failed to create.");
-        //         }
-        //         $estatus = Estatus::where('key', Estatus::ESTATUS_PENDIENTE)->first();
-        //         $purchasesOrder->estatus()->associate($estatus);
-        //         $purchasesOrder->save();
-
-        //         // $charges = $request->get('charges', []);
-        //         if ($charges = $request->get('charges', [])) {
-        //             foreach ($charges as $key => $value) {
-        //                 # code... 
-        //                 $purchasesOrder->chargeAgency()->attach($value['agency_id'], [
-        //                     'department_id' => $value['depto_id'],
-        //                     'percent' => $value['percent']
-        //                 ]);
-        //             }
-        //         }
-        //         if ($products = $request->get('products', [])) {
-        //             foreach ($products as $product => $value) {
-        //                 if ($value) {
-        //                     $purchasesOrder->detailPurchase()->attach(
-        //                         $value['concept_product_id'],
-        //                         [
-        //                             'unit_id' => $value['unit_id'],
-        //                             'description' => $value['description'],
-        //                             'qty' => $value['qty'],
-        //                             'price' => $value['price'],
-        //                             'discount' => $value['discount'],
-        //                             'subtotal' => $value['subtotal']
-        //                         ]
-        //                     );
-        //                 }
-        //             }
-        //         }
-        //         $purchasesOrder->refresh();
-        //         return $this->sendResponseCreated([$purchasesOrder]);
-        //     }
-        // );
-
-        // $purchasesOrder->elaborated->notify(new PurchaseOrderCreatedNotification($purchasesOrder->refresh()));
 
     }
 
@@ -240,43 +224,7 @@ class PurchaseOrderController extends AdminController
 
     public function edit(PurchaseOrder $purchase_order)
     {
-
-        $purchase = [
-            'supplier' => $purchase_order->supplier,
-            'charges' => $purchase_order->charges,
-            'products' => $purchase_order->products,
-            "invoice" => [
-                'metodo_pago' => $purchase_order->metodopago,
-                'uso_cfdi' => $purchase_order->usocfdi,
-                'forma_pago' => $purchase_order->formapago,
-            ],
-            'amounts' => [
-                "subtotal" => $purchase_order->subtotal,
-                "discount" => $purchase_order->discount,
-                "with_tax" => $purchase_order->with_tax,
-                "tax" => $purchase_order->tax,
-                "with_isr" => $purchase_order->with_isr,
-                "tax_isr" => $purchase_order->tax_isr,
-                "with_iva_retenido" => $purchase_order->with_iva_retenido,
-                "tax_iva_retenido" => $purchase_order->tax_iva_retenido,
-                "with_retencion_cedular" => $purchase_order->with_retencion_cedular,
-                "tax_retencion_cedular" => $purchase_order->tax_retencion_cedular,
-                "with_retencion_125" => $purchase_order->with_retencion_125,
-                "tax_retencion_125" => $purchase_order->tax_retencion_125,
-                "with_flete" => $purchase_order->with_flete,
-                "tax_flete" => $purchase_order->tax_flete,
-                "total" => $purchase_order->total,
-            ],
-            "purchase_concept" => $purchase_order->purchase_concept,
-            "purchase_type_id" => $purchase_order->purchase_type_id,
-            "agency_id" => $purchase_order->ship->id,
-            "observation" => $purchase_order->observation,
-            "note" => $purchase_order->note,
-            "payment_condition" => $purchase_order->payment_condition,
-            "estatus" => $purchase_order->estatus,
-            "created_by" => $purchase_order->created_by,
-            "invoice_info" => $purchase_order->invoice ?? [],
-        ];
+        $purchase = new PurchaseOrderCollection($purchase_order);
         return $this->sendResponseOk(compact('purchase'), "Get Edit PurchaseOrder");
     }
     /**
@@ -286,30 +234,11 @@ class PurchaseOrderController extends AdminController
      * @param  App\Components\Purchase\Models\PurchaseOrder  $purchaseOrder
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, PurchaseOrder $purchase_order)
+    public function update(UpdatePurchaseOrderRequest $request, PurchaseOrder $purchase_order)
     {
         return DB::transaction(
             function () use ($purchase_order, $request) {
                 $request['updated_by'] = Auth::user()->id;
-                $validate = validator($request->all(), [
-                    'supplier_id' => 'required',
-                    'subtotal' => 'required',
-                    'discount' => 'required',
-                    'total' => 'required',
-                    'charges' => 'required|Array',
-                    'products' => 'required|Array',
-                    'payment_condition' => 'required',
-                    'purchase_concept_id' => 'required',
-                    'observation' => 'required',
-                    'uso_cfdi' => 'required',
-                    'metodo_pago' => 'required',
-                    'forma_pago' => 'required',
-                    'updated_by' => 'required'
-                ], []);
-
-                if ($validate->fails()) {
-                    return $this->sendResponseBadRequest($validate->errors()->first());
-                }
                 if ($request['estatus.key'] == 'denegar') {
                     $estatus = Estatus::where('key', Estatus::ESTATUS_PENDIENTE)->first();
                     $purchase_order->estatus()->associate($estatus);
@@ -320,37 +249,162 @@ class PurchaseOrderController extends AdminController
                     return $this->sendResponseBadRequest("Error en la Actualizacion");
                 }
                 $purchase_order->refresh();
-                $syncCharges = [];
-                $syncProducts = [];
+
                 if ($charges = $request->get('charges', [])) {
-                    foreach ($charges as $key => $value) {
-                        if ($value) {
-                            $pivot = [
-                                'department_id' => $value['depto_id'],
-                                'percent' => $value['percent']
-                            ];
-                            $syncCharges[$value['agency_id']] = $pivot;
+                    $primaryKeyPivotCharge = PurchasePivotCharge::getPrimaryKey();
+                    $chargesIdsToUpdate = array_map(function ($item) use ($primaryKeyPivotCharge, $purchase_order) {
+                        $result = array_intersect_key($item, array_flip($primaryKeyPivotCharge));
+                        $result['purchase_order_id'] = $purchase_order->id;
+                        return $result;
+                    }, $charges);
+
+                    foreach ($purchase_order->pivotCharge as $charge) {
+                        $chargeId = $charge->getPrimaryKeyValues();
+                        if (in_array($chargeId, $chargesIdsToUpdate)) {
+                            // El charge existe en el array, actualízalo
+                            $chargeData = $charges[array_search($chargeId, $chargesIdsToUpdate)];
+                            DB::statement("
+                                        UPDATE {$charge->getTable()}
+                                        SET percent = :percent
+                                        WHERE purchase_order_id = :purchase_order_id
+                                        AND agency_id = :agency_id
+                                        AND department_id = :department_id
+                                    ", [
+                                    'percent' => $chargeData['percent'],
+                                    'purchase_order_id' => $purchase_order->id,
+                                    'agency_id' => $chargeData['agency_id'],
+                                    'department_id' => $chargeData['department_id']
+                                ]);
+                        } else {
+                            // El charge no existe en el array, elimínalo
+                            DB::statement("
+                                        DELETE FROM {$charge->getTable()}
+                                        WHERE purchase_order_id = :purchase_order_id
+                                        AND agency_id = :agency_id
+                                        AND department_id = :department_id
+                                    ", $charge->getPrimaryKeyValues());
                         }
                     }
+
+                    $newCharges = [];
+                    foreach ($charges as $postData) {
+                        $chargeIdToInsert = array_diff_key($postData, ['percent' => '']);
+                        $chargeIdToInsert['purchase_order_id'] = $purchase_order->id;
+                        $pivotCharge = PurchasePivotCharge::where('purchase_order_id', $chargeIdToInsert['purchase_order_id'])
+                            ->where('agency_id', $chargeIdToInsert['agency_id'])
+                            ->where('department_id', $chargeIdToInsert['department_id'])
+                            ->get();
+                        if ($pivotCharge->isEmpty()) {
+                            $newCharges[] = $postData;
+                        }
+                    }
+                    $purchase_order->pivotCharge()->createMany($newCharges);
                 }
                 if ($products = $request->get('products', [])) {
-                    foreach ($products as $product => $value) {
-                        if ($value) {
-                            $pivotProducts = [
-                                'unit_id' => $value['unit_id'],
-                                'description' => $value['description'],
-                                'qty' => $value['qty'],
-                                'price' => $value['price'],
-                                'discount' => $value['discount'],
-                                'subtotal' => $value['subtotal']
-                            ];
-                            $syncProducts[$value['concept_product_id']] = $pivotProducts;
+                    $productsIdsToUpdate = array_column($products, 'id');
+                    foreach ($purchase_order->pivotProduct as $product) {
+                        $productId = $product->id;
+                        if (in_array($productId, $productsIdsToUpdate)) {
+                            // El product existe en el array, actualízalo
+                            $productData = $products[array_search($productId, $productsIdsToUpdate)];
+                            $product->update($productData);
+                        } else {
+                            // El product no existe en el array, elimínalo
+                            $product->delete();
                         }
                     }
+                    // Agrega los nuevos elementos al final de la relación
+                    $newProducts = [];
+                    foreach ($products as $postData) {
+                        if (!isset($postData['id'])) {
+                            // El post no tiene un ID, es un nuevo registro
+                            $newProducts[] = $postData;
+                        }
+                    }
+                    $purchase_order->pivotProduct()->createMany($newProducts);
                 }
-                $purchase_order->detailPurchase()->sync($syncProducts);
-                $purchase_order->chargeAgency()->sync($syncCharges);
-                return $this->sendResponseUpdated();
+                // Actualiza Archivos si existe
+                if ($request->get('file') == []) {
+                    if (!!$purchase_order->files) {
+                        $purchase_order->files->each(function ($file) {
+                            $file->delete();
+                            if (Storage::disk('s3')->exists($file->path)) {
+                                Storage::disk('s3')->delete($file->path);
+                            }
+                        });
+                    }
+                }
+                if ($request->hasFile('file')) {
+                    $files = $request->file('file');
+                    $error = false;
+                    $errorMessage = '';
+                    $fileRecord = null;
+                    if (!!$purchase_order->files) {
+                        $purchase_order->files->each(function ($file) {
+                            $file->delete();
+                            if (Storage::disk('s3')->exists($file->path)) {
+                                Storage::disk('s3')->delete($file->path);
+                            }
+                        });
+                    }
+                    foreach ($files as $file) {
+                        try {
+                            $fileOriginalName = $file->getClientOriginalName();
+                            $filePath = $file->store('purchase_orders/id_' . $purchase_order->id . '/quotes', 's3');
+
+                            if (!$filePath) {
+                                $this->addError("Failed to upload.", 400);
+                                return false;
+                            }
+
+                            // other data
+                            $ext = pathinfo(config('filesystems.disks.local.root') . '/' . $filePath, PATHINFO_EXTENSION);
+                            $size = Storage::disk('s3')->getSize($filePath);
+                            $type = Storage::disk('s3')->getMimetype($filePath);
+
+                            $fileData = [
+                                'original_name' => $fileOriginalName,
+                                'path' => $filePath,
+                                'ext' => $ext,
+                                'size' => $size,
+                                'type' => $type,
+                            ];
+                        } catch (FileNotFoundException $e) {
+                            $error = true;
+                            $errorMessage = $e->getMessage();
+                            break;
+                        }
+                        if (!$fileData) {
+                            $error = true;
+                            $errorMessage = $this->fileService->getErrors()->first();
+                            break;
+                        }
+                        $fileRecord = $purchase_order->files()->create([
+                            'name' => $fileData['original_name'],
+                            'uploaded_by' => Auth::user()->id,
+                            'file_type' => $fileData['type'],
+                            'extension' => $fileData['ext'],
+                            'size' => $fileData['size'],
+                            'path' => $fileData['path'],
+                        ]);
+
+                        if (!$fileRecord) {
+                            if (Storage::disk('s3')->exists($fileData['path'])) {
+                                Storage::disk('s3')->delete($fileData['path']);
+                            }
+                            $error = true;
+                            $errorMessage = "Failed to create record.";
+                            break;
+                        }
+
+                    }
+                    if ($error) {
+                        return $this->sendResponseBadRequest($errorMessage);
+                    }
+
+                }
+                $purchaseOrderUpdated = new PurchaseOrderCollection($purchase_order->refresh());
+                return $this->sendResponseUpdated(compact('purchaseOrderUpdated'));
             }
         );
     }
@@ -369,21 +423,55 @@ class PurchaseOrderController extends AdminController
 
     public function print(PurchaseOrder $purchaseOrder)
     {
-        $data = $purchaseOrder->load(['supplier', 'ship', 'elaborated']);
-        $pdf = \PDF::loadView('pdf.purchase', compact('data'));
+
+        $purchase = [
+            'id' => $purchaseOrder->id,
+            'estatus' => $purchaseOrder->estatus->only('id', 'key', 'title'),
+            'elaborated' => $purchaseOrder->elaborated->only('id', 'name', 'email'),
+            'supplier' => $purchaseOrder->supplier->only('id', 'code_equip', 'business_name', 'rfc', 'email', 'credit_days'),
+            'amounts' => $purchaseOrder->only(
+                'subtotal',
+                'discount',
+                'with_tax',
+                'tax',
+                'with_isr',
+                'tax_isr',
+                'with_iva_retenido',
+                'tax_iva_retenido',
+                'with_retencion_cedular',
+                'tax_retencion_cedular',
+                'with_retencion_125',
+                'tax_retencion_125',
+                'with_flete',
+                'tax_flete',
+                'total',
+            ),
+            'products' => $purchaseOrder->products->toArray(),
+            'charges' => $purchaseOrder->charges->toArray(),
+            'invoice' => [
+                'metodo_pago' => $purchaseOrder->metodopago->toArray(),
+                'uso_cfdi' => $purchaseOrder->usocfdi->toArray(),
+                'forma_pago' => $purchaseOrder->formapago->toArray(),
+            ],
+            'purchase_concept' => $purchaseOrder->purchase_concept->only('id', 'name'),
+            'purchase_type' => $purchaseOrder->purchaseType->only('id', 'name'),
+            'ship' => $purchaseOrder->ship->only('id', 'title','address'),
+            'observation' => $purchaseOrder->observation,
+            'note' => $purchaseOrder->note,
+            'payment_condition' => $purchaseOrder->payment_condition,
+            'authorization_date' => $purchaseOrder->authorization_date,
+        ];
+        $item = Helpers::arrayToObject($purchase);
+        // dd($item);
+        $pdf = App::make('dompdf.wrapper');
+        $pdf->getDomPDF()->set_option("enable_php", true);
+        $pdf->loadView('pdf.purchase', compact('item'));
         return $pdf->stream();
+
     }
-    public function updateEstatus(Request $request, PurchaseOrder $purchase_order)
+    public function updateEstatus(UpdateStatusPurchaseOrderRequest $request, PurchaseOrder $purchase_order)
     {
         $request['updated_by'] = Auth::user()->id;
-        $validate = validator($request->all(), [
-            'estatus_key' => 'string|required',
-            'updated_by' => 'required'
-        ], []);
-
-        if ($validate->fails()) {
-            return $this->sendResponseBadRequest($validate->errors()->first());
-        }
         $estatus = Estatus::where('key', $request['estatus_key'])->first();
         $request['estatus_id'] = $estatus->id;
         if ($request['estatus_key'] == Estatus::ESTATUS_AUTORIZADO)

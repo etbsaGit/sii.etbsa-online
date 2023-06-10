@@ -2,8 +2,9 @@
 
 namespace App\Components\Common\Models;
 
-use App\Components\Purchase\Models\PurchaseOrder;
 use Illuminate\Database\Eloquent\Model;
+
+use App\Components\Purchase\Models\PurchaseOrder;
 
 class cClaveProdServ extends Model
 {
@@ -25,9 +26,24 @@ class cClaveProdServ extends Model
         'Palabrassimilares' => 'string',
     ];
 
-    public function purchaseOrder()
+    // public function purchaseOrders()
+    // {
+    //     return $this->belongsToMany(
+    //         PurchaseOrder::class,
+    //         'purchase_pivot_detail_products',
+    //         'c_ClaveProdServ',
+    //         'purchase_order_id',
+    //         'c_ClaveProdServ',
+    //         'id'
+    //     )
+    //         ->withPivot('description', 'unit_id', 'qty', 'price', 'discount', 'subtotal')
+    //         ->as('product');
+    // }
+
+    public function purchaseOrders()
     {
-        return $this->belongsToMany(PurchaseOrder::class, 'purchase_pivot_detail_products', 'clave_prod_sat', 'purchase_order_id', 'c_ClaveProdServ', 'id');
+        return $this->belongsToMany(PurchaseOrder::class, 'purchase_order_pivot')
+            ->using(PurchasePivotProduct::class);
     }
 
     public function scopeSearch($query, string $search)
@@ -39,6 +55,17 @@ class cClaveProdServ extends Model
                 $query->orWhere('Palabrassimilares', 'like', "%{$search}%");
             });
         });
+    }
+
+    public function scopeGetClvProd($query, string $claveProdServ)
+    {
+
+        $ClvNotExist = "1010101";
+        $exists = $query->orWhere('c_ClaveProdServ', $claveProdServ)->exists();
+        return $exists
+            ? $query->orWhere('c_ClaveProdServ', $claveProdServ)
+            : $query->orWhere('c_ClaveProdServ', $ClvNotExist);
+
     }
 
     public function scopeFilter($query, array $filters)

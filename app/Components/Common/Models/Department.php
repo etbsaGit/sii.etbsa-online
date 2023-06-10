@@ -2,6 +2,7 @@
 
 namespace App\Components\Common\Models;
 
+use App\Components\Purchase\Pivots\PurchasePivotCharge;
 use App\Components\User\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
@@ -31,8 +32,18 @@ class Department extends Model
         return $this->hasMany('App\Components\Tracking\Models\TrackingProspect');
     }
 
-    public function purchaseOrder()
+    public function purchaseOrders()
     {
-        return $this->belongsToMany(PurchaseOrder::class, 'purchase_agency_pivot_table', 'department_id');
+        return $this->belongsToMany(PurchaseOrder::class, 'purchase_order_pivot')
+                    ->using(PurchasePivotCharge::class);
     }
+
+    // public function purchaseOrder()
+    // {
+    //     return $this->belongsToMany(PurchaseOrder::class, 'purchase_pivot_charges');
+    // }
+    // public function purchaseOrder()
+    // {
+    //     return $this->belongsToMany(PurchaseOrder::class, 'purchase_agency_pivot_table', 'department_id');
+    // }
 }

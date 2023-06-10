@@ -15,10 +15,10 @@ class PurchaseConceptProduct extends Model
         return $this->belongsTo(PurchaseConcept::class, 'purchase_concept_id');
     }
 
-    public function purchaseOrder()
-    {
-        return $this->belongsToMany(PurchaseOrder::class, 'purchase_pivot_detail_products', 'concept_product_id', 'purchase_order_id');
-    }
+    // public function purchaseOrder()
+    // {
+    //     return $this->belongsToMany(PurchaseOrder::class, 'purchase_pivot_detail_products', 'concept_product_id', 'purchase_order_id');
+    // }
 
     public function scopeSearch($query, String $search)
     {

@@ -41,8 +41,8 @@ class SupplierRepository extends BaseRepository
                 if ($document) {
                     $file = $document['file'] ?? null;
                     $pivot = [
-                        'file_path' => $file != "null" && $file != null ?
-                        $document['file']->store('supplier/id_' . $supplier->id . '/' . $document['key'], 's3')
+                        'file_path' => $file != "null" && $file != null
+                        ? $document['file']->store('supplier/id_' . $supplier->id . '/' . $document['key'], 's3')
                         : null,
                         'status_id' => Estatus::where('key', $document['status_key'])->first()->id,
                         'date_due' => Carbon::now()->addMonths(3),

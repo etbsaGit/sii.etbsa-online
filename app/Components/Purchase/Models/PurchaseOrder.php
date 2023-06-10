@@ -2,6 +2,8 @@
 
 namespace App\Components\Purchase\Models;
 
+use App\Components\Purchase\Pivots\PurchasePivotCharge;
+use App\Components\Purchase\Pivots\PurchasePivotProduct;
 use Illuminate\Database\Eloquent\Model;
 
 use App\Components\User\Models\User;
@@ -16,8 +18,12 @@ use App\Components\Common\Models\Document;
 use App\Components\Common\Models\Message;
 use App\Components\Core\Utilities\Helpers;
 
+
+use App\Components\Common\Models\cClaveProdServ;
+
 class PurchaseOrder extends Model
 {
+    protected $connection = 'mysql';
     protected $table = 'purchase_orders';
     protected $guarded = ['id'];
     protected $appends = ['products', 'charges'];
@@ -81,30 +87,68 @@ class PurchaseOrder extends Model
         return $this->belongsTo(Agency::class, 'agency_id');
     }
 
+    public function purchaseType()
+    {
+        return $this->belongsTo(PurchaseType::class, 'purchase_type_id');
+    }
     public function purchase_concept()
     {
         return $this->belongsTo(PurchaseConcept::class, 'purchase_concept_id');
     }
 
-    public function chargeAgency()
+    // public function chargeAgency()
+    // {
+    //     return $this->belongsToMany(Agency::class, 'purchase_pivot_charges', 'purchase_order_id', 'agency_id', 'id', 'id')
+    //         ->using(PurchasePivotCharge::class)
+    //         ->withPivot('percent')
+    //         ->withTimestamps()
+    //         ->as('charge');
+    // }
+
+    // public function chargeDepartment()
+    // {
+    //     return $this->belongsToMany(Department::class, 'purchase_pivot_charges', 'purchase_order_id')
+    //         ->withPivot('agency_id', 'percent')
+    //         ->as('charge');
+    // }
+    // public function purchaseCharges()
+    // {
+    //     return $this->hasMany(
+    //         PurchasePivotCharge::class,
+    //         'purchase_order_id',
+    //         'id'
+    //     );
+    // }
+
+    // public function pivotCharge()
+    // {
+    //     return $this->belongsToMany(Department::class, 'purchase_pivot_charges')
+    //         ->withPivot('agency_id', 'percent')
+    //         ->using(PurchasePivotCharge::class)
+    //         ->withTimestamps();
+    // }
+    public function pivotCharge()
     {
-        return $this->belongsToMany(Agency::class, 'purchase_agency_pivot_table', 'purchase_order_id')
-            ->withPivot('department_id', 'percent')
-            ->as('charge');
+        return $this->hasMany(PurchasePivotCharge::class, 'purchase_order_id');
     }
 
-    public function chargeDepartment()
+    public function agencies()
     {
-        return $this->belongsToMany(Department::class, 'purchase_agency_pivot_table', 'purchase_order_id')
-            ->withPivot('agency_id', 'percent')
-            ->as('charge');
+        return $this->belongsToMany(Agency::class, 'purchase_pivot_charges')
+            ->using(PurchasePivotCharge::class);
     }
 
-    public function detailPurchase()
+    public function departments()
     {
-        return $this->belongsToMany(PurchaseConceptProduct::class, 'purchase_pivot_detail_products', 'purchase_order_id', 'concept_product_id')
-            ->withPivot('description', 'unit_id', 'qty', 'price', 'discount', 'subtotal')
-            ->as('detail');
+        return $this->belongsToMany(Department::class, 'purchase_pivot_charges')
+            ->using(PurchasePivotCharge::class);
+    }
+    public function pivotProduct()
+    {
+        return $this->hasMany(
+            PurchasePivotProduct::class,
+            'purchase_order_id',
+        );
     }
 
     public function files()
@@ -112,46 +156,41 @@ class PurchaseOrder extends Model
         return $this->morphMany('App\Components\File\Models\File', 'fileable');
     }
 
-    public function setChargesAttribute($charges)
-    {
-        $this->attributes['charges'] = serialize($charges);
-    }
-
     public function getChargesAttribute()
     {
-        if (empty($this->attributes['charges']) || is_null($this->attributes['charges'])) {
-            return [];
-        }
-        $charges = unserialize($this->attributes['charges']);
-        return array_map(function ($item) {
+        return $this->pivotCharge->map(function ($charge) {
+            // dd($charge->agency->only('id', 'title'));
+            // return [
+            //     'agency' => $charge->pivot->agency->only('id', 'title'),
+            //     'department' => $charge->pivot->department->only('id', 'title'),
+            //     'percent' => $charge->pivot->percent
+            // ];
             return [
-                'agency' => \DB::table('agencies')->where('id', '=', $item['agency_id'])->get(['id', 'code', 'title'])->toArray()[0],
-                'department' => \DB::table('departments')->where('id', '=', $item['depto_id'])->get(['id', 'title'])->toArray()[0],
-                'percent' => $item['percent']
-            ];
-        }, $charges);
-    }
-
-    public function getProductsAttribute()
-    {
-        $detail = collect($this->detailPurchase);
-        return $detail->map(function ($item) {
-            return [
-                'group' => [
-                    'id' => $item->id,
-                    'name' => $item->name
-                ],
-                'unit' =>  CatUnitSat::where('id', '=', $item->detail->unit_id)->first(),
-                'description' => $item->detail->description,
-                'qty' => $item->detail->qty,
-                'price' => $item->detail->price,
-                'discount' => $item->detail->discount,
-                'subtotal' => $item->detail->subtotal,
+                'agency' => $charge->agency->only('id', 'title'),
+                'department' => $charge->department->only('id', 'title'),
+                'percent' => $charge->percent
             ];
         });
     }
 
-    public function scopeSearch($query, String $search)
+    public function getProductsAttribute()
+    {
+        return $this->pivotProduct->map(function ($product) {
+            return [
+                "id" => $product->id,
+                "claveProduct" => $product->claveProdServ->only('c_ClaveProdServ', 'Descripción', 'Palabrassimilares'),
+                'unit' => $product->claveUnit->only(['id', 'clave', 'name']),
+                'unit_d' => $product->unit_id,
+                'description' => $product->description,
+                'qty' => $product->qty,
+                'price' => $product->price,
+                'discount' => $product->discount,
+                'subtotal' => $product->subtotal,
+
+            ];
+        });
+    }
+    public function scopeSearch($query, string $search)
     {
         $query->when($search ?? null, function ($query, $search) {
             $query->orWhere(function ($query) use ($search) {
@@ -165,8 +204,8 @@ class PurchaseOrder extends Model
                     ->orWhereHas('supplier', function ($query) use ($search) {
                         return $query->where('suppliers.business_name', 'like', "%{$search}%");
                     })->orWhereHas('elaborated', function ($query) use ($search) {
-                        return $query->where('users.name', 'like', "%{$search}%");
-                    });
+                    return $query->where('users.name', 'like', "%{$search}%");
+                });
             });
         });
     }
@@ -208,15 +247,15 @@ class PurchaseOrder extends Model
             });
         });
 
-        $query->when($filters['agencie'] ?? null, function ($query, $agency_id) {
-            $query->whereHas('chargeAgency', function ($query) use ($agency_id) {
-                return $query->whereIn('agency_id', $agency_id);
-            });
-        })->when($filters['department'] ?? null, function ($query, $depto_id) {
-            $query->whereHas('chargeDepartment', function ($query) use ($depto_id) {
-                return $query->whereIn('department_id', $depto_id);
-            });
-        });
+        // $query->when($filters['agencie'] ?? null, function ($query, $agency_id) {
+        //     $query->whereHas('chargeAgency', function ($query) use ($agency_id) {
+        //         return $query->whereIn('agency_id', $agency_id);
+        //     });
+        // })->when($filters['department'] ?? null, function ($query, $depto_id) {
+        //     $query->whereHas('chargeDepartment', function ($query) use ($depto_id) {
+        //         return $query->whereIn('department_id', $depto_id);
+        //     });
+        // });
 
         $query->when($filters['date_range'] ?? null, function ($query, $dates) use ($estatus) {
             if ($estatus == "todos" || $estatus == "pendiente")
@@ -247,8 +286,8 @@ class PurchaseOrder extends Model
         $query->when(
             (($user->inGroup('Gerente') || $user->inGroup('Compras')) &&
                 $user->hasPermission('compras.admin')) ||
-                $user->hasPermission('compras.all.list') ||
-                $user->isSuperUser(),
+            $user->hasPermission('compras.all.list') ||
+            $user->isSuperUser(),
             function ($query) {
                 return $query;
             },
@@ -260,28 +299,3 @@ class PurchaseOrder extends Model
         );
     }
 }
-
-
-/**
- * serializes concept attribute on the fly before saving to database
- *
- * @param $concepts
- */
-// public function setConceptsAttribute($concepts)
-// {
-//     $this->attributes['concepts'] = serialize($concepts);
-// }
-
-/**
- * unserializes concepts attribute before spitting out from database
- *
- * @return mixed
- */
-    // public function getConceptsAttribute()
-    // {
-    //     if (empty($this->attributes['concepts']) || is_null($this->attributes['concepts'])) {
-    //         return [];
-    //     }
-
-    //     return unserialize($this->attributes['concepts']);
-    // }

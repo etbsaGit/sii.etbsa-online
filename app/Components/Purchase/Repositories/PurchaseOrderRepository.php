@@ -29,10 +29,9 @@ class PurchaseOrderRepository extends BaseRepository
             'elaborated.profiable.agency:id,title',
             'estatus:id,title,key',
             'purchase_concept:id,name',
-            'chargeAgency',
-            'chargeDepartment',
-            // 'ship',
-            // 'detailPurchase',
+            'purchaseType:id,name',
+            'files'
+
         ], function ($query) use ($params) {
             $query->where(function ($query) use ($params) {
                 $query->search($params['search'] ?? '')

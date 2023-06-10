@@ -54,7 +54,7 @@ class CargosInternos extends Model
             'cargo_interno_id',
             'sucursal_id'
         )
-            ->using(CargosInternosSucusales::class)
+            ->using(CargosInternosSucursales::class)
             ->withPivot('percent', 'cargo_interno_id', 'sucursal_id', 'department_id')
             ->as('sucursales')->withTimestamps();
     }
@@ -65,15 +65,15 @@ class CargosInternos extends Model
             'cargos_internos_sucursales',
             'cargo_interno_id',
             'department_id'
-        )->using(CargosInternosSucusales::class)
+        )->using(CargosInternosSucursales::class)
             ->withPivot('percent', 'cargo_interno_id', 'sucursal_id', 'department_id')
             ->as('departamentos')->withTimestamps();
     }
 
-    public function cargosSucursal()
-    {
-        return $this->hasMany(CargosInternosSucusales::class, 'cargo_interno_id');
-    }
+    // public function cargosSucursal()
+    // {
+    //     return $this->hasMany(CargosInternosSucursales::class, 'cargo_interno_id');
+    // }
 
     public function scopeSearch($query, string $search)
     {

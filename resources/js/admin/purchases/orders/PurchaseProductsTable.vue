@@ -9,18 +9,6 @@
       mobile-breakpoint="0"
       dense
     >
-      <template v-slot:[`item.name`]="{ item }">
-        <v-list-item dense class="pa-0">
-          <v-list-item-content>
-            <v-list-item-title v-text="item.name" />
-            <v-list-item-subtitle
-              v-text="item.description"
-              class="text-truncate"
-              style="max-width: 300px;"
-            />
-          </v-list-item-content>
-        </v-list-item>
-      </template>
       <template v-slot:[`item.unit`]="{ value }">
         <span class="font-weight-medium">
           {{ `${value.name} - ${value.clave}` }}
@@ -36,10 +24,6 @@
           :return-value.sync="item.qty"
           large
           persistent
-          @save="save"
-          @cancel="cancel"
-          @open="open"
-          @close="close"
           save-text="Guardar"
           cancel-text="Cancelar"
         >
@@ -78,10 +62,6 @@
           :return-value.sync="item.discount"
           large
           persistent
-          @save="save"
-          @cancel="cancel"
-          @open="open"
-          @close="close"
           save-text="Guardar"
           cancel-text="Cancelar"
         >
@@ -140,22 +120,14 @@
             <v-form v-model="valid" ref="form" lazy-validation>
               <v-row class="overline">
                 <v-col cols="12">
-                  <v-select
-                    v-model="form.group"
-                    label="Grupo del Articulo*"
-                    :items="ConceptProductProp"
-                    item-text="name"
-                    item-value="id"
-                    :rules="[(v) => !!v || 'Valor Requerido']"
-                    return-object
-                    outlined
-                    dense
-                  ></v-select>
+                  <search-clv-product
+                    v-model="form.claveProduct"
+                  ></search-clv-product>
                 </v-col>
                 <v-col cols="12">
                   <v-textarea
                     v-model="form.description"
-                    label="Descripcion"
+                    label="Descripcion*"
                     :rules="[(v) => !!v || 'Valor Requerido']"
                     hide-details
                     outlined
@@ -177,9 +149,13 @@
                   >
                     <template v-slot:item="{ item }">
                       <v-list-item-content>
-                        <v-list-item-title v-text="item.type" />
-                        <v-list-item-subtitle v-text="item.name" />
-                        <v-list-item-subtitle v-text="item.clave" />
+                        <v-list-item-title> {{ item.type }} </v-list-item-title>
+                        <v-list-item-subtitle>
+                          {{ item.name }}
+                        </v-list-item-subtitle>
+                        <v-list-item-subtitle>
+                          {{ item.clave }}
+                        </v-list-item-subtitle>
                       </v-list-item-content>
                     </template>
                   </v-autocomplete>
@@ -209,7 +185,7 @@
               </v-row>
             </v-form>
           </v-container>
-          <small>*indicates required field</small>
+          <small>*Indica Campo Obligatorio</small>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -226,17 +202,14 @@
 </template>
 <script>
 import SupplierProductList from "../supplierProducts/SupplierProductList.vue";
+import SearchClvProduct from "./SearchClvProduct.vue";
 export default {
   name: "PurchaceSupplierProductsTable",
-  components: { SupplierProductList },
+  components: { SupplierProductList, SearchClvProduct },
   props: {
     SupplierIdProp: {
-      require: false,
       type: Number | String,
-    },
-    ConceptProductProp: {
-      require: true,
-      type: Array,
+      require: false,
     },
     dialogForm: {
       default: false,
@@ -259,11 +232,12 @@ export default {
       snackColor: "",
       snackText: "",
       headers: [
+
         {
-          text: "Grupo de Articulo",
+          text: "Clave Producto",
           align: "start",
           sortable: false,
-          value: "group.name",
+          value: "claveProduct.c_ClaveProdServ",
           divider: true,
         },
         {
@@ -285,7 +259,7 @@ export default {
         cat_unit: [],
       },
       form: {
-        group: {},
+        claveProduct: {},
         description: "",
         unit: { id: 1, clave: "H87", name: "Pieza" },
         qty: 1,
@@ -294,7 +268,7 @@ export default {
         subtotal: 0,
       },
       formDefault: {
-        group: {},
+        claveProduct: {},
         description: "",
         unit: { id: 1, clave: "H87", name: "Pieza" },
         qty: 1,
@@ -334,31 +308,13 @@ export default {
       const _this = this;
       await axios
         .get("/admin/purchase-order/resources/options")
-        .then(function (response) {
+        .then(function(response) {
           let { unitSat } = response.data.data;
           _this.options.cat_unit = unitSat;
         });
     },
     Amount(item) {
       return (item.subtotal = item.qty * item.price - item.discount);
-    },
-    save() {
-      this.snack = true;
-      this.snackColor = "success";
-      this.snackText = "Data saved";
-    },
-    cancel() {
-      this.snack = true;
-      this.snackColor = "error";
-      this.snackText = "Canceled";
-    },
-    open() {
-      this.snack = true;
-      this.snackColor = "info";
-      this.snackText = "Dialog opened";
-    },
-    close() {
-      console.log("Dialog closed");
     },
     editItem(item) {
       this.editedIndex = this.items.indexOf(item);
@@ -403,18 +359,6 @@ export default {
         textName.indexOf(searchText) > -1 ||
         textType.indexOf(searchText) > -1
       );
-    },
-    unitDescription(unit) {
-      const _this = this;
-      const array1 = _this.options.cat_unit;
-      if (unit) {
-        const found = array1.find((e) => {
-          e.clave === unit;
-        });
-        console.log(array1, found, unit);
-        // return array;
-        // return `${unidad.clave} - ${unidad.name}`;
-      }
     },
   },
 };

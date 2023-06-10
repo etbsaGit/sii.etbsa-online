@@ -14,7 +14,7 @@ class CargoInternoRepository extends BaseRepository
 
     public function list($params)
     {
-        return $this->get($params, ['cargosSucursal'], function ($q) use ($params) {
+        return $this->get($params, [], function ($q) use ($params) {
             $q->search($params['search'] ?? '');
             return $q;
         });

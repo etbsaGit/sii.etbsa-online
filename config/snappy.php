@@ -39,11 +39,11 @@ return [
         'binary'  => 'C:\laragon\www\sii.etbsa-online\usr\local\bin\64bit\wkhtmltopdf.exe',
         // 'binary'  => env('WKHTML_PDF_BINARY_WIN', '/usr/local/bin/wkhtmltopdf'),
         'timeout' => false,
-        'options' => [
-            'page-size' => 'a4',
-            'enable-javascript' => true,
-            'footer-center' => '© Equipos y Tractores del Bajio S.A. de C.V. ' . date('Y'),
-        ],
+        // 'options' => [
+        //     'page-size' => 'a4',
+        //     'enable-javascript' => true,
+        //     'footer-center' => '© Equipos y Tractores del Bajio S.A. de C.V. ' . date('Y'),
+        // ],
         'env'     => [],
     ],
 

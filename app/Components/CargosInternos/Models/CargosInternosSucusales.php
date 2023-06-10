@@ -7,7 +7,7 @@ use App\Components\Common\Models\Agency;
 use App\Components\Common\Models\Department;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
-class CargosInternosSucusales extends Pivot
+class CargosInternosSucursales extends Pivot
 {
     protected $table = 'cargos_internos_sucursales';
     protected $fillable = [
