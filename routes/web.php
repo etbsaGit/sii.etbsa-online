@@ -41,6 +41,10 @@ Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function
 
     Route::resource('prospects', 'ProspectController');
 
+    // catalogo ClavesProductServSat
+    Route::get('claveProdSat', 'CClaveProdServController@index')->name('cProductServSat.index');
+    Route::get('byClaveProdSat', 'CClaveProdServController@getByClvProd')->name('cProductServSat.getByClvProd');
+
     //Notification
     Route::get('notification', 'NotificationController@index')->name('notification.index');
     Route::delete('notification/{notification}', 'NotificationController@destroy')->name('notification.destroy');

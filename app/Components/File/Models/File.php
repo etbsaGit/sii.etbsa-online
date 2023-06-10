@@ -6,6 +6,7 @@ use App\Components\User\Models\User;
 use Carbon\Carbon;
 use Firebase\JWT\JWT;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Class File
@@ -37,7 +38,7 @@ class File extends Model
         'path',
     ];
 
-    protected $appends = ['file_token'];
+    protected $appends = ['file_token','file_path'];
 
     /**
      * generate a token on each file on the fly that will give authorization to be downloaded
@@ -68,14 +69,12 @@ class File extends Model
         try {
             $key = env('FILE_DOWNLOAD_SECRET');
             $decoded = JWT::decode($token, $key, array('HS256'));
-        } catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             \Log::error(self::TAG . ": Invalid file token.");
             return false;
         }
 
-        if(!$decoded->file_id==$this->id)
-        {
+        if (!$decoded->file_id == $this->id) {
             return false;
         }
 
@@ -89,7 +88,7 @@ class File extends Model
      */
     public function user()
     {
-        return $this->belongsTo(User::class,'uploaded_by');
+        return $this->belongsTo(User::class, 'uploaded_by');
     }
 
     /**
@@ -99,7 +98,7 @@ class File extends Model
      */
     public function group()
     {
-        return $this->belongsTo(FileGroup::class,'file_group_id');
+        return $this->belongsTo(FileGroup::class, 'file_group_id');
     }
 
     public function fileable()
@@ -115,5 +114,10 @@ class File extends Model
     public static function getStoragePath()
     {
         return config('filesystems.local');
+    }
+
+    public function getFilePathAttribute()
+    {
+        return $this->path ? Storage::disk('s3')->url($this->path) : '';
     }
 }

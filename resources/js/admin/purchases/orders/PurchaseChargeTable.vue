@@ -40,7 +40,7 @@
                     Cambiar Procentaje %
                   </div>
                   <v-text-field
-                    v-model="item.percent"
+                    v-model.number="item.percent"
                     label="Ingresar Porcentaje"
                     type="number"
                     suffix="%"

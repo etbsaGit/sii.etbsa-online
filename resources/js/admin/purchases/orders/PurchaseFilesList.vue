@@ -11,13 +11,17 @@
           <v-list-item-title>{{ file.name }}</v-list-item-title>
 
           <v-list-item-subtitle>
-            {{ file.lastModifiedDate }}
+            {{ file.created_at ? file.created_at : file.lastModifiedDate }}
           </v-list-item-subtitle>
         </v-list-item-content>
 
         <v-list-item-action>
-          <v-btn icon>
-            <v-icon color="grey lighten-1">mdi-information</v-icon>
+          <v-btn icon @click="showFile(file)">
+            <v-icon
+              :color="file.file_path ? 'blue lighten-1' : 'grey lighten-1'"
+            >
+              mdi-information
+            </v-icon>
           </v-btn>
         </v-list-item-action>
       </v-list-item>
@@ -43,5 +47,16 @@ export default {
       },
     ],
   }),
+  methods: {
+    showFile(file) {
+      if (file.file_path) {
+        console.log("Abrir Path ", file.file_path);
+        window.open(file.file_path, "_blank");
+      } else if (file) {
+        const url = URL.createObjectURL(file);
+        window.open(url, "_blank");
+      }
+    },
+  },
 };
 </script>

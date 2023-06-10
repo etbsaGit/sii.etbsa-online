@@ -16,7 +16,17 @@ class CClaveProdServController extends AdminController
     public function index()
     {
         $params = request()->all();
-        $data = cClaveProdServ::search($params['search'] ?? '')->get();
+        $data = cClaveProdServ::filter($params ?? [])
+            ->search($params['search'] ?? '')
+            ->get();
+        return $this->sendResponseOk($data);
+    }
+
+    public function getByClvProd()
+    {
+        $params = request()->all();
+        $data = cClaveProdServ::getClvProd($params["ClvProd"] ?? '')->first(['c_ClaveProdServ', 'Descripción', 'Palabrassimilares']);
+
         return $this->sendResponseOk($data);
     }
 }

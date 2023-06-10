@@ -208,16 +208,16 @@ export default {
       const currentDate = new Date();
       const limitDate = new Date();
       limitDate.setDate(currentDate.getMonth() - 3);
-      if (document.file.lastModifiedDate <= limitDate) {
-        this.$store.commit("showSnackbar", {
-          message: "Tiene 3 mes o mas de Antiguedad el Archivo",
-          color: "error",
-          duration: 3000,
-        });
-        document.file = null;
-        document.status = "documento.none";
-        return;
-      }
+      // if (document.file.lastModifiedDate <= limitDate) {
+      //   this.$store.commit("showSnackbar", {
+      //     message: "Tiene 3 mes o mas de Antiguedad el Archivo",
+      //     color: "error",
+      //     duration: 3000,
+      //   });
+      //   document.file = null;
+      //   document.status = "documento.none";
+      //   return;
+      // }
       document.status_key = "documento.revicion";
       this.$nextTick(() => {
         this.dialogUpload = false;

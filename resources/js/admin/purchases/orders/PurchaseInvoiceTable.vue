@@ -11,12 +11,12 @@
                   class="text-wrap"
                   style="max-width: 200px"
                 >
-                  {{ form.metodo_pago.description || "" }}
+                  {{ form.metodo_pago ? form.metodo_pago.description : "" }}
                 </v-list-item-subtitle>
               </v-list-item-content>
             </td>
             <td class="text-right" style="width: 50px">
-              {{ form.metodo_pago.clave }}
+              {{ form.metodo_pago ? form.metodo_pago.clave : "" }}
             </td>
           </tr>
           <tr>
@@ -27,12 +27,12 @@
                   class="text-wrap"
                   style="max-width: 200px"
                 >
-                  {{ form.uso_cfdi.description || "" }}
+                  {{ form.uso_cfdi ? form.uso_cfdi.description : "" }}
                 </v-list-item-subtitle>
               </v-list-item-content>
             </td>
             <td class="text-right" style="width: 50px">
-              {{ form.uso_cfdi.clave || "" }}
+              {{ form.uso_cfdi ? form.uso_cfdi.clave : "" }}
             </td>
           </tr>
           <tr>
@@ -43,35 +43,35 @@
                   class="text-wrap"
                   style="max-width: 200px"
                 >
-                  {{ form.forma_pago.description || "" }}
+                  {{ form.forma_pago ? form.forma_pago.description : "" }}
                 </v-list-item-subtitle>
               </v-list-item-content>
             </td>
             <td class="text-right" style="width: 50px">
-              {{ form.forma_pago.clave || "" }}
+              {{ form.forma_pago ? form.forma_pago.clave : "" }}
             </td>
           </tr>
         </tbody>
       </template>
     </v-simple-table>
-    <v-dialog v-model="Dialog" max-width="600px">
+    <v-dialog v-model="Dialog" max-width="600px" persistent>
       <v-card>
         <v-card-title>
           <span class="text-h5">Configuracion Facturacion</span>
         </v-card-title>
         <v-card-text>
           <v-container>
-            <v-form v-model="valid" ref="form" lazy-validation>
+            <v-form v-model="valid" ref="formInvoiceConfig" lazy-validation>
               <v-row class="overline">
                 <v-col cols="12" md="12">
                   <v-select
                     v-model="form.metodo_pago"
                     :items="options.metodoPago"
-                    :hint="`${
-                      form.metodo_pago ? form.metodo_pago.description : ''
-                    }`"
+                    :hint="
+                      `${form.metodo_pago ? form.metodo_pago.description : ''}`
+                    "
                     persistent-hint
-                    label="Metodo Pago:"
+                    label="*Metodo Pago:"
                     item-text="clave"
                     item-value="clave"
                     return-object
@@ -81,8 +81,12 @@
                   >
                     <template v-slot:item="data">
                       <v-list-item-content>
-                        <v-list-item-title v-text="data.item.clave" />
-                        <v-list-item-subtitle v-text="data.item.description" />
+                        <v-list-item-title>
+                          {{ data.item.clave }}
+                        </v-list-item-title>
+                        <v-list-item-subtitle>
+                          {{ data.item.description }}
+                        </v-list-item-subtitle>
                       </v-list-item-content>
                     </template>
                   </v-select>
@@ -90,21 +94,25 @@
                 <v-col cols="12" md="6">
                   <v-select
                     v-model="form.uso_cfdi"
-                    :items="options.usoCFDI"
-                    label="UsoCFDI"
-                    :hint="`${form.uso_cfdi ? form.uso_cfdi.description : ''}`"
-                    persistent-hint
+                    :items="usocfdi"
+                    label="*UsoCFDI:"
                     item-text="clave"
                     item-value="clave"
+                    :hint="`${form.uso_cfdi ? form.uso_cfdi.description : ''}`"
+                    :rules="[(v) => !!v || 'Es Requerido']"
+                    persistent-hint
                     return-object
                     outlined
-                    :rules="[(v) => !!v || 'Es Requerido']"
                     dense
                   >
                     <template v-slot:item="data">
                       <v-list-item-content>
-                        <v-list-item-title v-text="data.item.clave" />
-                        <v-list-item-subtitle v-text="data.item.description" />
+                        <v-list-item-title>
+                          {{ data.item.clave }}
+                        </v-list-item-title>
+                        <v-list-item-subtitle>
+                          {{ data.item.description }}
+                        </v-list-item-subtitle>
                       </v-list-item-content>
                     </template>
                   </v-select>
@@ -114,11 +122,11 @@
                   <v-select
                     v-model="form.forma_pago"
                     :items="options.formaPago"
-                    :hint="`${
-                      form.forma_pago ? form.forma_pago.description : ''
-                    }`"
+                    :hint="
+                      `${form.forma_pago ? form.forma_pago.description : ''}`
+                    "
                     persistent-hint
-                    label="Forma Pago:"
+                    label="*Forma Pago:"
                     item-text="clave"
                     item-value="clave"
                     return-object
@@ -135,8 +143,12 @@
                   >
                     <template v-slot:item="data">
                       <v-list-item-content>
-                        <v-list-item-title v-text="data.item.clave" />
-                        <v-list-item-subtitle v-text="data.item.description" />
+                        <v-list-item-title>
+                          {{ data.item.clave }}
+                        </v-list-item-title>
+                        <v-list-item-subtitle>
+                          {{ data.item.description }}
+                        </v-list-item-subtitle>
                       </v-list-item-content>
                     </template>
                   </v-select>
@@ -144,14 +156,11 @@
               </v-row>
             </v-form>
           </v-container>
-          <small>*indicates required field</small>
+          <small>*Indica Campo Obligatorio</small>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <!-- <v-btn color="blue darken-1" text @click="Dialog = false">
-            Cerrar
-          </v-btn> -->
-          <v-btn color="blue darken-1" text @click="saveItem"> OK </v-btn>
+          <v-btn color="blue darken-1" text @click="close"> Confirmar </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -159,7 +168,7 @@
 </template>
 <script>
 export default {
-  name: "PurchaseConfigInvoiceTable",
+  name: "PurchaseInvoiceConfigTable",
   props: {
     dialogForm: {
       type: Boolean,
@@ -169,30 +178,27 @@ export default {
       type: Object,
       default: () => {
         return {
-          metodo_pago_id: null,
-          uso_cfdi_id: null,
-          forma_pago_id: null,
+          metodo_pago: null,
+          uso_cfdi: null,
+          forma_pago: null,
         };
       },
     },
-    usocfdi: Array,
-    default: () => {
-      return [];
+    usocfdi: {
+      type: Array,
+      default: () => {
+        return [];
+      },
     },
   },
   data() {
     return {
       valid: true,
       editedIndex: -1,
-      // form: {
-      //   uso_cfdi: "",
-      //   metodo_pago: "",
-      //   forma_pago: "",
-      // },
       formDefault: {
-        uso_cfdi: "",
-        metodo_pago: "",
-        forma_pago: "",
+        uso_cfdi: {},
+        metodo_pago: {},
+        forma_pago: {},
       },
       options: {
         usoCFDI: [],
@@ -205,29 +211,13 @@ export default {
     this.loadOptions();
   },
   watch: {
-    usocfdi(value) {
-      this.form.uso_cfdi = {};
-      this.loadOptions();
-    },
-    "form.uso_cfdi"(value) {
-      this.form.uso_cfdi_id = value.clave;
-    },
     "form.metodo_pago"(value) {
       if (value.clave == "PPD") {
         this.form.forma_pago = {
           clave: "99",
           description: "Por definir",
         };
-      } else {
-        this.form.forma_pago = {
-          clave: "03",
-          description: "Transferencia electronica de fondos",
-        };
       }
-      this.form.metodo_pago_id = value.clave;
-    },
-    "form.forma_pago"(value) {
-      this.form.forma_pago_id = value.clave;
     },
   },
   computed: {
@@ -242,7 +232,6 @@ export default {
         if (!v) {
           this.$emit("close");
           this.$nextTick(() => {
-            // this.form = { ...this.formDefault };
             this.editedIndex = -1;
           });
         } else {
@@ -257,14 +246,15 @@ export default {
       const _this = this;
       await axios
         .get("/admin/purchase-order/resources/options")
-        .then(function (response) {
+        .then(function(response) {
           let { metodoPago, formaPago } = response.data.data;
           _this.options.metodoPago = metodoPago;
           _this.options.usoCFDI = _this.usocfdi;
           _this.options.formaPago = formaPago;
         });
     },
-    saveItem() {
+    close() {
+      if (!this.$refs.formInvoiceConfig.validate()) return;
       this.Dialog = false;
     },
   },

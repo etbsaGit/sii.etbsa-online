@@ -8,9 +8,10 @@
     fixed-header
     caption
     dense
-    class="blue--text text-uppercase text-wrap"
+    class="blue--text caption text-uppercase text-wrap"
+    dark
   >
-    <template v-slot:top>
+    <template #top>
       <search-panel
         :rightDrawer="rightDrawer"
         @cancelSearch="cancelSearch"
@@ -147,7 +148,7 @@
             persistent
             width="450px"
           >
-            <template v-slot:activator="{ on, attrs }">
+            <template #activator="{ on, attrs }">
               <v-text-field
                 v-model="filters.date_range"
                 label="Rango de Fechas"
@@ -198,17 +199,8 @@
           Crear Orden de Compra
         </v-btn>
       </v-toolbar>
-      <!-- <dialog-component
-        :show="dialogEdit"
-        @close="dialogEdit = false"
-        fullscreen
-        closeable
-        :title="formTitle"
-      >
-        <edit-purchase v-if="dialogEdit" :purchaseId="editedId"></edit-purchase>
-      </dialog-component> -->
     </template>
-    <template v-slot:[`item.actions`]="{ item }">
+    <template #[`item.actions`]="{ item }">
       <v-menu offset-x transition="slide-x-transition" rounded="r-xl">
         <template v-slot:activator="{ on, attrs }">
           <v-btn icon v-bind="attrs" v-on="on">
@@ -256,43 +248,65 @@
         </v-list>
       </v-menu>
     </template>
-    <template v-slot:[`item.id`]="{ item }">
+    <template #[`item.id`]="{ item }">
       <span> #{{ item.id.toString().padStart(5, 0) }} </span>
     </template>
-    <template v-slot:[`item.supplier.business_name`]="{ item }">
-      <v-list-item dense>
-        <div class="d-flex flex-column">
-          <span class="d-block font-weight-semibold text--primary text-wrap">
-            {{ item.supplier.business_name }}
-          </span>
-          <small>{{ item.supplier.rfc }}</small>
-        </div>
-      </v-list-item>
+    <template #[`item.supplier`]="{ value }">
+      <v-list-item-content>
+        <v-list-item-title
+          class="d-block font-weight-semibold text-primary text-wrap"
+        >
+          {{ value.business_name }}
+        </v-list-item-title>
+        <v-list-item-subtitle>{{ value.rfc }}</v-list-item-subtitle>
+      </v-list-item-content>
     </template>
-    <template v-slot:[`item.elaborated`]="{ item }">
-      <v-list-item dense class="pa-0">
-        <v-list-item-content class="pa-0">
-          <v-list-item-title class="caption text-wrap">
+    <template #[`item.elaborated`]="{ item }">
+      <v-menu bottom right transition="scale-transition" origin="top left">
+        <template v-slot:activator="{ on }">
+          <v-chip label outlined v-on="on">
+            <!-- <v-avatar left>
+              <v-img src="https://cdn.vuetifyjs.com/images/john.png"></v-img>
+            </v-avatar> -->
             {{
               item.elaborated.profiable
                 ? item.elaborated.profiable.full_name
                 : item.elaborated.name
             }}
-          </v-list-item-title>
-          <v-list-item-subtitle>
-            {{
-              item.elaborated.profiable
-                ? item.elaborated.profiable.agency.title
-                : ""
-            }}
-          </v-list-item-subtitle>
-        </v-list-item-content>
-      </v-list-item>
+          </v-chip>
+        </template>
+        <v-card width="300">
+          <v-list dark>
+            <v-list-item>
+              <!-- <v-list-item-avatar>
+                <v-img src="https://cdn.vuetifyjs.com/images/john.png"></v-img>
+              </v-list-item-avatar> -->
+              <v-list-item-content>
+                <v-list-item-title>
+                  {{
+                    item.elaborated.profiable
+                      ? item.elaborated.profiable.full_name
+                      : item.elaborated.name
+                  }}
+                </v-list-item-title>
+                <v-list-item-subtitle>
+                  {{ item.elaborated.email }}
+                </v-list-item-subtitle>
+              </v-list-item-content>
+              <v-list-item-action>
+                <v-btn icon>
+                  <v-icon>mdi-close-circle</v-icon>
+                </v-btn>
+              </v-list-item-action>
+            </v-list-item>
+          </v-list>
+        </v-card>
+      </v-menu>
     </template>
-    <template v-slot:[`item.total`]="{ item }">
+    <template #[`item.total`]="{ item }">
       <b>{{ item.total | money }}</b>
     </template>
-    <template v-slot:[`item.estatus`]="{ item }">
+    <template #[`item.estatus`]="{ item }">
       <v-chip
         label
         small
@@ -303,49 +317,57 @@
         {{ item.estatus.title }}
       </v-chip>
     </template>
-
-    <template v-slot:[`item.cargos`]="{ item }">
-      <v-dialog transition="dialog-bottom-transition" width="600">
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn text v-bind="attrs" v-on="on">
-            Ver <v-icon right>mdi-eye</v-icon>
+    <template #[`item.purchaseType`]="{ item }">
+      <v-list-item-content>
+        <v-list-item-title>
+          {{ item.purchase_type.name }}
+        </v-list-item-title>
+        <v-list-item-subtitle>
+          {{ item.purchase_concept.name }}
+        </v-list-item-subtitle>
+      </v-list-item-content>
+    </template>
+    <template #[`item.charges`]="{ value }">
+      <div v-if="value.length == 0">Sin Cargos</div>
+      <v-dialog v-else width="500">
+        <template #activator="{ on, attrs }">
+          <v-btn color="blue lighten-2" small dark v-bind="attrs" v-on="on">
+            Mostrar ({{ value.length }})
           </v-btn>
         </template>
-        <template v-slot:default>
-          <v-sheet elevation="10" rounded="xl">
-            <v-sheet
-              class="pa-3 blue white--text text-h5 overline"
-              rounded="t-xl"
-            >
-              Cargos a Sucursal
-            </v-sheet>
-            <div class="pa-4">
-              <!-- <v-chip-group active-class="primary--text" column> -->
-              <v-chip
-                v-for="(tag, index) in item.charge_agency"
-                :key="`${tag.agency}-${index}`"
-                class="overline ma-2"
-                large
-                dark
+
+        <v-card rounded="xl">
+          <v-card-title
+            class="white--text text-title text-uppercase blue lighten-2"
+          >
+            Cargos a Sucursales
+          </v-card-title>
+
+          <v-card-text>
+            <v-list>
+              <v-list-item
+                v-for="(item, index) in value"
+                :key="`cargo-${index}`"
               >
-                {{ item.charge_agency[index].title }} -
-                {{ item.charge_department[index].title }} -
-                {{ item.charge_agency[index].charge.percent }}%
-              </v-chip>
-              <!-- <v-chip
-                  v-for="(tag, index) in item.charges"
-                  :key="`${tag.agency}-${index}`"
-                  class="overline"
-                >
-                  {{ tag.agency }} - {{ tag.department }} - {{ tag.percent }}%
-                </v-chip> -->
-              <!-- </v-chip-group> -->
-            </div>
-          </v-sheet>
-        </template>
+                <v-list-item-content>
+                  <v-list-item-title>{{ item.agency.title }}</v-list-item-title>
+                  <v-list-item-subtitle>
+                    {{ item.department.title }}
+                  </v-list-item-subtitle>
+                </v-list-item-content>
+
+                <v-list-item-action-text>
+                  <v-chip color="blue" dark label>
+                    {{ item.percent }} %
+                  </v-chip>
+                </v-list-item-action-text>
+              </v-list-item>
+            </v-list>
+          </v-card-text>
+        </v-card>
       </v-dialog>
     </template>
-    <template v-slot:[`item.created_at`]="{ value }">
+    <template #[`item.created_at`]="{ value }">
       {{ $appFormatters.formatDate(value, "l") }}
     </template>
   </v-data-table>
@@ -369,6 +391,7 @@ export default {
     TableHeaderButtons,
   },
   data: () => ({
+    chipExpande: false,
     valid: true,
     modalDateRange: false,
     dialogCreate: false,
@@ -386,19 +409,20 @@ export default {
       },
       {
         text: "Proveedor",
-        value: "supplier.business_name",
+        value: "supplier",
         fixed: true,
       },
       {
         text: "Cargos a Sucursal",
-        value: "cargos",
+        value: "charges",
+        align: "center",
         fixed: true,
         sortable: false,
       },
-      { text: "Concepto Compra", value: "purchase_concept.name", width: 200 },
+      { text: "Tipo O.C.", value: "purchaseType", width: 200 },
       {
-        text: "Articulos",
-        value: "detail_purchase.length",
+        text: "# Partidas",
+        value: "products.length",
         align: "center",
         sortable: false,
       },
@@ -528,7 +552,7 @@ export default {
       };
       await axios
         .post(`/admin/purchase-order/update-estatus/${item.id}`, payload)
-        .then(function (response) {
+        .then(function(response) {
           _this.$store.commit("showSnackbar", {
             message: response.data.message,
             color: "success",
@@ -538,7 +562,7 @@ export default {
           _this.loadPurchaseEdit();
           // _this.$eventBus.$emit("CLOSE_DIALOG");
         })
-        .catch(function (error) {
+        .catch(function(error) {
           _this.$store.commit("hideLoader");
           if (error.response) {
             _this.$store.commit("showSnackbar", {
@@ -579,7 +603,7 @@ export default {
       };
       await axios
         .get("/admin/purchase-order", { params: params })
-        .then(function (response) {
+        .then(function(response) {
           // console.log(response.data.data);
           let Response = response.data.data;
           _this.items = Response.data;
@@ -597,7 +621,7 @@ export default {
       const _this = this;
       await axios
         .get("/admin/purchase-order/resources/options")
-        .then(function (response) {
+        .then(function(response) {
           let Data = response.data.data;
           _this.options.suppliers = Data.suppliers;
           _this.options.agencies = Data.agencies;
@@ -616,18 +640,18 @@ export default {
   },
   watch: {
     pagination: {
-      handler: _.debounce(function () {
+      handler: _.debounce(function() {
         this.reloadTable();
       }, 999),
       deep: true,
     },
     filters: {
-      handler: _.debounce(function (v) {
+      handler: _.debounce(function(v) {
         this.reloadTable();
       }, 999),
       deep: true,
     },
-    search: _.debounce(function (v) {
+    search: _.debounce(function(v) {
       this.reloadTable();
     }, 999),
   },

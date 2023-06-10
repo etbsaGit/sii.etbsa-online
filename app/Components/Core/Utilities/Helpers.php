@@ -266,4 +266,19 @@ class Helpers
         fclose($fp);
         return true;
     }
+
+    public static function  arrayToObject($array)
+    {
+        $objeto = new \stdClass();
+    
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $objeto->$key = self::arrayToObject($value);
+            } else {
+                $objeto->$key = $value;
+            }
+        }
+    
+        return $objeto;
+    }
 }

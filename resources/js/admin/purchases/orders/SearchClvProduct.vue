@@ -9,7 +9,7 @@
     :items="items"
     :loading="isLoading"
     :search-input.sync="search"
-    color="pink"
+    color="blue"
     hide-no-data
     hide-selected
     item-text="Description"
@@ -19,6 +19,7 @@
     prepend-icon="mdi-database-search"
     persistent-placeholder
     :filter="customFilter"
+    :rules="[(v) => !!v || 'Seleccione una Clave de Prodroducto']"
     return-object
     clearable
     outlined
@@ -77,12 +78,12 @@ export default {
       },
     },
     fields() {
-      if (!this.model) return [];
+      if (!this.Model) return [];
 
-      return Object.keys(this.model).map((key) => {
+      return Object.keys(this.Model).map((key) => {
         return {
           key,
-          value: this.model[key] || "n/a",
+          value: this.Model[key] || "n/a",
         };
       });
     },
@@ -101,9 +102,12 @@ export default {
   watch: {
     value: _.debounce(function(nVal, oVal) {
       const _this = this;
+      console.log("Watch Value",nVal,oVal);
+      if (nVal == null) return;
       if (
         nVal.c_ClaveProdServ != oVal.c_ClaveProdServ &&
-        _this.search == null
+        _this.search == null &&
+        !_this.entries.some((e) => e.c_ClaveProdServ === nVal.c_ClaveProdServ)
       ) {
         return (_this.search = nVal.c_ClaveProdServ);
       }

@@ -47,15 +47,15 @@ class CargosInternosController extends AdminController
                     'estatus' => $model->estatus->title,
                     'sucursales' => $model->sucursales,
                     // 'cargos_sucursal' => $model->cargosSucursal->map->only(['sucursal_id', 'department_id']),
-                    'cargos_sucursal' => $model->cargosSucursal->map(
-                        function ($item) {
-                                return [
-                                    'agencia' => Agency::find($item->sucursal_id)->title,
-                                    'departamento' => Department::find($item->department_id)->title,
-                                    'percent' => $item->percent
-                                ];
-                            }
-                    )
+                    // 'cargos_sucursal' => $model->cargosSucursal->map(
+                    //     function ($item) {
+                    //             return [
+                    //                 'agencia' => Agency::find($item->sucursal_id)->title,
+                    //                 'departamento' => Department::find($item->department_id)->title,
+                    //                 'percent' => $item->percent
+                    //             ];
+                    //         }
+                    // )
                 ];
             })
         )->toArray();
@@ -134,7 +134,6 @@ class CargosInternosController extends AdminController
         $item = collect($cargos_interno)->union(
             [
                 'estatus' => $cargos_interno->estatus->title,
-
                 'cargos_sucursal' => $cargos_interno->cargosSucursal->map(
                     function ($item) {
                         return [

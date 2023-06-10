@@ -52,11 +52,11 @@ class SupplierController extends AdminController
     {
 
         $validate = validator($request->all(), [
-            'code_equip' => 'required|unique:suppliers,code_equip',
+            'code_equip' => 'unique:suppliers,code_equip',
             'business_name' => 'required|unique:suppliers,business_name',
             'rfc' => 'required|min:12|unique:suppliers,rfc',
         ], [
-                'code_equip.required' => 'La Clave de Equip es Obligatoria',
+                // 'code_equip.required' => 'La Clave de Equip es Obligatoria',
                 'code_equip.unique' => 'La Clave de Equip esta Duplicada',
                 'rfc.unique' => 'El RFC ya existe en un Registro',
                 'rfc.min' => 'RFC debe ser valido'
@@ -116,14 +116,14 @@ class SupplierController extends AdminController
             $request->all(),
             [
                 'code_equip' =>
-                ['required', Rule::unique('suppliers')->ignore($supplier->id)],
+                [Rule::unique('suppliers')->ignore($supplier->id)],
                 'business_name' =>
-                ['required', Rule::unique('suppliers')->ignore($supplier->id)],
+                ['required'],
                 'rfc' =>
-                ['required', 'min:12', Rule::unique('suppliers')->ignore($supplier->id)],
+                ['required', 'min:12'],
             ],
             [
-                'code_equip.required' => 'La Clave de Equip es Obligatoria',
+                // 'code_equip.required' => 'La Clave de Equip es Obligatoria',
                 'code_equip.unique' => 'La Clave de Equip esta Duplicada',
                 'rfc.unique' => 'El RFC ya existe en un Registro',
                 'rfc.min' => 'RFC debe ser valido'
