@@ -96,37 +96,6 @@ class PurchaseOrder extends Model
         return $this->belongsTo(PurchaseConcept::class, 'purchase_concept_id');
     }
 
-    // public function chargeAgency()
-    // {
-    //     return $this->belongsToMany(Agency::class, 'purchase_pivot_charges', 'purchase_order_id', 'agency_id', 'id', 'id')
-    //         ->using(PurchasePivotCharge::class)
-    //         ->withPivot('percent')
-    //         ->withTimestamps()
-    //         ->as('charge');
-    // }
-
-    // public function chargeDepartment()
-    // {
-    //     return $this->belongsToMany(Department::class, 'purchase_pivot_charges', 'purchase_order_id')
-    //         ->withPivot('agency_id', 'percent')
-    //         ->as('charge');
-    // }
-    // public function purchaseCharges()
-    // {
-    //     return $this->hasMany(
-    //         PurchasePivotCharge::class,
-    //         'purchase_order_id',
-    //         'id'
-    //     );
-    // }
-
-    // public function pivotCharge()
-    // {
-    //     return $this->belongsToMany(Department::class, 'purchase_pivot_charges')
-    //         ->withPivot('agency_id', 'percent')
-    //         ->using(PurchasePivotCharge::class)
-    //         ->withTimestamps();
-    // }
     public function pivotCharge()
     {
         return $this->hasMany(PurchasePivotCharge::class, 'purchase_order_id');
@@ -159,12 +128,6 @@ class PurchaseOrder extends Model
     public function getChargesAttribute()
     {
         return $this->pivotCharge->map(function ($charge) {
-            // dd($charge->agency->only('id', 'title'));
-            // return [
-            //     'agency' => $charge->pivot->agency->only('id', 'title'),
-            //     'department' => $charge->pivot->department->only('id', 'title'),
-            //     'percent' => $charge->pivot->percent
-            // ];
             return [
                 'agency' => $charge->agency->only('id', 'title'),
                 'department' => $charge->department->only('id', 'title'),
@@ -247,15 +210,15 @@ class PurchaseOrder extends Model
             });
         });
 
-        // $query->when($filters['agencie'] ?? null, function ($query, $agency_id) {
-        //     $query->whereHas('chargeAgency', function ($query) use ($agency_id) {
-        //         return $query->whereIn('agency_id', $agency_id);
-        //     });
-        // })->when($filters['department'] ?? null, function ($query, $depto_id) {
-        //     $query->whereHas('chargeDepartment', function ($query) use ($depto_id) {
-        //         return $query->whereIn('department_id', $depto_id);
-        //     });
-        // });
+        $query->when($filters['agencie'] ?? null, function ($query, $agency_id) {
+            $query->whereHas('agencies', function ($query) use ($agency_id) {
+                return $query->whereIn('agency_id', $agency_id);
+            });
+        })->when($filters['department'] ?? null, function ($query, $depto_id) {
+            $query->whereHas('departments', function ($query) use ($depto_id) {
+                return $query->whereIn('department_id', $depto_id);
+            });
+        });
 
         $query->when($filters['date_range'] ?? null, function ($query, $dates) use ($estatus) {
             if ($estatus == "todos" || $estatus == "pendiente")

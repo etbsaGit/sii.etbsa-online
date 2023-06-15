@@ -266,36 +266,48 @@
               </v-card-text>
             </v-card>
 
-            <v-card flat>
-              <v-row dense>
-                <v-col cols="12" md="6">
-                  <v-card-title>Justificacion</v-card-title>
-                  <v-card-text class="overline">
-                    <v-textarea
-                      v-model="form.observation"
-                      outlined
-                      filled
-                      placeholder="Describir el motivo de compra"
-                      hint="Justificacion de la compra*"
-                      :rules="[(v) => !!v || 'Es requerido']"
-                      persistent-hint
-                    ></v-textarea>
-                  </v-card-text>
-                </v-col>
-                <v-col cols="12" md="6">
-                  <v-card-title>Nota a Proveedor</v-card-title>
-                  <v-card-text class="overline">
-                    <v-textarea
-                      v-model="form.note"
-                      outlined
-                      filled
-                      placeholder="Describir a quien van dirigidos los Productos o servicios"
-                      hint="Nota que ira en la OC para conocimiento del proveedor*"
-                      persistent-hint
-                    ></v-textarea>
-                  </v-card-text>
-                </v-col>
-              </v-row>
+            <v-card flat class="mt-2">
+              <v-card-text>
+                <v-row v-if="InvoiceTableShow">
+                  <v-col cols="12">
+                    <invoice-table
+                      :purchase-id="purchaseId"
+                      :items="form.invoice_info"
+                    />
+                  </v-col>
+                </v-row>
+              </v-card-text>
+              <v-card-text>
+                <v-row dense>
+                  <v-col cols="12" md="6">
+                    <v-card-title>Justificacion</v-card-title>
+                    <v-card-text class="overline">
+                      <v-textarea
+                        v-model="form.observation"
+                        outlined
+                        filled
+                        placeholder="Describir el motivo de compra"
+                        hint="Justificacion de la compra*"
+                        :rules="[(v) => !!v || 'Es requerido']"
+                        persistent-hint
+                      ></v-textarea>
+                    </v-card-text>
+                  </v-col>
+                  <v-col cols="12" md="6">
+                    <v-card-title>Nota a Proveedor</v-card-title>
+                    <v-card-text class="overline">
+                      <v-textarea
+                        v-model="form.note"
+                        outlined
+                        filled
+                        placeholder="Describir a quien van dirigidos los Productos o servicios"
+                        hint="Nota que ira en la OC para conocimiento del proveedor*"
+                        persistent-hint
+                      ></v-textarea>
+                    </v-card-text>
+                  </v-col>
+                </v-row>
+              </v-card-text>
             </v-card>
           </v-col>
           <v-col cols="12" md="3">
@@ -367,6 +379,7 @@ import PurchaseInvoiceTable from "./PurchaseInvoiceTable.vue";
 import PurchaseFilesList from "./PurchaseFilesList.vue";
 import SearchClvProduct from "./SearchClvProduct.vue";
 import PurchaseImportCsvProducts from "./PurchaseImportCsvProducts.vue";
+import InvoiceTable from "./InvoiceTable.vue";
 export default {
   name: "PurchaseOrderEdit",
   components: {
@@ -377,6 +390,7 @@ export default {
     PurchaseFilesList,
     SearchClvProduct,
     PurchaseImportCsvProducts,
+    InvoiceTable,
   },
   props: {
     purchaseId: {
@@ -446,6 +460,9 @@ export default {
     };
   },
   mounted() {
+    this.$eventBus.$on("ORDERS_REFRESH", () => {
+      this.loadPurchaseEdit();
+    });
     this.loadOptions();
     this.$store.commit("setBreadcrumbs", [
       { label: "Ordenes de Compra", to: { name: "purchase.list" } },
@@ -697,7 +714,7 @@ export default {
             color: "success",
             duration: 3000,
           });
-          _this.$eventBus.$emit("ORDERS_REFRESH");
+          // _this.$eventBus.$emit("ORDERS_REFRESH");
           _this.loadPurchaseEdit();
           // _this.$eventBus.$emit("CLOSE_DIALOG");
         })
