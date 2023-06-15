@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App;
 use App\Components\Common\Models\Currency;
 use App\Components\Product\Models\Product;
 use App\Components\Product\Models\ProductCategory;
@@ -133,8 +134,11 @@ class TrackingQuoteController extends AdminController
     public function printQuote(TrackingQuote $quote)
     {
         $data = $quote->load('tracking', 'products', 'currency');
-        $pdf = \PDF::loadView('pdf.tracking_quote', compact('data'));
+        // $pdf = \PDF::loadView('pdf.tracking_quote', compact('data'));
         // return $this->sendResponse($data, 'SHOW PDF');
+        $pdf = App::make('dompdf.wrapper');
+        $pdf->getDomPDF()->set_option("enable_php", true);
+        $pdf->loadView('pdf.tracking_quote', compact('data'));
         return $pdf->stream();
     }
 }

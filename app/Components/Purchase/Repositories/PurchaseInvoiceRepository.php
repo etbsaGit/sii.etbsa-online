@@ -24,13 +24,13 @@ class PurchaseInvoiceRepository extends BaseRepository
     public function list($params)
     {
         return $this->get($params, [
-            'invoiceable:id,created_by,charges,updated_by,estatus_id,supplier_id,observation,note,purchase_concept_id,payment_condition',
+            'invoiceable:id,created_by,updated_by,estatus_id,supplier_id,observation,note,purchase_concept_id,payment_condition',
             'invoiceable.supplier:id,business_name,rfc',
+            'invoiceable.pivotCharge',
             'invoiceable.estatus:id,title,key',
             'invoiceable.elaborated.profiable:id,name,last_name,agency_id',
             'invoiceable.elaborated.profiable.agency:id,title',
             'invoiceable.purchase_concept:id,name',
-            'estatus:id,title,key'
         ], function ($query) use ($params) {
             $query->whereHasMorph(
                 'invoiceable',

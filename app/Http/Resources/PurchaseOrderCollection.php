@@ -56,6 +56,7 @@ class PurchaseOrderCollection extends JsonResource
             'note' => $this->note,
             'payment_condition' => $this->payment_condition,
             'file' => $this->files->map->only('id', 'name', 'file_path', 'file_type', 'created_at'),
+            'invoice_info' => $this->invoice
         ];
     }
 }

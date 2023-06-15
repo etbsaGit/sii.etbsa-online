@@ -1,20 +1,95 @@
-<!DOCTYPE html>
 <html>
 
 <head>
     <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Cotizacion</title>
+    <title>Equipos y Tractores del Bajio</title>
+    <style>
+        @page {
+            margin: 0.75cm 0cm;
+            font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;
+        }
 
+        body {
+            margin: 3.6cm 0.25cm;
+        }
+
+        header {
+            position: fixed;
+            top: 0cm;
+            left: 0cm;
+            right: 0cm;
+            height: 2.5cm;
+
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+            font-size: 0.8em;
+            line-height: 1em;
+            font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;
+            color: #555;
+            padding-top: 2rem;
+            padding-left: 1rem;
+            padding-right: 1rem;
+
+        }
+
+        header table {
+            height: inherit;
+            width: 100%;
+            line-height: inherit;
+        }
+
+        header table td {
+            vertical-align: top;
+        }
+
+        footer {
+            position: fixed;
+            bottom: 0cm;
+            left: 0cm;
+            right: 0cm;
+            height: 2cm;
+
+            /** Extra personal styles **/
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+            font-size: 0.8em;
+            line-height: 1em;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: #555;
+            background-color: #123f0283;
+            color: white;
+            text-align: center;
+            line-height: 1rem;
+            padding-bottom: 2rem;
+            padding-left: 1rem;
+            padding-right: 1rem;
+
+        }
+
+        footer table {
+            height: inherit;
+            width: 100%;
+            line-height: inherit;
+        }
+
+        footer table td {
+            vertical-align: middle;
+        }
+
+        .page-break {
+            page-break-after: always;
+        }
+    </style>
     <style>
         .invoice-box {
-            margin: auto;
+            width: 100%;
+            /* max-width: 300px; */
+            /* margin: auto; */
+            /* padding: 30px; */
+            border: 1px solid #eee;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
-            font-size: 10pt;
-            font-family: 'Raleway', 'sans-serif';
+            font-size: 0.8em;
+            line-height: 1em;
+            font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;
             color: #555;
-            line-height: normal;
         }
 
         .invoice-box table {
@@ -25,6 +100,7 @@
 
         .invoice-box table td {
             padding: 5px;
+            /* border: 1px solid #df1414; */
             vertical-align: top;
         }
 
@@ -34,22 +110,24 @@
 
         .invoice-box table tr.top table td {
             padding-bottom: 20px;
+            /* border: 1px solid #3614df; */
         }
 
         .invoice-box table tr.top table td.title {
-            font-size: 10pt;
-            line-height: 10px;
+            font-size: 45px;
+            line-height: 45px;
             color: #333;
         }
 
         .invoice-box table tr.information table td {
-            padding-bottom: 40px;
+            padding: 5px;
         }
 
         .invoice-box table tr.heading td {
             background: #eee;
             border-bottom: 1px solid #ddd;
             font-weight: bold;
+            vertical-align: middle;
         }
 
         .invoice-box table tr.details td {
@@ -58,10 +136,13 @@
 
         .invoice-box table tr.item td {
             border-bottom: 1px solid #eee;
+            /* border: 2px solid #eeb004; */
         }
 
         .invoice-box table tr.item.last td {
             border-bottom: none;
+            padding-top: 1cm;
+            /* border: 3px solid #d5df14; */
         }
 
         .invoice-box table tr.total td:nth-child(2) {
@@ -69,7 +150,7 @@
             font-weight: bold;
         }
 
-        @media only screen and (max-width: 600px) {
+        @media only screen and (max-width: 400px) {
             .invoice-box table tr.top table td {
                 width: 100%;
                 display: block;
@@ -77,6 +158,18 @@
             }
 
             .invoice-box table tr.information table td {
+                width: 100%;
+                display: block;
+                text-align: center;
+            }
+
+            header table tr.top table td {
+                width: 100%;
+                display: block;
+                text-align: center;
+            }
+
+            header table tr.information table td {
                 width: 100%;
                 display: block;
                 text-align: center;
@@ -96,177 +189,258 @@
         .invoice-box.rtl table tr td:nth-child(2) {
             text-align: left;
         }
+
+        .swiss {
+            max-width: 600px;
+            opacity: 0.2;
+        }
+
+        .position-ref {
+            position: relative;
+        }
     </style>
+
 </head>
 
 <body>
-    <div class="invoice-box">
-        <table cellpadding="0" cellspacing="0">
-            <tr class="top">
-                <td colspan="5">
-                    <table>
-                        <tr>
-                            <td class="title">
-                                <img src="{{ public_path() . '/img/etbsa-logo-corporativo-dark.jpeg' }}"
-                                    style="width: 100%; max-width: 250px; max-height: 150px;" />
-                            </td>
+    <script type="text/php">
+        if ( isset($pdf) ) {
+            $pdf->page_script('
+                $font = $fontMetrics->get_font("Helvetica, sans-serif", "normal");
+                $pdf->text(520, 25, "Pagina $PAGE_NUM de $PAGE_COUNT", $font, 10);
+            ');
+        }
+    </script>
+    <header>
 
-                            <td>
-                                Cotizacion: # {{ str_pad($data->id, 5, '0', STR_PAD_LEFT) }}<br />
-                                LEAD: # {{ str_pad($data->tracking->id, 5, '0', STR_PAD_LEFT) }}<br />
-                                Creacion: {{ $data->created_at }}<br />
-                                Vencimiento: {{ $data->date_due }}
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-
-            <tr class="information">
-                <td colspan="5">
-                    <table>
-                        <tr>
-                            <td>
-                                Equipos y Tractores del Bajio SA de CV<br />
-                                Carr. Panamericana Celaya-Salamanca Km 61.<br />
-                                1a. Fracc. de Crespo. Celaya, Gto. C.P. 38120<br />
-                                (461) 614.23.23/24/25<br />
-                                www.etbsa.com.mx<br />
-
-                            </td>
-
-                            <td>
-                                Atencion a: {{ $data->tracking->prospect->full_name }}<br />
-                                Telefono: {{ $data->tracking->prospect->phone }}<br />
-                                {{ $data->tracking->prospect->company }} <br><br>
-                                Vendedor: {{ $data->tracking->attended->name }}<br />
-                                Email: {{ $data->tracking->attended->email }}
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-            <tr class="heading">
-                <td colspan="6" style="text-transform: uppercase;">
-                    Condicion de Pago: {{ $data->label_payment }}
-                </td>
-            </tr>
-            <tr class="heading">
-                <td>SKU</td>
-                <td>Producto</td>
-                <td>Cant.</td>
-                <td>Precio U.</td>
-                <td>Subtotal</td>
-            </tr>
-
-            @foreach ($data->products as $product)
-                <tr class="item">
-                    <td>
-                        {{ $product->sku }}<br />
-                    </td>
-                    <td style="text-align: justify">
-                        {{ $product->name }}<br />
-                        <span style="font-size: 8pt;">{{ $product->description }}</span>
-                    </td>
-                    <td style="text-align: center">{{ $product->quotation->quantity }}</td>
-                    <td>${{ number_format($product->quotation->price_unit, 2, '.', ',') }} {{ $data->currency->name }}
-                    </td>
-                    <td>${{ number_format($product->quotation->subtotal, 2, '.', ',') }} {{ $data->currency->name }}
-                    </td>
-                </tr>
-            @endforeach
-
-            <tr class="total" style="text-align: right">
-                <td colspan="3">Subtotal: </td>
-                <td colspan="2" style="text-align: right">{{ '$ ' . number_format($data->subtotal, 2, '.', ',') }}
-                    {{ $data->currency->name }}
-                </td>
-            </tr>
-            <tr class="total" style="text-align: right">
-                <td colspan="3">IVA: </td>
-                <td colspan="2">{{ number_format($data->tax, 2, '.', ',') * 100 }}%</td>
-            </tr>
-            @if ($data->currency->name == 'USD')
-                <tr class="total" style="text-align: right">
-                    <td colspan="3">T.C.: </td>
-                    <td colspan="2">{{ '$ ' . number_format($data->exchange_value, 2, '.', ',') }}
-                        {{ $data->currency->name }} </td>
-                </tr>
-            @endif
-            @if ($data->discount > 0)
-                <tr class="total" style="text-align: right">
-                    <td colspan="3">Descuento: </td>
-                    <td colspan="2">{{ '$ ' . number_format($data->discount, 2, '.', ',') }}
-                        {{ $data->currency->name }} </td>
-                </tr>
-            @endif
-            <tr class="total" style="text-align: right">
-                <td colspan="3">Total {{ $data->currency->name }}: </td>
-                <td colspan="2" style="font-size: 12pt">{{ '$ ' . number_format($data->total, 2, '.', ',') }}
-                    {{ $data->currency->name }}
-                </td>
-            </tr>
-            {{-- @if ($data->currency->name == 'USD')
-                <tr class="total" style="text-align: right">
-                    <td colspan="3">Total M.N.: </td>
-                    <td colspan="2" style="font-size: 12pt">
-                        {{ '$ ' . number_format($data->total * $data->exchange_value, 2, '.', ',') }}
-                        MXN
-                    </td>
-                </tr>
-            @endif --}}
-
-        </table>
 
         <table>
-
-            <tr class="heading">
-                <td>Nota del Vendedor</td>
-                <td colspan="5"></td>
-            </tr>
-            <tr class="details">
-                <td colspan="5" style="text-align: left">{{ $data->observation }} </td>
-            </tr>
-            {{-- <tr class="details">
-                <td colspan="5" style="text-align: left; font-size: 10pt;">
-                    *Los precios de los productos pueden varias sin previo aviso <br>
-                    *Solo con Disponibilidad en Inventario <br>
-                    *La presente cotización tiene una vigencia de 30 días a partir de la fecha de expedición de la
-                    misma<br><br>
-                    Sin otro en particular de momento, quedo a sus órdenes para cualquier duda o aclaración.
+            <tr class="top">
+                <td style="width: 120px">
+                    <img src="img/logo.png" style="width: 180px" />
                 </td>
-            </tr> --}}
-            <tr class="details">
-                <td colspan="5"
-                    style="text-align: left; font-size: 7pt; font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; font-style: italic;text-align: justify">
-                    Costos de Envío / Flete se definen de acuerdo a la zona <b>**NO INCLUIDO EN EL PRECIO
-                        PUBLICADO**</b>,
-                    El costo del producto puede variar sin previo aviso, favor de verificar con nosotros antes de
-                    apartar.
-                    <b>**ETBSA Nunca le Solicitara que deposite dinero sin antes haber visto la Maquinaria**</b>,
-                    ETBSA realiza todas las operaciones y tramites de venta de Maquinaria, dentro de sus instalaciones
-                    oficiales, las ubicaciones las puede consultar en la pagina oficial
-                    <a href="https://www.etbsa.com.mx/"> www.etbsa.com.mx </a> <br>
-                    <b>
-                        **La presente cotización tiene una vigencia de 30 días a partir de la fecha de expedición de la
-                        misma**
-                    </b>
+                <td colspan="4"
+                    style="text-align: center; width: 350px; font-size: 9pt; line-height: 1rem; text-transform: uppercase;">
+                    <b style="font-size: 12pt;">Equipos y Tractores del Bajio</b><br />
+                    Carretera Panamericana Celaya - Salamanca Km. 61<br />
+                    1ra Fracc. crespo C.P. 38120 Celaya, Gto.<br />
+                    Tel. 461-614-2323, 461-614-2324, 461-614-2325<br />
+                    <b>R.F.C.: ETB-860812-I23</b>
+                </td>
+
+                <!-- <td style="text-align: right; width: 200px; line-height: 1rem;">
+                    <b>Cotizacion: </b># {{ str_pad($data->id, 5, '100', STR_PAD_LEFT) }}<br />
+                    LEAD: # {{ str_pad($data->tracking->id, 4, '0', STR_PAD_LEFT) }}<br />
+                    Creacion: {{ $data->created_at }}<br />
+                    Vencimiento: {{ $data->date_due }}
+                </td> -->
+                <td style="text-align: center; width: 100px;">
+                    <img src="img/logo-jd-dark.png" style="width: 90;" />
                 </td>
             </tr>
-
-            <tr class="details">
-                <td colspan="5">
-                    <div style="text-align: center; font-size: 10pt;">
-                        <br>
-                        <br>
-                        __________________________________________________<br>
-                        NOMBRE Y FIRMA DEL GERENTE QUE AUTORIZA
-                    </div>
-                </td>
-            </tr>
-
         </table>
-    </div>
+        <div style="text-align: center; height: 50%;">
+            <img class="swiss" style="margin-top: 250px;" src="img/logo-dark.png">
+        </div>
+
+    </header>
+    <footer>
+        <!-- <div>
+            El Numero de Orden de Compra debe aparecer siempre en la Factura, Etiquetas y Notas de Envio
+            correspondientes, inclusive en los embarques a terceros. La Factura debera contener la misma
+            infomacion (linea por linea) que la mostrada en esta Orden de Compra, Para entregas contactar al
+            Requisitor.
+        </div> -->
+        <table>
+            <tr class="top">
+                <td style="width: 100px;text-align: center;">
+                    <img src="img/etbsa-tree.png" style="width: 64px" />
+                </td>
+                <td colspan="4"
+                    style="text-align: left; width: 370px; font-size: 0.7rem; line-height: 0.8rem; font-style: italic;color: #ddd;">
+                    <b
+                        style="color: #ffffff; font-size: 12pt; text-transform: uppercase;font-weight: bold; font-family: Arial, Helvetica, sans-serif;">Plan
+                        mundial de reforestacion</b><br>
+                    ¡Juntos por un México más Verde!<br>
+
+                    Por cada máquina entregada, ETBSA junto con John Deere Plantará 3 árboles con el objetivo de lograr
+                    Un Millón de árboles en 2030.
+
+                    Considere el medio ambiente antes de imprimir este documento.
+                    Consulte nuestros lineamisntos y códigos de proveedores en nuestra paqina (URL).
+                </td>
+
+                <td style="text-align: right; width: 200px; line-height: 1rem;">
+                    <b>Cotizacion: </b># {{ str_pad($data->id, 5, '100', STR_PAD_LEFT) }}<br />
+                    LEAD: # {{ str_pad($data->tracking->id, 4, '0', STR_PAD_LEFT) }}<br />
+                    Creacion: {{ $data->created_at }}<br />
+                    Vencimiento: {{ $data->date_due }}
+                </td>
+            </tr>
+        </table>
+    </footer>
+
+    <main>
+        <div class="invoice-box">
+            <table cellpadding="0" cellspacing="0">
+                <tr class="information">
+                    <td colspan="2">
+                        <table>
+                            <tr class="heading">
+                                <td>
+                                    Vendedor: <br>
+                                    Email:
+                                </td>
+                                <td style="text-align: left;">
+                                    {{ $data->tracking->attended->name }} <br>
+                                    {{ $data->tracking->attended->email }}
+                                </td>
+                            </tr>
+
+                            <tr class="heading">
+                                <td>
+                                    Atencion A: <br />
+                                    <br>
+                                    Telefono:
+                                </td>
+                                <td style="text-align: left;">
+                                    <b>{{ $data->tracking->prospect->full_name }}</b><br />
+                                    {{ $data->tracking->prospect->company }} <br>
+                                    <b>{{ $data->tracking->prospect->phone }}</b>
+                                </td>
+
+                            </tr>
+                        </table>
+                    </td>
+                    <td colspan="6" style="text-align: right;">
+                        <img src="img/QRVoBo.png" style="width: 100px ; height: 100px;" />
+                    </td>
+                </tr>
+
+                <tr class="information">
+                    <td colspan="2">
+                        <table>
+                            <tr class="heading">
+                                <td>Condicion de Pago</td>
+                                <td style="text-align: left;"> {{ $data->label_payment }} </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td colspan="6"></td>
+                </tr>
+
+                <tr class="heading">
+                    <td colspan="1" style="text-align: center;">Cant.</td>
+                    <td colspan="3" style="text-align: center;">SKU. / Producto</td>
+                    <td colspan="2" style="text-align: right;">Precio</td>
+                    <td colspan="2" style="text-align: right;">Subtotal</td>
+                </tr>
+                @foreach ($data->products as $product)
+                <tr class="item">
+                    <td colspan="1" style="text-align: center;">
+                        {{ $product->quotation->quantity }}
+                    </td>
+
+                    <td colspan="3" style="width: 324px;">
+                        <div style="text-align: start">
+                            <b>{{ $product->sku }}</b>
+                            ({{ $product->name }})
+                        </div>
+                        <div style="text-align: justify; font-size: 0.5rem; padding-top: 5px;">
+                            {{ $product->description }}
+                        </div>
+                    </td>
+                    <td colspan="2" style="text-align: right;font-size: 0.8rem;">
+                        {{ '$ ' . number_format($product->quotation->price_unit, 2, '.', ',') }}
+                        {{ $data->currency->name }}</td>
+                    <td colspan="2" style="text-align: right;font-size: 0.8rem;">
+                        {{ '$ ' . number_format($product->quotation->subtotal, 2, '.', ',') }}
+                        {{ $data->currency->name }}</td>
+                </tr>
+                @endforeach
+                <tr class="total" style="text-align: end;">
+                    <td colspan="4"></td>
+                    <td colspan="2">Subtotal:</td>
+                    <td colspan="2" style="text-align: right;font-size: 0.8rem;">
+                        {{ '$ ' . number_format($data->subtotal, 2, '.', ',') }}
+                        {{ $data->currency->name }}
+                    </td>
+                </tr>
+                <tr class="total" style="text-align: end;">
+                    <td colspan="4"></td>
+                    <td colspan="2">IVA:</td>
+                    <td colspan="2" style="text-align: right;font-size: 0.8rem;">
+                        {{ number_format($data->tax, 2, '.', ',') * 100 }}%
+                    </td>
+                </tr>
+                @if ($data->discount > 0)
+                <tr class="total" style="text-align: end;">
+                    <td colspan="4"></td>
+                    <td colspan="2">IVA Descuento:</td>
+                    <td colspan="2" style="text-align: right;font-size: 0.8rem;">
+                        {{ '$ ' . number_format($data->discount, 2, '.', ',') }}
+                        {{ $data->currency->name }}
+                    </td>
+                </tr>
+                @endif
+                @if ($data->currency->name == 'USD')
+                <tr class="total" style="text-align: right">
+                    <td colspan="4"></td>
+                    <td colspan="2">T.C.: </td>
+                    <td colspan="2" style="font-size: 0.8rem;">
+                        {{ '$ ' . number_format($data->exchange_value, 2, '.', ',') }}
+                        {{ $data->currency->name }} </td>
+                </tr>
+                @endif
+                <tr class="total" style="text-align: end;">
+                    <td colspan="4"></td>
+                    <td colspan="2">Total:</td>
+                    <td colspan="2" style="text-align: right;font-size: 0.8rem;font-weight: bold;">
+                        {{ '$ ' . number_format($data->total, 2, '.', ',') }}
+                        {{ $data->currency->name }}
+                    </td>
+                </tr>
+                <tr class="information" style="font-size: 0.7em; line-height: 1em;text-transform: uppercase;">
+                    <td colspan="8" style="padding-top: 40px;">
+                        <table>
+                            @if ($data->observation)
+                            <tr style="padding-bottom: 0px;">
+                                <td style="padding-bottom: 0px;">
+                                    NOTA del Vendedor:<br />
+                                    {{ $data->observation }}
+                                </td>
+                            </tr>
+                            @endif
+                            <tr style="padding-bottom: 0px;">
+                                <td style="padding-bottom: 0px;">
+                                    Costos de Envío / Flete se definen de acuerdo a la zona <b>**NO INCLUIDO EN EL
+                                        PRECIO PUBLICADO**</b>, El costo del producto puede variar sin previo aviso,
+                                    favor de verificar con nosotros antes de apartar. <b>**ETBSA Nunca le Solicitara que
+                                        deposite dinero sin antes haber visto la Maquinaria**</b><br>
+                                    <!-- Táctica de mano de obra con el precio normal de los 22mas iva y automáticamente el
+                                    descuento quedando a $ 8120 y que te arroje un cupón que diga 20 % de descuento en
+                                    el compra del paquete de refacciones de mantenimiento <br> -->
+                                    <br> ETBSA realiza todas
+                                    las operaciones y tramites de venta de Maquinaria, dentro de sus instalaciones
+                                    oficiales, las ubicaciones las puede consultar en la pagina oficial <a
+                                        href="https://www.etbsa.com.mx/"> www.etbsa.com.mx </a> <br> <b><br> **La
+                                        presente
+                                        cotización tiene una vigencia de 30 días a partir de la fecha de expedición de
+                                        la misma** </b>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+            </td>
+            </tr>
+            </table>
+        </div>
+
+    </main>
+
+
 </body>
 
 </html>

@@ -8,9 +8,8 @@
     fixed-header
     caption
     dense
-    class="blue--text caption text-uppercase text-wrap"
-    dark
-  >
+    class="black--text caption font-weight-bold text-uppercase text-wrap"
+  > 
     <template #top>
       <search-panel
         :rightDrawer="rightDrawer"

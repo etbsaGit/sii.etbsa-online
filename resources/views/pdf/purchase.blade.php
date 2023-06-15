@@ -216,11 +216,11 @@
 
         <table>
             <tr class="top">
-                <td style="width: 200px">
-                    <img src="img/logo.png" style="width: 200px" />
+                <td style="width: 120px">
+                    <img src="img/logo.png" style="width: 150px" />
                 </td>
                 <td colspan="4"
-                    style="text-align: center; width: 370px; font-size: 9pt; line-height: 1rem; text-transform: uppercase;">
+                    style="text-align: center; width: 350px; font-size: 9pt; line-height: 1rem; text-transform: uppercase;">
                     <b style="font-size: 12pt;">Equipos y Tractores del Bajio</b><br />
                     Carretera Panamericana Celaya - Salamanca Km. 61<br />
                     1ra Fracc. crespo C.P. 38120 Celaya, Gto.<br />
@@ -228,11 +228,11 @@
                     <b>R.F.C.: ETB-860812-I23</b>
                 </td>
 
-                <td style="text-align: right; width: 170px; line-height: 1.2rem;">
+                <td style="text-align: right; width: 200px; line-height: 1.2rem;">
                     <b>ORDEN DE COMPRA</b><br />
                     # {{ $item->id }}<br />
-                   {{$item->authorization_date}}<br />
-                    {{ today()}}
+                    Creacion:{{ $item->authorization_date }}<br />
+                    Impresion:{{ today() }}
                 </td>
             </tr>
         </table>
@@ -277,8 +277,9 @@
                                 <td colspan="4">
                                     Sucursal embarque: {{ $item->ship->title }} <br>
                                     Direccion:
-                                    {{ $item->ship->address ?? 'Carretera Celaya-Salamanca Km. 61 Primera Frac. de
-                                    Crespo 38120' }}<br>
+                                    {{ $item->ship->address ??
+                                        'Carretera Celaya-Salamanca Km. 61 Primera Frac. de
+                                                                        Crespo 38120' }}<br>
                                     Comprador: {{ $item->elaborated->name }}<br>
                                     Email:{{ $item->elaborated->email }}<br>
                                 </td>
@@ -327,8 +328,9 @@
                                     Condicion de Pago:
                                     ({{ $item->payment_condition < 8 ? 'CONTADO' : 'CREDITO' }}) </td>
                                 <td style="font-size: 0.8em;">
-                                    {{ $item->payment_condition < 8 ? 'CON PREFACTURA' : $item->payment_condition . ' '
-                                        . 'Dias habiles despues de recibir Factura' }}
+                                    {{ $item->payment_condition < 8
+                                        ? 'CON PREFACTURA'
+                                        : $item->payment_condition . ' ' . 'Dias habiles despues de recibir Factura' }}
                                 </td>
                             </tr>
                         </table>
@@ -343,22 +345,22 @@
                     <td colspan="1" style="text-align: right;">Subtotal</td>
                 </tr>
                 @foreach ($item->products as $product)
-                <tr class="item">
-                    <td colspan="1" style="text-align: center;">{{ $product->qty }}</td>
-                    <td colspan="1" style="text-align: left;">
-                        {{ $product->unit->clave . '-' . $product->unit->name }}</td>
-                    <td colspan="4">
-                        <div style="text-align: start">
-                            <b>{{ $product->claveProduct->c_ClaveProdServ }}</b>
-                            ({{ $product->claveProduct->Descripción }})
-                        </div>
-                        <div style="text-align: justify;">{{ $product->description }}</div>
-                    </td>
-                    <td colspan="1" style="text-align: right;">
-                        {{ '$ ' . number_format($product->price, 2, '.', ',') }}</td>
-                    <td colspan="1" style="text-align: right;">
-                        {{ '$ ' . number_format($product->subtotal, 2, '.', ',') }}</td>
-                </tr>
+                    <tr class="item">
+                        <td colspan="1" style="text-align: center;">{{ $product->qty }}</td>
+                        <td colspan="1" style="text-align: left;">
+                            {{ $product->unit->clave . '-' . $product->unit->name }}</td>
+                        <td colspan="4">
+                            <div style="text-align: start">
+                                <b>{{ $product->claveProduct->c_ClaveProdServ }}</b>
+                                ({{ $product->claveProduct->Descripción }})
+                            </div>
+                            <div style="text-align: justify;">{{ $product->description }}</div>
+                        </td>
+                        <td colspan="1" style="text-align: right;">
+                            {{ '$ ' . number_format($product->price, 2, '.', ',') }}</td>
+                        <td colspan="1" style="text-align: right;">
+                            {{ '$ ' . number_format($product->subtotal, 2, '.', ',') }}</td>
+                    </tr>
                 @endforeach
                 <tr class="total" style="text-align: end;">
                     <td colspan="6"></td>
@@ -373,52 +375,52 @@
                         {{ '$ ' . number_format($item->amounts->tax, 2, '.', ',') }}</td>
                 </tr>
                 @if ($item->amounts->tax_isr > 0)
-                <tr class="total" style="text-align: end;">
-                    <td colspan="6"></td>
-                    <td colspan="1">ISR:</td>
-                    <td colspan="1" style="text-align: right;">
-                        {{ '$ ' . number_format($item->amounts->tax_isr, 2, '.', ',') }}</td>
-                </tr>
+                    <tr class="total" style="text-align: end;">
+                        <td colspan="6"></td>
+                        <td colspan="1">ISR:</td>
+                        <td colspan="1" style="text-align: right;">
+                            {{ '$ ' . number_format($item->amounts->tax_isr, 2, '.', ',') }}</td>
+                    </tr>
                 @endif
                 @if ($item->amounts->tax_iva_retenido > 0)
-                <tr class="total" style="text-align: end;">
-                    <td colspan="6"></td>
-                    <td colspan="1">IVA Retenido:</td>
-                    <td colspan="1" style="text-align: right;">
-                        {{ '$ ' . number_format($item->amounts->tax_iva_retenido, 2, '.', ',') }}</td>
-                </tr>
+                    <tr class="total" style="text-align: end;">
+                        <td colspan="6"></td>
+                        <td colspan="1">IVA Retenido:</td>
+                        <td colspan="1" style="text-align: right;">
+                            {{ '$ ' . number_format($item->amounts->tax_iva_retenido, 2, '.', ',') }}</td>
+                    </tr>
                 @endif
                 @if ($item->amounts->tax_retencion_cedular > 0)
-                <tr class="total" style="text-align: end;">
-                    <td colspan="6"></td>
-                    <td colspan="1">Cedular GTO 2%:</td>
-                    <td colspan="1" style="text-align: right;">
-                        {{ '$ ' . number_format($item->amounts->tax_retencion_cedular, 2, '.', ',') }}</td>
-                </tr>
+                    <tr class="total" style="text-align: end;">
+                        <td colspan="6"></td>
+                        <td colspan="1">Cedular GTO 2%:</td>
+                        <td colspan="1" style="text-align: right;">
+                            {{ '$ ' . number_format($item->amounts->tax_retencion_cedular, 2, '.', ',') }}</td>
+                    </tr>
                 @endif
                 @if ($item->amounts->tax_retencion_125 > 0)
-                <tr class="total" style="text-align: end;">
-                    <td colspan="6"></td>
-                    <td colspan="1">Retencion 1.25%:</td>
-                    <td colspan="1" style="text-align: right;">
-                        {{ '$ ' . number_format($item->amounts->tax_retencion_125, 2, '.', ',') }}</td>
-                </tr>
+                    <tr class="total" style="text-align: end;">
+                        <td colspan="6"></td>
+                        <td colspan="1">Retencion 1.25%:</td>
+                        <td colspan="1" style="text-align: right;">
+                            {{ '$ ' . number_format($item->amounts->tax_retencion_125, 2, '.', ',') }}</td>
+                    </tr>
                 @endif
                 @if ($item->amounts->tax_flete > 0)
-                <tr class="total" style="text-align: end;">
-                    <td colspan="6"></td>
-                    <td colspan="1">Flete:</td>
-                    <td colspan="1" style="text-align: right;">
-                        {{ '$ ' . number_format($item->amounts->tax_flete, 2, '.', ',') }}</td>
-                </tr>
+                    <tr class="total" style="text-align: end;">
+                        <td colspan="6"></td>
+                        <td colspan="1">Flete:</td>
+                        <td colspan="1" style="text-align: right;">
+                            {{ '$ ' . number_format($item->amounts->tax_flete, 2, '.', ',') }}</td>
+                    </tr>
                 @endif
                 @if ($item->amounts->discount > 0)
-                <tr class="total" style="text-align: end;">
-                    <td colspan="6"></td>
-                    <td colspan="1">Descuento:</td>
-                    <td colspan="1" style="text-align: right;">
-                        {{ '$ ' . number_format($item->amounts->discount, 2, '.', ',') }}</td>
-                </tr>
+                    <tr class="total" style="text-align: end;">
+                        <td colspan="6"></td>
+                        <td colspan="1">Descuento:</td>
+                        <td colspan="1" style="text-align: right;">
+                            {{ '$ ' . number_format($item->amounts->discount, 2, '.', ',') }}</td>
+                    </tr>
                 @endif
                 <tr class="total" style="text-align: end;">
                     <td colspan="6"></td>
@@ -430,12 +432,12 @@
                     <td colspan="8">
                         <table>
                             @if ($item->note)
-                            <tr style="padding-bottom: 0px;">
-                                <td style="padding-bottom: 0px;">
-                                    NOTA para el Proveedor:<br />
-                                    {{ $item->note }}
-                                </td>
-                            </tr>
+                                <tr style="padding-bottom: 0px;">
+                                    <td style="padding-bottom: 0px;">
+                                        NOTA para el Proveedor:<br />
+                                        {{ $item->note }}
+                                    </td>
+                                </tr>
                             @endif
                             <tr style="padding-bottom: 0px;">
                                 <td style="padding-bottom: 0px;">
@@ -459,11 +461,10 @@
                                 <td style="padding-bottom: 0px;">
                                     Nota Contabilidad (Cargos):<br>
                                     @foreach ($item->charges as $charge)
-                                    <span style="font-size:0.8em; line-height: 0.5em;">
-                                        {{ $charge->agency->title . ',' . $charge->department->title . ',' .
-                                        $charge->percent . '%' }}
-                                    </span>
-                                    <br />
+                                        <span style="font-size:0.8em; line-height: 0.5em;">
+                                            {{ $charge->agency->title . ',' . $charge->department->title . ',' . $charge->percent . '%' }}
+                                        </span>
+                                        <br />
                                     @endforeach
                                 </td>
                             </tr>
