@@ -21,7 +21,7 @@ class Estatus extends Model
     const ESTATUS_PROGRAMAR_PAGO = 'programar_pago';
     const ESTATUS_POR_PAGAR = 'por_pagar';
     const ESTATUS_PAGADA = 'pagada';
-    const ESTATUS_DENGAR = 'denegar';
+    const ESTATUS_DENEGAR = 'denegar';
     const ESTATUS_DISPERSADO = 'flotilla.dispersado';
     const ESTATUS_DESPACHADO = 'flotilla.despachado';
     const ESTATUS_EnSERVICIO = 'flotilla.enServicio';
@@ -30,6 +30,8 @@ class Estatus extends Model
     const ESTATUS_DOCUMENTO_VALIDO = 'documento.valido';
     const ESTATUS_DOCUMENTO_INVALIDO = 'documento.invalido';
     const ESTATUS_DOCUMENTO_REVICION = 'documento.revicion';
+    const ESTATUS_PAGADA_PORFACTURAR = 'pagada.porFacturar';
+    const ESTATUS_POR_FACTURAR = 'por_facturar';
 
 
     /**

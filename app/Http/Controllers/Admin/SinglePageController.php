@@ -61,7 +61,7 @@ class SinglePageController extends AdminController
                 'label' => 'Flotilla',
                 'nav_type' => MenuItem::$NAV_TYPE_NAV,
                 'icon' => 'mdi-car-side',
-                'visible' => true,
+                'visible' => false,
                 'children' => [
                     new MenuItem([
                         'group_requirements' => ['Flotilla', 'Super User'],
@@ -101,7 +101,7 @@ class SinglePageController extends AdminController
                 'label' => 'NT',
                 'nav_type' => MenuItem::$NAV_TYPE_NAV,
                 'icon' => 'mdi-store',
-                'visible' => true,
+                'visible' => false,
                 'children' => [
                     new MenuItem([
                         'group_requirements' => [],
@@ -255,7 +255,7 @@ class SinglePageController extends AdminController
                 'icon' => 'mdi-chart-areaspline',
                 'route_type' => 'vue',
                 'route_name' => 'marketing',
-                'visible' => true,
+                'visible' => false,
             ]),
             new MenuItem([
                 'group_requirements' => ['RRHH', 'Super User'],
@@ -337,16 +337,6 @@ class SinglePageController extends AdminController
                     ]),
                     new MenuItem([
                         'group_requirements' => ['Compras', 'Super User'],
-                        'permission_requirements' => ['compras.admin'],
-                        'label' => 'Facturas por Pagar',
-                        'nav_type' => MenuItem::$NAV_TYPE_NAV,
-                        'icon' => 'mdi-file',
-                        'route_type' => 'vue',
-                        'route_name' => 'purchase.invoice.list',
-                        'visible' => true,
-                    ]),
-                    new MenuItem([
-                        'group_requirements' => ['Compras', 'Super User'],
                         'permission_requirements' => ['proveedor.crear'],
                         'label' => 'Proveedores',
                         'nav_type' => MenuItem::$NAV_TYPE_NAV,
@@ -357,7 +347,17 @@ class SinglePageController extends AdminController
                     ]),
                     new MenuItem([
                         'group_requirements' => ['Compras', 'Super User'],
-                        'permission_requirements' => ['compras.admin'],
+                        'permission_requirements' => ['compras.admin','factura.pagada'],
+                        'label' => 'Facturas por Pagar',
+                        'nav_type' => MenuItem::$NAV_TYPE_NAV,
+                        'icon' => 'mdi-file',
+                        'route_type' => 'vue',
+                        'route_name' => 'purchase.invoice.list',
+                        'visible' => true,
+                    ]),
+                    new MenuItem([
+                        'group_requirements' => ['Compras', 'Super User'],
+                        'permission_requirements' => ['compras.admin','factura.pagada'],
                         'label' => 'Conceptos Compras',
                         'nav_type' => MenuItem::$NAV_TYPE_NAV,
                         'icon' => 'mdi-account-box-multiple-outline',

@@ -24,9 +24,10 @@ class PurchaseOrderRepository extends BaseRepository
     public function list($params)
     {
         return $this->get($params, [
-            'supplier:id,business_name,rfc',
-            'elaborated.profiable:id,name,last_name,agency_id',
+            'supplier:id,code_equip,business_name,rfc',
+            'elaborated.profiable:id,name,last_name,agency_id,department_id',
             'elaborated.profiable.agency:id,title',
+            'elaborated.profiable.department:id,title',
             'estatus:id,title,key',
             'purchase_concept:id,name',
             'purchaseType:id,name',

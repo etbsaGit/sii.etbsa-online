@@ -199,7 +199,7 @@ class VehicleDispersalController extends AdminController
                 case Estatus::ESTATUS_AUTORIZADO:
                     $this->vehicleDispersalRepository->dispersalAurotize($id, $request->all());
                     break;
-                case Estatus::ESTATUS_DENGAR:
+                case Estatus::ESTATUS_DENEGAR:
                     $this->vehicleDispersalRepository->dispersalDenied($id, $request->all());
                     break;
                 case Estatus::ESTATUS_DISPERSADO:

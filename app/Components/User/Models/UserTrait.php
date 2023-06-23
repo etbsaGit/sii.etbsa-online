@@ -493,6 +493,18 @@ trait UserTrait
         return $this->rules;
     }
 
+    public function scopeSearch($query, $search)
+    {
+        $query->when($search ?? null, function ($query, $search) {
+            $query->where(function ($query) use ($search) {
+                $query->orWhere('id', 'like', $search)
+                    ->orWhere('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            });
+        });
+
+    }
+
     public function scopeOfName($query, $name)
     {
         if ($name === null || $name === '') {

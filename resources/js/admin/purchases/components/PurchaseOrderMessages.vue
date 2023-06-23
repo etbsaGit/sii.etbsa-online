@@ -1,5 +1,5 @@
 <template>
-  <messages @SendMessage="sendMessage" :items="Messages"></messages>
+  <messages @SendMessage="sendMessage" :items="Messages" @refreshMessages.once="loadPurchaseMessages()"></messages>
 </template>
 <script>
 import Messages from "@admin/components/shared/Messages.vue";
@@ -8,7 +8,7 @@ export default {
   props: {
     purchaseId: {
       require: true,
-      type: Number,
+      type: Number | String,
     },
   },
   data: () => ({
@@ -47,8 +47,8 @@ export default {
         .post(`/admin/purchase-order/${_this.purchaseId}/message`, payload)
         .then((response) => {
           _this.loadPurchaseMessages();
-          this.resetIcon();
-          this.clearMessage();
+          // this.resetIcon();
+          // this.clearMessage();
         });
     },
   },

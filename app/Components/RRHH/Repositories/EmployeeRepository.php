@@ -14,9 +14,10 @@ class EmployeeRepository extends BaseRepository
 
     public function list($params)
     {
-        return $this->get($params, ['agency:id,title', 'department:id,title'], function ($query) use ($params) {
+        return $this->get($params, ['agency:id,title', 'department:id,title', 'user'], function ($query) use ($params) {
             $query->where(function ($query) use ($params) {
                 $query->search($params['search'] ?? '');
+                $query->filter($params);
             });
             return $query;
         });

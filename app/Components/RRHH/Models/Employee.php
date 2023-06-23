@@ -60,7 +60,7 @@ class Employee extends Model
     // }
 
 
-    public function scopeSearch($query, String $search)
+    public function scopeSearch($query, string $search)
     {
         $query->when($search ?? null, function ($query, $search) {
             $query->where(function ($query) use ($search) {
@@ -69,10 +69,33 @@ class Employee extends Model
             });
         });
     }
+    public function scopeFilter($query, array $filter = [])
+    {
+        $query->when($filter['number_employee'] ?? null, function ($query, $number_employee) {
+            $query->orWhere('number_employee', 'like', "%{$number_employee}%");
+        })->when($filter['name'] ?? null, function ($query, $name) {
+            $query->orWhere('name', 'like', "%{$name}%");
+        })->when($filter['last_name'] ?? null, function ($query, $last_name) {
+            $query->orWhere('last_name', 'like', "%{$last_name}%");
+        })->when($filter['job_title'] ?? null, function ($query, $job_title) {
+            $query->orWhere('job_title', 'like', "%{$job_title}%");
+        })->when($filter['agencies_ids'] ?? null, function ($query, $agencies_ids) {
+            $query->whereHas('agency', function ($query) use ($agencies_ids) {
+                return $query->whereIn('agency_id', $agencies_ids);
+            });
+        })->when($filter['department_ids'] ?? null, function ($query, $department_ids) {
+            $query->whereHas('department', function ($query) use ($department_ids) {
+                return $query->whereIn('department_id', $department_ids);
+            });
+        });
+    }
+    // last_name
+    // job_title
+    // agency_id
 
     public function getFullNameAttribute()
     {
-        return trim(str_replace('  ', ' ',  "{$this->name} {$this->last_name}"));
+        return trim(str_replace('  ', ' ', "{$this->name} {$this->last_name}"));
     }
 
 

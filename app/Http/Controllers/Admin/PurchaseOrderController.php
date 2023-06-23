@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App;
 use App\Components\Purchase\Pivots\PurchasePivotCharge;
+use App\Mail\PurchaseOrder\PurchaseOrderCreated;
 use Barryvdh\DomPDF\PDF;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use League\Flysystem\FileNotFoundException;
 use Illuminate\Http\Request;
@@ -204,7 +206,8 @@ class PurchaseOrderController extends AdminController
                 }
 
                 $purchaseOrder->refresh();
-                // // TODO: Despachar Evento de nueva creacion enviar Notificacion a las Sucusales y Admons Correpondientes
+                // TODO: Despachar Evento de nueva creacion enviar Notificacion a las Sucusales y Admons Correpondientes
+                // Mail::to(auth()->user())->send(new PurchaseOrderCreated());
                 return $this->sendResponseCreated([$purchaseOrder]);
             }
         );
@@ -242,7 +245,6 @@ class PurchaseOrderController extends AdminController
                 if ($request['estatus.key'] == 'denegar') {
                     $estatus = Estatus::where('key', Estatus::ESTATUS_PENDIENTE)->first();
                     $purchase_order->estatus()->associate($estatus);
-                    $purchase_order->save();
                 }
                 $updated = $purchase_order->update($request->all());
                 if (!$updated) {
@@ -270,11 +272,11 @@ class PurchaseOrderController extends AdminController
                                         AND agency_id = :agency_id
                                         AND department_id = :department_id
                                     ", [
-                                    'percent' => $chargeData['percent'],
-                                    'purchase_order_id' => $purchase_order->id,
-                                    'agency_id' => $chargeData['agency_id'],
-                                    'department_id' => $chargeData['department_id']
-                                ]);
+                                'percent' => $chargeData['percent'],
+                                'purchase_order_id' => $purchase_order->id,
+                                'agency_id' => $chargeData['agency_id'],
+                                'department_id' => $chargeData['department_id']
+                            ]);
                         } else {
                             // El charge no existe en el array, elimínalo
                             DB::statement("
@@ -455,7 +457,7 @@ class PurchaseOrderController extends AdminController
             ],
             'purchase_concept' => $purchaseOrder->purchase_concept->only('id', 'name'),
             'purchase_type' => $purchaseOrder->purchaseType->only('id', 'name'),
-            'ship' => $purchaseOrder->ship->only('id', 'title','address'),
+            'ship' => $purchaseOrder->ship->only('id', 'title', 'address'),
             'observation' => $purchaseOrder->observation,
             'note' => $purchaseOrder->note,
             'payment_condition' => $purchaseOrder->payment_condition,
@@ -471,21 +473,70 @@ class PurchaseOrderController extends AdminController
     }
     public function updateEstatus(UpdateStatusPurchaseOrderRequest $request, PurchaseOrder $purchase_order)
     {
-        $request['updated_by'] = Auth::user()->id;
-        $estatus = Estatus::where('key', $request['estatus_key'])->first();
-        $request['estatus_id'] = $estatus->id;
-        if ($request['estatus_key'] == Estatus::ESTATUS_AUTORIZADO)
-            $request['authorization_date'] = Carbon::now();
-        if ($request['estatus_key'] == Estatus::ESTATUS_DENGAR)
-            $request['authorization_date'] = null;
+        return DB::transaction(
+            function () use ($purchase_order, $request) {
 
-        $updated = $purchase_order->update($request->all());
-        if (!$updated) {
-            return $this->sendResponseBadRequest("Error en la Actualizacion");
-        }
-        $purchase_order->estatus()->associate($estatus);
-        $purchase_order->save();
-        // $purchase_order->elaborated->notify(new PurchaseOrderUpdatedNotification($purchase_order->refresh()));
-        return $this->sendResponseUpdated([], 'Estatus Actualizado');
+                $estatus = Estatus::where('key', $request['estatus_key'])->first();
+                if ($request['estatus_key'] == Estatus::ESTATUS_AUTORIZADO)
+                    $purchase_order->authorization_date = Carbon::now();
+                if ($request['estatus_key'] == Estatus::ESTATUS_DENEGAR)
+                    $purchase_order->authorization_date = null;
+                if ($request['estatus_key'] == Estatus::ESTATUS_PROGRAMAR_PAGO) {
+                    if ($purchase_order->invoice()->exists()) {
+                        foreach ($purchase_order->invoice as $invoice) {
+                            $invoice->fill([
+                                'date_to_pay' => null,
+                                'payment_date' => null,
+                            ])->update();
+                        }
+                    }
+                    $purchase_order->date_to_pay = null;
+                    $purchase_order->payment_date = null;
+                }
+                if ($request['estatus_key'] == Estatus::ESTATUS_POR_FACTURAR) {
+                    if ($purchase_order->invoice()->exists()) {
+                        foreach ($purchase_order->invoice as $invoice) {
+                            $invoice->fill([
+                                'date_to_pay' => null,
+                                'payment_date' => null,
+                            ])->update();
+                        }
+                    }
+                    $purchase_order->date_to_pay = null;
+                    $purchase_order->payment_date = null;
+                }
+                if ($request['estatus_key'] == Estatus::ESTATUS_POR_PAGAR) {
+                    if ($purchase_order->invoice()->exists()) {
+                        foreach ($purchase_order->invoice as $invoice) {
+                            $invoice->fill([
+                                'date_to_pay' => $request->get('date_to_pay', null),
+                                'payment_date' => null,
+                            ])->update();
+                        }
+                    }
+                    $purchase_order->date_to_pay = $request->get('date_to_pay', null);
+                    $purchase_order->payment_date = null;
+                }
+                if ($request['estatus_key'] == Estatus::ESTATUS_PAGADA_PORFACTURAR) {
+                    if ($purchase_order->invoice()->exists()) {
+                        foreach ($purchase_order->invoice as $invoice) {
+                            $invoice->fill([
+                                'payment_date' => $request['payment_date'],
+                            ])->update();
+                        }
+                    }
+                    $purchase_order->payment_date = $request['payment_date'];
+                }
+
+                $purchase_order->estatus()->associate($estatus);
+                $purchase_order->updated_by = Auth::user()->id;
+                $updated = $purchase_order->save();
+                if (!$updated) {
+                    return $this->sendResponseBadRequest("Error en la Actualizacion");
+                }
+                // $purchase_order->elaborated->notify(new PurchaseOrderUpdatedNotification($purchase_order->refresh()));
+                return $this->sendResponseUpdated([], 'Estatus Actualizado');
+            }
+        );
     }
 }

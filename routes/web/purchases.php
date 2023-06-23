@@ -36,6 +36,7 @@ Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function
 
     Route::post('purchase-invoice/reset_date_to_payment/{invoice}', 'PurchaseInvoiceController@resetDateToPayment')->name('purchase-invoice.resetDateToPayment');
     Route::post('purchase-invoice/reset_date_payment/{invoice}', 'PurchaseInvoiceController@resetDatePayment')->name('purchase-invoice.resetDatePayment');
+    Route::delete('purchase-invoice/{invoice}', 'PurchaseInvoiceController@destroy')->name('purchase-invoice.destroy');
 
 
     // PURCHASE CONCEPTS

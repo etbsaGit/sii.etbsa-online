@@ -16,9 +16,9 @@ mix
   .js("resources/js/admin.js", "public/js")
   .sass("resources/sass/admin.scss", "public/css")
   .sass("resources/sass/front.scss", "public/css")
-  // .sass("resources/sass/pdf.scss", "public/css")
   .copyDirectory("resources/img", "public/img")
   .webpackConfig(require("./webpack.config"))
+  // .vue({ version: 2 })
   .extract([
     "vue",
     "vue-router",

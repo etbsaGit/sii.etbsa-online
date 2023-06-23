@@ -221,8 +221,8 @@ class CargosInternosController extends AdminController
                     'authorization_date' => Carbon::now()
                 ];
             }
-            if ($request->status_key == Estatus::ESTATUS_DENGAR) {
-                $status = Estatus::where('key', Estatus::ESTATUS_DENGAR)->first();
+            if ($request->status_key == Estatus::ESTATUS_DENEGAR) {
+                $status = Estatus::where('key', Estatus::ESTATUS_DENEGAR)->first();
                 $update_request = [
                     'estatus_id' => $status->id,
                     'autorized_by' => null,

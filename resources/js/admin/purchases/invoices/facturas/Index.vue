@@ -22,9 +22,7 @@
           <template v-slot:default>
             <tbody>
               <tr>
-                <td class="caption">
-                  Orden de Compra:
-                </td>
+                <td class="caption">Orden de Compra:</td>
                 <td class="d-flex align-center">
                   <v-btn
                     dark
@@ -41,15 +39,19 @@
                 </td>
               </tr>
               <tr>
-                <td class="caption">
-                  Concepto de Compra:
+                <td class="caption">Tipo de Orden Compra:</td>
+                <td class="d-flex align-center">
+                  {{ item.invoiceable.purchase_type.name }}
                 </td>
+              </tr>
+              <tr>
+                <td class="caption">Concepto de Compra:</td>
                 <td class="d-flex align-center">
                   {{ item.invoiceable.purchase_concept.name }}
                 </td>
               </tr>
               <tr>
-                <td class="caption">Cargos:</td>
+                <td class="caption">Cargos Sucursal:</td>
                 <td class="d-flex align-center">
                   <v-chip-group active-class="primary--text" column>
                     <v-chip
@@ -363,7 +365,7 @@
       </v-list-item>
     </template>
     <template v-slot:[`item.invoiceable.supplier`]="{ value }">
-      <v-list-item dense class="pa-0 caption" style="min-width: 200px;">
+      <v-list-item dense class="pa-0 caption" style="min-width: 200px">
         <v-list-item-content class="pa-0 caption">
           <v-list-item-title class="font-weight-bold caption text-wrap">
             {{ value.business_name }}
@@ -376,6 +378,9 @@
     </template>
     <template v-slot:[`item.amount`]="{ value }">
       <span class="font-weight-bold"> {{ value | currency }} MXN </span>
+    </template>
+    <template v-slot:[`item.invoiceable.payment_condition`]="{ value }">
+      {{ value < 8 ? "CONTADO" : `${value} DIAS` }}
     </template>
     <template v-slot:[`item.invoiceable.estatus`]="{ value }">
       <v-chip
@@ -404,6 +409,7 @@ import SearchPanel from "@admin/components/shared/SearchPanel.vue";
 import TableHeaderButtons from "@admin/components/shared/TableHeaderButtons.vue";
 
 export default {
+  name: "PurchasesInvoicesList",
   components: {
     SearchPanel,
     TableHeaderButtons,
@@ -436,7 +442,7 @@ export default {
       },
       { text: "Importe", value: "amount", align: "right" },
       {
-        text: "Condicion (Dias)",
+        text: "Condicion de Pago",
         value: "invoiceable.payment_condition",
         align: "center",
       },

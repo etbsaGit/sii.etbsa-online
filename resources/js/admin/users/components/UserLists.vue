@@ -125,15 +125,13 @@
               </v-icon>
               {{ p.title }}
             </v-chip>
-            <p v-if="dialogs.showPermissions.items.length == 0">
-              Sin Permisos
-            </p>
+            <p v-if="dialogs.showPermissions.items.length == 0">Sin Permisos</p>
           </v-card-text>
         </v-card>
       </v-dialog>
     </template>
 
-    <template v-slot:[`header.email`]="{ header }" class="align-center">
+    <template v-slot:[`header.email`]="{ header }">
       <v-icon left small>mdi-email</v-icon> {{ header.text }}
     </template>
     <template v-slot:[`item.action`]="{ item }">
@@ -284,6 +282,10 @@ export default {
     ]);
   },
   watch: {
+    search: _.debounce(function () {
+      const _this = this;
+      _this.loadUsers(() => {});
+    }, 999),
     pagination: {
       handler() {
         this.loadUsers(() => {});
@@ -293,15 +295,15 @@ export default {
     "filters.name": _.debounce(function () {
       const _this = this;
       _this.loadUsers(() => {});
-    }, 700),
+    }, 999),
     "filters.email": _.debounce(function () {
       const _this = this;
       _this.loadUsers(() => {});
-    }, 700),
+    }, 999),
     "filters.groupId": _.debounce(function () {
       const _this = this;
       _this.loadUsers(() => {});
-    }, 700),
+    }, 999),
   },
   methods: {
     updateSearchPanel() {
@@ -384,15 +386,6 @@ export default {
         page: _this.pagination.page,
         per_page: _this.pagination.itemsPerPage,
       };
-      // let params = {
-      //   name: _this.filters.name,
-      //   email: _this.filters.email,
-      //   group_id: _this.filters.groupId.join(","),
-      //   order_sort: _this.pagination.sortDesc[0] ? "desc" : "asc",
-      //   order_by: _this.pagination.sortBy[0] || "name",
-      //   page: _this.pagination.page,
-      //   per_page: _this.pagination.itemsPerPage,
-      // };
 
       await axios
         .get("/admin/users", { params: params })

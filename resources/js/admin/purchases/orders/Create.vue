@@ -101,7 +101,6 @@
                       :items="options.payment_condition"
                       :rules="[(v) => !!v || 'Es requerido']"
                       outlined
-                      readonly
                       dense
                     ></v-select>
                   </v-col>

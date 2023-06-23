@@ -31,63 +31,71 @@ class PurchaseInvoiceController extends AdminController
 
     public function storeInvoicePurchase(Request $request, PurchaseOrder $purchase_order)
     {
-        return DB::transaction(function () use ($request, $purchase_order) {
-            $request->validate([
-                'file' => 'required|mimes:xml|max:2048',
-            ]);
-            $xml = simplexml_load_file($request->file);
-            $ns = $xml->getNamespaces(true);
-            $xml->registerXPathNamespace('c', $ns['cfdi']);
-            $xml->registerXPathNamespace('t', $ns['tfd']);
-            $data_xml = array();
-            if ($ns['cfdi'] && $ns['tfd']) {
-                foreach ($xml->xpath('//cfdi:Comprobante//cfdi:Emisor')[0]->attributes() as $Emisor => $value) {
-                    $data_xml[$Emisor . "_Emisor"] = $value;
-                }
-                foreach ($xml->xpath('//cfdi:Comprobante')[0]->attributes() as $Comprobante => $value) {
-                    $data_xml[$Comprobante] = $value;
-                }
-                foreach ($xml->xpath('//t:TimbreFiscalDigital')[0]->attributes() as $TimbreFiscalDigital => $value) {
-                    $data_xml[$TimbreFiscalDigital] = $value;
-                }
-                foreach ($xml->xpath('//cfdi:Comprobante//cfdi:Receptor')[0]->attributes() as $Receptor => $value) {
-                    $data_xml[$Receptor . "_Receptor"] = $value;
-                }
+        $request->validate([
+            'file' => 'required|mimes:xml|max:2048',
+        ]);
+        $xml = simplexml_load_file($request->file);
+        $ns = $xml->getNamespaces(true);
+        $xml->registerXPathNamespace('c', $ns['cfdi']);
+        $xml->registerXPathNamespace('t', $ns['tfd']);
+        $data_xml = array();
+        if ($ns['cfdi'] && $ns['tfd']) {
+            foreach ($xml->xpath('//cfdi:Comprobante//cfdi:Emisor')[0]->attributes() as $Emisor => $value) {
+                $data_xml[$Emisor . "_Emisor"] = $value;
             }
-
-            $payload = [
-                'folio' => $data_xml['Folio'][0],
-                'serie' => $data_xml['Serie'][0],
-                'invoice_date' => $data_xml['Fecha'][0],
-                // 'folio_fiscal' => $data_xml['UUID'][0],
-                'folio_fiscal' => json_decode(json_encode(($data_xml['UUID'])), true)[0],
-                'metodo_pago' => $data_xml['MetodoPago'][0],
-                'forma_pago' => $data_xml['FormaPago'][0],
-                'uso_cfdi' => $data_xml['UsoCFDI_Receptor'][0],
-                'amount' => $data_xml['Total'][0],
-                'balance' => $data_xml['Total'][0],
-                'currency' => $data_xml['Moneda'][0],
-                'owner_id' => \Auth::user()->id,
-                'estatus_id' => Estatus::where('key', Estatus::ESTATUS_PROGRAMAR_PAGO)->first()->id
-
-            ];
-            $validate = Validator(
-                $payload,
-                [
-                    'folio_fiscal' => "required|unique:invoices"
-                ],
-                [
-                    'folio_fiscal.unique' => "El Folio Fiscal ya fue Registardo anteriormente"
-                ]
-            );
-
-            if ($validate->fails()) {
-                return $this->sendResponseBadRequest("Folio Fiscal Duplicado");
+            foreach ($xml->xpath('//cfdi:Comprobante')[0]->attributes() as $Comprobante => $value) {
+                $data_xml[$Comprobante] = $value;
             }
-            $estatus = Estatus::where('key', Estatus::ESTATUS_PROGRAMAR_PAGO)->first();
-            $purchase_order->updated_by = \Auth::user()->id;
+            foreach ($xml->xpath('//t:TimbreFiscalDigital')[0]->attributes() as $TimbreFiscalDigital => $value) {
+                $data_xml[$TimbreFiscalDigital] = $value;
+            }
+            foreach ($xml->xpath('//cfdi:Comprobante//cfdi:Receptor')[0]->attributes() as $Receptor => $value) {
+                $data_xml[$Receptor . "_Receptor"] = $value;
+            }
+        }
+
+        $payload = [
+            'folio' => $data_xml['Folio'][0],
+            'serie' => $data_xml['Serie'][0],
+            'invoice_date' => $data_xml['Fecha'][0],
+            // 'folio_fiscal' => $data_xml['UUID'][0],
+            'folio_fiscal' => json_decode(json_encode(($data_xml['UUID'])), true)[0],
+            'metodo_pago' => $data_xml['MetodoPago'][0],
+            'forma_pago' => $data_xml['FormaPago'][0],
+            'uso_cfdi' => $data_xml['UsoCFDI_Receptor'][0],
+            'amount' => $data_xml['Total'][0],
+            'balance' => $data_xml['Total'][0],
+            'currency' => $data_xml['Moneda'][0],
+            'owner_id' => \Auth::user()->id,
+            'date_to_pay' => $purchase_order->date_to_pay ?? null,
+            'payment_date' => $purchase_order->payment_date ?? null,
+            'estatus_id' => $purchase_order->estatus->id
+
+        ];
+        $validate = Validator(
+            $payload,
+            [
+                'folio_fiscal' => "required|unique:invoices"
+            ],
+            [
+                'folio_fiscal.unique' => "El Folio Fiscal ya fue Registardo anteriormente"
+            ]
+        );
+
+        if ($validate->fails()) {
+            return $this->sendResponseBadRequest("Folio Fiscal Duplicado");
+        }
+        return DB::transaction(function () use ($request, $purchase_order, $payload) {
             $invoice_purchase = $purchase_order->invoice()->create($payload);
+            if ($purchase_order->estatus->key == Estatus::ESTATUS_POR_PAGAR) {
+                $estatus = Estatus::where('key', Estatus::ESTATUS_POR_PAGAR)->first();
+            } else if ($purchase_order->estatus->key == Estatus::ESTATUS_PAGADA_PORFACTURAR) {
+                $estatus = Estatus::where('key', Estatus::ESTATUS_PAGADA)->first();
+            } else {
+                $estatus = Estatus::where('key', Estatus::ESTATUS_PROGRAMAR_PAGO)->first();
+            }
             $purchase_order->estatus()->associate($estatus);
+            $purchase_order->updated_by = \Auth::user()->id;
             $purchase_order->save();
 
             $message = 'Factura Registrada con Exito!';
@@ -98,59 +106,83 @@ class PurchaseInvoiceController extends AdminController
 
     public function updateDateToPayment(Request $request, Invoice $invoice)
     {
-        $estatus = Estatus::where('key', Estatus::ESTATUS_POR_PAGAR)->first();
-        $updated = $invoice->update(['date_to_pay' => $request->date_to_pay]);
-        if (!$updated) {
-            return $this->sendResponseBadRequest("Error en la Actualizacion");
-        }
-        $purchase_order = $invoice->invoiceable;
-        $purchase_order->estatus()->associate($estatus);
-        $purchase_order->save();
-        return $this->sendResponseOk($invoice, "Factura(s) Programadas a Pago.");
+        return DB::transaction(function () use ($invoice, $request) {
+
+            $estatus = Estatus::where('key', Estatus::ESTATUS_POR_PAGAR)->first();
+            $updated = $invoice->update([
+                'date_to_pay' => $request->date_to_pay,
+                'estatus_id' => $estatus->id,
+            ]);
+            if (!$updated) {
+                return $this->sendResponseBadRequest("Error en la Actualizacion");
+            }
+            $purchase_order = $invoice->invoiceable;
+            $purchase_order->estatus()->associate($estatus);
+            $purchase_order->date_to_pay = $request->date_to_pay;
+            $purchase_order->update();
+            return $this->sendResponseOk(compact('invoice'), "Factura(s) Programadas a Pago.");
+        });
     }
 
     public function updateDatePayment(Request $request, Invoice $invoice)
     {
 
-        $estatus = Estatus::where('key', Estatus::ESTATUS_PAGADA)->first();
-        $updated = $invoice->update([
-            'payment_date' => $request->payment_date,
-        ]);
-        if (!$updated) {
-            return $this->sendResponseBadRequest("Error en la Actualizacion Fecha de Fac Pagada");
-        }
-        $purchase_order = $invoice->invoiceable;
-        $purchase_order->estatus()->associate($estatus);
-        $purchase_order->save();
-        return $this->sendResponseOk($invoice, "Factura Pagada con exito!");
+        return DB::transaction(function () use ($invoice, $request) {
+
+            $estatus = Estatus::where('key', Estatus::ESTATUS_PAGADA)->first();
+            $updated = $invoice->update([
+                'payment_date' => $request->payment_date,
+                'estatus_id' => $estatus->id,
+            ]);
+            if (!$updated) {
+                return $this->sendResponseBadRequest("Error en la Actualizacion Fecha de Fac Pagada");
+            }
+            $purchase_order = $invoice->invoiceable;
+            $purchase_order->estatus()->associate($estatus);
+            $purchase_order->payment_date = $request->payment_date;
+            $purchase_order->update();
+            return $this->sendResponseOk(compact('invoice'), "Factura Pagada con exito!");
+        });
     }
 
     public function resetDateToPayment(Invoice $invoice)
     {
-        $estatus = Estatus::where('key', Estatus::ESTATUS_PROGRAMAR_PAGO)->first();
-        $updated = $invoice->update(['date_to_pay' => null]);
-        if (!$updated) {
-            return $this->sendResponseBadRequest("Error en la Actualizacion");
-        }
-        $purchase_order = $invoice->invoiceable;
-        $purchase_order->estatus()->associate($estatus);
-        $purchase_order->save();
-        return $this->sendResponseOk($invoice, "Se Resetio la Programacion de Pago");
+        return DB::transaction(function () use ($invoice) {
+
+            $estatus = Estatus::where('key', Estatus::ESTATUS_PROGRAMAR_PAGO)->first();
+            $updated = $invoice->update([
+                'date_to_pay' => null,
+                'estatus_id' => $estatus->id,
+            ]);
+            if (!$updated) {
+                return $this->sendResponseBadRequest("Error en la Actualizacion");
+            }
+            $purchase_order = $invoice->invoiceable;
+            $purchase_order->estatus()->associate($estatus);
+            $purchase_order->date_to_pay = null;
+            $purchase_order->update();
+            return $this->sendResponseOk(compact('invoice'), "Se Resetio la Programacion de Pago");
+        });
     }
 
     public function resetDatePayment(Invoice $invoice)
     {
-        $estatus = Estatus::where('key', Estatus::ESTATUS_POR_PAGAR)->first();
-        $updated = $invoice->update([
-            'payment_date' => null,
-        ]);
-        if (!$updated) {
-            return $this->sendResponseBadRequest("Error en la Actualizacion Fecha de Fac Pagada");
-        }
-        $purchase_order = $invoice->invoiceable;
-        $purchase_order->estatus()->associate($estatus);
-        $purchase_order->save();
-        return $this->sendResponseOk($invoice, "Se Resetio la Fecha de Pago");
+        return DB::transaction(function () use ($invoice) {
+
+            $estatus = Estatus::where('key', Estatus::ESTATUS_POR_PAGAR)->first();
+            $updated = $invoice->update([
+                'payment_date' => null,
+                'estatus_id' => $estatus->id,
+            ]);
+            if (!$updated) {
+                return $this->sendResponseBadRequest("Error en la Actualizacion Fecha de Fac Pagada");
+            }
+            $purchase_order = $invoice->invoiceable;
+            $purchase_order->estatus()->associate($estatus);
+            $purchase_order->payment_date = null;
+            $purchase_order->update();
+            return $this->sendResponseOk(compact('invoice'), "Se Resetio la Fecha de Pago");
+        });
     }
 
     public function validInvoicePurchaseOrder(Request $request, PurchaseOrder $purchase_order)
@@ -252,5 +284,22 @@ class PurchaseInvoiceController extends AdminController
 
         $pdf = \PDF::loadView('pdf.purchase-report', compact('data'));
         return $pdf->stream();
+    }
+
+    public function destroy(Invoice $invoice)
+    {
+        return DB::transaction(function () use ($invoice) {
+            $purchase_order = $invoice->invoiceable;
+            $purchase_order->fill([
+                'date_to_payment' => null,
+                'payment_date' => null,
+                'estatus_id' => Estatus::where('key', $purchase_order->payment_date ?
+                    Estatus::ESTATUS_PAGADA_PORFACTURAR
+                    : Estatus::ESTATUS_POR_FACTURAR)
+                    ->first()->id,
+            ])->save();
+            $invoice->delete();
+            return $this->sendResponseDeleted();
+        });
     }
 }
