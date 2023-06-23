@@ -4,14 +4,16 @@
             <th>Factura UUID</th>
             <th>Folio / Serie</th>
             <th>Importe</th>
-            <th>Cargos</th>
+            <th>Cargos Sucursal</th>
             <th>Fecha Factura</th>
             <th>Fecha para Pagar</th>
             <th>Proveedor</th>
             <th>Proveedor RFC</th>
-            <th>Concepto</th>
-            <th>Articulos</th>
-            <th>Motivo</th>
+            <th>Folio OC</th>
+            <th>Tipo de OC</th>
+            <th>Concepto Compra</th>
+            <th>ClvProd - Articulos</th>
+            <th>Justificacion de Compra</th>
         </tr>
     </thead>
     <tbody>
@@ -36,18 +38,22 @@
                 <td>{{ $item->date_to_pay }}</td>
                 <td>{{ $item->invoiceable->supplier->business_name }}</td>
                 <td>{{ $item->invoiceable->supplier->rfc }}</td>
-                <td>{{ $item->invoiceable->purchase_concept->name }}</td>
+                <td>{{ $item->invoiceable->id }}</td>
+                <td>
+                    {{ $item->invoiceable->purchaseType->name }}
+                </td>
+                <td>
+                    {{ $item->invoiceable->purchase_concept->name }}
+                </td>
                 <td>
                     @foreach ($partidas as $partida)
-                        {{ $partida->description . ' - ' . $partida->group->name }}
+                        {{ $partida->claveProduct->c_ClaveProdServ . ' - ' . $partida->description }} 
                         <br />
                     @endforeach
                 </td>
                 <td>
                     {{ $item->invoiceable->observation }}
                 </td>
-                {{-- <td>{{ $cargo->department->title }}</td>
-                    <td>{{ $cargo->percent }}</td> --}}
             </tr>
         @endforeach
     </tbody>

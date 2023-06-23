@@ -12,21 +12,11 @@
         <template v-slot:default>
           <thead>
             <tr>
-              <th class="text-left">
-                Folio Factura (UUID)
-              </th>
-              <th class="text-left">
-                Importe
-              </th>
-              <th class="text-left">
-                Fecha de Facturacion
-              </th>
-              <th class="text-left">
-                Programacion de Pago
-              </th>
-              <th class="text-left">
-                Fecha en que se Pago
-              </th>
+              <th class="text-left">Folio Factura (UUID)</th>
+              <th class="text-left">Importe</th>
+              <th class="text-left">Fecha de Facturacion</th>
+              <th class="text-left">Programacion de Pago</th>
+              <th class="text-left">Fecha en que se Pago</th>
               <th></th>
             </tr>
           </thead>
@@ -157,10 +147,25 @@
                 </span>
               </td>
               <td>
-                <v-btn icon color="green" @click="editItem(item)">
+                <!-- <v-btn icon color="green" @click="editItem(item)">
                   <v-icon>mdi-pencil </v-icon>
+                </v-btn> -->
+                <v-btn
+                  text
+                  color="blue"
+                  small
+                  href="https://verificacfdi.facturaelectronica.sat.gob.mx"
+                  target="_blank"
+                  dark
+                >
+                  SAT Comprobante
                 </v-btn>
-                <v-btn icon color="red" @click="deleteItem(item)">
+                <v-btn
+                  v-if="!item.payment_date"
+                  icon
+                  color="red"
+                  @click="deleteItem(item)"
+                >
                   <v-icon>mdi-trash-can </v-icon>
                 </v-btn>
               </td>
@@ -204,12 +209,8 @@
                   <template v-slot:default>
                     <thead>
                       <tr>
-                        <th class="text-left">
-                          Campo XML
-                        </th>
-                        <th class="text-left">
-                          Valor
-                        </th>
+                        <th class="text-left">Campo XML</th>
+                        <th class="text-left">Valor</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -218,7 +219,7 @@
                         <td>
                           <span
                             class="d-inline-block text-truncate"
-                            style="max-width: 400px;"
+                            style="max-width: 400px"
                           >
                             {{ data_file_xml[item][0] }}
                           </span>
@@ -370,9 +371,35 @@ export default {
         type: "confirm",
         title: "Eliminar Factura",
         message: "¿Seguro de que desea eliminar este registro?",
-        okCb: () => {
-          _this.editedIndex = _this.items.indexOf(item);
-          _this.items.splice(_this.editedIndex, 1);
+        okCb: async () => {
+          // _this.editedIndex = _this.items.indexOf(item);
+          // _this.items.splice(_this.editedIndex, 1);
+          await axios
+            .delete(`/admin/purchase-invoice/${item.id}`)
+            .then(function (response) {
+              _this.$store.commit("showSnackbar", {
+                message: response.data.message,
+                color: "success",
+                duration: 3000,
+              });
+              _this.$eventBus.$emit("ORDERS_REFRESH");
+              _this.dialogForm = false;
+            })
+            .catch(function (error) {
+              _this.$store.commit("hideLoader");
+              if (error.response) {
+                _this.$store.commit("showSnackbar", {
+                  message: error.response.data.message,
+                  color: "error",
+                  duration: 3000,
+                });
+                return false;
+              } else if (error.request) {
+                console.log(error.request);
+              } else {
+                console.log("Error", error.message);
+              }
+            });
         },
         cancelCb: () => {
           console.log("CANCEL");

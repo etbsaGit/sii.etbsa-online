@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Components\Common\Models\Agency;
+use App\Components\Common\Models\Department;
 use App\Components\RRHH\Models\DirectBoss;
 use App\Components\RRHH\Models\Employee;
 use App\Components\RRHH\Repositories\EmployeeRepository;
@@ -27,8 +29,12 @@ class EmployeeController extends AdminController
      */
     public function index()
     {
-        $data = $this->employeeRepository->list(request()->all());
-        return $this->sendResponseOk($data, "list  ok.");
+        $items = $this->employeeRepository->list(request()->all());
+        $filtersOptions = [
+            "agencies" => Agency::all('id', 'title'),
+            "departments" => Department::all('id', 'title')
+        ];
+        return $this->sendResponseOk(compact('items', 'filtersOptions'), "Emepleados Encontrados");
     }
 
     /**
@@ -151,9 +157,14 @@ class EmployeeController extends AdminController
             $employee->update(['photo_path' => $request->file('photo')->store('avatares/' . $employee->id, 's3')]);
         }
         if ($request->has('user_id')) {
-            return $this->assignedUser($employee, User::find($request->user_id));
+            if (is_null($request->user_id)) {
+                $employee->user->profiable()->dissociate();
+                $employee->user->save();
+            } else {
+                return $this->assignedUser($employee, User::find($request->user_id));
+            }
         }
-        return $this->sendResponseUpdated($updated);
+        return $this->sendResponseUpdated([$updated]);
     }
 
     /**
@@ -173,7 +184,7 @@ class EmployeeController extends AdminController
 
         if ($employee->user) {
             $employee->user->profiable()->dissociate();
-            // $employee->user->save();
+            $employee->user->save();
         }
         $user->profiable()->associate($employee);
         $user->save();

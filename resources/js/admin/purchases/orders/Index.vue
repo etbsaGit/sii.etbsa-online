@@ -9,7 +9,7 @@
     caption
     dense
     class="black--text caption font-weight-bold text-uppercase text-wrap"
-  > 
+  >
     <template #top>
       <search-panel
         :rightDrawer="rightDrawer"
@@ -18,6 +18,38 @@
       >
         <v-form ref="formFilter">
           <div class="d-flex flex-column ma-2">
+            <v-select
+              v-model="filters.purchase_type"
+              :items="options.purchase_types"
+              item-text="name"
+              item-value="id"
+              label="Tipo de O.C."
+              prepend-icon="mdi-filter-variant"
+              hide-details
+              outlined
+              filled
+              clearable
+              dense
+              class="mb-2"
+            ></v-select>
+            <v-select
+              v-model="filters.purchase_concept"
+              label="Concepto de Compra"
+              :disabled="PurchaseConcept.length == 0"
+              :items="PurchaseConcept"
+              item-value="id"
+              item-text="name"
+              prepend-icon="mdi-filter-variant"
+              hide-details
+              outlined
+              filled
+              clearable
+              dense
+              class="mb-2"
+              multiple
+              chips
+              deletable-chips
+            ></v-select>
             <v-autocomplete
               v-model="filters.supplier"
               :items="options.suppliers"
@@ -37,7 +69,7 @@
               :items="options.agencies"
               item-text="title"
               item-value="id"
-              label="Sucursal"
+              label="Cargo Sucursal"
               prepend-icon="mdi-filter-variant"
               hide-details
               outlined
@@ -54,7 +86,7 @@
               :items="options.departments"
               item-text="title"
               item-value="id"
-              label="Departamento"
+              label="Cargo Departamento"
               prepend-icon="mdi-filter-variant"
               hide-details
               outlined
@@ -109,6 +141,23 @@
               clearable
               dense
               class="mb-2"
+            ></v-select>
+            <v-select
+              v-model="filters.ship"
+              :items="options.agencies"
+              item-text="title"
+              item-value="id"
+              label="Sucursal de Embarque"
+              prepend-icon="mdi-filter-variant"
+              hide-details
+              outlined
+              filled
+              clearable
+              dense
+              class="mb-2"
+              multiple
+              chips
+              deletable-chips
             ></v-select>
           </div>
         </v-form>
@@ -240,7 +289,13 @@
                 <v-icon class="blue--text">mdi-send-check</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title>Enviar a Proveedor</v-list-item-title>
+                <v-list-item-title>
+                  {{
+                    item.payment_condition < 8
+                      ? "Solicitar Prog. Pago"
+                      : "Enviar a Proveedor"
+                  }}
+                </v-list-item-title>
               </v-list-item-content>
             </v-list-item>
           </v-list-item-group>
@@ -252,34 +307,54 @@
     </template>
     <template #[`item.supplier`]="{ value }">
       <v-list-item-content>
+        <v-list-item-subtitle>{{ value.code_equip }}</v-list-item-subtitle>
         <v-list-item-title
           class="d-block font-weight-semibold text-primary text-wrap"
         >
           {{ value.business_name }}
         </v-list-item-title>
-        <v-list-item-subtitle>{{ value.rfc }}</v-list-item-subtitle>
+        <v-list-item-subtitle class="text--secondary">
+          {{ value.rfc }}
+        </v-list-item-subtitle>
       </v-list-item-content>
     </template>
     <template #[`item.elaborated`]="{ item }">
-      <v-menu bottom right transition="scale-transition" origin="top left">
+      <v-menu
+        bottom
+        left
+        offset-x
+        transition="scale-transition"
+        origin="top right"
+      >
         <template v-slot:activator="{ on }">
-          <v-chip label outlined v-on="on">
-            <!-- <v-avatar left>
-              <v-img src="https://cdn.vuetifyjs.com/images/john.png"></v-img>
-            </v-avatar> -->
+          <v-chip pill color="black" dark v-on="on">
+            <v-avatar left>
+              <img
+                v-if="item.elaborated.profiable"
+                :src="item.elaborated.profiable.profile_photo_url"
+                :alt="item.elaborated.name"
+              />
+              <v-icon v-else class="blue--text"> mdi-account </v-icon>
+            </v-avatar>
+
             {{
               item.elaborated.profiable
-                ? item.elaborated.profiable.full_name
+                ? item.elaborated.profiable.name
                 : item.elaborated.name
             }}
           </v-chip>
         </template>
-        <v-card width="300">
+        <v-card width="400">
           <v-list dark>
             <v-list-item>
-              <!-- <v-list-item-avatar>
-                <v-img src="https://cdn.vuetifyjs.com/images/john.png"></v-img>
-              </v-list-item-avatar> -->
+              <v-list-item-avatar>
+                <img
+                  v-if="item.elaborated.profiable"
+                  :src="item.elaborated.profiable.profile_photo_url"
+                  :alt="item.elaborated.name"
+                />
+                <v-icon v-else class="blue--text"> mdi-account </v-icon>
+              </v-list-item-avatar>
               <v-list-item-content>
                 <v-list-item-title>
                   {{
@@ -290,6 +365,11 @@
                 </v-list-item-title>
                 <v-list-item-subtitle>
                   {{ item.elaborated.email }}
+                </v-list-item-subtitle>
+                <v-list-item-subtitle v-if="item.elaborated.profiable">
+                  {{
+                    `${item.elaborated.profiable.agency.title} ${item.elaborated.profiable.department.title}`
+                  }}
                 </v-list-item-subtitle>
               </v-list-item-content>
               <v-list-item-action>
@@ -326,19 +406,26 @@
         </v-list-item-subtitle>
       </v-list-item-content>
     </template>
+    <template #[`item.payment_condition`]="{ value }">
+      {{ value < 8 ? "CONTADO" : `${value} dias` }}
+    </template>
     <template #[`item.charges`]="{ value }">
       <div v-if="value.length == 0">Sin Cargos</div>
-      <v-dialog v-else width="500">
-        <template #activator="{ on, attrs }">
-          <v-btn color="blue lighten-2" small dark v-bind="attrs" v-on="on">
-            Mostrar ({{ value.length }})
+      <v-menu
+        v-else
+        :close-on-content-click="false"
+        offset-x
+        transition="scale-transition"
+        origin="top left"
+      >
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn color="indigo" dark v-bind="attrs" small v-on="on">
+            Cargos ({{ value.length }})
           </v-btn>
         </template>
 
-        <v-card rounded="xl">
-          <v-card-title
-            class="white--text text-title text-uppercase blue lighten-2"
-          >
+        <v-card>
+          <v-card-title class="white--text text-title text-uppercase indigo">
             Cargos a Sucursales
           </v-card-title>
 
@@ -364,7 +451,7 @@
             </v-list>
           </v-card-text>
         </v-card>
-      </v-dialog>
+      </v-menu>
     </template>
     <template #[`item.created_at`]="{ value }">
       {{ $appFormatters.formatDate(value, "l") }}
@@ -420,8 +507,8 @@ export default {
       },
       { text: "Tipo O.C.", value: "purchaseType", width: 200 },
       {
-        text: "# Partidas",
-        value: "products.length",
+        text: "Condicion Pago",
+        value: "payment_condition",
         align: "center",
         sortable: false,
       },
@@ -440,8 +527,12 @@ export default {
       uso_cfdi: null,
       metodo_pago: null,
       forma_pago: null,
-      estatus: "pendiente",
+      estatus: "todos",
       date_range: null,
+      payment_condition: null,
+      purchase_type: null,
+      purchase_concept: null,
+      ship: null,
     },
     options: {
       suppliers: [],
@@ -459,8 +550,12 @@ export default {
         { text: "Por Facturar", value: "por_facturar" },
         { text: "Programar Pago", value: "programar_pago" },
         { text: "Pendiente de Pago", value: "por_pagar" },
+        { text: "Pagadas, por Facturar", value: "pagada.porFacturar" },
         { text: "Pagadas", value: "pagada" },
       ],
+      payment_conditions: [],
+      purchase_types: [],
+      purchase_concepts: [],
     },
     colors: {
       pendiente: "blue",
@@ -469,8 +564,9 @@ export default {
       autorizado: "orange",
       por_facturar: "black",
       programar_pago: "pink",
-      por_pagar: "brow darken-2",
-      pagada: "cry",
+      por_pagar: "indigo darken-2",
+      "pagada.porFacturar": "grey darken-2",
+      pagada: "cyan",
     },
     totalItems: 0,
     pagination: {
@@ -511,6 +607,15 @@ export default {
         this.showSearchPanel = _showSearchPanel;
       },
     },
+    PurchaseConcept() {
+      const _this = this;
+      let concept_by_type = _this.options.purchase_types.find(
+        (e) => e.id == _this.filters.purchase_type
+      );
+      return concept_by_type != undefined
+        ? concept_by_type.purchase_concept
+        : [];
+    },
   },
   methods: {
     updateSearchPanel() {
@@ -547,11 +652,12 @@ export default {
     async markAsSend(item) {
       const _this = this;
       let payload = {
-        estatus_key: "por_facturar",
+        estatus_key:
+          item.payment_condition < 8 ? "programar_pago" : "por_facturar",
       };
       await axios
         .post(`/admin/purchase-order/update-estatus/${item.id}`, payload)
-        .then(function(response) {
+        .then(function (response) {
           _this.$store.commit("showSnackbar", {
             message: response.data.message,
             color: "success",
@@ -561,7 +667,7 @@ export default {
           _this.loadPurchaseEdit();
           // _this.$eventBus.$emit("CLOSE_DIALOG");
         })
-        .catch(function(error) {
+        .catch(function (error) {
           _this.$store.commit("hideLoader");
           if (error.response) {
             _this.$store.commit("showSnackbar", {
@@ -602,8 +708,7 @@ export default {
       };
       await axios
         .get("/admin/purchase-order", { params: params })
-        .then(function(response) {
-          // console.log(response.data.data);
+        .then(function (response) {
           let Response = response.data.data;
           _this.items = Response.data;
           _this.totalItems = Response.total;
@@ -620,7 +725,7 @@ export default {
       const _this = this;
       await axios
         .get("/admin/purchase-order/resources/options")
-        .then(function(response) {
+        .then(function (response) {
           let Data = response.data.data;
           _this.options.suppliers = Data.suppliers;
           _this.options.agencies = Data.agencies;
@@ -628,6 +733,7 @@ export default {
           _this.options.metodoPago = Data.metodoPago;
           _this.options.usoCFDI = Data.usoCFDI;
           _this.options.formaPago = Data.formaPago;
+          _this.options.purchase_types = Data.purchase_types;
         });
     },
     resetFilter() {
@@ -639,18 +745,18 @@ export default {
   },
   watch: {
     pagination: {
-      handler: _.debounce(function() {
+      handler: _.debounce(function () {
         this.reloadTable();
       }, 999),
       deep: true,
     },
     filters: {
-      handler: _.debounce(function(v) {
+      handler: _.debounce(function (v) {
         this.reloadTable();
       }, 999),
       deep: true,
     },
-    search: _.debounce(function(v) {
+    search: _.debounce(function (v) {
       this.reloadTable();
     }, 999),
   },

@@ -71,7 +71,7 @@ class CargosInternosObserver
             foreach ($sucursales as $sucursal) {
                 if ($estatus == Estatus::ESTATUS_AUTORIZADO)
                     $toEmails[] = $emailSucursales['contabilidad'][explode(' ', $sucursal->code)[0]];
-                if ($estatus == Estatus::ESTATUS_DENGAR || $estatus == Estatus::ESTATUS_PENDIENTE)
+                if ($estatus == Estatus::ESTATUS_DENEGAR || $estatus == Estatus::ESTATUS_PENDIENTE)
                     $toEmails[] = $emailSucursales['gerentes'][explode(' ', $sucursal->code)[0]];
                 if ($estatus == Estatus::ESTATUS_PROGRAMAR_PAGO)
                     $toEmails[] = $emailSucursales['gerentes'][explode(' ', $sucursal->code)[0]];

@@ -1,9 +1,9 @@
 <template>
+  <!-- class="app-navigation-menu" -->
+  <!-- :expand-on-hover="!$vuetify.breakpoint.mobile" -->
+  <!-- width="260" -->
   <v-navigation-drawer
     v-model="Drawer"
-    width="260"
-    class="app-navigation-menu"
-    :expand-on-hover="!$vuetify.breakpoint.mobile"
     floating
     clipped
     dark

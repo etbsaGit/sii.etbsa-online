@@ -5,7 +5,7 @@
         <v-slide-x-transition group>
           <user-message
             v-for="(message, index) in items"
-            :key="index"
+            :key="`message-${index}`"
             :message-item="message"
           ></user-message>
         </v-slide-x-transition>
@@ -26,7 +26,9 @@
             rounded
             outlined
             clearable
-            @click:append-outer="sendMessage"
+            @click:append-outer="
+              !!message ? sendMessage() : $emit('refreshMessages')
+            "
             @keyup.enter="sendMessage"
             @click:clear="clearMessage"
           ></v-text-field>
@@ -53,7 +55,7 @@ export default {
   }),
 
   methods: {
-    async sendMessage() {
+    sendMessage() {
       const _this = this;
       if (!_this.message) return;
       if (!_this.$refs.formMessage.validate()) return;
@@ -63,15 +65,15 @@ export default {
         },
       };
       _this.$emit("SendMessage", payload);
-      _this.resetIcon();
+      // _this.resetIcon();
       _this.clearMessage();
     },
     clearMessage() {
       this.$refs.formMessage.reset();
     },
-    resetIcon() {
-      this.iconIndex = 0;
-    },
+    // resetIcon() {
+    //   this.iconIndex = 0;
+    // },
   },
 };
 </script>

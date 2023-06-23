@@ -4,6 +4,7 @@ namespace App\Components\Purchase\Models;
 
 use App\Components\Purchase\Pivots\PurchasePivotCharge;
 use App\Components\Purchase\Pivots\PurchasePivotProduct;
+use App\Components\RRHH\Models\Employee;
 use Illuminate\Database\Eloquent\Model;
 
 use App\Components\User\Models\User;
@@ -129,8 +130,8 @@ class PurchaseOrder extends Model
     {
         return $this->pivotCharge->map(function ($charge) {
             return [
-                'agency' => $charge->agency->only('id', 'title'),
-                'department' => $charge->department->only('id', 'title'),
+                'agency' => $charge->agency->only('id', 'title', 'code'),
+                'department' => $charge->department->only('id', 'title', 'code'),
                 'percent' => $charge->percent
             ];
         });
@@ -158,17 +159,15 @@ class PurchaseOrder extends Model
         $query->when($search ?? null, function ($query, $search) {
             $query->orWhere(function ($query) use ($search) {
                 $query->orWhere('id', 'like', $search)
-                    // ->orWhere('authorization_token', 'like', "%{$search}%")
-                    // ->orWhereHas('sucursal', function ($query) use ($search) {
-                    //     return $query->where('agencies.title', 'like', "%{$search}%");
-                    // })
-                    ->orWhere('charges', 'like', "%{$search}%")
-                    ->orWhere('reason', 'like', "%{$search}%")
                     ->orWhereHas('supplier', function ($query) use ($search) {
                         return $query->where('suppliers.business_name', 'like', "%{$search}%");
-                    })->orWhereHas('elaborated', function ($query) use ($search) {
-                    return $query->where('users.name', 'like', "%{$search}%");
-                });
+                    })
+                    ->orWhereHas('elaborated', function ($query) use ($search) {
+                        return $query->where('users.name', 'like', "%{$search}%")
+                            ->orWhereHasMorph('profiable', [Employee::class], function ($query) use ($search) {
+                                $query->where('employees.name', 'like', "%{$search}%");
+                            });
+                    });
             });
         });
     }
@@ -218,6 +217,18 @@ class PurchaseOrder extends Model
             $query->whereHas('departments', function ($query) use ($depto_id) {
                 return $query->whereIn('department_id', $depto_id);
             });
+        })->when($filters['purchase_type'] ?? null, function ($query, $purchase_type) {
+            $query->whereHas('purchaseType', function ($query) use ($purchase_type) {
+                return $query->where('id', $purchase_type);
+            });
+        })->when($filters['purchase_concept'] ?? null, function ($query, $purchase_concept) {
+            $query->whereHas('purchase_concept', function ($query) use ($purchase_concept) {
+                return $query->whereIn('id', $purchase_concept);
+            });
+        })->when($filters['ship'] ?? null, function ($query, $ship) {
+            $query->whereHas('ship', function ($query) use ($ship) {
+                return $query->whereIn('id', $ship);
+            });
         });
 
         $query->when($filters['date_range'] ?? null, function ($query, $dates) use ($estatus) {
@@ -228,15 +239,23 @@ class PurchaseOrder extends Model
             if ($estatus == "por_facturar")
                 return $query->whereBetween('updated_at', [$dates[0], $dates[1]]);
             if ($estatus == "programar_pago")
-                return $query->whereHas('invoice', function ($query) use ($dates) {
-                    return $query->whereNull('date_to_pay')
-                        ->whereBetween('invoice_date', [$dates[0], $dates[1]]);
-                });
+                // return $query->whereHas('invoice', function ($query) use ($dates) {
+                return $query->whereNull('date_to_pay')
+                    ->whereBetween('invoice_date', [$dates[0], $dates[1]]);
+            // });
+            // return $query->whereHas('invoice', function ($query) use ($dates) {
+            //     return $query->whereNull('date_to_pay')
+            //         ->whereBetween('invoice_date', [$dates[0], $dates[1]]);
+            // });
             if ($estatus == "por_pagar")
-                return $query->whereHas('invoice', function ($query) use ($dates) {
-                    return $query->whereNull('payment_date')
-                        ->whereBetween('date_to_pay', [$dates[0], $dates[1]]);
-                });
+                // return $query->whereHas('invoice', function ($query) use ($dates) {
+                return $query->whereNull('payment_date')
+                    ->whereBetween('date_to_pay', [$dates[0], $dates[1]]);
+            // });
+            // return $query->whereHas('invoice', function ($query) use ($dates) {
+            //     return $query->whereNull('payment_date')
+            //         ->whereBetween('date_to_pay', [$dates[0], $dates[1]]);
+            // });
             if ($estatus == "pagada")
                 return $query->whereHas('invoice', function ($query) use ($dates) {
                     return $query->whereBetween('payment_date', [$dates[0], $dates[1]]);

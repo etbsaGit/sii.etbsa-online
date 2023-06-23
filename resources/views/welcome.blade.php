@@ -66,8 +66,8 @@
         }
 
         .swiss {
-            max-width: 650px;
-            opacity: 0.2;
+            width: 650px;
+            opacity: 0.5;
         }
     </style>
 </head>
@@ -87,8 +87,7 @@
 
         <div class="content">
             <div class="title m-b-md align-center">
-                <img class="swiss" src="{{ url('img/etbsa-logo-corporativo-dark.jpeg') }}">
-                {{-- <img class="swiss" src="{{url('img/etbsa-logo-construccion.png')}}"> --}}
+                <img class="swiss" src="{{ asset('img/logo-dark.svg') }}">
             </div>
 
             <div class="links">

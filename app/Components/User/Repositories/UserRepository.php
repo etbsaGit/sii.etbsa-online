@@ -29,9 +29,10 @@ class UserRepository extends BaseRepository
     public function listUsers($params)
     {
         return $this->get($params, ['groups'], function ($q) use ($params) {
-            $q->ofGroups(Helpers::commasToArray($params['group_id'] ?? ''));
+            $q->search($params['search'] ?? '');
             $q->ofName($params['name'] ?? '');
             $q->ofEmail($params['email'] ?? '');
+            $q->ofGroups(Helpers::commasToArray($params['group_id'] ?? ''));
 
             return $q;
         });

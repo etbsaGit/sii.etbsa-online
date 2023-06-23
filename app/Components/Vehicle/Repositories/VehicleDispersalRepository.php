@@ -78,7 +78,7 @@ class VehicleDispersalRepository extends BaseRepository
             if (!$VehicleDispersal) {
                 return false;
             };
-            $estatus = Estatus::where('key', Estatus::ESTATUS_DENGAR)->first();
+            $estatus = Estatus::where('key', Estatus::ESTATUS_DENEGAR)->first();
             $VehicleDispersal->estatus()->associate($estatus);
             $VehicleDispersal->update($payload);
             $VehicleDispersal->save();

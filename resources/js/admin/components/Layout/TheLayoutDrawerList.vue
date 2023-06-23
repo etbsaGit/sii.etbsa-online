@@ -1,5 +1,5 @@
 <template>
-  <v-list :dense="dense" class="layout-drawer">
+  <v-list :dense="dense" rounded class="layout-drawer">
     <div
       v-for="(nav, i) in routes.filter((item) => !!item.visible)"
       :key="`nav-${i}`"
@@ -12,10 +12,10 @@
         dense
       >
         <v-list-item-icon>
-          <v-icon v-text="nav.icon" />
+          <v-icon> {{ nav.icon }} </v-icon>
         </v-list-item-icon>
         <v-list-item-content>
-          <v-list-item-title v-text="nav.label" />
+          <v-list-item-title> {{ nav.label }} </v-list-item-title>
         </v-list-item-content>
       </v-list-item>
       <v-list-group
@@ -26,7 +26,7 @@
       >
         <template v-slot:activator>
           <v-list-item-content>
-            <v-list-item-title v-text="nav.label" />
+            <v-list-item-title> {{ nav.label }} </v-list-item-title>
           </v-list-item-content>
         </template>
 

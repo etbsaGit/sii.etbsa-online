@@ -4,7 +4,7 @@
     :items="items"
     :options.sync="pagination"
     :server-items-length="totalItems"
-    class="text-truncate blue--text text-uppercase caption"
+    class="text-truncate blue--text font-weight-bold text-uppercase caption"
     calculate-widths
     fixed-header
     caption
@@ -16,7 +16,84 @@
         @cancelSearch="cancelSearch"
         @resetFilter="resetFilter"
       >
-        <v-form ref="formFilter"> </v-form>
+        <v-form ref="formFilter">
+          <div class="d-flex flex-column ma-2">
+            <v-text-field
+              v-model="filters.number_employee"
+              label="Numero de Empleado"
+              prepend-icon="mdi-filter-variant"
+              hide-details
+              outlined
+              filled
+              dense
+              class="mb-2"
+            ></v-text-field>
+            <v-text-field
+              v-model="filters.name"
+              label="Nombre Empleado"
+              prepend-icon="mdi-filter-variant"
+              hide-details
+              outlined
+              filled
+              dense
+              class="mb-2"
+            ></v-text-field>
+            <v-text-field
+              v-model="filters.last_name"
+              label="Apellidos"
+              prepend-icon="mdi-filter-variant"
+              hide-details
+              outlined
+              filled
+              dense
+              class="mb-2"
+            ></v-text-field>
+            <v-text-field
+              v-model="filters.job_title"
+              label="Puesto"
+              prepend-icon="mdi-filter-variant"
+              hide-details
+              outlined
+              filled
+              dense
+              class="mb-2"
+            ></v-text-field>
+            <v-select
+              v-model="filters.agencies_ids"
+              :items="options.agencies"
+              item-text="title"
+              item-value="id"
+              label="Sucursal"
+              prepend-icon="mdi-filter-variant"
+              hide-details
+              outlined
+              filled
+              clearable
+              dense
+              class="mb-2"
+              multiple
+              chips
+              deletable-chips
+            ></v-select>
+            <v-select
+              v-model="filters.department_ids"
+              :items="options.departments"
+              item-text="title"
+              item-value="id"
+              label="Departamento"
+              prepend-icon="mdi-filter-variant"
+              hide-details
+              outlined
+              filled
+              clearable
+              dense
+              class="mb-2"
+              multiple
+              chips
+              deletable-chips
+            ></v-select>
+          </div>
+        </v-form>
       </search-panel>
       <v-card class="d-flex justify-end align-center flex-wrap px-3 py-1" flat>
         <v-card
@@ -26,7 +103,7 @@
         >
           <v-text-field
             v-model="search"
-            label="Buscar"
+            label="Buscar #Empleado, Nombre"
             class="pa-2"
             prepend-icon="mdi-magnify"
             hide-details
@@ -85,12 +162,10 @@
       </dialog-component>
     </template>
     <template #[`item.action`]="{ item }">
-      <v-icon class="green--text" @click="editItem(item)">
-        mdi-pencil
-      </v-icon>
+      <v-icon class="green--text" @click="editItem(item)"> mdi-pencil </v-icon>
     </template>
     <template #[`item.agency.title`]="{ item }">
-      <v-list-item dense class="pa-0">
+      <v-list-item dense class="pa-0 blue--text">
         <v-list-item-content class="pa-0 caption">
           <v-list-item-title v-if="item.agency">
             {{ item.agency.title }}
@@ -100,6 +175,22 @@
           </v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
+    </template>
+    <template #[`item.full_name`]="{ item }">
+      <div class="d-flex align-center">
+        <v-avatar size="34" class="me-3">
+          <VImg :src="item.profile_photo_url" />
+        </v-avatar>
+
+        <div class="d-flex flex-column">
+          <div class="text-h6 font-weight-medium mb-0">
+            {{ item.full_name }}
+          </div>
+          <span v-if="item.user" class="text-caption">
+            {{ item.user.email }}
+          </span>
+        </div>
+      </div>
     </template>
     <template #[`item.admission_date`]="{ item }">
       <span v-if="item.admission_date">
@@ -138,11 +229,11 @@ export default {
       dialogDelete: false,
       headers: [
         {
-          text: "Num.",
+          text: "Num. Empleado",
           align: "center",
           sortable: false,
           fixed: true,
-          value: "id",
+          value: "number_employee",
         },
         {
           text: "Nombre Completo",
@@ -184,28 +275,18 @@ export default {
       items: [],
       search: null,
       filters: {
-        folio: null,
-        supplier: null,
-        agencie: null,
-        uso_cfdi: null,
-        metodo_pago: null,
-        forma_pago: null,
-        estatus: "todos",
+        number_employee: null,
+        name: null,
+        last_name: null,
+        job_title: null,
+        agencies_ids: null,
+        department_ids: null,
       },
       options: {
-        estatus: [
-          { text: "Pendientes", value: "pendiente" },
-          { text: "Autorizados", value: "autorizado" },
-          { text: "En Reclutamiento", value: "reclutamiento" },
-          { text: "Cubierta", value: "cubierta" },
-          { text: "Todos", value: "todos" },
-        ],
+        agencies: [],
+        departments: [],
       },
-      colors: {
-        pendiente: "green",
-        reclutamiento: "pink",
-        cubierta: "blue",
-      },
+
       totalItems: 0,
       pagination: {
         itemsPerPage: 10,
@@ -279,15 +360,23 @@ export default {
         page: _this.pagination.page,
         per_page: _this.pagination.itemsPerPage,
       };
-      await axios
-        .get("/admin/employees", { params: params })
-        .then(function (response) {
-          let Response = response.data.data;
-          _this.items = Response.data;
-          _this.totalItems = Response.total;
-          _this.pagination.totalItems = Response.total;
-          (cb || Function)();
-        });
+      const {
+        data: {
+          data: { items, filtersOptions },
+          message,
+        },
+      } = await axios.get("/admin/employees", { params: params });
+
+      _this.items = items.data;
+      _this.totalItems = items.total;
+      _this.pagination.totalItems = items.total;
+      _this.options = filtersOptions;
+      _this.$store.commit("showSnackbar", {
+        message: message,
+        color: "success",
+        duration: 3000,
+      });
+      (cb || Function)();
     },
 
     resetFilter() {

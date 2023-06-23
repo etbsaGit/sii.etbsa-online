@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Components\CargosInternos\Models\CargosInternos;
+use App\Components\Purchase\Models\PurchaseOrder;
 use App\Observers\CargosInternosObserver;
+use App\Observers\PurchaseOrderObserver;
 use Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider;
 use Illuminate\Support\ServiceProvider;
 
@@ -17,6 +19,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         CargosInternos::observe(CargosInternosObserver::class);
+        PurchaseOrder::observe(PurchaseOrderObserver::class);
     }
 
     /**

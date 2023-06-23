@@ -17,18 +17,89 @@
         target="_blank"
         dark
       >
-        Descargar OC PDF
+        VER PDF
         <v-icon right>mdi-file-pdf-box</v-icon>
       </v-btn>
+      <!-- || $gate.allow('shedulePaymentDate', 'compras') -->
+      <v-dialog
+        v-if="canDateToPay"
+        ref="dialogDateToPay"
+        v-model="modalDateToPay"
+        :return-value.sync="form.date_to_pay"
+        persistent
+        width="400px"
+      >
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn class="ml-2" color="pink" v-bind="attrs" v-on="on" dark>
+            Programar Fecha de Pago
+            <v-icon right>mdi-calendar-clock</v-icon>
+          </v-btn>
+        </template>
+        <v-toolbar dense>
+          <v-toolbar-title>Programar fecha de Pago</v-toolbar-title>
+        </v-toolbar>
+        <v-date-picker v-model="form.date_to_pay" scrollable color="pink">
+          <v-spacer></v-spacer>
+          <v-btn text color="primary" @click="modalDateToPay = false">
+            Cancel
+          </v-btn>
+          <v-btn
+            text
+            color="primary"
+            :disabled="!form.date_to_pay"
+            @click="updateEstatusPurchase('por_pagar')"
+          >
+            Confirmar
+          </v-btn>
+        </v-date-picker>
+      </v-dialog>
+      <!-- || $gate.allow('markAsPaidIvoice', 'compras')" -->
+      <v-dialog
+        v-if="canPaymentDate"
+        ref="dialogPaymentDate"
+        v-model="modalPaymentDate"
+        :return-value.sync="form.payment_date"
+        persistent
+        width="400px"
+      >
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn class="ml-2" color="indigo" v-bind="attrs" v-on="on" dark>
+            Marcar Fecha de Pago
+            <v-icon right>mdi-calendar-check</v-icon>
+          </v-btn>
+        </template>
+        <v-toolbar color="indigo" dense dark>
+          <v-toolbar-title>Fecha Coprobante de Pago</v-toolbar-title>
+        </v-toolbar>
+        <v-date-picker v-model="form.payment_date" scrollable color="indigo">
+          <v-spacer></v-spacer>
+          <v-btn text color="primary" @click="modalPaymentDate = false">
+            Cancel
+          </v-btn>
+          <v-btn
+            text
+            color="primary"
+            :disabled="!form.payment_date"
+            @click="updateEstatusPurchase('pagada.porFacturar')"
+          >
+            Confirmar
+          </v-btn>
+        </v-date-picker>
+      </v-dialog>
 
       <v-btn
         v-if="canMarkAsSend"
         class="ml-2"
         color="black"
-        @click="updateEstatusPurchase('por_facturar')"
+        @click="
+          updateEstatusPurchase(IsContado ? 'programar_pago' : 'por_facturar')
+        "
         dark
       >
-        Marcar OC Como Por Facturar <v-icon right>mdi-file-send-outline</v-icon>
+        {{
+          IsContado ? "Solicitar Prog. de Pago" : "Solicitar Factura Proveedor"
+        }}
+        <v-icon right>mdi-file-send-outline</v-icon>
       </v-btn>
       <v-btn
         v-if="canAutorize"
@@ -61,11 +132,56 @@
         Mensajes <v-icon right>mdi-forum</v-icon>
       </v-btn>
     </v-card-title>
-    <v-card-subtitle>
+    <v-card-subtitle class="mt-2">
       <b>Estatus Actual:</b>
-      <v-chip label color="primary" class="overline" dark>
-        {{ form.estatus ? form.estatus.title : "" }}
-      </v-chip>
+      <template v-if="form.estatus">
+        <v-chip
+          label
+          :color="getColorByStatus(form.estatus.key)"
+          class="overline"
+          dark
+        >
+          {{ form.estatus.title }}
+        </v-chip>
+      </template>
+      <template v-if="IsContado">
+        <v-chip
+          outlined
+          color="pink"
+          class="overline"
+          dark
+          @click:close="
+            updateEstatusPurchase(IsContado ? 'programar_pago' : 'por_facturar')
+          "
+          close-icon="mdi-trash-can"
+          :close="
+            !!form.date_to_pay && $gate.allow('authorizePurchase', 'compras')
+          "
+        >
+          {{
+            form.date_to_pay
+              ? `Pagar el: ${form.date_to_pay}`
+              : "Sin fecha Programada"
+          }}
+        </v-chip>
+        <v-chip
+          outlined
+          color="indigo"
+          class="overline"
+          dark
+          @click:close="updateEstatusPurchase('por_pagar')"
+          close-icon="mdi-trash-can"
+          :close="
+            !!form.payment_date && $gate.allow('authorizePurchase', 'compras')
+          "
+        >
+          {{
+            form.payment_date
+              ? `Pagada el: ${form.payment_date}`
+              : "Sin fecha de Pago"
+          }}
+        </v-chip>
+      </template>
     </v-card-subtitle>
 
     <v-divider></v-divider>
@@ -165,7 +281,6 @@
                       :items="options.payment_condition"
                       :rules="[(v) => !!v || 'Es requerido']"
                       outlined
-                      readonly
                       dense
                     ></v-select>
                   </v-col>
@@ -369,6 +484,18 @@
         </v-row>
       </v-form>
     </v-card-text>
+
+    <dialog-component
+      :show="dialogMessages"
+      @close="dialogMessages = false"
+      :maxWidth="600"
+      closeable
+      title="Mensajes"
+    >
+      <purchase-order-messages
+        :purchaseId="purchaseId"
+      ></purchase-order-messages>
+    </dialog-component>
   </v-card>
 </template>
 <script>
@@ -380,6 +507,8 @@ import PurchaseFilesList from "./PurchaseFilesList.vue";
 import SearchClvProduct from "./SearchClvProduct.vue";
 import PurchaseImportCsvProducts from "./PurchaseImportCsvProducts.vue";
 import InvoiceTable from "./InvoiceTable.vue";
+import PurchaseOrderMessages from "../components/PurchaseOrderMessages.vue";
+import DialogComponent from "../../components/DialogComponent.vue";
 export default {
   name: "PurchaseOrderEdit",
   components: {
@@ -391,6 +520,8 @@ export default {
     SearchClvProduct,
     PurchaseImportCsvProducts,
     InvoiceTable,
+    PurchaseOrderMessages,
+    DialogComponent,
   },
   props: {
     purchaseId: {
@@ -400,6 +531,9 @@ export default {
   },
   data() {
     return {
+      dialogMessages: false,
+      modalDateToPay: false,
+      modalPaymentDate: false,
       canUpdate: false,
       alertSupplier: false,
       validFormInfo: true,
@@ -408,6 +542,8 @@ export default {
       dialogConfigInvoice: false,
       dialog: false,
       form: {
+        date_to_pay: null,
+        payment_date: null,
         file: [],
         charges: [],
         products: [],
@@ -456,6 +592,17 @@ export default {
         ],
         purchase_concept: [],
         purchase_types: [],
+      },
+      colors: {
+        pendiente: "blue",
+        denegar: "red",
+        verificado: "purple",
+        autorizado: "orange",
+        por_facturar: "black",
+        programar_pago: "pink",
+        por_pagar: "indigo darken-2",
+        "pagada.porFacturar": "grey darken-2",
+        pagada: "cyan",
       },
     };
   },
@@ -702,6 +849,8 @@ export default {
       const _this = this;
       let payload = {
         estatus_key: estatus_key,
+        date_to_pay: this.form.date_to_pay ?? null,
+        payment_date: this.form.payment_date ?? null,
       };
       await axios
         .post(
@@ -767,6 +916,9 @@ export default {
           }
         });
     },
+    getColorByStatus(status) {
+      return this.colors[status];
+    },
   },
   // Coputed que controlan lo botones de Accion
   computed: {
@@ -791,6 +943,9 @@ export default {
         ? Object.keys(this.form.supplier).length > 0
         : false;
     },
+    IsContado() {
+      return this.form.payment_condition < 8;
+    },
     canSave() {
       let estatus = {
         pendiente: true,
@@ -802,6 +957,43 @@ export default {
         return false;
       }
     },
+    canDateToPay() {
+      let estatus = {
+        programar_pago: true,
+        por_facturar: true,
+        por_pagar: false,
+        pendiente: false,
+        denegar: false,
+        verificado: false,
+        autorizado: false,
+        "pagada.porFacturar": false,
+        pagada: false,
+      };
+      return this.form.estatus &&
+        this.IsContado &&
+        (this.$gate.allow("authorizePurchase", "compras") ||
+          this.$gate.allow("shedulePaymentDate", "compras"))
+        ? estatus[this.form.estatus.key]
+        : false;
+    },
+    canPaymentDate() {
+      let estatus = {
+        por_pagar: true,
+        pendiente: false,
+        denegar: false,
+        verificado: false,
+        autorizado: false,
+        por_facturar: false,
+        programar_pago: false,
+        "pagada.porFacturar": false,
+        pagada: false,
+      };
+      return this.form.estatus &&
+        this.IsContado &&
+        this.$gate.allow("markAsPaidIvoice", "compras")
+        ? estatus[this.form.estatus.key]
+        : false;
+    },
     canPrint() {
       let estatus = {
         autorizado: true,
@@ -809,6 +1001,7 @@ export default {
         pagada: true,
         por_facturar: true,
         por_pagar: true,
+        "pagada.porFacturar": true,
       };
       return this.form.estatus ? estatus[this.form.estatus.key] : false;
     },
@@ -843,7 +1036,6 @@ export default {
     canVerify() {
       let estatus = {
         pendiente: true,
-        denegar: true,
       };
       if (this.$gate.allow("validPurchase", "compras")) {
         return !!this.form.estatus ? !!estatus[this.form.estatus.key] : false;
@@ -857,6 +1049,7 @@ export default {
         por_pagar: true,
         pagada: true,
         por_facturar: true,
+        "pagada.porFacturar": true,
       };
       return !!this.form.estatus ? !!estatus[this.form.estatus.key] : false;
     },

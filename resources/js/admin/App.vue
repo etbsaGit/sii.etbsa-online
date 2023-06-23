@@ -1,16 +1,9 @@
 <template>
   <v-app id="inspire">
-    <!-- v-model="drawer" -->
-    <the-layout-drawer id="nav-drawer" class="d-print-none"></the-layout-drawer>
-    <v-app-bar app clipped-left flat dark class="d-print-none">
-      <v-app-bar-nav-icon @click="toggleNavigation">
-        <v-icon>
-          {{
-            $store.getters.getNavigationDrawer
-              ? "mdi-format-indent-decrease"
-              : "mdi-format-indent-increase"
-          }}
-        </v-icon>
+    <!-- <v-app-bar app clipped-right flat height="72" class="d-print-none"> -->
+    <v-app-bar app dense dark class="d-print-none">
+      <v-app-bar-nav-icon @click="drawer = !drawer">
+        <v-icon>mdi-menu-open</v-icon>
       </v-app-bar-nav-icon>
       <v-breadcrumbs
         :items="getBreadcrumbs"
@@ -31,31 +24,95 @@
         </template>
       </v-breadcrumbs>
       <v-spacer></v-spacer>
-      <!-- <notification></notification> -->
-      <profile></profile>
+
+      <v-btn v-if="false" icon @click="drawerRight = !drawerRight">
+        <v-icon>mdi-backburger</v-icon>
+      </v-btn>
     </v-app-bar>
 
-    <v-main class="d-print-table">
-      <div
-        class="app-content-container boxed-container pa-6 blue-grey lighten-5 h-full"
-        style="height: 100%;"
+    <v-navigation-drawer
+      v-model="drawer"
+      app
+      :mini-variant="drawerMini"
+      :expand-on-hover="drawerMini"
+      style="z-index: 99"
+      class="d-print-none"
+    >
+      <v-list>
+        <v-list-item class="px-2">
+          <v-list-item-avatar>
+            <v-img v-if="photo" :src="photo"></v-img>
+            <v-icon v-else>mdi-account</v-icon>
+          </v-list-item-avatar>
+        </v-list-item>
+
+        <v-list-item link>
+          <v-list-item-content>
+            <v-list-item-title class="title caption">
+              {{ name }}
+            </v-list-item-title>
+            <v-list-item-subtitle>{{ user }}</v-list-item-subtitle>
+          </v-list-item-content>
+          <v-list-item-action>
+            <v-btn icon @click="drawerMini = !drawerMini">
+              <v-icon>{{
+                drawerMini
+                  ? "mdi-format-indent-increase"
+                  : "mdi-format-indent-decrease"
+              }}</v-icon>
+            </v-btn>
+          </v-list-item-action>
+        </v-list-item>
+      </v-list>
+
+      <v-divider></v-divider>
+      <the-layout-drawer-list :routes="getNavigation" icon-show dense />
+      <template v-slot:append>
+        <div class="pa-2">
+          <v-btn color="purple" @click="logout('/logout', '/')" block dark>
+            <v-icon left>mdi-logout-variant</v-icon>
+            <span v-if="!drawerMini">Cerrar Sesion</span>
+          </v-btn>
+        </div>
+      </template>
+    </v-navigation-drawer>
+
+    <v-navigation-drawer v-if="false" v-model="drawerRight" app clipped right>
+      <v-list>
+        <v-list-item v-for="n in 5" :key="n" link>
+          <v-list-item-content>
+            <v-list-item-title>Item {{ n }}</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+    </v-navigation-drawer>
+
+    <v-main id="scrolling-techniques-4">
+      <v-container
+        fluid
+        class="overflow-y-auto cyan lighten-5 d-print-table"
+        style="height: 100%"
       >
         <v-slide-x-transition>
           <router-view></router-view>
         </v-slide-x-transition>
-      </div>
+      </v-container>
     </v-main>
-    <portal-target name="modal" multiple></portal-target>
 
-    <v-footer app inset absolute class="d-print-none">
+    <v-footer app color="transparent" inset absolute class="d-print-none">
       <v-spacer />
       <div class="overline text-right">
         Equipos y Tractores del Bajio &copy;
         {{ new Date().getFullYear() }}
       </div>
     </v-footer>
-
-    <!-- snackbar -->
+    <div
+      v-if="showLoader"
+      style="z-index: 999"
+      class="d-flex justify-center align-center wask_loader bg_half_transparent"
+    >
+      <moon-loader color="green"></moon-loader>
+    </div>
     <v-snackbar
       app
       v-model="showSnackbar"
@@ -66,12 +123,6 @@
     >
       <span class="overline"> {{ snackbarMessage }} </span>
     </v-snackbar>
-    <!-- loader -->
-    <div v-if="showLoader" class="wask_loader bg_half_transparent">
-      <moon-loader color="green"></moon-loader>
-    </div>
-
-    <!-- dialog confirm -->
     <v-dialog
       v-show="showDialog"
       v-model="showDialog"
@@ -93,30 +144,25 @@
           <v-btn color="blue" dark @click.native="dialogCancel">
             Cancelar
           </v-btn>
-          <v-btn color="red" text @click.native="dialogOk">
-            Confirmar
-          </v-btn>
+          <v-btn color="red" text @click.native="dialogOk"> Confirmar </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
-
-    <!-- the progress bar -->
     <vue-progress-bar></vue-progress-bar>
+    <portal-target name="modal" multiple></portal-target>
   </v-app>
 </template>
 
 <script>
-import Profile from "@admin/components/Layout/Profile.vue";
-import TheLayoutDrawer from "@admin/components/Layout/TheLayoutDrawer.vue";
-import Notification from "@admin/components/shared/Notification.vue";
 import { mapGetters, mapMutations } from "vuex";
+import TheLayoutDrawerList from "./components/Layout/TheLayoutDrawerList.vue";
 export default {
-  components: { TheLayoutDrawer, Notification, Profile },
-  name: "App",
+  components: { TheLayoutDrawerList },
   data() {
     return {
-      drawer: true,
-      mini: false,
+      drawerMini: null,
+      drawer: null,
+      drawerRight: false,
     };
   },
   computed: {
@@ -130,7 +176,11 @@ export default {
       "dialogTitle",
       "dialogMessage",
       "dialogIcon",
+      "getNavigation",
+      "showSnackbar",
+      "showDialog",
     ]),
+    ...mapGetters("user", ["user", "name", "photo", "status"]),
     showSnackbar: {
       get() {
         return this.$store.getters.showSnackbar;
@@ -150,14 +200,17 @@ export default {
     },
   },
   methods: {
+    logout(logoutUrl, afterLogoutRedirectUrl) {
+      axios.post(logoutUrl).then((r) => {
+        window.location.href = afterLogoutRedirectUrl;
+      });
+    },
     dialogOk() {
       this.$store.commit("dialogOk");
     },
     dialogCancel() {
       this.$store.commit("dialogCancel");
     },
-    ...mapMutations(["toggleNavigation"]),
   },
 };
 </script>
-<style></style>
