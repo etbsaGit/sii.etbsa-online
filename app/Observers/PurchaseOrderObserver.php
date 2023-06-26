@@ -5,7 +5,6 @@ namespace App\Observers;
 use App\Components\Common\Models\Estatus;
 use App\Components\Purchase\Models\PurchaseOrder;
 use App\Components\User\Models\User;
-use App\Http\Resources\PurchaseOrderCollection;
 use App\Mail\PurchaseOrder\PurchaseOrderCreated;
 use Illuminate\Support\Facades\Mail;
 
@@ -14,44 +13,44 @@ class PurchaseOrderObserver
 {
     public $emailSucursales = [
         'contabilidad' => [
-            '01' => 'contabilidadCELAYA@example.com.mx',
-            '51' => 'contabilidadCELAYA@example.com.mx',
-            '04' => 'contabilidadABASOLO@example.com.mx',
-            '02' => 'contabilidadACAMBARO@example.com.mx',
-            '03' => 'contabilidadIRAPUATO@example.com.mx',
-            '53' => 'contabilidadIRAPUATO@example.com.mx',
-            '55' => 'contabilidadMORELIA@example.com.mx',
-            '09' => 'contabilidadNUEVAS@example.com.mx',
-            '57' => 'contabilidadQUERETARO@example.com.mx',
-            '58' => 'contabilidadQUERETARO@example.com.mx',
-            '59' => 'contabilidadRENTA@example.com.mx',
-            '05' => 'contabilidadSALAMANCA@example.com.mx',
-            '06' => 'contabilidadSILAO@example.com.mx',
-            '56' => 'contabilidadSILAO@example.com.mx',
-            '99' => 'contabilidadMatriz@example.com.mx',
-            '08' => 'contabilidadSAN@example.com.mx',
+            '01' => 'cupalaura@etbsa.com.mx',
+            '51' => 'cupalaura@etbsa.com.mx',
+            '04' => 'contabilidadirapuato@etbsa.com.mx',
+            '02' => 'ContabilidadSalamanca@etbsa.com.mx',
+            '03' => 'contabilidadirapuato@etbsa.com.mx',
+            '53' => 'contabilidadirapuato@etbsa.com.mx',
+            '55' => 'ContabilidadSalamanca@etbsa.com.mx',
+            '09' => 'AContableMatriz@etbsa.com.mx',
+            '57' => 'ContabilidadQro@etbsa.com.mx',
+            '58' => 'ContabilidadQro@etbsa.com.mx',
+            '59' => '',
+            '05' => 'ContabilidadSalamanca@etbsa.com.mx',
+            '06' => 'ContabilidadSilao@etbsa.com.mx',
+            '56' => 'ContabilidadSilao@etbsa.com.mx',
+            '99' => 'AContableMatriz@etbsa.com.mx',
+            '08' => 'ContabilidadSalamanca@etbsa.com.mx',
+
         ],
         'gerentes' => [
-            '01' => 'gerenteCELAYA@example.com.mx',
-            '51' => 'gerenteCELAYA@example.com.mx',
-            '04' => 'gerenteABASOLO@example.com.mx',
-            '02' => 'gerenteACAMBARO@example.com.mx',
-            '03' => 'gerenteIRAPUATO@example.com.mx',
-            '53' => 'gerenteIRAPUATO@example.com.mx',
-            '55' => 'gerenteMORELIA@example.com.mx',
-            '09' => 'gerenteNUEVAS@example.com.mx',
-            '57' => 'gerenteQUERETARO@example.com.mx',
-            '58' => 'gerenteQUERETARO@example.com.mx',
-            '59' => 'gerenteRENTA@example.com.mx',
-            '05' => 'gerenteSALAMANCA@example.com.mx',
-            '06' => 'gerenteSILAO@example.com.mx',
-            '56' => 'gerenteSILAO@example.com.mx',
-            '99' => 'gerenteMatriz@example.com.mx',
-            '08' => 'gerenteSAN@example.com.mx',
+            '01' => 'barrosoernesto@etbsa.com.mx',
+            '51' => 'barrosoernesto@etbsa.com.mx',
+            '04' => 'ayalaelena@etbsa.com.mx',
+            '02' => '',
+            '03' => 'ayalaelena@etbsa.com.mx',
+            '53' => 'ayalaelena@etbsa.com.mx',
+            '55' => '',
+            '09' => 'sanchezfelipe@etbsa.com.mx',
+            '57' => 'jacoboalejandro@etbsa.com.mx',
+            '58' => 'jacoboalejandro@etbsa.com.mx',
+            '59' => '',
+            '05' => 'rodriguezluzmaria@etbsa.com.mx',
+            '06' => 'sanchezdavid@etbsa.com.mx',
+            '56' => 'alvarezrogelio@etbsa.com.mx',
+            '99' => 'albertoaugusto@etbsa.com.mx',
+            '08' => 'ocanagaspar@etbsa.com.mx',
         ],
         'admin' => [
-            'admin_1@example.com.mx',
-            'admin_2@example.com.mx',
+            'admin@etbsa-online.com.mx',
         ]
     ];
     public function saved(PurchaseOrder $purchaseOrder)
@@ -62,15 +61,6 @@ class PurchaseOrderObserver
         $bodyMessage = '';
         $current_estatus = $purchaseOrder->estatus->key;
         $cargos = $purchaseOrder->charges;
-        // if ($current_estatus == Estatus::ESTATUS_PENDIENTE) {
-        //     $subjectMessage = 'Orden de Compra Creada';
-        //     $toEmails = User::All()
-        //         ->map(function ($user) {
-        //             if ($user->hasPermission('compras.validar')) {
-        //                 return $user->email;
-        //             }
-        //         })->filter()->toArray();
-        // }
         if ($current_estatus == Estatus::ESTATUS_VERIFICADO) {
             $subjectMessage = 'Orden de Compra Verificada';
             $toEmails = User::All()

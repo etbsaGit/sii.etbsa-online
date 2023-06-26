@@ -103,8 +103,57 @@
           outlined
           dense
           hide-details
-          style="max-width: 350px"
+          clearable
         ></v-text-field>
+        <v-select
+          v-model="filters.purchase_type_id"
+          :items="options.purchaseTypes"
+          item-value="id"
+          item-text="name"
+          label="Tipo de Compra"
+          prepend-icon="mdi-filter-variant"
+          hide-details
+          outlined
+          filled
+          clearable
+          dense
+          class="mx-2"
+          style="max-width: 350px"
+        ></v-select>
+        <v-select
+          v-model="filters.uso_cfdi_ids"
+          :items="options.usocfdi"
+          item-value="id"
+          item-text="clave"
+          label="USO de CFDI"
+          prepend-icon="mdi-filter-variant"
+          hide-details
+          outlined
+          filled
+          clearable
+          dense
+          multiple
+          chips
+          deletable-chips
+        >
+          <template #item="{ item, attrs }">
+            <v-list-item-action>
+              <v-checkbox :input-value="attrs.inputValue"></v-checkbox>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title>
+                {{ item.clave }}
+              </v-list-item-title>
+              <v-list-item-subtitle>
+                {{ item.description }}
+              </v-list-item-subtitle>
+            </v-list-item-content>
+          </template>
+        </v-select>
+        <v-spacer />
+        <v-btn icon @click="initialize()">
+          <v-icon>mdi-refresh</v-icon>
+        </v-btn>
       </v-toolbar>
     </template>
     <template #[`item.usocfdi`]="{ item }">
@@ -146,6 +195,8 @@ export default {
     search: "",
     filters: {
       name: "",
+      purchase_type_id: "",
+      uso_cfdi_ids: [],
     },
     editedItemId: -1,
     editedItem: {
@@ -173,19 +224,19 @@ export default {
     pagination: {
       handler: _.debounce(function (v) {
         this.initialize(() => {});
-      }, 700),
+      }, 999),
       deep: true,
     },
     filters: {
       handler: _.debounce(function (v) {
         this.initialize(() => {});
-      }, 700),
+      }, 999),
       deep: true,
     },
     search: {
       handler: _.debounce(function (v) {
         this.initialize(() => {});
-      }, 700),
+      }, 999),
       deep: true,
     },
     dialog(val) {
@@ -197,15 +248,6 @@ export default {
     dialogUpdateUsoCfdi(val) {
       val || this.closeUpdateUsoCfdi();
     },
-    // "pagination.page": function () {
-    //   this.initialize(() => {});
-    // },
-    // "pagination.rowsPerPage": function () {
-    //   this.initialize(() => {});
-    // },
-    // "filters.name": _.debounce(function () {
-    //   this.initialize(() => {});
-    // }, 700),
   },
 
   mounted() {
@@ -213,7 +255,7 @@ export default {
     _this.$store.commit("setBreadcrumbs", [
       { label: "Conceptos de Compra", name: "" },
     ]);
-    this.initialize();
+    // this.initialize();
   },
 
   methods: {
@@ -225,13 +267,25 @@ export default {
         page: _this.pagination.page,
         per_page: _this.pagination.itemsPerPage,
       };
-      await axios
-        .get("/admin/purchase-concept", { params: params })
-        .then((res) => {
-          _this.items = res.data.data.data;
-          _this.totalItems = res.data.data.total;
-          _this.pagination.totalItems = res.data.data.total;
-        });
+
+      const {
+        data: {
+          data: { items, optionsfilters },
+          message,
+        },
+      } = await axios.get("/admin/purchase-concept", { params: params });
+
+      _this.items = items.data;
+      _this.totalItems = items.total;
+      _this.pagination.totalItems = items.total;
+      _this.options.usocfdi = optionsfilters.uso_cfdi;
+      _this.options.purchaseTypes = optionsfilters.purchase_types;
+
+      _this.$store.commit("showSnackbar", {
+        message: message,
+        color: "success",
+        duration: 3000,
+      });
     },
 
     editItem(item) {

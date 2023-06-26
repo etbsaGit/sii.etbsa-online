@@ -288,7 +288,7 @@ class SinglePageController extends AdminController
                 ]
             ]),
             new MenuItem([
-                'group_requirements' => ['Super User', 'Vendedor'],
+                'group_requirements' => ['Super User'],
                 'permission_requirements' => [],
                 'label' => 'Cargos Internos',
                 'nav_type' => MenuItem::$NAV_TYPE_NAV,
