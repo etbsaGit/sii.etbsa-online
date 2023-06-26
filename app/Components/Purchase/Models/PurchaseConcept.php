@@ -34,6 +34,20 @@ class PurchaseConcept extends Model
                 $query->orWhere('name', 'like', "%{$search}%");
             });
         });
+
+        
+    }
+    public function scopeFilter($query, array $filters = [])
+    {
+        $query->when($filters['purchase_type_id'] ?? null, function ($query, $purchase_type_id) {
+            $query->whereHas('purchaseType', function ($query) use ($purchase_type_id) {
+                return $query->where('id', $purchase_type_id);
+            });
+        })->when($filters['uso_cfdi_ids'] ?? null, function ($query, $uso_cfdi_ids) {
+            $query->whereHas('usocfdi', function ($query) use ($uso_cfdi_ids) {
+                return $query->whereIn('uso_cfdi_clave', $uso_cfdi_ids);
+            });
+        });
     }
 
     // public function setProductsAttribute($products)

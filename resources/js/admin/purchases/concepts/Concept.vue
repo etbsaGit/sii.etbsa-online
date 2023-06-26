@@ -145,6 +145,7 @@ export default {
     },
     options: {
       usocfdi: [],
+      purchase_types: [],
     },
     usocfdi: [],
   }),
@@ -187,11 +188,12 @@ export default {
   methods: {
     async initialize() {
       const _this = this;
-      await axios.get("/admin/purchase-concept").then((res) => {
-        _this.items = res.data.data.data;
-        _this.totalItems = res.data.data.total;
-        _this.pagination.totalItems = res.data.data.total;
-      });
+      const {dara:{items,optionsfilters,message}} = await axios.get("/admin/purchase-concept");
+      _this.items = items.data;
+      _this.totalItems = items.total;
+      _this.pagination.totalItems = items.total;
+      _this.options.usocfdi = optionsfilters.usocfdi;
+      _this.options.purchase_types = optionsfilters.purchase_types;
     },
 
     editItem(item) {

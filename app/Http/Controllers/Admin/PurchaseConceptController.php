@@ -31,8 +31,12 @@ class PurchaseConceptController extends AdminController
      */
     public function index()
     {
-        $data = $this->purchaseConceptRepository->list(request()->all());
-        return $this->sendResponseOk($data, "list Purchase Concept ok.");
+        $items = $this->purchaseConceptRepository->list(request()->all());
+        $optionsfilters = [
+            'uso_cfdi' => CatUsoCfdi::all(),
+            'purchase_types' => PurchaseType::all('id', 'name')
+        ];
+        return $this->sendResponseOk(compact('items', 'optionsfilters'), "list Purchase Concept ok.");
     }
 
     /**
@@ -65,7 +69,6 @@ class PurchaseConceptController extends AdminController
             return $this->sendResponseBadRequest($validate->errors()->first());
         }
 
-        /** @var Prospect $prospect */
         $created = $this->purchaseConceptRepository->create($request->all());
 
         if (!$created) {
@@ -78,7 +81,7 @@ class PurchaseConceptController extends AdminController
     /**
      * Display the specified resource.
      *
-     * @param  \App\PurchaseConcept  $purchaseConcept
+     * @param  \App\Components\Purchase\Models\PurchaseConcept  $purchaseConcept
      * @return \Illuminate\Http\Response
      */
     public function show(PurchaseConcept $purchaseConcept)
@@ -89,7 +92,7 @@ class PurchaseConceptController extends AdminController
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\PurchaseConcept  $purchaseConcept
+     * @param  \App\Components\Purchase\Models\PurchaseConcept  $purchaseConcept
      * @return \Illuminate\Http\Response
      */
     public function edit(PurchaseConcept $purchaseConcept)
@@ -101,7 +104,7 @@ class PurchaseConceptController extends AdminController
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\PurchaseConcept  $purchaseConcept
+     * @param  \App\Components\Purchase\Models\PurchaseConcept  $purchaseConcept
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, PurchaseConcept $purchaseConcept)
@@ -114,17 +117,17 @@ class PurchaseConceptController extends AdminController
             return $this->sendResponseBadRequest($validate->errors()->first());
         }
 
-        /** @var Prospect $prospect */
         $updated = $purchaseConcept->update($request->all());
 
-        if (!$updated) return $this->sendResponseBadRequest();
+        if (!$updated)
+            return $this->sendResponseBadRequest();
         return $this->sendResponseUpdated();
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\PurchaseConcept  $purchaseConcept
+     * @param  \App\Components\Purchase\Models\PurchaseConcept  $purchaseConcept
      * @return \Illuminate\Http\Response
      */
     public function destroy(PurchaseConcept $purchaseConcept)
@@ -138,7 +141,8 @@ class PurchaseConceptController extends AdminController
             'usocfdi' => 'array',
         ]);
 
-        if ($validate->fails()) return $this->sendResponseBadRequest($validate->errors()->first());
+        if ($validate->fails())
+            return $this->sendResponseBadRequest($validate->errors()->first());
 
         // $seller = $this->sellerRepository->find($id);
 
@@ -146,7 +150,8 @@ class PurchaseConceptController extends AdminController
 
         if ($usocfdi = $request->get('usocfdi', [])) {
             foreach ($usocfdi as $usoCfdiClave => $shouldAttach) {
-                if ($shouldAttach) $usoCfdiClaves[] = $usoCfdiClave;
+                if ($shouldAttach)
+                    $usoCfdiClaves[] = $usoCfdiClave;
             }
         }
 
