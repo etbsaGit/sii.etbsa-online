@@ -14,9 +14,9 @@
             <v-col cols="12" md="6" class="pa-2 flex-grow-1 flex-shrink-0">
               <v-autocomplete
                 v-model="filters.clave_cliente"
-                label="CLIENTE"
+                label="CLAVE CLIENTE"
                 :items="options.Clientes"
-                item-text="Cliente"
+                item-text="Clave_Cliente"
                 item-value="Clave_Cliente"
                 placeholder="Seleccionar Cliente"
                 :filter="customFilterCliente"
@@ -24,15 +24,19 @@
                 outlined
                 hide-details
                 dense
+                multiple
+                chips
+                small-chips
+                deletable-chips
               >
-                <template v-slot:selection="{ item }">
+                <!-- <template v-slot:selection="{ item }">
                   <v-list-item-content>
                     <v-list-item-subtitle>
                       {{ item.Clave_Cliente }}
                     </v-list-item-subtitle>
                     <v-list-item-title> {{ item.Cliente }} </v-list-item-title>
                   </v-list-item-content>
-                </template>
+                </template> -->
                 <template #item="{ item }">
                   <v-list-item-content>
                     <v-list-item-subtitle>
@@ -46,9 +50,9 @@
             <v-col cols="12" md="6" class="pa-2 flex-grow-1 flex-shrink-0">
               <v-autocomplete
                 v-model="filters.clave_vendedor"
-                label="VENDEDOR"
+                label="CLAVE VENDEDOR"
                 :items="options.Vendedores"
-                item-text="Nombre"
+                item-text="ClaveVendedor"
                 item-value="ClaveVendedor"
                 placeholder="Seleccionar Vendedor"
                 :filter="customFilterVendedor"
@@ -56,15 +60,19 @@
                 outlined
                 hide-details
                 dense
+                multiple
+                chips
+                small-chips
+                deletable-chips
               >
-                <template v-slot:selection="{ item }">
+                <!-- <template v-slot:selection="{ item }">
                   <v-list-item-content>
                     <v-list-item-subtitle>
                       {{ item.ClaveVendedor }}
                     </v-list-item-subtitle>
                     <v-list-item-title> {{ item.Nombre }} </v-list-item-title>
                   </v-list-item-content>
-                </template>
+                </template> -->
                 <template #item="{ item }">
                   <v-list-item-content>
                     <v-list-item-subtitle>
@@ -314,9 +322,9 @@
         <v-toolbar flat>
           <v-spacer />
           <v-toolbar-title class="text-right">
-            <!-- Total:{{ sumTotalVentasAg | currency }}
-            <v-divider inset/> -->
-            Total (MXN):{{ sumTotalVentasAgMX | currency }}
+            Total (MXN):{{ sumTotalVentasAg | currency }}
+            <!-- <v-divider inset/>
+            Total (MXN):{{ sumTotalVentasAgMX | currency }} -->
           </v-toolbar-title>
         </v-toolbar>
       </template>
@@ -366,8 +374,8 @@ export default {
         page: 1,
       },
       filters: {
-        clave_cliente: null,
-        clave_vendedor: null,
+        clave_cliente: [],
+        clave_vendedor: [],
         sucursales: [],
         lineas: [],
         years: [],
@@ -388,7 +396,6 @@ export default {
       handler: _.debounce(function (v) {
         this.getData(() => {});
       }, 1200),
-      deep: true,
     },
   },
   methods: {
@@ -407,6 +414,8 @@ export default {
           estado: [],
         }
       );
+      this.pagination.page = 1;
+      this.pagination.itemsPerPage = 10;
     },
     async getData() {
       const _this = this;
@@ -421,7 +430,7 @@ export default {
       };
       const {
         data: {
-          data: { items, sumatoriaTotal, sumatoriaTotalMX },
+          data: { items, sumatoriaTotal },
           message,
         },
       } = await axios.get("/admin/marketing/sales-customer", { params });
@@ -429,7 +438,6 @@ export default {
       this.totalItems = items.total;
       this.pagination.totalItems = items.total;
       this.sumTotalVentasAg = sumatoriaTotal;
-      this.sumTotalVentasAgMX = sumatoriaTotalMX;
 
       this.$store.commit("showSnackbar", {
         message: message,
@@ -464,6 +472,15 @@ export default {
         const claveMatch = item.ClaveVendedor.toLowerCase().includes(word);
 
         return nameMatch || claveMatch;
+      });
+    },
+    toggle() {
+      this.$nextTick(() => {
+        if (this.likesAllFruit) {
+          this.selectedFruits = [];
+        } else {
+          this.selectedFruits = this.fruits.slice();
+        }
       });
     },
   },
