@@ -44,6 +44,11 @@ return [
             'database' => database_path('ProductosUnidades40.db3'),
             'prefix' => '',
         ],
+        'sqlite_equip_db' => [
+            'driver' => 'sqlite',
+            'database' => database_path('EquipDB.db3'),
+            'prefix' => '',
+        ],
 
         'mysql' => [
             'driver' => 'mysql',

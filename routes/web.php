@@ -54,6 +54,10 @@ Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function
     Route::get('marketing/sales_history/resources', 'MarketingController@resources')->name('salesHistoryResources');
     Route::get('marketing/export', 'ExportController@exportMarketing')->name('marketingExport');
 
+    // SalesCustoemrHistory
+    Route::get('marketing/sales-customer', 'SalesCustomerHistoryController@index')->name('salesCustomerHistory');
+    Route::get('marketing/sales-customer/filters', 'SalesCustomerHistoryController@getOptions')->name('getOptionsEquipDB');
+
     // ResourcesController
     Route::get('resource/agencies', 'ResourcesShareController@getAgencies')->name('resources.agencies');
     Route::get('resource/users', 'ResourcesShareController@getUser')->name('resources.users');
@@ -72,7 +76,7 @@ Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function
                 return $item->sucursal == $value;
             })->map(function ($item, $key) {
                 if ($item->meta_mes_actual > 0) {
-                    $venta_meta_mes = ($item->venta_mes_actual * 100) /  $item->meta_mes_actual;
+                    $venta_meta_mes = ($item->venta_mes_actual * 100) / $item->meta_mes_actual;
                 }
                 // if ($item->meta_anual > 0) {
                 //     $venta_meta_anual = ($item->venta_enero_mes_actual * 100) /  $item->meta_anual;
@@ -105,7 +109,7 @@ Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function
                 ],
                 'yAxis' => [
                     'type' => 'category',
-                    'data' =>  $dpto->all()
+                    'data' => $dpto->all()
                 ],
                 'series' => [
                     // [
@@ -149,13 +153,13 @@ Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function
 
         $data = $metas->map(function ($item, $key) {
             if ($item->meta_mes_actual > 0) {
-                $venta_meta_mes = ($item->venta_mes_actual * 100) /  $item->meta_mes_actual;
+                $venta_meta_mes = ($item->venta_mes_actual * 100) / $item->meta_mes_actual;
             }
             if ($item->meta_anual > 0) {
-                $venta_meta_anual = ($item->venta_enero_mes_actual * 100) /  $item->meta_anual;
+                $venta_meta_anual = ($item->venta_enero_mes_actual * 100) / $item->meta_anual;
             }
             if ($item->meta_enero_mes_actual > 0) {
-                $venta_meta_mes_actual = ($item->venta_enero_mes_actual * 100) /  $item->meta_enero_mes_actual;
+                $venta_meta_mes_actual = ($item->venta_enero_mes_actual * 100) / $item->meta_enero_mes_actual;
             }
             return [
                 'Sucursal' => $item->sucursal,
