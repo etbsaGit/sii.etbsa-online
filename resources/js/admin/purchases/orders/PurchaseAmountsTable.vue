@@ -4,7 +4,7 @@
       <tbody>
         <tr>
           <td>Subtotal</td>
-          <td class="text-right" style="width: 100px;">
+          <td class="text-right" style="width: 100px">
             {{ Subtotal || 0 | money }}
           </td>
         </tr>
@@ -16,7 +16,7 @@
               dense
             ></v-switch>
           </td>
-          <td class="text-right" style="width: 100px;">
+          <td class="text-right" style="width: 100px">
             {{ Tax || 0 | money }}
           </td>
         </tr>
@@ -126,7 +126,7 @@
           </td>
         </tr>
         <tr>
-          <td style="width: 100px;">Descuento Adicional</td>
+          <td style="width: 100px">Descuento Adicional</td>
           <td class="text-right pr-2">
             <v-text-field
               v-model.number="form.discount"
@@ -140,9 +140,33 @@
           </td>
         </tr>
         <tr>
-          <td>Total</td>
-          <td class="text-right" style="width: 100px;">
-            <b>{{ Total || 0 | money }}</b>
+          <td style="width: 100px">Moneda</td>
+          <td class="text-right pr-2">
+            <v-select
+              v-model.number="form.currency"
+              :items="[
+                { id: 1, name: 'MXN' },
+                { id: 2, name: 'USD' },
+              ]"
+              item-value="id"
+              item-text="name"
+              dense
+              hide-details
+              outlined
+              solo
+              return-object
+            ></v-select>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <span>Total:</span>
+          </td>
+          <td class="text-right" style="width: 100px">
+            <b>
+              {{ Total || 0 | money }}
+              {{ form.currency ? form.currency.name : "MXN" }}
+            </b>
           </td>
         </tr>
       </tbody>
