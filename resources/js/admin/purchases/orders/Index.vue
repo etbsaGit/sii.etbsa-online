@@ -302,8 +302,8 @@
         </v-list>
       </v-menu>
     </template>
-    <template #[`item.id`]="{ item }">
-      <span> #{{ item.id.toString().padStart(5, 0) }} </span>
+    <template #[`item.purchase_number`]="{ value }">
+      <span> #{{value}} </span>
     </template>
     <template #[`item.supplier`]="{ value }">
       <v-list-item-content>
@@ -490,7 +490,7 @@ export default {
         text: "Folio OC",
         align: "center",
         sortable: false,
-        value: "id",
+        value: "purchase_number",
         fixed: true,
       },
       {

@@ -31,31 +31,41 @@
                   label="Proveedor:"
                   placeholder="Buscar por #Equip | Nombre | RFC | Email"
                   persistent-placeholder
-                  persistent-hint
-                  :hint="
-                    HasSupplier
-                      ? `RFC: ${form.supplier.rfc} #Equip ${form.supplier.code_equip}`
-                      : ''
-                  "
                   :filter="customFilter"
-                  :rules="[(v) => !!v || 'Es Requerido']"
+                  :rules="[requiredValidator]"
                   return-object
                   clearable
                   outlined
                   filled
-                  dense
                 >
+                  <template v-slot:selection="{ item }">
+                    <div class="d-flex flex-column title">
+                      {{ item.business_name }}
+                      <div class="d-flex">
+                        <v-chip label color="secondary" dark>
+                          {{ `Num. Proveedor: ${item.code_equip || "S/R"}` }}
+                        </v-chip>
+                        <v-chip label color="primary" dark>
+                          {{ `RFC: ${item.rfc}` }}
+                        </v-chip>
+                        <v-chip label color="accent" dark>
+                          {{ `Email: ${item.email}` }}
+                        </v-chip>
+                      </div>
+                    </div>
+                  </template>
                   <template v-slot:item="{ item }">
                     <v-list-item-content>
+                      <v-list-item-subtitle>
+                        {{ `Num. Proveedor:${item.code_equip || "S/R"}` }}
+                      </v-list-item-subtitle>
                       <v-list-item-title
                         class="text-uppercase font-weight-bold"
                       >
                         {{ item.business_name }}
                       </v-list-item-title>
                       <v-list-item-subtitle class="text-subtitle-2">
-                        {{
-                          `#Equip:${item.code_equip || "S/R"}  RFC:${item.rfc}`
-                        }}
+                        {{ `RFC:${item.rfc}` }}
                       </v-list-item-subtitle>
                       <v-list-item-subtitle>
                         {{ item.email }}
@@ -143,11 +153,15 @@
                 </v-btn>
                 <v-spacer />
                 <!-- BTN Adjuntar Cotizacion -->
-                <v-dialog transition="dialog-top-transition" max-width="600">
+                <v-dialog
+                  transition="dialog-top-transition"
+                  max-width="600"
+                  persistent
+                >
                   <template v-slot:activator="{ on, attrs }">
                     <v-btn dark color="blue" small v-bind="attrs" v-on="on">
-                      Adjuntar Cotizacion
-                      <v-icon right>mdi-file-pdf-box</v-icon>
+                      Adjuntar Archivos
+                      <v-icon right>mdi-paperclip</v-icon>
                     </v-btn>
                   </template>
                   <template v-slot:default="dialog">
@@ -157,13 +171,17 @@
                       >
                         Cargar Cotizacion
                         <v-spacer />
-                        <v-icon large color="red" @click="dialog.value = false">
+                        <v-icon
+                          large
+                          color="red"
+                          @click="(dialog.value = false), (files = [])"
+                        >
                           mdi-close-circle
                         </v-icon>
                       </v-card-title>
                       <v-card-text class="pt-4">
                         <v-file-input
-                          v-model="form.file"
+                          v-model="files"
                           outlined
                           placeholder="Seleccionar Archivo"
                           label="Archvio"
@@ -176,7 +194,12 @@
                           block
                           dark
                           color="primary"
-                          @click="dialog.value = false"
+                          :disabled="files.length == 0"
+                          @click="
+                            files.map((file) => form.file.push(file)),
+                              (dialog.value = false),
+                              (files = [])
+                          "
                         >
                           Adjuntar
                         </v-btn>
@@ -297,6 +320,7 @@ import PurchaseInvoiceTable from "./PurchaseInvoiceTable.vue";
 import PurchaseFilesList from "./PurchaseFilesList.vue";
 import SearchClvProduct from "./SearchClvProduct.vue";
 import PurchaseImportCsvProducts from "./PurchaseImportCsvProducts.vue";
+import { requiredValidator, integerValidator } from "@validator";
 export default {
   name: "PurchaseOrderCreate",
   components: {
@@ -310,12 +334,15 @@ export default {
   },
   data() {
     return {
+      requiredValidator,
+      integerValidator,
       alertSupplier: false,
       validFormInfo: true,
       dialogSupplierProducts: false,
       dialogAddCharge: false,
       dialogConfigInvoice: false,
       dialog: false,
+      files: [],
       form: {
         file: [],
         charges: [],
@@ -341,6 +368,7 @@ export default {
           with_flete: false,
           tax_flete: 0,
           total: 0,
+          currency: { id: 1, name: "MXN" },
         },
         supplier: null,
         purchase_type_id: 1,
@@ -514,6 +542,7 @@ export default {
         metodo_pago,
         forma_pago,
         purchase_concept_id,
+        currency_id: amounts.currency.id,
         ...amounts,
         ...rest,
       };
@@ -572,20 +601,38 @@ export default {
         });
     },
     customFilter(item, queryText, itemText) {
-      const textEquip = item.code_equip ? item.code_equip.toLowerCase() : "";
-      const textName = item.business_name
-        ? item.business_name.toLowerCase()
-        : "";
-      const textRfc = item.rfc ? item.rfc.toLowerCase() : "";
-      const textEmail = item.email ? item.email.toLowerCase() : "";
-      const searchText = queryText.toLowerCase();
+      const words = queryText.toLowerCase().split(" ");
 
-      return (
-        textEquip.indexOf(searchText) > -1 ||
-        textName.indexOf(searchText) > -1 ||
-        textRfc.indexOf(searchText) > -1 ||
-        textEmail.indexOf(searchText) > -1
-      );
+      return words.every((word) => {
+        const codeEquipMatch = item.code_equip
+          ? item.code_equip.toLowerCase().includes(word)
+          : false;
+        const businessNameMatch = item.business_name
+          ? item.business_name.toLowerCase().includes(word)
+          : false;
+        const rfcMatch = item.rfc
+          ? item.rfc.toLowerCase().includes(word)
+          : false;
+        const emailMatch = item.email
+          ? item.email.toLowerCase().includes(word)
+          : false;
+
+        return codeEquipMatch || businessNameMatch || rfcMatch || emailMatch;
+      });
+      // const textEquip = item.code_equip ? item.code_equip.toLowerCase() : "";
+      // const textName = item.business_name
+      //   ? item.business_name.toLowerCase()
+      //   : "";
+      // const textRfc = item.rfc ? item.rfc.toLowerCase() : "";
+      // const textEmail = item.email ? item.email.toLowerCase() : "";
+      // const searchText = queryText.toLowerCase();
+
+      // return (
+      //   textEquip.indexOf(searchText) > -1 ||
+      //   textName.indexOf(searchText) > -1 ||
+      //   textRfc.indexOf(searchText) > -1 ||
+      //   textEmail.indexOf(searchText) > -1
+      // );
     },
   },
 };
