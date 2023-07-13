@@ -2,6 +2,7 @@
 
 namespace App\Components\Purchase\Models;
 
+use App\Components\Common\Models\Currency;
 use App\Components\Purchase\Pivots\PurchasePivotCharge;
 use App\Components\Purchase\Pivots\PurchasePivotProduct;
 use App\Components\RRHH\Models\Employee;
@@ -86,6 +87,11 @@ class PurchaseOrder extends Model
     public function ship()
     {
         return $this->belongsTo(Agency::class, 'agency_id');
+    }
+
+    public function currency()
+    {
+        return $this->belongsTo(Currency::class, 'currency_id');
     }
 
     public function purchaseType()
