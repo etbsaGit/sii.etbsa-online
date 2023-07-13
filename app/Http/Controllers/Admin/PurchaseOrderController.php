@@ -3,11 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App;
+use App\Components\Common\Services\PurchaseNumberService;
 use App\Components\Purchase\Pivots\PurchasePivotCharge;
-use App\Mail\PurchaseOrder\PurchaseOrderCreated;
-use Barryvdh\DomPDF\PDF;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use League\Flysystem\FileNotFoundException;
 use Illuminate\Http\Request;
@@ -28,6 +26,7 @@ use App\Components\Purchase\Models\Supplier;
 use App\Components\Common\Models\Estatus;
 use App\Components\Purchase\Models\PurchaseConcept;
 use App\Components\Purchase\Models\PurchaseType;
+use App\Components\File\Models\File as FilePurchase;
 
 use Carbon\Carbon;
 use Auth;
@@ -39,15 +38,17 @@ class PurchaseOrderController extends AdminController
      */
     private $purchaseOrderRepository;
     private $fileService;
+    private $purchaseNumberService;
 
     /**
      * UserController constructor.
      * @param PurchaseOrderRepository $purchaseOrderRepository
      */
-    public function __construct(PurchaseOrderRepository $purchaseOrderRepository, FileService $fileService)
+    public function __construct(PurchaseOrderRepository $purchaseOrderRepository, FileService $fileService, PurchaseNumberService $purchaseNumberService)
     {
         $this->purchaseOrderRepository = $purchaseOrderRepository;
         $this->fileService = $fileService;
+        $this->purchaseNumberService = $purchaseNumberService;
     }
     /**
      * Display a listing of the resource.
@@ -123,7 +124,9 @@ class PurchaseOrderController extends AdminController
             function () use ($request) {
                 $request['created_by'] = Auth::user()->id;
                 $request['estatus_id'] = Estatus::where('key', Estatus::ESTATUS_PENDIENTE)->first()->id;
+                $request['purchase_number'] = $this->purchaseNumberService->setNextPurchaseNumber();
                 $purchaseOrder = $this->purchaseOrderRepository->create($request->all());
+
 
                 if (!$purchaseOrder) {
                     return $this->sendResponseBadRequest("Failed to create.");
@@ -152,7 +155,7 @@ class PurchaseOrderController extends AdminController
                         // dd($file);
                         try {
                             $fileOriginalName = $file->getClientOriginalName();
-                            $filePath = $file->store('purchase_orders/id_' . $purchaseOrder->id . '/quotes', 's3');
+                            $filePath = $file->store('purchase_orders/id_' . $purchaseOrder->id . '/files', 's3');
 
                             if (!$filePath) {
                                 $this->addError("Failed to upload.", 400);
@@ -326,85 +329,85 @@ class PurchaseOrderController extends AdminController
                     $purchase_order->pivotProduct()->createMany($newProducts);
                 }
                 // Actualiza Archivos si existe
-                if ($request->get('file') == []) {
-                    if (!!$purchase_order->files) {
-                        $purchase_order->files->each(function ($file) {
-                            $file->delete();
-                            if (Storage::disk('s3')->exists($file->path)) {
-                                Storage::disk('s3')->delete($file->path);
-                            }
-                        });
-                    }
-                }
-                if ($request->hasFile('file')) {
-                    $files = $request->file('file');
-                    $error = false;
-                    $errorMessage = '';
-                    $fileRecord = null;
-                    if (!!$purchase_order->files) {
-                        $purchase_order->files->each(function ($file) {
-                            $file->delete();
-                            if (Storage::disk('s3')->exists($file->path)) {
-                                Storage::disk('s3')->delete($file->path);
-                            }
-                        });
-                    }
-                    foreach ($files as $file) {
-                        try {
-                            $fileOriginalName = $file->getClientOriginalName();
-                            $filePath = $file->store('purchase_orders/id_' . $purchase_order->id . '/quotes', 's3');
-
-                            if (!$filePath) {
-                                $this->addError("Failed to upload.", 400);
-                                return false;
-                            }
-
-                            // other data
-                            $ext = pathinfo(config('filesystems.disks.local.root') . '/' . $filePath, PATHINFO_EXTENSION);
-                            $size = Storage::disk('s3')->getSize($filePath);
-                            $type = Storage::disk('s3')->getMimetype($filePath);
-
-                            $fileData = [
-                                'original_name' => $fileOriginalName,
-                                'path' => $filePath,
-                                'ext' => $ext,
-                                'size' => $size,
-                                'type' => $type,
-                            ];
-                        } catch (FileNotFoundException $e) {
-                            $error = true;
-                            $errorMessage = $e->getMessage();
-                            break;
-                        }
-                        if (!$fileData) {
-                            $error = true;
-                            $errorMessage = $this->fileService->getErrors()->first();
-                            break;
-                        }
-                        $fileRecord = $purchase_order->files()->create([
-                            'name' => $fileData['original_name'],
-                            'uploaded_by' => Auth::user()->id,
-                            'file_type' => $fileData['type'],
-                            'extension' => $fileData['ext'],
-                            'size' => $fileData['size'],
-                            'path' => $fileData['path'],
-                        ]);
-
-                        if (!$fileRecord) {
-                            if (Storage::disk('s3')->exists($fileData['path'])) {
-                                Storage::disk('s3')->delete($fileData['path']);
-                            }
-                            $error = true;
-                            $errorMessage = "Failed to create record.";
-                            break;
-                        }
-
-                    }
-                    if ($error) {
-                        return $this->sendResponseBadRequest($errorMessage);
-                    }
-
-                }
+                // if ($request->get('file') == []) {
+                //     if (!!$purchase_order->files) {
+                //         $purchase_order->files->each(function ($file) {
+                //             $file->delete();
+                //             if (Storage::disk('s3')->exists($file->path)) {
+                //                 Storage::disk('s3')->delete($file->path);
+                //             }
+                //         });
+                //     }
+                // }
+                // if ($request->hasFile('file')) {
+                //     $files = $request->file('file');
+                //     $error = false;
+                //     $errorMessage = '';
+                //     $fileRecord = null;
+                //     if (!!$purchase_order->files) {
+                //         $purchase_order->files->each(function ($file) {
+                //             $file->delete();
+                //             if (Storage::disk('s3')->exists($file->path)) {
+                //                 Storage::disk('s3')->delete($file->path);
+                //             }
+                //         });
+                //     }
+                //     foreach ($files as $file) {
+                //         try {
+                //             $fileOriginalName = $file->getClientOriginalName();
+                //             $filePath = $file->store('purchase_orders/id_' . $purchase_order->id . '/files', 's3');
+    
+                //             if (!$filePath) {
+                //                 $this->addError("Failed to upload.", 400);
+                //                 return false;
+                //             }
+    
+                //             // other data
+                //             $ext = pathinfo(config('filesystems.disks.local.root') . '/' . $filePath, PATHINFO_EXTENSION);
+                //             $size = Storage::disk('s3')->getSize($filePath);
+                //             $type = Storage::disk('s3')->getMimetype($filePath);
+    
+                //             $fileData = [
+                //                 'original_name' => $fileOriginalName,
+                //                 'path' => $filePath,
+                //                 'ext' => $ext,
+                //                 'size' => $size,
+                //                 'type' => $type,
+                //             ];
+                //         } catch (FileNotFoundException $e) {
+                //             $error = true;
+                //             $errorMessage = $e->getMessage();
+                //             break;
+                //         }
+                //         if (!$fileData) {
+                //             $error = true;
+                //             $errorMessage = $this->fileService->getErrors()->first();
+                //             break;
+                //         }
+                //         $fileRecord = $purchase_order->files()->create([
+                //             'name' => $fileData['original_name'],
+                //             'uploaded_by' => Auth::user()->id,
+                //             'file_type' => $fileData['type'],
+                //             'extension' => $fileData['ext'],
+                //             'size' => $fileData['size'],
+                //             'path' => $fileData['path'],
+                //         ]);
+    
+                //         if (!$fileRecord) {
+                //             if (Storage::disk('s3')->exists($fileData['path'])) {
+                //                 Storage::disk('s3')->delete($fileData['path']);
+                //             }
+                //             $error = true;
+                //             $errorMessage = "Failed to create record.";
+                //             break;
+                //         }
+    
+                //     }
+                //     if ($error) {
+                //         return $this->sendResponseBadRequest($errorMessage);
+                //     }
+    
+                // }
                 $purchaseOrderUpdated = new PurchaseOrderCollection($purchase_order->refresh());
                 return $this->sendResponseUpdated(compact('purchaseOrderUpdated'));
             }
@@ -538,5 +541,89 @@ class PurchaseOrderController extends AdminController
                 return $this->sendResponseUpdated([], 'Estatus Actualizado');
             }
         );
+    }
+
+    public function destroyFile(FilePurchase $file)
+    {
+
+        // dd($file,Storage::disk('s3')->exists($file->path));
+        try {
+            $file->delete();
+            if (Storage::disk('s3')->exists($file->path)) {
+                Storage::disk('s3')->delete($file->path);
+            }
+        } catch (\Throwable $th) {
+            //throw $th;
+            return $this->sendResponseDeleted("Error de Servidor");
+        }
+        return $this->sendResponseDeleted("Archivo Eliminado");
+    }
+
+    public function attachFiles(Request $request, PurchaseOrder $purchase_order)
+    {
+        // dd($request->hasFile('file'), $request->file('file'));
+
+        if ($request->hasFile('file')) {
+            $files = $request->file('file');
+            $error = false;
+            $errorMessage = '';
+            $fileRecord = null;
+            foreach ($files as $file) {
+                try {
+                    $fileOriginalName = $file->getClientOriginalName();
+                    $filePath = $file->store('purchase_orders/id_' . $purchase_order->id . '/files', 's3');
+
+                    if (!$filePath) {
+                        $this->addError("Failed to upload.", 400);
+                        return false;
+                    }
+
+                    // other data
+                    $ext = pathinfo(config('filesystems.disks.local.root') . '/' . $filePath, PATHINFO_EXTENSION);
+                    $size = Storage::disk('s3')->getSize($filePath);
+                    $type = Storage::disk('s3')->getMimetype($filePath);
+
+                    $fileData = [
+                        'original_name' => $fileOriginalName,
+                        'path' => $filePath,
+                        'ext' => $ext,
+                        'size' => $size,
+                        'type' => $type,
+                    ];
+                } catch (FileNotFoundException $e) {
+                    $error = true;
+                    $errorMessage = $e->getMessage();
+                    break;
+                }
+                if (!$fileData) {
+                    $error = true;
+                    $errorMessage = $this->fileService->getErrors()->first();
+                    break;
+                }
+                $fileRecord = $purchase_order->files()->create([
+                    'name' => $fileData['original_name'],
+                    'uploaded_by' => Auth::user()->id,
+                    'file_type' => $fileData['type'],
+                    'extension' => $fileData['ext'],
+                    'size' => $fileData['size'],
+                    'path' => $fileData['path'],
+                ]);
+
+                if (!$fileRecord) {
+                    if (Storage::disk('s3')->exists($fileData['path'])) {
+                        Storage::disk('s3')->delete($fileData['path']);
+                    }
+                    $error = true;
+                    $errorMessage = "Failed to create record.";
+                    break;
+                }
+
+            }
+            if ($error) {
+                return $this->sendResponseBadRequest($errorMessage);
+            }
+
+            return $this->sendResponseCreated();
+        }
     }
 }
