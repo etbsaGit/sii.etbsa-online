@@ -230,7 +230,7 @@
 
                 <td style="text-align: right; width: 200px; line-height: 1.2rem;">
                     <b>ORDEN DE COMPRA</b><br />
-                    # {{ $item->id }}<br />
+                    # {{ $item->purchase_number }}<br />
                     Creacion:{{ $item->authorization_date }}<br />
                     Impresion:{{ today() }}
                 </td>

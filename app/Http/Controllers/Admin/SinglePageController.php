@@ -273,7 +273,7 @@ class SinglePageController extends AdminController
                         'icon' => 'mdi-chart-areaspline',
                         'route_type' => 'vue',
                         'route_name' => 'marketing',
-                        'visible' => true,
+                        'visible' => false,
                     ]),
                     new MenuItem([
                         'group_requirements' => ['Super User'],
