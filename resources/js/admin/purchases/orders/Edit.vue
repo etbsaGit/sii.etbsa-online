@@ -1,8 +1,7 @@
 <template>
   <v-card>
     <v-card-title class="overline align-center">
-      <v-icon left>mdi-file-document</v-icon> Detalle Orden de compra #
-      {{ purchaseId.toString().padStart(5, 0) }}
+      <v-icon left>mdi-file-document</v-icon> Detalle Orden de compra #{{ form.purchase_number }}
       <v-spacer></v-spacer>
       <b>Acciones:</b>
       <v-btn v-if="canSave" class="ml-2" color="green " @click="update" dark>
@@ -330,8 +329,8 @@
                 >
                   <template v-slot:activator="{ on, attrs }">
                     <v-btn dark color="blue" small v-bind="attrs" v-on="on">
-                      Adjuntar Cotizacion
-                      <v-icon right>mdi-file-pdf-box</v-icon>
+                      Adjuntar Archivos
+                      <v-icon right>mdi-paperclip</v-icon>
                     </v-btn>
                   </template>
                   <template v-slot:default="dialog">
@@ -339,19 +338,19 @@
                       <v-card-title
                         class="white--text secondary title text-uppercase"
                       >
-                        Cargar Cotizacion
+                        Cargar Archivo(s)
                         <v-spacer />
                         <v-icon
                           large
                           color="red"
-                          @click="(dialog.value = false), (form.file = [])"
+                          @click="(dialog.value = false), (files = [])"
                         >
                           mdi-close-circle
                         </v-icon>
                       </v-card-title>
                       <v-card-text class="pt-4">
                         <v-file-input
-                          v-model="form.file"
+                          v-model="files"
                           outlined
                           placeholder="Seleccionar Archivo"
                           label="Archvio"
@@ -364,7 +363,8 @@
                           block
                           dark
                           color="primary"
-                          @click="dialog.value = false"
+                          :disabled="files.length == 0"
+                          @click="attachFiles()"
                         >
                           Adjuntar
                         </v-btn>
@@ -372,6 +372,7 @@
                     </v-card>
                   </template>
                 </v-dialog>
+
                 <!-- END Adjuntar Cotizacion -->
               </v-card-actions>
               <v-card-text v-if="form.file.length > 0">
@@ -541,6 +542,7 @@ export default {
       dialogAddCharge: false,
       dialogConfigInvoice: false,
       dialog: false,
+      files: [],
       form: {
         date_to_pay: null,
         payment_date: null,
@@ -775,7 +777,7 @@ export default {
       const formData = new FormData();
       const payload = _this.getPayload();
 
-      console.log(payload.charges);
+      // console.log(payload.charges);
       payload.file.forEach((item) => {
         formData.append("file[]", item);
       });
@@ -814,6 +816,17 @@ export default {
       } finally {
         _this.$store.commit("hideLoader");
       }
+    },
+    async attachFiles() {
+      const _this = this;
+      const formData = new FormData();
+      _this.files.forEach((item) => {
+        formData.append("file[]", item);
+      });
+      await axios.post(`/admin/purchase-file/attach/${_this.purchaseId}`, formData);
+      _this.dialog.value = false;
+      _this.files = [];
+      _this.$eventBus.$emit("ORDERS_REFRESH");
     },
     async loadOptions(cb) {
       const _this = this;
