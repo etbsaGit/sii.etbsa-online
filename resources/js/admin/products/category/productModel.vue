@@ -20,13 +20,13 @@
     <v-spacer />
     <v-data-table
       v-bind:headers="headers"
-      :options.sync="pagination"
       :items="items"
+      :options.sync="pagination"
       :server-items-length="totalItems"
       fixed-header
       dense
     >
-      <template #[`item.category`]="{value}">
+      <template #[`item.category`]="{ value }">
         {{ value.name }}
       </template>
       <template #[`item.action`]="{ item }">
@@ -115,8 +115,10 @@ export default {
         product_category_id: 1,
       },
       items: [],
-      options: {},
       totalItems: 0,
+      options: {
+        category: [],
+      },
       pagination: {
         rowsPerPage: 10,
       },
@@ -127,6 +129,7 @@ export default {
 
       filters: {
         search: "",
+        category_id: null,
       },
     };
   },
@@ -135,13 +138,13 @@ export default {
     pagination: {
       handler: _.debounce(function (v) {
         this.loadProductModel(() => {});
-      }, 700),
+      }, 999),
       deep: true,
     },
     filters: {
       handler: _.debounce(function (v) {
         this.loadProductModel(() => {});
-      }, 700),
+      }, 999),
       deep: true,
     },
     dialog(val) {
@@ -169,13 +172,31 @@ export default {
         per_page: _this.pagination.itemsPerPage,
       };
 
-      await axios.get("/admin/products/model", { params }).then((response) => {
-        _this.items = response.data.data.data.data;
-        _this.options = response.data.data.options;
-        _this.totalItems = response.data.data.total;
-        _this.pagination.totalItems = response.data.data.total;
-        (cb || Function)();
+      const {
+        data: {
+          data: { items, options },
+          message,
+        },
+      } = await axios.get("/admin/products/model", { params });
+
+      _this.items = items.data;
+      _this.totalItems = items.total;
+      _this.pagination.totalItems = items.total;
+      _this.options.category = options.category;
+
+      _this.$store.commit("showSnackbar", {
+        message: message,
+        color: "success",
+        duration: 3000,
       });
+
+      // await axios.get("/admin/products/model", { params }).then((response) => {
+      //   _this.items = response.data.data.data.data;
+      //   _this.options = response.data.data.options;
+      //   _this.totalItems = response.data.data.total;
+      //   _this.pagination.totalItems = response.data.data.total;
+      //   (cb || Function)();
+      // });
     },
 
     deleteItem(item) {

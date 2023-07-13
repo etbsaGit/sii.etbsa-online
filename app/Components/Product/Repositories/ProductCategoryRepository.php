@@ -19,4 +19,20 @@ class ProductCategoryRepository extends BaseRepository
             return $q;
         });
     }
+
+
+    public function index($params)
+    {
+        return $this->get($params, [], function ($q) use ($params) {
+            $q->search($params['search'] ?? '');
+            return $q;
+        });
+    }
+
+    function options()
+    {
+        $categories = ProductCategory::orderBy('id', 'desc')->get();
+
+        return compact('categories');
+    }
 }

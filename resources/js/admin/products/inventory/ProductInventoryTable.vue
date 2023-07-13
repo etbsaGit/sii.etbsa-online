@@ -1,69 +1,37 @@
 <template>
   <v-data-table
     :headers="headers"
-    :items="categories"
+    :items="product_inventory"
     :options.sync="pagination"
     :server-items-length="totalItems"
-    class="elevation-1 text-uppercase caption"
+    class="elevation-1"
+    show-group-by
     dense
-  >
+    >
+    <!-- sort-by="calories" -->
+    <!-- group-by="location_branch.title" -->
     <template v-slot:top>
-      <div class="d-flex flex-row justify-end pa-2">
-        <v-dialog v-model="dialog" max-width="750px">
+      <div class="d-flex flex-row justify-end">
+        <v-dialog v-model="dialog" max-width="750px" persistent scrollable>
           <template v-slot:activator="{ on, attrs }">
             <v-btn color="primary" dark class="mb-2" v-bind="attrs" v-on="on">
-              Nueva Categoria
+              Agregar Producto
             </v-btn>
           </template>
           <v-card>
             <v-card-title>
               <span class="text-h5">{{ formTitle }}</span>
+              <v-spacer />
+              <v-icon @click="close" color="red">mdi-close</v-icon>
             </v-card-title>
 
             <v-card-text>
-              <v-container>
-                <v-row>
-                  <v-col cols="12">
-                    <v-text-field
-                      v-model="editedItem.name"
-                      label="Nombre Categoria"
-                      placeholder="Nombre Categoria"
-                      outlined
-                    ></v-text-field>
-                  </v-col>
-                  <v-col cols="12">
-                    <v-select
-                      v-model="editedItem.parent"
-                      label="Categoria Padre"
-                      placeholder="Selecciones una Categoria"
-                      :items="options.categories"
-                      item-text="name"
-                      item-value="id"
-                      outlined
-                    >
-                      <template v-slot:selection="{ item }">
-                        <v-breadcrumbs
-                          :items="item.breadcrumbs_category"
-                          class="pa-0 overline"
-                        >
-                          <template v-slot:divider>
-                            <v-icon>mdi-chevron-right</v-icon>
-                          </template>
-                        </v-breadcrumbs>
-                      </template>
-                      <template v-slot:item="{ item }">
-                        <v-breadcrumbs
-                          :items="item.breadcrumbs_category"
-                          class="pa-0 overline"
-                        >
-                          <template v-slot:divider>
-                            <v-icon>mdi-chevron-right</v-icon>
-                          </template>
-                        </v-breadcrumbs>
-                      </template>
-                    </v-select>
-                  </v-col>
-                </v-row>
+              <v-container fluid>
+                <product-inventory-form
+                  ref="form"
+                  :form.sync="editedItem"
+                  :options="options"
+                ></product-inventory-form>
               </v-container>
             </v-card-text>
 
@@ -93,7 +61,7 @@
         </v-dialog>
       </div>
       <v-toolbar flat>
-        <v-toolbar-title>Categorias Productos</v-toolbar-title>
+        <v-toolbar-title>Inventario de Productos</v-toolbar-title>
         <v-divider class="mx-4" inset vertical></v-divider>
         <v-spacer></v-spacer>
 
@@ -104,51 +72,70 @@
         </v-toolbar-items>
       </v-toolbar>
     </template>
-    <template v-slot:item.breadcrumbs_category="{ value }">
-      <v-breadcrumbs :items="value" class="pa-0">
-        <template v-slot:divider>
-          <v-icon>mdi-chevron-right</v-icon>
-        </template>
-      </v-breadcrumbs>
-    </template>
     <template v-slot:item.actions="{ item }">
       <v-icon small class="mr-2" @click="editItem(item)"> mdi-pencil </v-icon>
       <v-icon small @click="deleteItem(item)"> mdi-delete </v-icon>
     </template>
     <template v-slot:no-data>
-      <h4>Sin Datos</h4>
+      <v-btn color="primary" @click="initialize"> Reset </v-btn>
     </template>
   </v-data-table>
 </template>
+
 <script>
-import TableHeaderButtons from "../components/shared/TableHeaderButtons.vue";
+import TableHeaderButtons from "../../components/shared/TableHeaderButtons.vue";
+import ProductInventoryForm from "./ProductInventoryForm.vue";
 export default {
-  components: { TableHeaderButtons },
+  components: { ProductInventoryForm, TableHeaderButtons },
   data: () => ({
     dialog: false,
     dialogDelete: false,
     headers: [
       {
-        text: "Categoria",
+        text: "Nombre Equipo",
         align: "start",
-        sortable: false,
-        value: "breadcrumbs_category",
+        sortable: true,
+        value: "product.name",
+        class: "col-3",
+        cellClass: "text-uppercase",
       },
-
-      { text: "Actions", value: "actions", align: "center", sortable: false },
+      { text: "Categoria", value: "product.category.name" },
+      { text: "Serie", value: "num_serie", class: "col-2" },
+      { text: "Num Economico", value: "num_economico" },
+      { text: "Serie Motor", value: "num_serie_motor" },
+      { text: "Factura", value: "invoice" },
+      { text: "Ubicacion Fisico", value: "location_branch.title" },
+      { text: "Actions", value: "actions", sortable: false },
     ],
-    categories: [],
-    editedIndex: -1,
+    product_inventory: [],
+    editedId: -1,
     editedItem: {
-      name: "",
-      parent: null,
+      product_id: null,
+      location: null,
+      assigned_branch: null,
+      model: null,
+      num_serie: null,
+      num_serie_motor: null,
+      num_economico: null,
+      costo_jd: null,
+      costo_etbsa: null,
+      invoice: null,
+      invoice_date: null,
+      arrival_date: null,
     },
     defaultItem: {
-      name: "",
-      parent: null,
-    },
-    options: {
-      categories: [],
+      product_id: null,
+      location: null,
+      assigned_branch: null,
+      model: null,
+      num_serie: null,
+      num_serie_motor: null,
+      num_economico: null,
+      costo_jd: null,
+      costo_etbsa: null,
+      invoice: null,
+      invoice_date: null,
+      arrival_date: null,
     },
     filters: {},
     search: "",
@@ -165,40 +152,27 @@ export default {
 
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? "Nueva Categoria" : "Editar Categoria";
+      return this.editedId === -1 ? "Nuevo Registro" : "Editar Registro";
     },
   },
 
   watch: {
-    dialog(val) {
-      val || this.close();
-    },
-    dialogDelete(val) {
-      val || this.closeDelete();
-    },
     pagination: {
       handler: _.debounce(function () {
         this.initialize();
       }, 999),
       deep: true,
     },
-    filters: {
-      handler: _.debounce(function (v) {
-        this.pagination.page = 1;
-        this.initialize();
-      }, 999),
-      deep: true,
+    dialog(val) {
+      val || this.close();
     },
-    search: _.debounce(function (v) {
-      this.pagination.page = 1;
-      this.initialize();
-    }, 999),
+    dialogDelete(val) {
+      val || this.closeDelete();
+    },
   },
 
-  mounted() {
-    const _this = this;
-    _this.initialize();
-    _this.$store.commit("setBreadcrumbs", [{ label: "Categorias", name: "" }]);
+  created() {
+    this.initialize();
   },
 
   methods: {
@@ -212,14 +186,15 @@ export default {
       };
       const {
         data: {
-          data: { categories, options },
+          data: { productInventories, options },
           message,
         },
-      } = await axios.get("/admin/products/categories", { params });
-      _this.categories = categories.data;
+      } = await axios.get("admin/products/inventory", { params: params });
+
+      _this.product_inventory = productInventories.data;
+      _this.totalItems = productInventories.total;
+      _this.pagination.totalItems = productInventories.total;
       _this.options = options;
-      _this.totalItems = categories.total;
-      _this.pagination.totalItems = categories.total;
 
       _this.$store.commit("showSnackbar", {
         message: message,
@@ -230,7 +205,14 @@ export default {
 
     editItem(item) {
       this.editedId = item.id;
-      this.editedItem = Object.assign({}, item);
+      this.editedItem = Object.assign(
+        {},
+        {
+          ...item,
+          location: item.location.id,
+          assigned_branch: item.assigned_branch.id,
+        }
+      );
       this.dialog = true;
     },
 
@@ -242,11 +224,11 @@ export default {
     async deleteItemConfirm() {
       const {
         data: { message },
-      } = await axios.delete(`/admin/products/categories/${this.editedId}`);
+      } = await axios.delete(` /admin/products/inventory/${this.editedId}`);
       this.$store.commit("showSnackbar", {
         message: message,
         color: "error",
-        duration: 5000,
+        duration: 3000,
       });
       this.initialize();
       this.closeDelete();
@@ -269,14 +251,14 @@ export default {
     },
 
     async save() {
-      // if (!this.$refs.form.$refs.formProductInventory.validate()) return;
+      if (!this.$refs.form.$refs.formProductInventory.validate()) return;
       let payload = {
         ...this.editedItem,
       };
       if (this.editedId > -1) {
         try {
           const { data: message } = await axios.put(
-            `/admin/products/categories/${this.editedId}`,
+            `/admin/products/inventory/${this.editedId}`,
             payload
           );
           _this.$store.commit("showSnackbar", {
@@ -300,7 +282,7 @@ export default {
       } else {
         try {
           const { data: message } = await axios.post(
-            "/admin/products/categories",
+            "/admin/products/inventory",
             payload
           );
           _this.$store.commit("showSnackbar", {

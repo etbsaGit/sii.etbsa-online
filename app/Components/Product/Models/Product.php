@@ -11,12 +11,29 @@ class Product extends Model
 {
     protected $table = 'products';
     protected $fillable = [
-        'product_category_id', 'product_model_id', 'brand_id', 'supplier_id', 'name', 'description', 'agency_id', 'sku',
-        'active', 'is_usado', 'is_dollar', 'currency_id',
-        'price_1', 'price_2', 'price_3',
-        'price_4', 'price_5', 'price_6',
-        'price_7', 'price_8', 'price_9',
-        'price_10', 'price_11'
+        'product_category_id',
+        'product_model_id',
+        'brand_id',
+        'supplier_id',
+        'name',
+        'description',
+        'agency_id',
+        'sku',
+        'active',
+        'is_usado',
+        'is_dollar',
+        'currency_id',
+        'price_1',
+        'price_2',
+        'price_3',
+        'price_4',
+        'price_5',
+        'price_6',
+        'price_7',
+        'price_8',
+        'price_9',
+        'price_10',
+        'price_11'
     ];
 
     const PRODUCT_QTY = 1;
@@ -25,7 +42,7 @@ class Product extends Model
     const PRODUCT_PRICE = 0;
     protected $appends = ['type', 'qty', 'discount'];
 
-    public function scopeSearch($query, String $search)
+    public function scopeSearch($query, string $search)
     {
         $query->when($search ?? null, function ($query, $search) {
             $query->where(function ($query) use ($search) {
@@ -54,7 +71,7 @@ class Product extends Model
             $query->whereHas('agency', function ($query) use ($agency_id) {
                 return $query->where('id', $agency_id);
             });
-        })->when($params['category_name'] ?? null, function ($query, $category) {
+        })->when($filters['category_name'] ?? null, function ($query, $category) {
             $query->Categoryname($category);
         });
     }
@@ -116,6 +133,11 @@ class Product extends Model
     public function currency()
     {
         return $this->belongsTo(Currency::class, 'currency_id');
+    }
+
+    public function inventory()
+    {
+        return $this->hasMany(ProductInventory::class, 'product_id', 'id');
     }
 
 
