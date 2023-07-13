@@ -21,9 +21,9 @@ class ProductModelController extends AdminController
      */
     public function index()
     {
-        $data = $this->productModelRepository->list(request()->all());
+        $items = $this->productModelRepository->list(request()->all());
         $options = $this->productModelRepository->options();
-        return $this->sendResponseOk(compact('data', 'options'));
+        return $this->sendResponseOk(compact('items', 'options'));
     }
 
     /**
