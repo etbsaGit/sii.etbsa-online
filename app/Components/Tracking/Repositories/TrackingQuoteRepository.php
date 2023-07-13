@@ -23,7 +23,7 @@ class TrackingQuoteRepository extends BaseRepository
     {
         return $this->get(
             $params,
-            ['products:id,name,description,sku', 'currency'],
+            ['products','products.category:id,name', 'currency'],
             function ($query) use ($params) {
                 $query->search($params['search'] ?? '')
                     ->filter($params);

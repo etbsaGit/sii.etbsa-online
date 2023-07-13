@@ -5,7 +5,7 @@
 <script>
 import HistorySales from "@admin/marketing/components/HistorySales.vue";
 export default {
-  name: "App",
+  name: "MarketingIndex",
   components: {
     HistorySales,
   },

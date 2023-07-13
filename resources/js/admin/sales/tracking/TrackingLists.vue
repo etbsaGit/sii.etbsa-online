@@ -245,6 +245,7 @@
             :propTrackingId="dialogs.id"
           ></tracking-prospect>
         </dialog-component>
+
         <dialog-component
           :show="dialogs.create"
           @close="dialogs.create = false"
@@ -254,15 +255,16 @@
         >
           <tracking-create
             v-if="dialogs.create"
-            @success="(dialogs.create = false)"
+            @success="dialogs.create = false"
           ></tracking-create>
         </dialog-component>
+
         <dialog-component
           :show="dialogs.quote"
           @close="dialogs.quote = false"
           title="Cotizaciones"
-          fullscreen
           closeable
+          max-width="1200"
         >
           <tracking-quote-component
             v-if="dialogs.quote && dialogs.id"
@@ -270,19 +272,6 @@
             :tracking-id="dialogs.id"
           ></tracking-quote-component>
         </dialog-component>
-
-        <!-- <v-dialog v-model="dialogs.create" scrollable max-width="700">
-          <v-card flat>
-            <v-spacer />
-            <v-icon color="red" @click="dialogs.create = false"
-              >mdi-close</v-icon
-            >
-            <tracking-create
-              v-if="dialogs.create"
-              @success="(dialogs.create = false), reset()"
-            ></tracking-create>
-          </v-card>
-        </v-dialog> -->
       </template>
 
       <!-- body.prepend -->
@@ -478,17 +467,6 @@
                   <v-list-item-title>Regresar como Activo</v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
-              <!-- <v-list-item
-                :href="`/admin/tracking/${item.id}/resources/print`"
-                target="_blank"
-              >
-                <v-list-item-icon>
-                  <v-icon class="blue--text" left>mdi-file-pdf-box</v-icon>
-                </v-list-item-icon>
-                <v-list-item-content>
-                  <v-list-item-title>PDF</v-list-item-title>
-                </v-list-item-content>
-              </v-list-item> -->
             </v-list-item-group>
           </v-list>
         </v-menu>
@@ -603,9 +581,9 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
 import Categories from "@admin/sales/tracking/resources/categories.json";
 import Assertiveness from "@admin/sales/tracking/resources/assertiveness.json";
-import { mapState } from "vuex";
 import TrackingProspect from "./TrackingProspect.vue";
 import Notification from "./components/Notification.vue";
 import SearchPanel from "@admin/components/shared/SearchPanel.vue";

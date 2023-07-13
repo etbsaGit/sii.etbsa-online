@@ -103,8 +103,6 @@ Vue.filter("percent", (value) =>
   }).format(value)
 );
 
-Vue.use(eventBus);
-
 new Vue({
   eventBus,
   router,
