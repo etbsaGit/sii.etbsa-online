@@ -2,9 +2,7 @@
   <v-data-table :headers="headers" :items="items" hide-default-footer dense>
     <template v-slot:top>
       <v-toolbar flat>
-        <v-toolbar-title>
-          Cotizaciones del Seguimiento
-        </v-toolbar-title>
+        <v-toolbar-title> Cotizaciones del Seguimiento </v-toolbar-title>
         <v-spacer></v-spacer>
         <v-dialog v-model="dialog" class="overflow-auto" persistent fullscreen>
           <template v-slot:activator="{ on, attrs }">
@@ -23,9 +21,7 @@
 
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn color="red darken-1" dark @click="close">
-                Cancelar
-              </v-btn>
+              <v-btn color="red darken-1" dark @click="close"> Cancelar </v-btn>
               <v-btn color="blue darken-1" text @click="save">
                 {{ formTitle }}
               </v-btn>
@@ -54,16 +50,16 @@
         </v-dialog>
       </v-toolbar>
     </template>
-    <template #[`item.total`]="{item,value}">
+    <template #[`item.total`]="{ item, value }">
       {{ value | money }} {{ item.currency.name }}
     </template>
-    <template #[`item.products`]="{value}">
+    <template #[`item.products`]="{ value }">
       {{ value.length }}
     </template>
-    <template #[`item.updated_at`]="{value}">
+    <template #[`item.updated_at`]="{ value }">
       {{ $appFormatters.formatDate(value, "L") }}
     </template>
-    <template #[`item.date_due`]="{value}">
+    <template #[`item.date_due`]="{ value }">
       {{ $appFormatters.formatDate(value, "L") }}
     </template>
     <template #[`item.actions`]="{ item }">
@@ -72,17 +68,14 @@
         :href="`/admin/quote/${item.id}/print`"
         target="_blank"
         class="mr-2"
+        color="blue"
       >
-        <v-icon small>
-          mdi-file-pdf-box
-        </v-icon>
+        <v-icon small> mdi-printer </v-icon>
       </v-btn>
-      <v-icon small class="mr-2" @click="editItem(item)">
+      <!-- <v-icon small class="mr-2" @click="editItem(item)">
         mdi-pencil
-      </v-icon>
-      <v-icon small @click="deleteItem(item)">
-        mdi-delete
-      </v-icon>
+      </v-icon> -->
+      <v-icon small color="red" @click="deleteItem(item)"> mdi-delete </v-icon>
     </template>
   </v-data-table>
 </template>
@@ -107,7 +100,7 @@ export default {
         sortable: false,
         value: "id",
       },
-      { text: "Condicion de Pago", value: "payment_condition" },
+      { text: "Condicion de Pago", value: "label_payment" },
       { text: "Total", value: "total" },
       { text: "Num. Partidas", value: "products", align: "center" },
       { text: "F. Creacion", value: "updated_at", align: "end" },
@@ -125,6 +118,7 @@ export default {
       products: [],
       exchange_value: 1,
       payment_condition: "por_definir",
+      category_id: null,
     },
     editedItemDefault: {
       subtotal: 0,
@@ -135,6 +129,7 @@ export default {
       products: [],
       exchange_value: 1,
       payment_condition: "por_definir",
+      category_id: null,
     },
   }),
 

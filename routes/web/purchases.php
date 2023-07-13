@@ -47,4 +47,8 @@ Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function
     // EXPORT
     Route::get('purchase-order/export', 'ExportController@exportPurchaseInvoice')->name('purchase.export');
     Route::get('purchase-invoice/export-report', 'PurchaseInvoiceController@printReport')->name('purchase.export-report');
+
+    // FILES
+    Route::delete('purchase-file/{file}','PurchaseOrderController@destroyFile')->name('purchase-file.destroy');
+    Route::post('purchase-file/attach/{purchase_order}','PurchaseOrderController@attachFiles')->name('purchase-file.attach');
 });

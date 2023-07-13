@@ -5,6 +5,7 @@ module.exports = {
     alias: {
       "~": path.resolve("resources/js"),
       "@admin": path.resolve("resources/js/admin"),
+      "@validator": path.resolve("resources/js/common/utils/validators.js"),
     },
   },
 };

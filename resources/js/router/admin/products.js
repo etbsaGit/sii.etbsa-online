@@ -34,6 +34,11 @@ export const products = [
         name: "products.exchanges.index",
         component: require("@admin/products/exchanges/Index").default,
       },
+      {
+        path: "product-invetory",
+        name: "products.inventory.index",
+        component: require("@admin/products/inventory/Index").default,
+      },
     ],
   },
 ];

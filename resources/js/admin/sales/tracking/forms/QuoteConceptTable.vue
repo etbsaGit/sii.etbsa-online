@@ -7,10 +7,12 @@
         item-value="id"
         item-text="name"
         placeholder="Seleccionar"
+        label="Categoria"
         hide-details
         outlined
         filled
         dense
+        :disabled="hasItems"
       >
       </v-autocomplete>
       <v-spacer></v-spacer>
@@ -68,12 +70,14 @@
       </template>
       <template v-slot:[`item.price`]="{ item, value }">
         <!-- v-if="!$gate.allow('assignSeller', 'tracking')" -->
-
         <!-- $gate.allow('isGerente', 'tracking') -->
+        <!-- v-if="$gate.allow('isGerente', 'tracking')" -->
+
+        <!-- :return-value.sync="item.price" -->
         <v-edit-dialog
-          v-if="$gate.allow('isGerente', 'tracking')"
-          :return-value.sync="item.price"
-          @save="saveSnack(item)"
+          ref="refEditPriceProduct"
+          :return-value="item.price"
+          @save="saveNewPrice(item, value, item.prices[TypePrice])"
           @cancel="cancelSnack"
           @open="openSnack"
           @close="closeSnack"
@@ -82,19 +86,10 @@
           persistent
           large
         >
-          <v-currency-field
-            :value="item.price"
-            :default-value="item.price"
-            outlined
-            dense
-            hide-details
-            reverse
-            single-line
-            class="py-1"
-            suffix="$"
-            :prefix="item.currency.name"
-            readonly
-          ></v-currency-field>
+          <v-chip outlined label large color="primary">
+            {{ item.price | currency }} {{ item.currency.name }}
+          </v-chip>
+
           <template v-slot:input>
             <div class="mt-4 text-h6">Actualizar Precio</div>
             <v-currency-field
@@ -112,9 +107,6 @@
             ></v-currency-field>
           </template>
         </v-edit-dialog>
-        <span v-else class="font-weight-medium">
-          {{ value | money }} {{ item.currency.name }}
-        </span>
       </template>
       <template v-slot:[`item.qty`]="{ item, value }">
         <span v-if="readOnly">{{ value }}</span>
@@ -157,7 +149,9 @@
         </v-edit-dialog>
       </template>
       <template v-slot:[`item.subtotal`]="{ item, value }">
-        {{ value | money }} {{ item.currency.name }}
+        <v-chip outlined label large>
+          {{ value | money }} {{ item.currency.name }}
+        </v-chip>
       </template>
       <template v-slot:[`item.accion`]="{ item }">
         <div class="d-flex flex-row">
@@ -171,6 +165,10 @@
       <v-card>
         <v-card-title>
           <span class="text-h5">{{ Title }} Productos</span>
+          <v-spacer />
+          <v-btn icon color="red" @click="Dialog = false">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
         </v-card-title>
         <v-card-text>
           <v-container>
@@ -185,11 +183,11 @@
         </v-card-text>
       </v-card>
     </v-dialog>
-    <v-snackbar v-model="snack" :timeout="3000" :color="snackColor">
+    <v-snackbar v-model="snack" :timeout="5000" :color="snackColor">
       {{ snackText }}
 
       <template v-slot:action="{ attrs }">
-        <v-btn v-bind="attrs" text @click="snack = false"> Close </v-btn>
+        <v-btn v-bind="attrs" text @click="snack = false"> Cerrar </v-btn>
       </template>
     </v-snackbar>
   </v-card>
@@ -211,10 +209,24 @@ const _paymentCondition = [
   { text: "Credito 30 Dias", value: "credito_30d", config: [5] },
   { text: "Arrendadoras", value: "arrendadoras", config: [6] },
 ];
+const _pricesConfig = [
+  { por_definir: "price_2" },
+  { precio_lista: "price_1" },
+  { contado: "price_2" },
+  { jdf_2y: "price_3" },
+  { jdf_5y: "price_4" },
+  { precio_expo: "price_5" },
+  { por_volumen: "price_6" },
+  { renta_1: "price_7" },
+  { renta_2: "price_8" },
+  { renta_3: "price_9" },
+  { credito_30d: "price_10" },
+  { arrendadoras: "price_11" },
+];
 
 export default {
-  components: { ProductsList },
   name: "QuoteConceptTable",
+  components: { ProductsList },
   props: {
     dialogForm: {
       default: false,
@@ -234,6 +246,13 @@ export default {
       },
       require: false,
     },
+    optionsTypePrices: {
+      type: Array,
+      default: () => {
+        return _pricesConfig;
+      },
+      require: false,
+    },
     items: {
       type: Array,
       default: () => {
@@ -246,6 +265,9 @@ export default {
     },
   },
   computed: {
+    hasItems() {
+      return this.items.length > 0;
+    },
     Title() {
       return this.editedIndex > -1 ? "Editar" : "Agregar";
     },
@@ -289,15 +311,23 @@ export default {
       }
       return Default.concat(result);
     },
+    TypePrice() {
+      const key = this.Payment;
+      const type = this.optionsTypePrices.find(
+        (item) => Object.keys(item)[0] === key
+      );
+      return type[key];
+    },
   },
   watch: {
     Payment(v, old) {
-      console.log(v, old);
+      // console.log(v, old);
       const _this = this;
-      let price_type =
-        _paymentCondition.find((p) => p.value == v).type_price ?? "";
+      // let price_type =
+      //   _paymentCondition.find((p) => p.value == v).type_price ?? "";
+
       _this.items.forEach((product) => {
-        product.price = product.prices[price_type] ?? product.price;
+        product.price = product.prices[_this.TypePrice] ?? product.price;
         product.subtotal = product.qty * product.price;
       });
     },
@@ -330,9 +360,9 @@ export default {
           value: "subtotal",
           sortable: false,
           align: "right",
-          width: "120px",
+          width: "220px",
         },
-        { value: "accion", sortable: false, width: "120px" },
+        { value: "accion", sortable: false },
       ],
     };
   },
@@ -361,6 +391,19 @@ export default {
       this.snackText = "Cantidad Actualizada";
       return product;
     },
+    saveNewPrice(product, newPrice, priceBase) {
+      const lessPrice = priceBase * 0.9;
+      if (!this.$gate.allow("isGerente", "tracking")) {
+        if (newPrice < lessPrice) {
+          this.snack = true;
+          this.snackColor = "error";
+          this.snackText = "Precio No Permitido";
+          product.price = priceBase;
+        }
+      }
+      product.subtotal = product.price * product.qty;
+      return product;
+    },
     cancelSnack() {
       this.snack = true;
       this.snackColor = "error";
@@ -372,7 +415,7 @@ export default {
       this.snackText = "Dialog opened";
     },
     closeSnack() {
-      console.log("Dialog closed");
+      // console.log("Dialog closed");
     },
     deleteItem(item) {
       const _this = this;
@@ -387,7 +430,7 @@ export default {
         },
         cancelCb: () => {
           _this.editedIndex = -1;
-          console.log("CANCEL");
+          // console.log("CANCEL");
         },
       });
     },

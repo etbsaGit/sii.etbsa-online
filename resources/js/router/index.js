@@ -6,7 +6,6 @@ import { admin } from "./admin";
 
 Vue.use(Router);
 
-
 const router = new Router({
   scrollBehavior: () => ({ y: 0 }),
   routes: [
@@ -44,6 +43,12 @@ const router = new Router({
       name: "marketing",
       path: "/marketing",
       component: require("@admin/marketing/Marketing").default,
+    },
+    {
+      name: "sales.customers",
+      path: "/ventas-clientes",
+      component: require("@admin/marketing/components/SalesCustomerTable")
+        .default,
     },
     {
       name: "settings",

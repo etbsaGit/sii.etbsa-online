@@ -4,6 +4,7 @@ namespace App\Components\Tracking\Models;
 
 use App\Components\Common\Models\Currency;
 use App\Components\Product\Models\Product;
+use App\Components\Product\Models\ProductCategory;
 use Illuminate\Database\Eloquent\Model;
 
 class TrackingQuote extends Model
@@ -34,6 +35,11 @@ class TrackingQuote extends Model
     public function currency()
     {
         return $this->belongsTo(Currency::class, 'currency_id');
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(ProductCategory::class, 'category_id');
     }
 
 

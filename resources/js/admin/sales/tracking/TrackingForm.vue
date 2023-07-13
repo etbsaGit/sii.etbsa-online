@@ -66,7 +66,7 @@
               <div
                 v-if="!SelectedProspect"
                 class="text-h6 grey--text text--lighten-1 font-weight-light"
-                style="align-self: center;"
+                style="align-self: center"
               >
                 Selecciona a un Prospecto
               </div>
@@ -273,20 +273,20 @@
               ></quote-concept-table>
             </v-card-text>
             <v-card-actions>
-              <v-btn text color="blue" @click="ShowProducts">
+              <v-btn dark color="blue" @click="ShowProducts">
                 <v-icon left>mdi-plus</v-icon> Agregar Producto
               </v-btn>
             </v-card-actions>
             <!-- Amounts -->
             <v-col cols="12">
-              <v-simple-table dense class="pa-4">
-                <tr class="py-3">
+              <v-simple-table dense class="pa-4 text-h6">
+                <tr>
                   <td>Subtotal:</td>
-                  <th class="text-right pr-2">
+                  <th class="text-right pr-2 text-h5">
                     {{ Subtotal | money }} {{ Currency.name }}
                   </th>
                 </tr>
-                <tr class="py-3">
+                <tr>
                   <td>IVA:</td>
                   <th class="d-flex justify-end mb-3">
                     <v-checkbox
@@ -300,7 +300,7 @@
                     </v-checkbox>
                   </th>
                 </tr>
-                <tr class="py-3">
+                <tr>
                   <td>T.C.:</td>
                   <th class="d-flex justify-end">
                     <v-currency-field
@@ -308,7 +308,7 @@
                       :default-value="form.exchange_value"
                       placeholder="0.00"
                       :rules="[(v) => !!v || 'Es Requerido']"
-                      style="max-width: 250px;"
+                      style="max-width: 250px"
                       prefix="MXN"
                       type="number"
                       suffix="$"
@@ -321,7 +321,7 @@
                     ></v-currency-field>
                   </th>
                 </tr>
-                <tr class="py-3" v-if="$gate.allow('isGerente', 'tracking')">
+                <tr v-if="$gate.allow('isGerente', 'tracking')">
                   <td>Descuento:</td>
                   <th class="d-flex justify-end">
                     <v-currency-field
@@ -334,7 +334,7 @@
                       :prefix="Currency.name"
                       reverse
                       class="py-2"
-                      style="max-width: 250px;"
+                      style="max-width: 250px"
                       dense
                     ></v-currency-field>
                   </th>
@@ -344,13 +344,13 @@
                 </tr>
                 <tr>
                   <td>Total:</td>
-                  <th class="text-right pr-2 text-h4">
+                  <th class="text-right pr-2 text-h5">
                     {{ Total | money }} {{ Currency.name }}
                   </th>
                 </tr>
                 <tr v-if="form.currency_id === 2">
                   <td>Total MXN:</td>
-                  <th class="text-right pr-2 text-h4">
+                  <th class="text-right pr-2 text-h5">
                     {{ (Total * form.exchange_value) | money }} MXN
                   </th>
                 </tr>

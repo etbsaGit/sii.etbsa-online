@@ -177,7 +177,17 @@ class SinglePageController extends AdminController
                     new MenuItem([
                         'group_requirements' => ['Super User'],
                         'permission_requirements' => ['product.admin'],
-                        'label' => 'Catageorias Productos',
+                        'label' => 'Inventario',
+                        'nav_type' => MenuItem::$NAV_TYPE_NAV,
+                        'icon' => 'mdi-store',
+                        'route_type' => 'vue',
+                        'route_name' => 'products.inventory.index',
+                        'visible' => true,
+                    ]),
+                    new MenuItem([
+                        'group_requirements' => ['Super User'],
+                        'permission_requirements' => ['product.admin'],
+                        'label' => 'Catagorias Productos',
                         'nav_type' => MenuItem::$NAV_TYPE_NAV,
                         'icon' => 'mdi-shape',
                         'route_type' => 'vue',
@@ -192,7 +202,7 @@ class SinglePageController extends AdminController
                         'icon' => 'mdi-shape',
                         'route_type' => 'vue',
                         'route_name' => 'products.attributes.index',
-                        'visible' => true,
+                        'visible' => false,
                     ]),
                 ]
             ]),
@@ -248,14 +258,34 @@ class SinglePageController extends AdminController
                 ]
             ]),
             new MenuItem([
-                'group_requirements' => ['DIRECCION', 'Super User'],
+                'group_requirements' => ['Super User'],
                 'permission_requirements' => [],
-                'label' => 'Historico Ventas',
+                'label' => 'Info de Equip',
                 'nav_type' => MenuItem::$NAV_TYPE_NAV,
                 'icon' => 'mdi-chart-areaspline',
-                'route_type' => 'vue',
-                'route_name' => 'marketing',
-                'visible' => false,
+                'visible' => true,
+                'children'=> [
+                    new MenuItem([
+                        'group_requirements' => ['Super User'],
+                        'permission_requirements' => [],
+                        'label' => 'Historico Ventas',
+                        'nav_type' => MenuItem::$NAV_TYPE_NAV,
+                        'icon' => 'mdi-chart-areaspline',
+                        'route_type' => 'vue',
+                        'route_name' => 'marketing',
+                        'visible' => true,
+                    ]),
+                    new MenuItem([
+                        'group_requirements' => ['Super User'],
+                        'permission_requirements' => [],
+                        'label' => 'Ventas Clientes',
+                        'nav_type' => MenuItem::$NAV_TYPE_NAV,
+                        'icon' => 'mdi-chart-areaspline',
+                        'route_type' => 'vue',
+                        'route_name' => 'sales.customers',
+                        'visible' => true,
+                    ]),
+                ]
             ]),
             new MenuItem([
                 'group_requirements' => ['RRHH', 'Super User'],

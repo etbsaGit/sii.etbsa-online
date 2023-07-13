@@ -26,7 +26,7 @@ class TrackingQuoteController extends AdminController
     public function index()
     {
         $data = $this->trackingQuoteRepository->listTrackingQuote(request()->all());
-        return $this->sendResponseOk($data, "list tracking Quote ok.");
+        return $this->sendResponseOk($data, "Lista de Cotizaciones");
     }
 
 
