@@ -132,9 +132,11 @@ class SalesCustomerHistoryController extends AdminController
                 if (is_array($clave_cliente)) {
                     foreach ($clave_cliente as $term) {
                         $q->orWhere('invoice_jd.CLAVE CLIENTE', 'LIKE', "%{$term}%");
+                        $q->orWhere('invoice_jd.CLAVE PROVEEDOR', 'LIKE', "%{$term}%");
                     }
                 } else {
                     $q->orWhere('invoice_jd.CLAVE CLIENTE', 'LIKE', "%{$clave_cliente}%");
+                    $q->orWhere('invoice_jd.CLAVE PROVEEDOR', 'LIKE', "%{$clave_cliente}%");
                 }
             });
 
@@ -199,7 +201,23 @@ class SalesCustomerHistoryController extends AdminController
                     ->orWhere('invoice_jd.NO ECO', 'like', "%{$search}%")
                     ->orWhere('invoice_jd.MODELO', 'like', "%{$search}%")
                     ->orWhere('invoice_jd.NO_DOCUMENTO', 'like', "%{$search}%")
-                    ->orWhere(DB::raw("
+                    ->orWhere('invoice_jd.RFC ABN', 'like', "%{$search}%")
+                    ->orWhere('invoice_jd.RFC COMPAÑIA', 'like', "%{$search}%");
+                    // ->orWhere(DB::raw("
+                    // COALESCE(
+                    //     CASE 
+                    //         WHEN cc.`NOMBRE CLIENTE` <> '' AND cc.`APELLIDOS CLIENTE` <> '' 
+                    //         THEN cc.`NOMBRE CLIENTE` || ' ' || cc.`APELLIDOS CLIENTE`
+                    //         ELSE cc.`COMPA�IA`
+                    //     END, 
+                    // 'N/E')
+                    // "
+                    // ), 'like', "%{$search}%");
+            });
+        });
+        $query->when($request->searchCustomer ?? null, function ($query, $searchCustomer) {
+            $query->where(function ($query) use ($searchCustomer) {
+                $query->orWhere(DB::raw("
                     COALESCE(
                         CASE 
                             WHEN cc.`NOMBRE CLIENTE` <> '' AND cc.`APELLIDOS CLIENTE` <> '' 
@@ -208,7 +226,7 @@ class SalesCustomerHistoryController extends AdminController
                         END, 
                     'N/E')
                     "
-                    ), 'like', "%{$search}%");
+                    ), 'like', "%{$searchCustomer}%");
             });
         });
 

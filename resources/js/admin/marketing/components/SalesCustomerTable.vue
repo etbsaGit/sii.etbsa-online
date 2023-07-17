@@ -266,6 +266,17 @@
           <v-toolbar-title> Facturacion Maquinaria</v-toolbar-title>
           <v-spacer />
           <v-text-field
+            v-model="searchCustomer"
+            label="Nombre Cliente"
+            placeholder="Nombre, Compañia"
+            persistent-placeholder
+            outlined
+            hide-details
+            clearable
+            dense
+            class="mr-2"
+          />
+          <v-text-field
             v-model="search"
             label="Buscar"
             placeholder="No Documento,Descripcion Producto, Serie"
@@ -278,7 +289,7 @@
           <v-btn icon @click="cleanFilter">
             <v-icon color="red">mdi-filter-remove-outline</v-icon>
           </v-btn>
-          <v-btn @click="getData()" dark>
+          <v-btn @click="searchBtn()" dark>
             Buscar
             <v-icon right color="blue">mdi-magnify</v-icon>
           </v-btn>
@@ -365,12 +376,13 @@ export default {
         { text: "Importe", align: "end", value: "TOTAL" },
       ],
       search: "",
+      searchCustomer: "",
       items: [],
       sumTotalVentasAg: 0,
       sumTotalVentasAgMX: 0,
       totalItems: 0,
       pagination: {
-        itemsPerPage: 10,
+        itemsPerPage: 5,
         page: 1,
       },
       filters: {
@@ -381,6 +393,8 @@ export default {
         years: [],
         currency: [],
         tipo_venta: [],
+        municipio: [],
+        estado: [],
       },
       options: {},
     };
@@ -394,39 +408,56 @@ export default {
     },
     search: {
       handler: _.debounce(function (v) {
-        this.getData(() => {});
+        this.getData({ page: 1, per_page: 5 });
+      }, 1200),
+    },
+    searchCustomer: {
+      handler: _.debounce(function (v) {
+        this.getData({ page: 1, per_page: 5 });
       }, 1200),
     },
   },
   methods: {
     cleanFilter() {
-      this.filters = Object.assign(
-        {},
-        {
-          clave_cliente: null,
-          clave_vendedor: null,
-          sucursales: [],
-          lineas: [],
-          years: [],
-          currency: [],
-          tipo_venta: [],
-          municipio: [],
-          estado: [],
-        }
-      );
-      this.pagination.page = 1;
-      this.pagination.itemsPerPage = 10;
+      const _this = this;
+
+      this.$nextTick(() => {
+        _this.filters.clave_cliente = [];
+        _this.filters.clave_vendedor = [];
+        _this.filters.sucursales = [];
+        _this.filters.lineas = [];
+        _this.filters.years = [];
+        _this.filters.currency = [];
+        _this.filters.tipo_venta = [];
+        _this.filters.municipio = [];
+        _this.filters.estado = [];
+        _this.pagination.page = 1;
+        _this.pagination.itemsPerPage = 5;
+      });
     },
-    async getData() {
+    searchBtn() {
+      const _this = this;
+      this.$nextTick(() => {
+        _this.pagination = Object.assign(
+          {},
+          {
+            page: 1,
+            itemsPerPage: 5,
+          }
+        );
+      });
+    },
+    async getData({ page, per_page }) {
       const _this = this;
       let params = {
         ..._this.filters,
         search: _this.search,
+        searchCustomer: _this.searchCustomer,
         // order_by: _this.pagination.sortBy[0] || "id",
         // order_sort: _this.pagination.sortDesc[0] ? "asc" : "desc",
         // order_by: _this.pagination.sortBy[0] || "id",
-        page: this.pagination.page,
-        per_page: this.pagination.itemsPerPage,
+        page: page ?? this.pagination.page,
+        per_page: per_page ?? this.pagination.itemsPerPage,
       };
       const {
         data: {
@@ -434,9 +465,14 @@ export default {
           message,
         },
       } = await axios.get("/admin/marketing/sales-customer", { params });
-      this.items = items.data;
-      this.totalItems = items.total;
-      this.pagination.totalItems = items.total;
+      this.$nextTick(() => {
+        _this.items = items.data;
+        _this.totalItems = items.total;
+        _this.pagination.totalItems = items.total;
+        _this.pagination.itemsPerPage = Number(items.per_page);
+        _this.pagination.page = Number(items.current_page);
+      });
+
       this.sumTotalVentasAg = sumatoriaTotal;
 
       this.$store.commit("showSnackbar", {
