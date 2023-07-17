@@ -165,7 +165,7 @@ class SinglePageController extends AdminController
                         'visible' => true,
                     ]),
                     new MenuItem([
-                        'group_requirements' => ['Super User'],
+                        'group_requirements' => [],
                         'permission_requirements' => ['product.admin'],
                         'label' => 'Tipo de Cambio',
                         'nav_type' => MenuItem::$NAV_TYPE_NAV,
