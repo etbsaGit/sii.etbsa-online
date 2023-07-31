@@ -131,6 +131,16 @@
                   </v-list-item-action>
                 </template>
               </v-select>
+              <v-select
+                v-model="filters.first_contact"
+                :items="options.origin"
+                label="Primer Contacto:"
+                prepend-icon="mdi-filter-variant"
+                clearable
+                hide-details
+                filled
+                dense
+              ></v-select>
             </v-row>
           </v-form>
         </search-panel>
@@ -692,6 +702,7 @@ export default {
         sellers: [],
         dates: [],
         estatus: "todos",
+        first_contact: null,
       },
 
       options: {
@@ -707,6 +718,7 @@ export default {
           { text: "Ventas Ganadas", value: "formalizado" },
           { text: "Todos", value: "todos" },
         ],
+        origin: ["Online", "Visita en Agencia", "Visita de Campo"],
       },
       colors: {
         activo: "green",

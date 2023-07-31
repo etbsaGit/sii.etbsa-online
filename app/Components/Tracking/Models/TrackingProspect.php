@@ -115,6 +115,10 @@ class TrackingProspect extends Model
             $query->where(function ($query) use ($assertiveness) {
                 $query->orWhere('assertiveness', $assertiveness);
             });
+        })->when($filters['first_contact'] ?? null, function ($query, $first_contact) {
+            $query->where(function ($query) use ($first_contact) {
+                $query->orWhere('first_contact', $first_contact);
+            });
         })->when($filters['prospect'] ?? null, function ($query, $prospect) {
             $query->whereHas('prospect', function ($query) use ($prospect) {
                 $query->whereIn('id', Helpers::commasToArray($prospect));
