@@ -29,7 +29,6 @@ class PurchaseOrderObserver
             '56' => 'ContabilidadSilao@etbsa.com.mx',
             '99' => 'AContableMatriz@etbsa.com.mx',
             '08' => 'ContabilidadSalamanca@etbsa.com.mx',
-
         ],
         'gerentes' => [
             '01' => 'barrosoernesto@etbsa.com.mx',
