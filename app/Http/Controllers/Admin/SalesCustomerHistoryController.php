@@ -24,41 +24,84 @@ class SalesCustomerHistoryController extends AdminController
 
         $query = InvoicesAG::query()
             ->select(
+
+                'cc.CIUDAD AS CCCiudad',
+                'cc.ESTADO AS CCEstado',
+                'invoice_jd.NO_DOCUMENTO',
+                'invoice_jd.DESCRIPCION PRODUCTO AS Producto',
+                'invoice_jd.NIP',
+                'invoice_jd.TOTAL',
                 DB::raw("
-                COALESCE(cs.`nombre`, 'N/E')
+                COALESCE(
+                    CASE
+                        WHEN cs.`nombre` <> ''  THEN cs.`nombre`
+                        ELSE NULL
+                    END
+                ,'N/E')
                 AS Sucursal"
                 ),
                 'cs.linea As SucursalLinea',
                 'ctv.descripcion as TipoVenta',
                 DB::raw("
                 COALESCE(
-                    CASE 
-                        WHEN cc.`NOMBRE CLIENTE` <> '' AND cc.`APELLIDOS CLIENTE` <> '' 
-                        THEN cc.`NOMBRE CLIENTE` || ' ' || cc.`APELLIDOS CLIENTE`
-                        ELSE cc.`COMPA�IA`
+                    CASE
+                        WHEN cc.`NOMBRE CLIENTE` <> '' AND cc.`APELLIDOS CLIENTE` <> ''  THEN cc.`NOMBRE CLIENTE` || ' ' || cc.`APELLIDOS CLIENTE`
+                        WHEN cc.`COMPA�IA` <> ''  THEN cc.`COMPA�IA`
+                        WHEN invoice_jd.`NOMBREPROVEEDOR` <> '' AND invoice_jd.`APELLIDOS PROVEEDOR` <> ''  THEN invoice_jd.`NOMBREPROVEEDOR` || ' ' || invoice_jd.`APELLIDOS PROVEEDOR`
+                        WHEN invoice_jd.`NOMBRE CLIENTE` <> '' THEN invoice_jd.`NOMBRE CLIENTE`
+                        ELSE NULL
                     END, 
                 'N/E')
                 AS Cliente"
                 ),
-                'cv.Nombre Vendedor AS Vendedor',
-                'cv.Clave vendedor AS VendedorClave',
-                'invoice_jd.NO_DOCUMENTO',
-                'invoice_jd.DESCRIPCION PRODUCTO AS Producto',
-                'invoice_jd.NIP',
-                'invoice_jd.TOTAL',
                 DB::raw("
-                CASE 
+                COALESCE(
+                CASE
+                    WHEN cc.`CLAVE CLIENTE` <> '' THEN cc.`CLAVE CLIENTE`
+                    WHEN invoice_jd.`CLAVE PROVEEDOR` <> '' THEN invoice_jd.`CLAVE PROVEEDOR`
+                    ELSE NULL
+                END , 'S/C')
+                AS Clave_Cliente"
+                ),
+                DB::raw("
+                CASE
                     WHEN invoice_jd.MONEDA == '' THEN 'MX'
                     ELSE invoice_jd.MONEDA
                 END AS currency"
                 ),
                 DB::raw("
                 COALESCE(
-                CASE 
-                    WHEN cc.`CLAVE CLIENTE` == '' THEN 'N/E'
-                    ELSE cc.`CLAVE CLIENTE`
+                CASE
+                    WHEN cv.`Clave vendedor` <> '' THEN cv.`Clave vendedor`
+                    ELSE NULL
                 END , 'N/E')
-                AS Clave_Cliente"
+                AS VendedorClave"
+                ),
+                DB::raw("
+                COALESCE(
+                CASE
+                    WHEN cv.`Nombre Vendedor` <> '' THEN cv.`Nombre Vendedor`
+                    ELSE NULL
+                END , 'N/E')
+                AS Vendedor"
+                ),
+                DB::raw("
+                COALESCE(
+                CASE
+                    WHEN invoice_jd.`CIUDAD`  <> '' THEN invoice_jd.`CIUDAD`
+                    WHEN cc.`CIUDAD`  <> '' THEN cc.`CIUDAD`
+                    ELSE NULL 
+                END , 'N/E')
+                AS Municipio"
+                ),
+                DB::raw("
+                COALESCE(
+                CASE
+                    WHEN invoice_jd.`ESTADO`  <> '' THEN invoice_jd.`ESTADO`
+                    WHEN cc.`ESTADO`  <> '' THEN cc.`ESTADO`
+                    ELSE NULL 
+                END , 'N/E')
+                AS Estado"
                 ),
                 DB::raw("
                     CASE 
@@ -69,74 +112,89 @@ class SalesCustomerHistoryController extends AdminController
                 ),
                 DB::raw('SUBSTR(`FECHA FACTURA`, -4) as year'),
             )
+            // ->leftJoin('catClientes AS cc', function ($lefJoin) {
+            //     $lefJoin->on('cc.CLAVE CLIENTE', '=', 'invoice_jd.CLAVE PROVEEDOR')
+            //         ->orWhere('cc.RFC', '=', 'invoice_jd.RFC COMPAÑIA')
+            //         ->orWhere('cc.RFC', '=', 'invoice_jd.RFC ABN');
+            // })
             ->leftJoin('catClientes AS cc', 'cc.CLAVE CLIENTE', '=', 'invoice_jd.CLAVE PROVEEDOR')
             ->leftJoin('catSucursales AS cs', 'cs.id', '=', 'invoice_jd.SUCURSAL')
             ->leftJoin('catVendedores AS cv', 'cv.Clave vendedor', '=', 'invoice_jd.VENDEDOR')
             ->leftJoin('catTipoVenta AS ctv', 'ctv.clave', '=', 'invoice_jd.TIPO DE VENTA')
-            ->orderBy('cs.nombre');
+            ->orderBy('year');
 
+        // $result = InvoicesAG::query()
+        //     ->selectRaw("
+        //         invoice_jd.`NO_DOCUMENTO`,
+        //         invoice_jd.`DESCRIPCION PRODUCTO`,
+        //         invoice_jd.`NIP`,
+        //         invoice_jd.`TOTAL`,
+        //         cc.`NOMBRE CLIENTE`,
+        //         '{\"nombre\": \"' || 
+        //             COALESCE(CASE
+        //                     WHEN cc.`NOMBRE CLIENTE` <> '' AND cc.`APELLIDOS CLIENTE` <> ''  THEN cc.`NOMBRE CLIENTE` || ' ' || cc.`APELLIDOS CLIENTE`
+        //                     WHEN cc.`COMPA�IA` <> ''  THEN cc.`COMPA�IA`
+        //                     WHEN invoice_jd.`NOMBREPROVEEDOR` <> '' AND invoice_jd.`APELLIDOS PROVEEDOR` <> ''  THEN invoice_jd.`NOMBREPROVEEDOR` || ' ' || invoice_jd.`APELLIDOS PROVEEDOR`
+        //                     WHEN invoice_jd.`NOMBRE CLIENTE` <> '' THEN invoice_jd.`NOMBRE CLIENTE`
+        //                     ELSE NULL
+        //                 END,\"N/E\") || '\", \"ciudad\": \"' || cc.CIUDAD || '\"}'
+        //         AS Cliente
+        //     ")
+        //     ->leftJoin('catClientes AS cc', 'cc.CLAVE CLIENTE', '=', 'invoice_jd.CLAVE PROVEEDOR')
+        //     ->leftJoin('catSucursales AS cs', 'cs.id', '=', 'invoice_jd.SUCURSAL')
+        //     ->leftJoin('catVendedores AS cv', 'cv.Clave vendedor', '=', 'invoice_jd.VENDEDOR')
+        //     ->leftJoin('catTipoVenta AS ctv', 'ctv.clave', '=', 'invoice_jd.TIPO DE VENTA')
+        //     ->orderBy('year')
+        //     ->limit(100)->get();
 
-
-        // $query = InvoicesAG::query()
-        //     ->select(
-        //         'cs.nombre As Sucursal',
-        //         'cs.linea As SucursalLinea',
-        //         'cc.CLAVE CLIENTE AS Clave_Cliente',
-        //         'ctv.descripcion as TipoVenta',
-        //         DB::raw("
-        //         CASE 
-        //             WHEN cc.`NOMBRE CLIENTE` <> '' AND cc.`APELLIDOS CLIENTE` <> '' 
-        //             THEN cc.`NOMBRE CLIENTE` || ' ' || cc.`APELLIDOS CLIENTE`
-        //             ELSE cc.`COMPA�IA`
-        //         END AS Cliente"
-        //         ),
-        //         'cv.Nombre Vendedor AS Vendedor',
-        //         'cv.Clave vendedor AS VendedorClave',
-        //         'invoice_jd.NO_DOCUMENTO',
-        //         'invoice_jd.DESCRIPCION PRODUCTO AS Producto',
-        //         'invoice_jd.NIP',
-        //         'invoice_jd.TOTAL',
-        //         DB::raw("
-        //         CASE 
-        //             WHEN invoice_jd.MONEDA == '' THEN 'MX'
-        //             ELSE invoice_jd.MONEDA
-        //         END AS currency"
-        //         ),
-        //         DB::raw("
-        //             CASE 
-        //             WHEN invoice_jd.`TIPO/CAMBIO` > 0 AND invoice_jd.`TIPO/CAMBIO` <> '' 
-        //             THEN invoice_jd.TOTAL * invoice_jd.`TIPO/CAMBIO`
-        //             ELSE invoice_jd.TOTAL
-        //             END AS TotalMX"
-        //         ),
-        //         DB::raw("
-        //             CASE 
-        //             WHEN invoice_jd.`TIPO/CAMBIO` > 0 AND invoice_jd.`TIPO/CAMBIO` <> '' 
-        //             THEN invoice_jd.`TIPO/CAMBIO`
-        //             ELSE 1
-        //             END AS TipoCambio"
-        //         ),
-        //         DB::raw('SUBSTR(`FECHA FACTURA`, -4) as year'),
-        //     )
-        //     ->join('catClientes as cc', 'invoice_jd.CLAVE PROVEEDOR', '=', 'cc.CLAVE CLIENTE')
-        //     ->join('catSucursales as cs', 'invoice_jd.SUCURSAL', '=', 'cs.id')
-        //     ->join('catVendedores as cv', 'invoice_jd.VENDEDOR', '=', 'cv.Clave vendedor')
-        //     ->join('catTipoVenta as ctv', 'invoice_jd.TIPO DE VENTA', '=', 'ctv.clave')
-        //     ->orderBy('cs.nombre');
-
+        // dd($result->toArray());
 
         $query->when($filters['clave_cliente'] ?? null, function ($query, $clave_cliente) {
-            // $query->where('invoice_jd.CLAVE CLIENTE', 'LIKE', "%{$clave_cliente}%");
-
             $query->where(function ($q) use ($clave_cliente) {
                 if (is_array($clave_cliente)) {
                     foreach ($clave_cliente as $term) {
                         $q->orWhere('invoice_jd.CLAVE CLIENTE', 'LIKE', "%{$term}%");
                         $q->orWhere('invoice_jd.CLAVE PROVEEDOR', 'LIKE', "%{$term}%");
+                        $q->orWhere(DB::raw("
+                        COALESCE(
+                            CASE
+                                WHEN cc.`NOMBRE CLIENTE` <> '' AND cc.`APELLIDOS CLIENTE` <> ''  THEN cc.`NOMBRE CLIENTE` || ' ' || cc.`APELLIDOS CLIENTE`
+                                WHEN cc.`COMPA�IA` <> ''  THEN cc.`COMPA�IA`
+                                WHEN invoice_jd.`NOMBREPROVEEDOR` <> '' AND invoice_jd.`APELLIDOS PROVEEDOR` <> ''  THEN invoice_jd.`NOMBREPROVEEDOR` || ' ' || invoice_jd.`APELLIDOS PROVEEDOR`
+                                WHEN invoice_jd.`NOMBRE CLIENTE` <> '' THEN invoice_jd.`NOMBRE CLIENTE`
+                                ELSE NULL
+                            END, 'N/E')"
+                        ), 'like', "%{$term}%");
+                        $q->orWhere(DB::raw("
+                        COALESCE(
+                            CASE
+                                WHEN cc.`CLAVE CLIENTE` <> '' THEN cc.`CLAVE CLIENTE`
+                                WHEN invoice_jd.`CLAVE PROVEEDOR` <> '' THEN invoice_jd.`CLAVE PROVEEDOR`
+                                ELSE NULL
+                            END , 'S/C')"
+                        ), 'like', "%{$term}%");
                     }
                 } else {
                     $q->orWhere('invoice_jd.CLAVE CLIENTE', 'LIKE', "%{$clave_cliente}%");
                     $q->orWhere('invoice_jd.CLAVE PROVEEDOR', 'LIKE', "%{$clave_cliente}%");
+                    $q->orWhere(DB::raw("
+                    COALESCE(
+                        CASE
+                            WHEN cc.`NOMBRE CLIENTE` <> '' AND cc.`APELLIDOS CLIENTE` <> ''  THEN cc.`NOMBRE CLIENTE` || ' ' || cc.`APELLIDOS CLIENTE`
+                            WHEN cc.`COMPA�IA` <> ''  THEN cc.`COMPA�IA`
+                            WHEN invoice_jd.`NOMBREPROVEEDOR` <> '' AND invoice_jd.`APELLIDOS PROVEEDOR` <> ''  THEN invoice_jd.`NOMBREPROVEEDOR` || ' ' || invoice_jd.`APELLIDOS PROVEEDOR`
+                            WHEN invoice_jd.`NOMBRE CLIENTE` <> '' THEN invoice_jd.`NOMBRE CLIENTE`
+                            ELSE NULL
+                        END, 'N/E')"
+                    ), 'like', "%{$clave_cliente}%");
+                    $q->orWhere(DB::raw("
+                        COALESCE(
+                            CASE
+                                WHEN cc.`CLAVE CLIENTE` <> '' THEN cc.`CLAVE CLIENTE`
+                                WHEN invoice_jd.`CLAVE PROVEEDOR` <> '' THEN invoice_jd.`CLAVE PROVEEDOR`
+                                ELSE NULL
+                            END , 'S/C')"
+                        ), 'like', "%{$clave_cliente}%");
                 }
             });
 
@@ -147,9 +205,23 @@ class SalesCustomerHistoryController extends AdminController
                 if (is_array($clave_vendedor)) {
                     foreach ($clave_vendedor as $term) {
                         $q->orWhere('invoice_jd.Clave vendedor', 'LIKE', "%{$term}%");
+                        $q->orWhere(DB::raw("
+                        COALESCE(
+                        CASE
+                            WHEN cv.`Nombre Vendedor` <> '' THEN cv.`Nombre Vendedor`
+                            ELSE NULL
+                        END , 'N/E')"
+                        ), 'LIKE', "%{$term}%");
                     }
                 } else {
                     $q->orWhere('invoice_jd.Clave vendedor', 'LIKE', "%{$clave_vendedor}%");
+                    $q->orWhere(DB::raw("
+                        COALESCE(
+                        CASE
+                            WHEN cv.`Nombre Vendedor` <> '' THEN cv.`Nombre Vendedor`
+                            ELSE NULL
+                        END , 'N/E')"
+                    ), 'LIKE', "%{$clave_vendedor}%");
                 }
             });
         })->when($filters['sucursales'] ?? null, function ($query, $sucursales) {
@@ -158,20 +230,44 @@ class SalesCustomerHistoryController extends AdminController
             $query->where(function ($q) use ($municipio) {
                 if (is_array($municipio)) {
                     foreach ($municipio as $term) {
-                        $q->orWhere('invoice_jd.CIUDAD', 'LIKE', "%{$term}%");
+                        $q->orWhere(DB::raw("
+                        COALESCE(
+                        CASE
+                            WHEN invoice_jd.`CIUDAD`  <> '' THEN invoice_jd.`CIUDAD`
+                            ELSE NULL 
+                        END , 'N/E')"
+                        ), 'LIKE', "%{$term}%");
                     }
                 } else {
-                    $q->orWhere('invoice_jd.CIUDAD', 'LIKE', "%{$municipio}%");
+                    $q->orWhere(DB::raw("
+                        COALESCE(
+                        CASE
+                            WHEN invoice_jd.`CIUDAD`  <> '' THEN invoice_jd.`CIUDAD`
+                            ELSE NULL 
+                        END , 'N/E')"
+                    ), 'LIKE', "%{$municipio}%");
                 }
             });
         })->when($filters['estado'] ?? null, function ($query, $estado) {
             $query->where(function ($q) use ($estado) {
                 if (is_array($estado)) {
                     foreach ($estado as $term) {
-                        $q->orWhere('invoice_jd.ESTADO', 'LIKE', "%{$term}%");
+                        $q->orWhere(DB::raw("
+                        COALESCE(
+                        CASE
+                            WHEN invoice_jd.`ESTADO`  <> '' THEN invoice_jd.`ESTADO`
+                            ELSE NULL 
+                        END , 'N/E')"
+                        ), 'LIKE', "%{$term}%");
                     }
                 } else {
-                    $q->orWhere('invoice_jd.ESTADO', 'LIKE', "%{$estado}%");
+                    $q->orWhere(DB::raw("
+                    COALESCE(
+                    CASE
+                        WHEN invoice_jd.`ESTADO`  <> '' THEN invoice_jd.`ESTADO`
+                        ELSE NULL 
+                    END , 'N/E')"
+                    ), 'LIKE', "%{$estado}%");
                 }
             });
         })->when($filters['lineas'] ?? null, function ($query, $lineas) {
@@ -192,8 +288,6 @@ class SalesCustomerHistoryController extends AdminController
             END"
             ), $currency);
         });
-
-
         $query->when($request->search ?? null, function ($query, $search) {
             $query->where(function ($query) use ($search) {
                 $query->orWhere('invoice_jd.DESCRIPCION PRODUCTO', 'like', "%{$search}%")
@@ -203,44 +297,43 @@ class SalesCustomerHistoryController extends AdminController
                     ->orWhere('invoice_jd.NO_DOCUMENTO', 'like', "%{$search}%")
                     ->orWhere('invoice_jd.RFC ABN', 'like', "%{$search}%")
                     ->orWhere('invoice_jd.RFC COMPAÑIA', 'like', "%{$search}%");
-                    // ->orWhere(DB::raw("
-                    // COALESCE(
-                    //     CASE 
-                    //         WHEN cc.`NOMBRE CLIENTE` <> '' AND cc.`APELLIDOS CLIENTE` <> '' 
-                    //         THEN cc.`NOMBRE CLIENTE` || ' ' || cc.`APELLIDOS CLIENTE`
-                    //         ELSE cc.`COMPA�IA`
-                    //     END, 
-                    // 'N/E')
-                    // "
-                    // ), 'like', "%{$search}%");
+                // ->orWhere(DB::raw("
+                // COALESCE(
+                //     CASE 
+                //         WHEN cc.`NOMBRE CLIENTE` <> '' AND cc.`APELLIDOS CLIENTE` <> '' 
+                //         THEN cc.`NOMBRE CLIENTE` || ' ' || cc.`APELLIDOS CLIENTE`
+                //         ELSE cc.`COMPA�IA`
+                //     END, 
+                // 'N/E')
+                // "
+                // ), 'like', "%{$search}%");
             });
         });
-        $query->when($request->searchCustomer ?? null, function ($query, $searchCustomer) {
-            $query->where(function ($query) use ($searchCustomer) {
-                $query->orWhere(DB::raw("
-                    COALESCE(
-                        CASE 
-                            WHEN cc.`NOMBRE CLIENTE` <> '' AND cc.`APELLIDOS CLIENTE` <> '' 
-                            THEN cc.`NOMBRE CLIENTE` || ' ' || cc.`APELLIDOS CLIENTE`
-                            ELSE cc.`COMPA�IA`
-                        END, 
-                    'N/E')
-                    "
-                    ), 'like', "%{$searchCustomer}%");
-            });
-        });
+        // $query->when($request->searchCustomer ?? null, function ($query, $searchCustomer) {
+        //     $query->where(function ($query) use ($searchCustomer) {
+        //         $query->orWhere(DB::raw("
+        //             COALESCE(
+        //                 CASE 
+        //                     WHEN cc.`NOMBRE CLIENTE` <> '' AND cc.`APELLIDOS CLIENTE` <> '' 
+        //                     THEN cc.`NOMBRE CLIENTE` || ' ' || cc.`APELLIDOS CLIENTE`
+        //                     ELSE cc.`COMPA�IA`
+        //                 END, 
+        //             'N/E')
+        //             "
+        //         ), 'like', "%{$searchCustomer}%");
+        //     });
+        // });
 
 
         if ($request['per_page'] == -1) {
-            $request['per_page'] = 999999999999;
+            $request['per_page'] = 999999;
         }
 
-
         $sumatoriaTotal = $query->sum('TOTAL');
-        // $sumatoriaTotalMX = $query->get()->sum('TotalMX');
-        $items = $query->paginate($request['per_page'] ?? 15);
-        // $sumatoriaTotal = $items->sum('TOTAL');
-        // $sumatoriaTotalMX = $items->sum('TotalMX');
+        $query->chunk(2000, function ($invoices) {
+            return $invoices;
+        });
+        $items = $query->paginate($request['per_page'] ?? 10);
 
         $archivo = database_path('EquipDB.db3');
         $fechaModificacion = File::lastModified($archivo);
@@ -252,13 +345,34 @@ class SalesCustomerHistoryController extends AdminController
     public function getOptions()
     {
         $options = [
-            'Clientes' => DB::connection('sqlite_equip_db')->table('catClientes AS cc')->distinct()
+            // 'Clientes' => DB::connection('sqlite_equip_db')->table('catClientes AS cc')->distinct()
+            //     ->select(
+            //         'cc.CLAVE CLIENTE AS Clave_Cliente',
+            //         DB::raw("CASE 
+            //         WHEN cc.`NOMBRE CLIENTE` <> '' AND cc.`APELLIDOS CLIENTE` <> '' THEN cc.`NOMBRE CLIENTE` || ' ' || cc.`APELLIDOS CLIENTE` 
+            //         ELSE cc.`COMPA�IA` END AS Cliente")
+            //     )->get(),
+            'Clientes' => DB::connection('sqlite_equip_db')->table('invoice_jd')->distinct()
                 ->select(
-                    'cc.CLAVE CLIENTE AS Clave_Cliente',
-                    DB::raw("CASE 
-                    WHEN cc.`NOMBRE CLIENTE` <> '' AND cc.`APELLIDOS CLIENTE` <> '' THEN cc.`NOMBRE CLIENTE` || ' ' || cc.`APELLIDOS CLIENTE` 
-                    ELSE cc.`COMPA�IA` END AS Cliente")
-                )->get(),
+                    DB::raw("
+                    COALESCE(
+                    CASE 
+                        WHEN cc.`CLAVE CLIENTE` <> '' THEN cc.`CLAVE CLIENTE`
+                        WHEN invoice_jd.`CLAVE PROVEEDOR` <> '' THEN invoice_jd.`CLAVE PROVEEDOR`
+                        ELSE NULL 
+                    END,'S/C') AS Clave_Cliente"),
+                    DB::raw("
+                    COALESCE(
+                    CASE 
+                        WHEN cc.`NOMBRE CLIENTE` <> '' AND cc.`APELLIDOS CLIENTE` <> ''  THEN cc.`NOMBRE CLIENTE` || ' ' || cc.`APELLIDOS CLIENTE`
+                        WHEN cc.`COMPA�IA` <> ''  THEN cc.`COMPA�IA`
+                        WHEN invoice_jd.`NOMBREPROVEEDOR` <> '' AND invoice_jd.`APELLIDOS PROVEEDOR` <> ''  THEN invoice_jd.`NOMBREPROVEEDOR` || ' ' || invoice_jd.`APELLIDOS PROVEEDOR`
+                        WHEN invoice_jd.`NOMBRE CLIENTE` <> '' THEN invoice_jd.`NOMBRE CLIENTE`
+                        ELSE NULL
+                    END,'S/N') AS Cliente")
+                )
+                ->leftJoin('catClientes AS cc', 'cc.CLAVE CLIENTE', '=', 'invoice_jd.CLAVE PROVEEDOR')
+                ->get(),
             'Vendedores' => DB::connection('sqlite_equip_db')->table('catVendedores as cv')->distinct()
                 ->select('cv.Clave vendedor AS ClaveVendedor', 'cv.Nombre Vendedor AS Nombre')
                 ->get(),
@@ -268,8 +382,8 @@ class SalesCustomerHistoryController extends AdminController
                 ->select('cs.linea')
                 ->get(),
             'SerieFiscal' => DB::connection('sqlite_equip_db')->table('invoice_jd')->distinct()
-                ->select('SERIE FISCAL')->whereNotNull('SERIE FISCAL')
-                ->get(),
+                ->select('SERIE FISCAL AS serie_fiscal')->whereNotNull('SERIE FISCAL')
+                ->pluck('serie_fiscal'),
             'Moneda' => DB::connection('sqlite_equip_db')->table('invoice_jd')->distinct()
                 ->select('MONEDA')->whereNotNull('MONEDA')
                 ->get(),

@@ -12,31 +12,23 @@
             no-gutters
           >
             <v-col cols="12" md="6" class="pa-2 flex-grow-1 flex-shrink-0">
-              <v-autocomplete
+              <v-combobox
                 v-model="filters.clave_cliente"
-                label="CLAVE CLIENTE"
+                label="CLIENTE"
                 :items="options.Clientes"
-                item-text="Clave_Cliente"
-                item-value="Clave_Cliente"
                 placeholder="Seleccionar Cliente"
                 :filter="customFilterCliente"
-                clearable
-                outlined
-                hide-details
-                dense
-                multiple
-                chips
-                small-chips
+                item-value="Clave_Cliente"
+                item-text="Clave_Cliente"
                 deletable-chips
+                hide-details
+                small-chips
+                clearable
+                multiple
+                outlined
+                dense
+                chips
               >
-                <!-- <template v-slot:selection="{ item }">
-                  <v-list-item-content>
-                    <v-list-item-subtitle>
-                      {{ item.Clave_Cliente }}
-                    </v-list-item-subtitle>
-                    <v-list-item-title> {{ item.Cliente }} </v-list-item-title>
-                  </v-list-item-content>
-                </template> -->
                 <template #item="{ item }">
                   <v-list-item-content>
                     <v-list-item-subtitle>
@@ -45,16 +37,16 @@
                     <v-list-item-title> {{ item.Cliente }} </v-list-item-title>
                   </v-list-item-content>
                 </template>
-              </v-autocomplete>
+              </v-combobox>
             </v-col>
             <v-col cols="12" md="6" class="pa-2 flex-grow-1 flex-shrink-0">
-              <v-autocomplete
+              <v-combobox
                 v-model="filters.clave_vendedor"
-                label="CLAVE VENDEDOR"
+                label="VENDEDOR"
                 :items="options.Vendedores"
                 item-text="ClaveVendedor"
                 item-value="ClaveVendedor"
-                placeholder="Seleccionar Vendedor"
+                placeholder="Buscar Clave Vendedor, Nombre Vendedor"
                 :filter="customFilterVendedor"
                 clearable
                 outlined
@@ -65,14 +57,6 @@
                 small-chips
                 deletable-chips
               >
-                <!-- <template v-slot:selection="{ item }">
-                  <v-list-item-content>
-                    <v-list-item-subtitle>
-                      {{ item.ClaveVendedor }}
-                    </v-list-item-subtitle>
-                    <v-list-item-title> {{ item.Nombre }} </v-list-item-title>
-                  </v-list-item-content>
-                </template> -->
                 <template #item="{ item }">
                   <v-list-item-content>
                     <v-list-item-subtitle>
@@ -81,7 +65,7 @@
                     <v-list-item-title> {{ item.Nombre }} </v-list-item-title>
                   </v-list-item-content>
                 </template>
-              </v-autocomplete>
+              </v-combobox>
             </v-col>
             <v-col cols="12" md="3" class="pa-2 flex-grow-1 flex-shrink-0">
               <v-select
@@ -260,12 +244,22 @@
       caption
       dense
       class="elevation-3"
+      calculate-widths
+      :footer-props="{
+        showCurrentPage: true,
+        showFirstLastPage: true,
+        firstIcon: 'mdi-arrow-collapse-left',
+        lastIcon: 'mdi-arrow-collapse-right',
+        prevIcon: 'mdi-minus',
+        nextIcon: 'mdi-plus',
+        itemsPerPageOptions: [5, 10, 15, 100, 200, 500, 2000, 5000],
+      }"
     >
       <template #top>
         <v-toolbar flat>
           <v-toolbar-title> Facturacion Maquinaria</v-toolbar-title>
           <v-spacer />
-          <v-text-field
+          <!-- <v-text-field
             v-model="searchCustomer"
             label="Nombre Cliente"
             placeholder="Nombre, Compañia"
@@ -275,7 +269,7 @@
             clearable
             dense
             class="mr-2"
-          />
+          /> -->
           <v-text-field
             v-model="search"
             label="Buscar"
@@ -307,6 +301,12 @@
         </div>
         <div class="text-uppercase font-weight-bold">{{ item.Cliente }}</div>
       </template>
+      <template v-slot:[`item.Estado`]="{ item, value }">
+        <div class="text-uppercase font-weight-bold">{{ value }}</div>
+        <div class="caption text--secondary">
+          {{ item.Municipio }}
+        </div>
+      </template>
       <template v-slot:[`item.Vendedor`]="{ item }">
         <div class="caption text--secondary">
           Clave: {{ item.VendedorClave }}
@@ -319,18 +319,30 @@
         </div>
         <div class="text-uppercase font-weight-bold">{{ item.Producto }}</div>
       </template>
+
+      <template v-slot:[`item.NIP`]="{ value }">
+        <div style="max-width: 200px">
+          <v-chip label outlined color="black" class="font-weight-bold" dark>
+            {{ value }}
+          </v-chip>
+        </div>
+      </template>
       <template v-slot:[`item.year`]="{ value }">
         <v-chip label outlined color="blue" class="font-weight-bold" dark>
           {{ value }}
         </v-chip>
       </template>
-      <template v-slot:[`item.TOTAL`]="{ item, value }">
+      <template v-slot:[`item.TOTAL`]="{ value }">
         <v-chip outlined label color="primary" class="font-weight-bold" dark>
-          {{ value | currency }} {{ item.currency }}
+          {{ value | currency }} MX
+          <!-- {{ item.currency }} -->
         </v-chip>
       </template>
       <template #footer>
         <v-toolbar flat>
+          <v-toolbar-title class="text-left">
+            Ultima Carga: {{ lastUpdated }}
+          </v-toolbar-title>
           <v-spacer />
           <v-toolbar-title class="text-right">
             Total (MXN):{{ sumTotalVentasAg | currency }}
@@ -357,32 +369,36 @@ export default {
     return {
       headers: [
         {
-          text: "No Documento",
+          text: "No. Documento",
           align: "start",
           filterable: false,
           value: "NO_DOCUMENTO",
+          sortable: false,
         },
         {
           text: "Sucursal",
           align: "start",
           filterable: false,
           value: "Sucursal",
+          sortable: false,
         },
-        { text: "Cliente", value: "Cliente" },
-        { text: "Vendedor", value: "Vendedor" },
-        { text: "Producto / Tipo Venta", value: "Producto" },
-        { text: "Serie Producto", value: "NIP" },
-        { text: "Año Factura", value: "year" },
-        { text: "Importe", align: "end", value: "TOTAL" },
+        { text: "Cliente", value: "Cliente", sortable: false },
+        { text: "Estado / Municipio", value: "Estado", sortable: false },
+        { text: "Vendedor", value: "Vendedor", sortable: false },
+        { text: "Producto / Tipo Venta", value: "Producto", sortable: false },
+        { text: "Serie Producto", value: "NIP", width: 100, sortable: false },
+        { text: "Año Factura", value: "year", sortable: false },
+        { text: "Importe", align: "end", value: "TOTAL", sortable: false },
       ],
       search: "",
       searchCustomer: "",
       items: [],
       sumTotalVentasAg: 0,
       sumTotalVentasAgMX: 0,
+      lastUpdated: "",
       totalItems: 0,
       pagination: {
-        itemsPerPage: 5,
+        itemsPerPage: 10,
         page: 1,
       },
       filters: {
@@ -399,23 +415,44 @@ export default {
       options: {},
     };
   },
+  computed: {
+    FilterClienteReduce() {
+      return this.filters.clave_cliente.reduce((result, item) => {
+        typeof item === "object" && item.hasOwnProperty("Clave_Cliente")
+          ? result.push(item.Clave_Cliente)
+          : result.push(item);
+        return result;
+      }, []);
+    },
+    FilterVendedorReduce() {
+      return this.filters.clave_vendedor.reduce((result, item) => {
+        typeof item === "object" && item.hasOwnProperty("ClaveVendedor")
+          ? result.push(item.ClaveVendedor)
+          : result.push(item);
+        return result;
+      }, []);
+    },
+  },
   watch: {
     pagination: {
-      handler: _.debounce(function (v) {
-        this.getData(() => {});
+      handler: _.debounce(function (newV, oldV) {
+        if (newV !== oldV) {
+          this.getData(() => {});
+        }
       }, 999),
       deep: true,
+      immediate: false,
     },
     search: {
       handler: _.debounce(function (v) {
-        this.getData({ page: 1, per_page: 5 });
+        this.getData({ page: 1, per_page: 10 });
       }, 1200),
     },
-    searchCustomer: {
-      handler: _.debounce(function (v) {
-        this.getData({ page: 1, per_page: 5 });
-      }, 1200),
-    },
+    // searchCustomer: {
+    //   handler: _.debounce(function (v) {
+    //     this.getData({ page: 1, per_page: 5 });
+    //   }, 1200),
+    // },
   },
   methods: {
     cleanFilter() {
@@ -432,7 +469,13 @@ export default {
         _this.filters.municipio = [];
         _this.filters.estado = [];
         _this.pagination.page = 1;
-        _this.pagination.itemsPerPage = 5;
+        _this.pagination = Object.assign(
+          {},
+          {
+            page: 1,
+            itemsPerPage: 10,
+          }
+        );
       });
     },
     searchBtn() {
@@ -442,7 +485,7 @@ export default {
           {},
           {
             page: 1,
-            itemsPerPage: 5,
+            itemsPerPage: 10,
           }
         );
       });
@@ -451,8 +494,10 @@ export default {
       const _this = this;
       let params = {
         ..._this.filters,
+        clave_cliente: _this.FilterClienteReduce,
+        clave_vendedor: _this.FilterVendedorReduce,
         search: _this.search,
-        searchCustomer: _this.searchCustomer,
+        // searchCustomer: _this.searchCustomer,
         // order_by: _this.pagination.sortBy[0] || "id",
         // order_sort: _this.pagination.sortDesc[0] ? "asc" : "desc",
         // order_by: _this.pagination.sortBy[0] || "id",
@@ -461,19 +506,17 @@ export default {
       };
       const {
         data: {
-          data: { items, sumatoriaTotal },
+          data: { items, sumatoriaTotal, lastUpdated },
           message,
         },
       } = await axios.get("/admin/marketing/sales-customer", { params });
       this.$nextTick(() => {
         _this.items = items.data;
         _this.totalItems = items.total;
-        _this.pagination.totalItems = items.total;
-        _this.pagination.itemsPerPage = Number(items.per_page);
-        _this.pagination.page = Number(items.current_page);
       });
 
       this.sumTotalVentasAg = sumatoriaTotal;
+      this.lastUpdated = lastUpdated;
 
       this.$store.commit("showSnackbar", {
         message: message,
@@ -494,6 +537,7 @@ export default {
       const words = queryText.toLowerCase().split(" ");
 
       return words.every((word) => {
+        // console.log(item.Cliente.toLowerCase());
         const nameMatch = item.Cliente.toLowerCase().includes(word);
         const claveMatch = item.Clave_Cliente.toLowerCase().includes(word);
 
