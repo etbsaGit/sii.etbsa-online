@@ -174,10 +174,12 @@ export default {
       item.products = await item.products.map((product) => {
         return {
           ...product,
-          // id: product.id,
-          // name: product.name,
-          // description: product.description,
-          // sku: product.sku,
+          prices: Object.keys(product).reduce((acc, key) => {
+            if (key.startsWith("price_")) {
+              acc[key] = product[key];
+            }
+            return acc;
+          }, {}),
           price: product.quotation.price_unit,
           qty: product.quotation.quantity,
           subtotal: product.quotation.subtotal,
@@ -185,7 +187,8 @@ export default {
           category_id: product.category.id,
         };
       });
-      item.category_id = item.products[0].category.id;
+      const [primerProduct = null] = item.products;
+      item.category_id = primerProduct ? primerProduct.category.id : null;
       item.read_only = true;
       _this.editedItem = Object.assign({}, item);
       _this.dialog = true;

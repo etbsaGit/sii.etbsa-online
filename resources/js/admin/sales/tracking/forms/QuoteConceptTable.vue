@@ -37,13 +37,13 @@
         placeholder="Placeholder"
         class="py-2"
         style="max-width: 250px"
-        :readonly="readOnly"
-        :hide-details="!readOnly"
-        :persistent-hint="readOnly"
-        hint="Este valor no puede ser Modificado"
         outlined
         dense
-      ></v-select>
+        ></v-select>
+        <!-- :readonly="readOnly"
+        :hide-details="!readOnly"
+        :persistent-hint="readOnly"
+        hint="Este valor no puede ser Modificado" -->
     </v-card-title>
     <v-data-table
       :headers="headers"
