@@ -37,7 +37,10 @@
         placeholder="Placeholder"
         class="py-2"
         style="max-width: 250px"
-        hide-details
+        :readonly="readOnly"
+        :hide-details="!readOnly"
+        :persistent-hint="readOnly"
+        hint="Este valor no puede ser Modificado"
         outlined
         dense
       ></v-select>
@@ -108,10 +111,10 @@
           </template>
         </v-edit-dialog>
       </template>
-      <template v-slot:[`item.qty`]="{ item, value }">
-        <span v-if="readOnly">{{ value }}</span>
+      <template v-slot:[`item.qty`]="{ item }">
+        <!-- <span v-if="readOnly">{{ value }}</span> -->
+        <!-- v-else -->
         <v-edit-dialog
-          v-else
           :return-value.sync="item.qty"
           large
           persistent
@@ -124,7 +127,7 @@
         >
           <v-text-field
             :value="item.qty"
-            style="max-width: 50px"
+            style="max-width: 125px"
             class="py-1"
             hide-details
             single-line

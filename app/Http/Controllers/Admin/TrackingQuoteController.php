@@ -103,6 +103,7 @@ class TrackingQuoteController extends AdminController
         }
 
         return DB::transaction(function () use ($quote, $request) {
+            $request['date_due'] = Carbon::now()->addDays(30);
             $this->trackingQuoteRepository->update($quote->id, $request->all());
             $quote->refresh();
             $syncConcept = [];
