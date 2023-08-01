@@ -9,7 +9,9 @@
               @edit="dialog = true"
               @close="dialog = false"
               :items.sync="form.products"
+              :Category_id="form.category_id"
               :paymentCondition="form.payment_condition"
+              :readOnly="form.read_only"
               @payment="(v) => (form.payment_condition = v)"
             ></quote-concept-table>
           </v-card-text>
@@ -50,7 +52,7 @@
                 type="number"
                 suffix="$"
                 prefix="MXN"
-                style="max-width: 200px;"
+                style="max-width: 200px"
                 hide-details
                 readonly
                 outlined
@@ -72,7 +74,7 @@
                 hide-details
                 :prefix="Currency.name"
                 reverse
-                style="max-width: 200px;"
+                style="max-width: 200px"
                 dense
               ></v-currency-field>
             </th>

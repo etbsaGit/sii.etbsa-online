@@ -273,7 +273,7 @@
                 <td style="text-align: right; width: 200px; line-height: 1rem;">
                     <b>Cotizacion: </b># {{ str_pad($data->id, 5, '100', STR_PAD_LEFT) }}<br />
                     LEAD: # {{ str_pad($data->tracking->id, 4, '0', STR_PAD_LEFT) }}<br />
-                    Creacion: {{ $data->created_at }}<br />
+                    Creacion: {{ $data->updated_at }}<br />
                     Vencimiento: {{ $data->date_due }}
                 </td>
             </tr>

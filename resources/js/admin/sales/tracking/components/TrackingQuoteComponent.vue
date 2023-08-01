@@ -72,9 +72,7 @@
       >
         <v-icon small> mdi-printer </v-icon>
       </v-btn>
-      <!-- <v-icon small class="mr-2" @click="editItem(item)">
-        mdi-pencil
-      </v-icon> -->
+      <v-icon small class="mr-2" @click="editItem(item)"> mdi-pencil </v-icon>
       <v-icon small color="red" @click="deleteItem(item)"> mdi-delete </v-icon>
     </template>
   </v-data-table>
@@ -184,8 +182,11 @@ export default {
           qty: product.quotation.quantity,
           subtotal: product.quotation.subtotal,
           currency: item.currency,
+          category_id: product.category.id,
         };
       });
+      item.category_id = item.products[0].category.id;
+      item.read_only = true;
       _this.editedItem = Object.assign({}, item);
       _this.dialog = true;
     },
