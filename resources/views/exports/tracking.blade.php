@@ -2,8 +2,10 @@
     <thead>
         <tr>
             <th>FOLIO</th>
-            <th>Prospecto</th>
+            <th>Nombre Prospecto</th>
+            <th>Compañia</th>
             <th>Tel. Prospecto</th>
+            <th>Email. Prospecto</th>
             <th>Categoria</th>
             <th>Referencia</th>
             <th>Precio</th>
@@ -25,7 +27,9 @@
             <tr>
                 <td>{{ $item->id }}</td>
                 <td>{{ $item->prospect->full_name }}</td>
+                <td>{{ $item->prospect->company ?? '' }}</td>
                 <td>{{ $item->prospect->phone }}</td>
+                <td>{{ $item->prospect->email ?? '' }}</td>
                 <td>{{ $item->title ?? 'S/A' }}</td>
                 <td>{{ $item->reference ?? 'S/A' }}</td>
                 <td>{{ '$' . $item->price ?? 'S/A' }}</td>
