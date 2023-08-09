@@ -93,7 +93,8 @@ export default {
             );
           }
           _this.isLoading = false;
-          _this.$emit("success");
+          // _this.$emit("success");
+          _this.$eventBus.$emit("CLOSE_TRACKING_DIALOG");
           // self.$router.push({ name: "tracking.list" });
         })
         .catch(function (error) {

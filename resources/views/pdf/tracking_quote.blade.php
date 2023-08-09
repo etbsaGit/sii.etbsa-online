@@ -405,8 +405,8 @@
                         <table>
                             @if ($data->observation)
                             <tr style="padding-bottom: 0px;">
-                                <td style="padding-bottom: 0px;">
-                                    NOTA del Vendedor:<br />
+                                <td style="padding-bottom: 5px; font-size: 0.8rem;">
+                                    <b>NOTA del Vendedor:</b><br /><br/>
                                     {{ $data->observation }}
                                 </td>
                             </tr>

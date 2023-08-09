@@ -1,6 +1,7 @@
 <template>
   <v-card flat>
-    <v-card-title v-if="Category_id == null">
+    <!-- <v-card-title v-if="Category_id == null"> -->
+    <v-card-title>
       <v-autocomplete
         v-model="select_category_id"
         :items="options.categories"
@@ -12,6 +13,7 @@
         outlined
         filled
         dense
+        @input="(value) => $emit('SELECTED_CATEGRORY', value)"
         :disabled="hasItems"
       >
       </v-autocomplete>
@@ -28,7 +30,7 @@
         dense
       ></v-select>
     </v-card-title>
-    <v-card-title v-else>
+    <!-- <v-card-title v-else>
       <v-spacer></v-spacer>
       <v-select
         v-model="Payment"
@@ -40,11 +42,11 @@
         outlined
         dense
         ></v-select>
-        <!-- :readonly="readOnly"
+      :readonly="readOnly"
         :hide-details="!readOnly"
         :persistent-hint="readOnly"
-        hint="Este valor no puede ser Modificado" -->
-    </v-card-title>
+        hint="Este valor no puede ser Modificado" 
+    </v-card-title> -->
     <v-data-table
       :headers="headers"
       :items="items"
@@ -200,8 +202,8 @@ import ProductsList from "../../../products/product/Index.vue";
 
 const _paymentCondition = [
   { text: "Por Definir", value: "por_definir", config: [] },
-  { text: "P. Lista", value: "precio_lista", config: [5, 6, 11, 14, 16] },
-  { text: "Contado", value: "contado", config: [1, 2, 3, 10, 5, 6, 11, 16] },
+  { text: "P. Lista", value: "precio_lista", config: [5, 6, 11, 14, 16, 9] },
+  { text: "Contado", value: "contado", config: [1, 2, 3, 10, 5, 6, 11, 16, 9] },
   { text: "JDF 2 años", value: "jdf_2y", config: [1, 2, 3, 10] },
   { text: "JDF 5 años", value: "jdf_5y", config: [1] },
   { text: "Expo", value: "precio_expo", config: [1, 5] },
@@ -337,7 +339,7 @@ export default {
   },
   data() {
     return {
-      select_category_id: null,
+      select_category_id: this.Category_id ?? null,
       options: { categories: [], price_types: _paymentCondition },
       valid: true,
       snack: false,

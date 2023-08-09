@@ -104,6 +104,7 @@ export default {
             color: "success",
             duration: 3000,
           });
+          _this.$eventBus.$emit("CLOSE_TRACKING_DIALOG");
         })
         .catch(function (error) {
           _this.$store.commit("hideLoader");

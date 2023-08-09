@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "@chrisheanan/vue-gauge": "^1.2.2",
+    "chart.js": "^4.3.3",
     "dropzone": "^5.9.2",
     "echarts": "^5.2.*",
     "js-file-download": "^0.4.12",
@@ -36,6 +37,7 @@
     "papaparse": "^5.3.1",
     "v-currency-field": "^3.1.1",
     "v-mask": "^2.2.4",
+    "vue-chartjs": "^5.2.0",
     "vue-currency-filter": "^5.2.0",
     "vue-gates": "^2.1.2",
     "vue-progressbar": "^0.7.5",
