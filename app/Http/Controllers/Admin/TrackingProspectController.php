@@ -23,14 +23,14 @@ use Illuminate\Support\Facades\DB;
 class TrackingProspectController extends AdminController
 {
     /**
-     * @var ProspectRepository
+     * @var TrackingRepository
      */
     private $trackingRepository;
     private $trackingQuote;
 
     /**
      * ProspectController constructor.
-     * @param ProspectRepository $trackingRepository
+     * @param TrackingRepository $trackingRepository
      */
     public function __construct(TrackingRepository $trackingRepository)
     {

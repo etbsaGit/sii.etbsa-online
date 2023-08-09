@@ -732,6 +732,19 @@ export default {
 
     self.$store.commit("setBreadcrumbs", [{ label: "Seguimientos", name: "" }]);
     self.loadResources(() => {});
+    self.$eventBus.$on(["CLOSE_TRACKING_DIALOG"], () => {
+      self.dialogs = Object.assign(
+        {},
+        {
+          create: false,
+          quote: false,
+          show: false,
+          id: null,
+        }
+      );
+      self.refresh();
+      // self.loadFileGroups(() => {});
+    });
   },
   computed: {
     ...mapState(["Assertiveness"]),
