@@ -76,8 +76,19 @@ class SalesCustomerHistoryController extends AdminController
                     foreach ($clave_vendedor as $term) {
                         $q->orWhere('cv.clave_vendodor', 'LIKE', "%{$term}%");
                         $q->orWhere('cv.nombre_vendor', 'LIKE', "%{$term}%");
+                        
                     }
                 }
+            });
+        })->when($filters['sucursales'] ?? null, function ($query, $sucursales) {
+            $query->whereIn('fa.SUCURSAL', $sucursales);
+        });
+
+        $query->when($request->search ?? null, function ($query, $search) {
+            $query->where(function ($query) use ($search) {
+                $query->orWhere('fa.DESCRIPCION PRODUCTO', 'like', "%{$search}%")
+                    ->orWhere('fa.NIP', 'like', "%{$search}%")
+                    ->orWhere('cv.MODELO', 'LIKE', "%{$search}%");
             });
         });
 
@@ -124,6 +135,7 @@ class SalesCustomerHistoryController extends AdminController
                     return 0;
                 }))->sortKeys()->values();
 
+
                 return [
                     'cliente' => $cliente,
                     'years' => $allYears,
@@ -139,6 +151,52 @@ class SalesCustomerHistoryController extends AdminController
             });
         }
 
+        $ventasPorVendedor = [];
+        $barVendedorGrafica = [];
+        $ultimasInvoiceVendedor = [];
+        if ($request->has('clave_vendedor')) {
+            $ventasPorVendedor = $results->groupBy(function ($item) {
+                return $item->tipo_venta . '_' . $item->clave_vendedor;
+                // return $item->clave_vendedor;
+                // return $item->tipo_venta . '_' . $item->cliente;
+                // return $item->tipo_venta;
+            })->map(function ($groupedItems) {
+                return [
+                    'clave_vendedor' => $groupedItems[0]->clave_vendedor,
+                    'vendedor' => $groupedItems[0]->nombre_vendedor,
+                    'tipo' => $groupedItems[0]->tipo_venta,
+                    'tipo_venta' => $groupedItems[0]->tipo_venta_nombre,
+                    'total_comprado' => $groupedItems->sum('precio_venta')
+                ];
+            })->values();
+
+            $allYears = $results->pluck('year')->unique()->sort()->values();
+            $barVendedorGrafica = $results->groupBy('clave_vendedor')->map(function ($ventasPorCliente, $cliente) use ($allYears) {
+                $acumuladoPorYear = $ventasPorCliente->groupBy('year')->map(function ($ventasPorYear) {
+                    return $ventasPorYear->sum('precio_venta');
+                });
+
+                // Rellenar con 0 los años sin ventas
+                $acumuladoPorYear = $acumuladoPorYear->union($allYears->flip()->map(function () {
+                    return 0;
+                }))->sortKeys()->values();
+
+
+                return [
+                    'cliente' => $cliente,
+                    'years' => $allYears,
+                    'acumulado' => $acumuladoPorYear,
+                ];
+            })->values();
+
+            $ultimasInvoiceVendedor = $results->mapToGroups(function ($item) {
+                return [$item->clave_vendedor => $item];
+            })->map(function ($invoiceDates) {
+                return $invoiceDates->last();
+            });
+        }
+
+
         $archivo = database_path('EquipDB.db3');
         $fechaModificacion = File::lastModified($archivo);
         $lastUpdated = date("Y-m-d H:i:s", $fechaModificacion);
@@ -150,7 +208,10 @@ class SalesCustomerHistoryController extends AdminController
                 'sumatoriaTotal',
                 'ventasPorCliente',
                 'barGrafica',
-                'ultimasInvoicePorCliente'
+                'ultimasInvoicePorCliente',
+                'ventasPorVendedor',
+                'barVendedorGrafica',
+                'ultimasInvoiceVendedor',
             )
         );
     }
@@ -176,8 +237,11 @@ class SalesCustomerHistoryController extends AdminController
             // 'Vendedores' => DB::connection('sqlite_equip_db')->table('catVendedores as cv')->distinct()
             //     ->select('cv.Clave vendedor AS ClaveVendedor', 'cv.Nombre Vendedor AS Nombre')
             //     ->get(),
-            'Sucursales' => DB::connection('sqlite_equip_db')->table('catSucursales as cs')->distinct()
-                ->get(),
+            'Sucursales' => DB::connection('sqlite_equip_db')->table('facturacion_utf8')->distinct()
+                ->select('SUCURSAL as name')
+                ->pluck('name'),
+            // DB::connection('sqlite_equip_db')->table('catSucursales as cs')->distinct()
+            //     ->get(),
             'Linea' => DB::connection('sqlite_equip_db')->table('catSucursales as cs')->distinct()
                 ->select('cs.linea')
                 ->get(),

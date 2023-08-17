@@ -67,13 +67,13 @@
                 </template>
               </v-combobox>
             </v-col>
-            <!-- <v-col cols="12" md="3" class="pa-2 flex-grow-1 flex-shrink-0">
-              <v-select
+            <v-col cols="12" md="3" class="pa-2 flex-grow-1 flex-shrink-0">
+              <!-- item-text="nombre"
+              item-value="id" -->
+              <!-- <v-select
                 v-model="filters.sucursales"
                 label="SUCURSAL"
                 :items="options.Sucursales"
-                item-text="nombre"
-                item-value="id"
                 placeholder="Seleccionar Sucursal"
                 clearable
                 outlined
@@ -81,9 +81,10 @@
                 dense
                 multiple
                 chips
+                small-chips
                 deletable-chips
-              >
-                <template v-slot:selection="{ item }">
+              > -->
+                <!-- <template v-slot:selection="{ item }">
                   <v-list-item-content>
                     <v-list-item-subtitle>
                       {{ item.linea }}
@@ -98,10 +99,10 @@
                     </v-list-item-subtitle>
                     <v-list-item-title> {{ item.nombre }} </v-list-item-title>
                   </v-list-item-content>
-                </template>
+                </template> -->
               </v-select>
             </v-col>
-            <v-col cols="12" md="3" class="pa-2 flex-grow-1 flex-shrink-0">
+            <!-- <v-col cols="12" md="3" class="pa-2 flex-grow-1 flex-shrink-0">
               <v-select
                 v-model="filters.lineas"
                 label="Linea"
@@ -273,7 +274,7 @@
           <v-text-field
             v-model="search"
             label="Buscar"
-            placeholder="No Documento,Descripcion Producto, Serie"
+            placeholder="Nombre Producto, Serie Producto, MODELO"
             persistent-placeholder
             outlined
             hide-details
@@ -361,8 +362,9 @@
       </template>
     </v-data-table>
 
-    <v-card-text>
-      <v-row v-if="ventasPorCliente.length > 0" dense>
+    <v-card-text v-if="ventasPorCliente.length > 0">
+      <div class="text-h3">Resumen Cliente(s)</div>
+      <v-row dense>
         <v-col cols="6">
           <v-simple-table class="elevation-4" height="500" fixed-header>
             <template #default>
@@ -393,21 +395,18 @@
           </v-simple-table>
         </v-col>
         <v-col cols="6">
-          <sales-customer-pie
+          <pie-chart
             :data-labels="dataLabels"
             :data-values="dataValues"
             :height="500"
           />
         </v-col>
         <v-col cols="6">
-          <sales-customer-bar
-            :data-set="BarDataSet"
-            :height="500"
-          ></sales-customer-bar>
+          <bar-chart :data-set="BarDataSet" :height="500"></bar-chart>
         </v-col>
         <v-col cols="6">
           <v-card flat>
-            <v-card-title> Ultima Venta </v-card-title>
+            <v-card-title> Ultima Compra Cliente </v-card-title>
             <v-card-text>
               <v-simple-table class="elevation-4" max-height="500" fixed-header>
                 <template #default>
@@ -463,17 +462,122 @@
         </v-col>
       </v-row>
     </v-card-text>
+    <!-- <v-card-text v-if="ventasPorVendedor.length > 0"> -->
+    <v-card-text v-if="ventasPorVendedor.length > 0">
+      <div class="text-h3">Resumen Vendedor(es)</div>
+      <v-row dense>
+        <v-col cols="6">
+          <v-simple-table class="elevation-4" height="500" fixed-header>
+            <template #default>
+              <thead>
+                <tr>
+                  <th>Vendedor</th>
+                  <th>Tipo de Venta</th>
+                  <th>Total Venta</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="(venta, index) in ventasPorVendedor"
+                  :key="`${index}-${venta.tipo_venta}`"
+                >
+                  <td>
+                    <div class="text-secondary">{{ venta.clave_vendedor }}</div>
+                    {{ venta.vendedor }}
+                  </td>
+                  <td class="text-no-wrap">
+                    <div class="font-weight-bold">{{ venta.tipo }}</div>
+                    {{ venta.tipo_venta || "Otro" }}
+                  </td>
+                  <td>{{ venta.total_comprado | currency }}</td>
+                </tr>
+              </tbody>
+            </template>
+          </v-simple-table>
+        </v-col>
+        <v-col cols="6">
+          <pie-chart
+            :data-labels="dataVendedorLabels"
+            :data-values="dataVendedorValues"
+            :height="500"
+          />
+        </v-col>
+        <v-col cols="12">
+          <bar-chart :data-set="BarDataVendedorSet" :height="500"></bar-chart>
+        </v-col>
+        <v-col cols="12">
+          <v-card flat>
+            <v-card-title> Ultima Venta Vendedor </v-card-title>
+            <v-card-text>
+              <v-simple-table class="elevation-4" max-height="500" fixed-header>
+                <template #default>
+                  <thead>
+                    <tr>
+                      <th>Cliente</th>
+                      <th>Sucursal</th>
+                      <th>Producto</th>
+                      <th>Precio Venta</th>
+                      <th>Tipo Venta</th>
+                      <th>Vendedor</th>
+                      <th>Direcciones</th>
+                      <th>Teléfonos</th>
+                      <th>Fecha Factura</th>
+                      <th>Año</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      v-for="(item, key) in ultimasInvoiceVendedor"
+                      :key="key"
+                    >
+                      <td>
+                        <div class="text-secondary">
+                          {{ item.clave_cliente }}
+                        </div>
+                        {{ item.cliente }}
+                      </td>
+                      <td>{{ item.sucursal }}</td>
+                      <td>
+                        <div>{{ item.NIP }}</div>
+                        {{ item.producto }}
+                      </td>
+                      <td>{{ item.precio_venta | currency }}</td>
+                      <td class="text-no-wrap">
+                        <div class="font-weight-bold">{{ item.tipo }}</div>
+                        {{ item.tipo_venta || "Otro" }}
+                      </td>
+                      <td>
+                        <div>{{ item.clave_vendedor }}</div>
+                        {{ item.nombre_vendedor }}
+                      </td>
+                      <td>{{ item.addresses }}</td>
+                      <td>{{ item.phones }}</td>
+                      <td>{{ item.invoice_date }}</td>
+                      <td>{{ item.year }}</td>
+                    </tr>
+                  </tbody>
+                </template>
+              </v-simple-table>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-card-text>
   </v-card>
 </template>
 <script>
-import SalesCustomerBar from "./SalesCustomerBar.vue";
-import SalesCustomerPie from "./SalesCustomerPie.vue";
+// import SalesCustomerBar from "./SalesCustomerBar.vue";
+// import SalesCustomerPie from "./SalesCustomerPie.vue";
+import PieChart from "./PieChart.vue";
+import BarChart from "./BarChart.vue";
 
 export default {
   name: "SalesCustomerHistory",
   components: {
-    SalesCustomerPie,
-    SalesCustomerBar,
+    // SalesCustomerPie,
+    // SalesCustomerBar,
+    PieChart,
+    BarChart,
   },
   mounted() {
     const _this = this;
@@ -525,6 +629,9 @@ export default {
       ventasPorCliente: [],
       barGrafica: [],
       ultimasInvoicePorCliente: [],
+      ventasPorVendedor: [],
+      barVendedorGrafica: [],
+      ultimasInvoiceVendedor: [],
       lastUpdated: "",
       totalItems: 0,
       pagination: {
@@ -554,11 +661,31 @@ export default {
     dataValues() {
       return this.ventasPorCliente.map((item) => item.total_comprado);
     },
+    dataVendedorLabels() {
+      return this.ventasPorVendedor.map(
+        (item) =>
+          `${item.tipo_venta || "Otro"} (${item.tipo}) ${item.clave_vendedor}`
+      );
+    },
+    dataVendedorValues() {
+      return this.ventasPorVendedor.map((item) => item.total_comprado);
+    },
     BarDataSet() {
       const _this = this;
       return {
         labels: _this.barGrafica[0].years.map(String),
         datasets: _this.barGrafica.map((clienteData, index) => ({
+          label: clienteData.cliente,
+          data: clienteData.acumulado,
+          backgroundColor: _this.getRandomColor(index),
+        })),
+      };
+    },
+    BarDataVendedorSet() {
+      const _this = this;
+      return {
+        labels: _this.barVendedorGrafica[0].years.map(String),
+        datasets: _this.barVendedorGrafica.map((clienteData, index) => ({
           label: clienteData.cliente,
           data: clienteData.acumulado,
           backgroundColor: _this.getRandomColor(index),
@@ -679,6 +806,9 @@ export default {
             ventasPorCliente,
             barGrafica,
             ultimasInvoicePorCliente,
+            ventasPorVendedor,
+            barVendedorGrafica,
+            ultimasInvoiceVendedor,
           },
           message,
         },
@@ -693,6 +823,9 @@ export default {
       this.barGrafica = barGrafica;
       this.lastUpdated = lastUpdated;
       this.ultimasInvoicePorCliente = ultimasInvoicePorCliente;
+      this.ventasPorVendedor = ventasPorVendedor;
+      this.barVendedorGrafica = barVendedorGrafica;
+      this.ultimasInvoiceVendedor = ultimasInvoiceVendedor;
 
       this.$store.commit("showSnackbar", {
         message: message,
