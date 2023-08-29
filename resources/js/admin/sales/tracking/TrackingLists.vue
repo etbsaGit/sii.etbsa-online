@@ -44,6 +44,7 @@
                 filled
                 dense
               ></v-select>
+            
               <v-autocomplete
                 v-model="filters.prospect"
                 :items="options.prospects"
@@ -53,20 +54,28 @@
                 placeholder="Buscar por Nombre o Telefono o Razon Social"
                 prepend-icon="mdi-filter-variant"
                 :filter="customFilter"
+                chips
+                small-chips
+                deletable-chips
                 hide-details
                 clearable
                 multiple
                 filled
                 dense
               >
-                <template v-slot:item="{ item }">
-                  <v-list-item-title> {{ item.full_name }} </v-list-item-title>
-                  <v-list-item-subtitle>
-                    {{ item.phone }}
-                  </v-list-item-subtitle>
-                  <v-list-item-subtitle>
-                    {{ item.company }}
-                  </v-list-item-subtitle>
+               
+                <template #item="{ item }">
+                  <v-list-item-content>
+                    <v-list-item-subtitle>
+                      {{ item.company }}
+                    </v-list-item-subtitle>
+                    <v-list-item-title class="text-uppercase font-weight-bold">
+                      {{ item.full_name }}
+                    </v-list-item-title>
+                    <v-list-item-subtitle>
+                      Tel: {{ item.phone }}
+                    </v-list-item-subtitle>
+                  </v-list-item-content>
                 </template>
               </v-autocomplete>
               <v-autocomplete
@@ -333,30 +342,39 @@
           <td></td>
           <td>
             <div class="d-flex flex-column py-2">
+            
               <v-autocomplete
                 v-model="filters.prospect"
                 :items="options.prospects"
                 item-text="full_name"
                 item-value="id"
-                placeholder="Buscar por Nombre | Telefono:"
+                placeholder="Buscar por Nombre o Telefono o Razon social"
                 :rules="[(v) => !!v || 'Es Requerido']"
                 :filter="customFilter"
+                chips
+                small-chips
+                deletable-chips
+                multiple
                 hide-details
                 clearable
-                multiple
-                solo
                 outlined
                 filled
                 dense
               >
-                <template v-slot:item="{ item }">
-                  <v-list-item-title> {{ item.full_name }} </v-list-item-title>
-                  <v-list-item-subtitle>
-                    {{ item.phone }}
-                  </v-list-item-subtitle>
-                  <v-list-item-subtitle>
-                    {{ item.company }}
-                  </v-list-item-subtitle>
+                
+
+                <template #item="{ item }">
+                  <v-list-item-content>
+                    <v-list-item-subtitle>
+                      {{ item.company }}
+                    </v-list-item-subtitle>
+                    <v-list-item-title class="text-uppercase font-weight-bold">
+                      {{ item.full_name }}
+                    </v-list-item-title>
+                    <v-list-item-subtitle>
+                      Tel: {{ item.phone }}
+                    </v-list-item-subtitle>
+                  </v-list-item-content>
                 </template>
               </v-autocomplete>
             </div>
@@ -932,16 +950,30 @@ export default {
       });
     },
     customFilter(item, queryText, itemText) {
-      const textName = item.full_name.toLowerCase();
-      const textPhone = item.phone.toLowerCase();
-      const textCompany = item.company ? item.company.toLowerCase() : "";
-      const searchText = queryText.toLowerCase();
+      const words = queryText.toLowerCase().split(" ");
 
-      return (
-        textName.indexOf(searchText) > -1 ||
-        textPhone.indexOf(searchText) > -1 ||
-        textCompany.indexOf(searchText) > -1
-      );
+      return words.every((word) => {
+        const nameMatch = item.full_name.toLowerCase().includes(word);
+        const phoneMatch = item.phone
+          ? item.phone.toLowerCase().includes(word)
+          : false;
+        const companyMatch = item.company
+          ? item.company.toLowerCase().includes(word)
+          : false;
+
+        return nameMatch || phoneMatch || companyMatch;
+      });
+
+      // const textName = item.full_name.toLowerCase();
+      // const textPhone = item.phone.toLowerCase();
+      // const textCompany = item.company ? item.company.toLowerCase() : "";
+      // const searchText = queryText.toLowerCase();
+
+      // return (
+      //   textName.indexOf(searchText) > -1 ||
+      //   textPhone.indexOf(searchText) > -1 ||
+      //   textCompany.indexOf(searchText) > -1
+      // );
     },
   },
 };
