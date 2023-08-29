@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Components\Common\Models\Currency;
 use App\Components\Common\Models\Estatus;
 use App\Components\Common\Models\ExchangeRates;
+use App\Components\Common\Models\SellerCategory;
 use App\Components\RRHH\Models\Employee;
 use App\Components\Tracking\Models\Prospect;
 use App\Components\Tracking\Models\TrackingProspect;
@@ -53,6 +54,7 @@ class TrackingProspectController extends AdminController
     {
         $prospects = Prospect::all('id', 'full_name', 'phone');
         $categories = DB::table('cat_sales_category')->get(['id', 'title']);
+        // $categories = auth()->user()->seller_category;
         $currency = DB::table('currency')->get(['id', 'name']);
         $agencies = DB::table('agencies')->get(['id', 'code', 'title']);
         $departments = DB::table('departments')->get(['id', 'title']);
@@ -191,6 +193,7 @@ class TrackingProspectController extends AdminController
                 'reference',
                 'description_topic',
                 'price',
+                'exchange_value',
                 'first_contact',
                 'assertiveness',
                 'tracking_condition',
@@ -362,6 +365,7 @@ class TrackingProspectController extends AdminController
         if (Auth::user()->isSuperUser()) {
             $agencies = DB::table('agencies')->get(['id', 'code', 'title']);
             $departments = DB::table('departments')->get(['id', 'title']);
+            // $categories = DB::table('cat_product_category')->get(['id', 'name']);
         } else {
             $agencies = Auth::user()->seller_agency->map(function ($i, $k) {
                 return ['id' => $i->id, 'code' => $i->code, 'title' => $i->title];
@@ -369,11 +373,14 @@ class TrackingProspectController extends AdminController
             $departments = Auth::user()->seller_type->map(function ($i, $k) {
                 return ['id' => $i->id, 'title' => $i->title];
             });
+            // $categories = Auth::user()->seller_category->map(function ($i, $k) {
+            //     return ['id' => $i->id, 'name' => $i->name];
+            // });
         }
-        // $categories = DB::table('cat_sales_category')->get(['id', 'title', 'key']);
         $categories = DB::table('cat_product_category')->get(['id', 'name']);
+       
         $currency = DB::table('currency')->get(['id', 'name']);
-        $prospects = Prospect::with('township')->get()->map->only('id', 'full_name', 'email', 'company', 'rfc', 'town', 'phone', 'township');
+        $prospects = Prospect::with('township')->get()->map->only(['id', 'full_name', 'email', 'company', 'rfc', 'town', 'phone', 'township']);
         $exchange_value = ExchangeRates::latest()->first()->value;
         return $this->sendResponseOk(compact('agencies', 'departments', 'prospects', 'currency', 'categories', 'exchange_value'));
     }
