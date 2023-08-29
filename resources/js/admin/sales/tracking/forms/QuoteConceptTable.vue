@@ -202,16 +202,24 @@ import ProductsList from "../../../products/product/Index.vue";
 
 const _paymentCondition = [
   { text: "Por Definir", value: "por_definir", config: [] },
-  { text: "P. Lista", value: "precio_lista", config: [5, 6, 11, 14, 16, 9] },
-  { text: "Contado", value: "contado", config: [1, 2, 3, 10, 5, 6, 11, 16, 9] },
-  { text: "JDF 2 años", value: "jdf_2y", config: [1, 2, 3, 10] },
+  {
+    text: "P. Lista",
+    value: "precio_lista",
+    config: [5, 6, 11, 14, 16, 9, 17],
+  },
+  {
+    text: "Contado",
+    value: "contado",
+    config: [1, 2, 3, 10, 5, 6, 11, 16, 9, 17],
+  },
+  { text: "JDF 2 años", value: "jdf_2y", config: [1, 2, 3, 10, 17] },
   { text: "JDF 5 años", value: "jdf_5y", config: [1] },
   { text: "Expo", value: "precio_expo", config: [1, 5] },
   { text: "Precio Volumen", value: "por_volumen", config: [5, 14] },
   { text: "Arrendamiento", value: "renta_1", config: [6, 15] },
   { text: "Arrendamiento 2 meses", value: "renta_2", config: [15] },
   { text: "Arrendamiento +3 meses", value: "renta_3", config: [15] },
-  { text: "Credito 30 Dias", value: "credito_30d", config: [5] },
+  { text: "Credito 30 Dias", value: "credito_30d", config: [5, 17] },
   { text: "Arrendadoras", value: "arrendadoras", config: [6] },
 ];
 const _pricesConfig = [

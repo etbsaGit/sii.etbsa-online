@@ -99,6 +99,14 @@
               >
                 {{ type.title }}
               </v-chip>
+              <div>Categorias:</div>
+              <v-chip
+                v-for="(type, key) in item.seller_category"
+                :key="`category-${key}`"
+                class="ma-1"
+              >
+                {{ type.name }}
+              </v-chip>
             </v-card-text>
           </v-card>
         </v-dialog>

@@ -81,7 +81,7 @@
               <v-col cols="12" md="4">
                 <p class="text-14 mb-1">T.C.</p>
                 <v-currency-field
-                  v-model.number="form.exchange_value"
+                  v-model.number="ExchangeRate"
                   :default-value="form.exchange_value"
                   placeholder="0.00"
                   :rules="[(v) => !!v || 'Es Requerido']"
@@ -711,16 +711,24 @@ import Assertiveness from "@admin/sales/tracking/resources/assertiveness.json";
 
 const _paymentCondition = [
   { text: "Por Definir", value: "por_definir", config: [] },
-  { text: "P. Lista", value: "precio_lista", config: [5, 6, 11, 14, 16, 9] },
-  { text: "Contado", value: "contado", config: [1, 2, 3, 10, 5, 6, 11, 16, 9] },
-  { text: "JDF 2 años", value: "jdf_2y", config: [1, 2, 3, 10] },
+  {
+    text: "P. Lista",
+    value: "precio_lista",
+    config: [5, 6, 11, 14, 16, 9, 17],
+  },
+  {
+    text: "Contado",
+    value: "contado",
+    config: [1, 2, 3, 10, 5, 6, 11, 16, 9, 17],
+  },
+  { text: "JDF 2 años", value: "jdf_2y", config: [1, 2, 3, 10, 17] },
   { text: "JDF 5 años", value: "jdf_5y", config: [1] },
   { text: "Expo", value: "precio_expo", config: [1, 5] },
   { text: "Precio Volumen", value: "por_volumen", config: [5, 14] },
   { text: "Arrendamiento", value: "renta_1", config: [6, 15] },
   { text: "Arrendamiento 2 meses", value: "renta_2", config: [15] },
   { text: "Arrendamiento +3 meses", value: "renta_3", config: [15] },
-  { text: "Credito 30 Dias", value: "credito_30d", config: [5] },
+  { text: "Credito 30 Dias", value: "credito_30d", config: [5, 17] },
   { text: "Arrendadoras", value: "arrendadoras", config: [6] },
 ];
 
@@ -779,16 +787,23 @@ export default {
       const _this = this;
       _this.form.products = [];
     },
-    "form.currency_id": function (v) {
-      const _this = this;
-      if (v === 2) {
-        _this.form.exchange_value = _this.options.exchange_value;
-      } else {
-        _this.form.exchange_value = 1;
-      }
-    },
+    // "form.currency_id": function (v) {
+    //   const _this = this;
+    //   if (v === 2) {
+    //     _this.form.exchange_value = _this.options.exchange_value;
+    //   } else {
+    //     _this.form.exchange_value = 1;
+    //   }
+    // },
   },
   computed: {
+    ExchangeRate: {
+      get() {
+        const _this = this;
+        return (_this.form.exchange_value =
+          _this.form.currency_id == 2 ? _this.options.exchange_value : 1);
+      },
+    },
     SelectedProspect() {
       const _this = this;
       if (_this.form.prospect_id) {
@@ -848,10 +863,12 @@ export default {
     Subtotal: {
       get() {
         const _this = this;
-        return (_this.form.subtotal = _this.form.products.reduce(
-          (acc, crr) => (acc += parseFloat(crr.subtotal)),
-          0
-        ));
+        if (!!_this.form.products && _this.form.products.length > 0)
+          return (_this.form.subtotal = _this.form.products.reduce(
+            (acc, crr) => (acc += parseFloat(crr.subtotal)),
+            0
+          ));
+        else return 0;
         // .map((item) => parseFloat(item.subtotal))
       },
       set(v) {

@@ -285,6 +285,16 @@ class SinglePageController extends AdminController
                         'route_name' => 'sales.customers',
                         'visible' => true,
                     ]),
+                    new MenuItem([
+                        'group_requirements' => ['Super User'],
+                        'permission_requirements' => [],
+                        'label' => 'Ventas Sucursal',
+                        'nav_type' => MenuItem::$NAV_TYPE_NAV,
+                        'icon' => 'mdi-chart-areaspline',
+                        'route_type' => 'vue',
+                        'route_name' => 'sales.agencies',
+                        'visible' => true,
+                    ]),
                 ]
             ]),
             new MenuItem([

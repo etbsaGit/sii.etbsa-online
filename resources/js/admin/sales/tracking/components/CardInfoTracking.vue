@@ -28,12 +28,11 @@
                   {{ created_at_format }}
                 </v-list-item-subtitle>
                 <v-list-item-subtitle class="subtitle-1 text-uppercase">
-                  {{ info.detail.price | currency }} {{ info.currency }}
+                  {{ info.detail.price | currency }} {{ info.currency }} <br />
+                  T.C. {{ info.detail.exchange_value | currency }}
                 </v-list-item-subtitle>
-                <v-list-item-title
-                  class="pt-4 text-wrap text-button"
-                  v-text="info.detail.description_topic"
-                />
+                <v-list-item-title class="pt-4 text-wrap text-button" />
+                {{ info.detail.description_topic }}
               </v-list-item-content>
             </v-list-item>
           </v-card>
@@ -81,9 +80,8 @@
                               <v-list dense color="grey lighten-3">
                                 <v-list-item>
                                   <v-list-item-content>
-                                    <v-list-item-title
-                                      v-text="'Registar Nuevo Cliente'"
-                                    />
+                                    <v-list-item-title />
+                                    Registar Nuevo Cliente
                                   </v-list-item-content>
                                   <v-list-item-action>
                                     <v-icon>mdi-account-plus</v-icon>
@@ -92,12 +90,12 @@
                               </v-list>
                             </template>
                             <template v-slot:item="{ item }">
-                              <v-list-item-title
-                                v-html="item.full_name"
-                              ></v-list-item-title>
-                              <v-list-item-subtitle
-                                v-html="item.rfc"
-                              ></v-list-item-subtitle>
+                              <v-list-item-title>
+                                {{ item.full_name }}
+                              </v-list-item-title>
+                              <v-list-item-subtitle>
+                                {{ item.rfc }}
+                              </v-list-item-subtitle>
                             </template>
                           </v-autocomplete>
                         </v-col>
@@ -173,9 +171,7 @@
             elevation="4"
             color="light-blue lighten-5"
           >
-            <v-toolbar flat dense class="overline">
-              Cliente
-            </v-toolbar>
+            <v-toolbar flat dense class="overline"> Cliente </v-toolbar>
             <v-divider></v-divider>
             <v-list-item three-line>
               <v-list-item-content>

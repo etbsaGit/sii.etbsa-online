@@ -70,7 +70,7 @@
             <v-col cols="12" md="3" class="pa-2 flex-grow-1 flex-shrink-0">
               <!-- item-text="nombre"
               item-value="id" -->
-              <!-- <v-select
+              <v-select
                 v-model="filters.sucursales"
                 label="SUCURSAL"
                 :items="options.Sucursales"
@@ -83,7 +83,7 @@
                 chips
                 small-chips
                 deletable-chips
-              > -->
+              >
                 <!-- <template v-slot:selection="{ item }">
                   <v-list-item-content>
                     <v-list-item-subtitle>
@@ -563,6 +563,106 @@
         </v-col>
       </v-row>
     </v-card-text>
+    <v-card-text v-if="ventasPorSucursal.length > 0">
+      <div class="text-h3">Resumen Sucursal(es)</div>
+      <v-row dense>
+        <v-col cols="6">
+          <v-simple-table class="elevation-4" height="500" fixed-header>
+            <template #default>
+              <thead>
+                <tr>
+                  <th>Sucursal</th>
+                  <th>Tipo de Venta</th>
+                  <th>Total Venta</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="(venta, index) in ventasPorSucursal"
+                  :key="`${index}-${venta.tipo_venta}`"
+                >
+                  <td>
+                    <div class="text-secondary">{{ venta.sucursal }}</div>
+                    {{ venta.vendedor }}
+                  </td>
+                  <td class="text-no-wrap">
+                    <div class="font-weight-bold">{{ venta.tipo }}</div>
+                    {{ venta.tipo_venta || "Otro" }}
+                  </td>
+                  <td>{{ venta.total_comprado | currency }}</td>
+                </tr>
+              </tbody>
+            </template>
+          </v-simple-table>
+        </v-col>
+        <v-col cols="6">
+          <pie-chart
+            :data-labels="dataSucursalLabels"
+            :data-values="dataSucursalValues"
+            :height="500"
+          />
+        </v-col>
+        <v-col cols="12">
+          <bar-chart :data-set="BarDataSucursalSet" :height="500"></bar-chart>
+        </v-col>
+        <v-col cols="12">
+          <v-card flat>
+            <v-card-title> Ultima Venta Sucursal </v-card-title>
+            <v-card-text>
+              <v-simple-table class="elevation-4" max-height="500" fixed-header>
+                <template #default>
+                  <thead>
+                    <tr>
+                      <th>Cliente</th>
+                      <th>Sucursal</th>
+                      <th>Producto</th>
+                      <th>Precio Venta</th>
+                      <th>Tipo Venta</th>
+                      <th>Vendedor</th>
+                      <th>Direcciones</th>
+                      <th>Teléfonos</th>
+                      <th>Fecha Factura</th>
+                      <th>Año</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      v-for="(item, key) in ultimasInvoiceSucursal"
+                      :key="key"
+                    >
+                      <td>
+                        <div class="text-secondary">
+                          {{ item.clave_cliente }}
+                        </div>
+                        {{ item.cliente }}
+                      </td>
+                      <td>{{ item.sucursal }}</td>
+                      <td>
+                        <div>{{ item.NIP }}</div>
+                        {{ item.producto }}
+                      </td>
+                      <td>{{ item.precio_venta | currency }}</td>
+                      <td class="text-no-wrap">
+                        <div class="font-weight-bold">{{ item.tipo }}</div>
+                        {{ item.tipo_venta || "Otro" }}
+                      </td>
+                      <td>
+                        <div>{{ item.clave_vendedor }}</div>
+                        {{ item.nombre_vendedor }}
+                      </td>
+                      <td>{{ item.addresses }}</td>
+                      <td>{{ item.phones }}</td>
+                      <td>{{ item.invoice_date }}</td>
+                      <td>{{ item.year }}</td>
+                    </tr>
+                  </tbody>
+                </template>
+              </v-simple-table>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-card-text>
   </v-card>
 </template>
 <script>
@@ -632,6 +732,9 @@ export default {
       ventasPorVendedor: [],
       barVendedorGrafica: [],
       ultimasInvoiceVendedor: [],
+      ventasPorSucursal: [],
+      barSucursalGrafica: [],
+      ultimasInvoiceSucursal: [],
       lastUpdated: "",
       totalItems: 0,
       pagination: {
@@ -670,6 +773,15 @@ export default {
     dataVendedorValues() {
       return this.ventasPorVendedor.map((item) => item.total_comprado);
     },
+    dataSucursalLabels() {
+      return this.ventasPorSucursal.map(
+        (item) =>
+          `${item.tipo_venta || "Otro"} (${item.tipo}) ${item.sucursal}`
+      );
+    },
+    dataSucursalValues() {
+      return this.ventasPorSucursal.map((item) => item.total_comprado);
+    },
     BarDataSet() {
       const _this = this;
       return {
@@ -686,6 +798,17 @@ export default {
       return {
         labels: _this.barVendedorGrafica[0].years.map(String),
         datasets: _this.barVendedorGrafica.map((clienteData, index) => ({
+          label: clienteData.cliente,
+          data: clienteData.acumulado,
+          backgroundColor: _this.getRandomColor(index),
+        })),
+      };
+    },
+    BarDataSucursalSet() {
+      const _this = this;
+      return {
+        labels: _this.barSucursalGrafica[0].years.map(String),
+        datasets: _this.barSucursalGrafica.map((clienteData, index) => ({
           label: clienteData.cliente,
           data: clienteData.acumulado,
           backgroundColor: _this.getRandomColor(index),
@@ -809,6 +932,9 @@ export default {
             ventasPorVendedor,
             barVendedorGrafica,
             ultimasInvoiceVendedor,
+            ventasPorSucursal,
+            barSucursalGrafica,
+            ultimasInvoiceSucursal,
           },
           message,
         },
@@ -826,6 +952,9 @@ export default {
       this.ventasPorVendedor = ventasPorVendedor;
       this.barVendedorGrafica = barVendedorGrafica;
       this.ultimasInvoiceVendedor = ultimasInvoiceVendedor;
+      this.ventasPorSucursal = ventasPorSucursal;
+      this.barSucursalGrafica = barSucursalGrafica;
+      this.ultimasInvoiceSucursal = ultimasInvoiceSucursal;
 
       this.$store.commit("showSnackbar", {
         message: message,
