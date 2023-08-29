@@ -21,7 +21,7 @@ class SellerRepository extends BaseRepository
      */
     public function listSellers($params)
     {
-        return $this->get($params, ['groups', 'seller_type', 'seller_agency'], function ($q) use ($params) {
+        return $this->get($params, ['groups', 'seller_type', 'seller_agency','seller_category'], function ($q) use ($params) {
             $q->whereHas('groups', function ($query) {
                 return $query->whereIn('groups.name', ['Vendedor']);
             });

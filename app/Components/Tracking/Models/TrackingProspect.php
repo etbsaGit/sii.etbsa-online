@@ -178,6 +178,7 @@ class TrackingProspect extends Model
             function ($query) use ($user) {
                 $query->whereIn('agency_id', $user->seller_agency->pluck('id'))
                     ->whereIn('department_id', $user->seller_type->pluck('id'))
+                    ->whereIn('title', $user->seller_category->pluck('name'))
                     ->orWhere('assigned_by', $user->id)
                     ->orWhere('attended_by', $user->id);
             },

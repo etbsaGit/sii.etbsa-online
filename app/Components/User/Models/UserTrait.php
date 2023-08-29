@@ -9,6 +9,7 @@
 
 namespace App\Components\User\Models;
 
+use App\Components\Common\Models\SellerCategory;
 use App\Components\Common\Models\SellerType;
 use App\Components\Common\Models\SellerAgency;
 use Hash;
@@ -96,6 +97,10 @@ trait UserTrait
     public function seller_agency()
     {
         return $this->belongsToMany(SellerAgency::class, 'sellers_agency_pivot', 'user_id');
+    }
+    public function seller_category()
+    {
+        return $this->belongsToMany(SellerCategory::class, 'seller_category_pivot', 'user_id','category_id');
     }
 
     // public function agency()

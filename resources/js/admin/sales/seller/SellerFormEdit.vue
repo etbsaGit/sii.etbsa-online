@@ -62,12 +62,35 @@
                   v-model="seller_type[g.id]"
                 ></v-switch>
               </v-flex>
+              <v-flex xs12 mt-4>
+                <h1 class="title">
+                  <v-icon>mdi-office-building</v-icon> Configuracion Gerente
+                  Categorias
+                </h1>
+                <v-divider></v-divider>
+              </v-flex>
+              <v-layout wrap mx-2 class="caption">
+                <v-flex
+                  xs12
+                  md3
+                  v-for="(g, k) in options.categories"
+                  :key="k"
+                  class="caption"
+                >
+                  <v-switch
+                    dense
+                    hide-details
+                    v-bind:label="g.name"
+                    v-model="seller_category[g.id]"
+                  ></v-switch>
+                </v-flex>
+              </v-layout>
+              <v-flex xs12>
+                <v-btn block @click="save()" :disabled="!valid" color="primary">
+                  Guardar
+                </v-btn>
+              </v-flex>
             </v-layout>
-            <v-flex xs12>
-              <v-btn block @click="save()" :disabled="!valid" color="primary"
-                >Guardar</v-btn
-              >
-            </v-flex>
           </v-layout>
         </v-container>
       </v-form>
@@ -91,9 +114,11 @@ export default {
       title: "",
       seller_type: [],
       seller_agency: [],
+      seller_category: [],
       options: {
         departments: [],
         agencies: [],
+        categories: [],
       },
     };
   },
@@ -109,6 +134,7 @@ export default {
         seller_key: self.title,
         seller_type: self.seller_type,
         seller_agency: self.seller_agency,
+        seller_category: self.seller_category,
       };
 
       self.isLoading = true;
@@ -157,6 +183,9 @@ export default {
           _.each(self.Seller.seller_agency, (g) => {
             self.seller_agency[g.id] = true;
           });
+          _.each(self.Seller.seller_category, (g) => {
+            self.seller_category[g.id] = true;
+          });
 
           (cb || Function)();
         });
@@ -174,11 +203,15 @@ export default {
           let Data = response.data.data;
           self.options.departments = Data.departments;
           self.options.agencies = Data.agencies;
+          self.options.categories = Data.categories;
 
           _.each(self.options.departments, (d) => {
             d.selected = false;
           });
           _.each(self.options.agencies, (d) => {
+            d.selected = false;
+          });
+          _.each(self.options.categories, (d) => {
             d.selected = false;
           });
 
