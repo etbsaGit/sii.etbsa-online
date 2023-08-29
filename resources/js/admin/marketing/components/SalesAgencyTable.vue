@@ -603,46 +603,119 @@ export default {
       return charts;
     },
 
+    // queryGroup() {
+    //   const conceptOrder = {
+    //     "Ventas Netas": 1,
+    //     "Costo de Ventas": 2,
+    //     "Gastos Fijos": 3,
+    //     "Gastos Variables": 4,
+    //     "Utilidad Bruta": 5,
+    //     "Utilidad y/o Perdida Neta": 6,
+    //   };
+    //   return this.groupedData.reduce((acc, item) => {
+    //     const existingLinea = acc.find(
+    //       (entry) => entry.LineaDeSucursal === item.LineaDeSucursal
+    //     );
+
+    //     if (existingLinea) {
+    //       const existingConcepto = existingLinea.CONCEPTOS.find(
+    //         (entry) => entry.CONCEPTO === item.CONCEPTO
+    //       );
+
+    //       if (existingConcepto) {
+    //         existingConcepto.Departamentos.push(item);
+    //       } else {
+    //         existingLinea.CONCEPTOS.push({
+    //           CONCEPTO: item.CONCEPTO,
+    //           Departamentos: [item],
+    //           // TotalAcumuladoVenta: [item].reduce(
+    //           //   (accumulator, depto) =>
+    //           //     accumulator + Number(depto.AcumuladoVenta),
+    //           //   0
+    //           // ),
+    //         });
+    //       }
+    //     } else {
+    //       acc.push({
+    //         LineaDeSucursal: item.LineaDeSucursal,
+    //         CONCEPTOS: [
+    //           {
+    //             CONCEPTO: item.CONCEPTO,
+    //             Departamentos: [item],
+    //             TotalAcumuladoVenta: [item].reduce(
+    //               (accumulator, depto) =>
+    //                 accumulator + Number(depto.AcumuladoVenta),
+    //               0
+    //             ),
+    //           },
+    //         ],
+    //       });
+    //     }
+
+    //     acc.forEach((entry) => {
+    //       entry.CONCEPTOS.sort(
+    //         (a, b) => conceptOrder[a.CONCEPTO] - conceptOrder[b.CONCEPTO]
+    //       );
+    //     });
+
+    //     return acc;
+    //   }, []);
+    // },
+
     queryGroup() {
+      const conceptOrder = {
+        "Ventas Netas": 1,
+        "Costo de Ventas": 2,
+        "Gastos Fijos": 3,
+        "Gastos Variables": 4,
+        "Utilidad Bruta": 5,
+        "Utilidad y/o Perdida Neta": 6,
+      };
+
       return this.groupedData.reduce((acc, item) => {
         const existingLinea = acc.find(
           (entry) => entry.LineaDeSucursal === item.LineaDeSucursal
         );
 
-        if (existingLinea) {
-          const existingConcepto = existingLinea.CONCEPTOS.find(
-            (entry) => entry.CONCEPTO === item.CONCEPTO
-          );
+        // Verifica si el concepto está en el orden definido
+        if (conceptOrder[item.CONCEPTO]) {
+          if (existingLinea) {
+            const existingConcepto = existingLinea.CONCEPTOS.find(
+              (entry) => entry.CONCEPTO === item.CONCEPTO
+            );
 
-          if (existingConcepto) {
-            existingConcepto.Departamentos.push(item);
-          } else {
-            existingLinea.CONCEPTOS.push({
-              CONCEPTO: item.CONCEPTO,
-              Departamentos: [item],
-              TotalAcumuladoVenta: [item].reduce(
-                (accumulator, depto) =>
-                  accumulator + Number(depto.AcumuladoVenta),
-                0
-              ),
-            });
-          }
-        } else {
-          acc.push({
-            LineaDeSucursal: item.LineaDeSucursal,
-            CONCEPTOS: [
-              {
+            if (existingConcepto) {
+              existingConcepto.Departamentos.push(item);
+            } else {
+              existingLinea.CONCEPTOS.push({
                 CONCEPTO: item.CONCEPTO,
                 Departamentos: [item],
-                TotalAcumuladoVenta: [item].reduce(
-                  (accumulator, depto) =>
-                    accumulator + Number(depto.AcumuladoVenta),
-                  0
-                ),
-              },
-            ],
-          });
+              });
+            }
+          } else {
+            acc.push({
+              LineaDeSucursal: item.LineaDeSucursal,
+              CONCEPTOS: [
+                {
+                  CONCEPTO: item.CONCEPTO,
+                  Departamentos: [item],
+                  TotalAcumuladoVenta: [item].reduce(
+                    (accumulator, depto) =>
+                      accumulator + Number(depto.AcumuladoVenta),
+                    0
+                  ),
+                },
+              ],
+            });
+          }
         }
+
+        // Ordena los conceptos según el orden definido
+        acc.forEach((entry) => {
+          entry.CONCEPTOS.sort(
+            (a, b) => conceptOrder[a.CONCEPTO] - conceptOrder[b.CONCEPTO]
+          );
+        });
 
         return acc;
       }, []);
@@ -721,7 +794,16 @@ export default {
       ];
 
       let datasets = [];
-      let conceptos = [...new Set(sucursalData.map((item) => item.CONCEPTO))];
+      // let conceptos = [...new Set(sucursalData.map((item) => item.CONCEPTO))];
+      const conceptOrder = {
+        "Ventas Netas": 1,
+        "Costo de Ventas": 2,
+        "Gastos Fijos": 3,
+        "Gastos Variables": 4,
+        "Utilidad Bruta": 5,
+        "Utilidad y/o Perdida Neta": 6,
+      };
+      let conceptos = Object.keys(conceptOrder);
 
       // departamentosUnicos.forEach((departamento, index) => {
       //   const color = _this.getRandomColor(index);
