@@ -54,10 +54,12 @@ Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function
     Route::get('marketing/sales_history/resources', 'MarketingController@resources')->name('salesHistoryResources');
     Route::get('marketing/export', 'ExportController@exportMarketing')->name('marketingExport');
 
-    // SalesCustoemrHistory
+    // SalesCustomerHistory
     Route::get('marketing/sales-customer', 'SalesCustomerHistoryController@index')->name('salesCustomerHistory');
     Route::get('marketing/sales-customer/filters', 'SalesCustomerHistoryController@getOptions')->name('getOptionsEquipDB');
 
+    Route::get('marketing/sales-agencies', 'SalesAgencyHistoryController@index')->name('salesAgencyHistory');
+    
     // ResourcesController
     Route::get('resource/agencies', 'ResourcesShareController@getAgencies')->name('resources.agencies');
     Route::get('resource/users', 'ResourcesShareController@getUser')->name('resources.users');

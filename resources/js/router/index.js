@@ -51,6 +51,12 @@ const router = new Router({
         .default,
     },
     {
+      name: "sales.agencies",
+      path: "/ventas-sucursales",
+      component: require("@admin/marketing/components/SalesAgencyTable")
+        .default,
+    },
+    {
       name: "settings",
       path: "/settings",
       component: require("@admin/settings/Settings").default,

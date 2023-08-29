@@ -76,12 +76,20 @@ class SalesCustomerHistoryController extends AdminController
                     foreach ($clave_vendedor as $term) {
                         $q->orWhere('cv.clave_vendodor', 'LIKE', "%{$term}%");
                         $q->orWhere('cv.nombre_vendor', 'LIKE', "%{$term}%");
-                        
+
                     }
                 }
             });
         })->when($filters['sucursales'] ?? null, function ($query, $sucursales) {
-            $query->whereIn('fa.SUCURSAL', $sucursales);
+            // $query->whereIn('fa.SUCURSAL', $sucursales);
+            $query->where(function ($q) use ($sucursales) {
+                if (is_array($sucursales)) {
+                    foreach ($sucursales as $term) {
+                        $q->orWhere('fa.SUCURSAL', 'LIKE', "%{$term}%");
+
+                    }
+                }
+            });
         });
 
         $query->when($request->search ?? null, function ($query, $search) {
@@ -97,17 +105,19 @@ class SalesCustomerHistoryController extends AdminController
         }
 
         $sumatoriaTotal = $query->sum('PRECIO VENTA');
+        if ($request->has('clave_cliente') || $request->has('clave_vendedor') || $request->has('sucursales')) {
+            $results = $query->get();
+            $allYears = $results->pluck('year')->unique()->sort()->values();
+        }
         $query->chunk(2000, function ($invoices) {
             return $invoices;
         });
-        $results = $query->get();
         $items = $query->paginate($request['per_page'] ?? 10);
-
         $ventasPorCliente = [];
         $barGrafica = [];
         $ultimasInvoicePorCliente = [];
         if ($request->has('clave_cliente')) {
-
+        
             // Grafica de Pie y Tabla 
             $ventasPorCliente = $results->groupBy(function ($item) {
                 return $item->tipo_venta . '_' . $item->clave_cliente;
@@ -124,7 +134,7 @@ class SalesCustomerHistoryController extends AdminController
             })->values();
 
             // Grafica de Barras
-            $allYears = $results->pluck('year')->unique()->sort()->values();
+            // $allYears = $results->pluck('year')->unique()->sort()->values();
             $barGrafica = $results->groupBy('clave_cliente')->map(function ($ventasPorCliente, $cliente) use ($allYears) {
                 $acumuladoPorYear = $ventasPorCliente->groupBy('year')->map(function ($ventasPorYear) {
                     return $ventasPorYear->sum('precio_venta');
@@ -170,7 +180,7 @@ class SalesCustomerHistoryController extends AdminController
                 ];
             })->values();
 
-            $allYears = $results->pluck('year')->unique()->sort()->values();
+            // $allYears = $results->pluck('year')->unique()->sort()->values();
             $barVendedorGrafica = $results->groupBy('clave_vendedor')->map(function ($ventasPorCliente, $cliente) use ($allYears) {
                 $acumuladoPorYear = $ventasPorCliente->groupBy('year')->map(function ($ventasPorYear) {
                     return $ventasPorYear->sum('precio_venta');
@@ -195,6 +205,49 @@ class SalesCustomerHistoryController extends AdminController
                 return $invoiceDates->last();
             });
         }
+        $ventasPorSucursal = [];
+        $barSucursalGrafica = [];
+        $ultimasInvoiceSucursal = [];
+        if ($request->has('sucursales')) {
+            $ventasPorSucursal = $results->groupBy(function ($item) {
+                return $item->tipo_venta . '_' . $item->sucursal;
+
+            })->map(function ($groupedItems) {
+                return [
+                    'sucursal' => $groupedItems[0]->sucursal,
+                    'tipo' => $groupedItems[0]->tipo_venta,
+                    'tipo_venta' => $groupedItems[0]->tipo_venta_nombre,
+                    'total_comprado' => $groupedItems->sum('precio_venta')
+                ];
+            })->values();
+
+            // $allYears = $results->pluck('year')->unique()->sort()->values();
+            // dd($results->toArray());
+            $barSucursalGrafica = $results->groupBy('sucursal')->map(function ($ventasPorCliente, $cliente) use ($allYears) {
+                // dd($ventasPorCliente->toArray());
+                $acumuladoPorYear = $ventasPorCliente->groupBy('year')->map(function ($ventasPorYear) {
+                    return $ventasPorYear->sum('precio_venta');
+                });
+
+                // Rellenar con 0 los años sin ventas
+                $acumuladoPorYear = $acumuladoPorYear->union($allYears->flip()->map(function () {
+                    return 0;
+                }))->sortKeys()->values();
+
+
+                return [
+                    'cliente' => $cliente,
+                    'years' => $allYears,
+                    'acumulado' => $acumuladoPorYear,
+                ];
+            })->values();
+
+            $ultimasInvoiceSucursal = $results->mapToGroups(function ($item) {
+                return [$item->sucursal => $item];
+            })->map(function ($invoiceDates) {
+                return $invoiceDates->last();
+            });
+        }
 
 
         $archivo = database_path('EquipDB.db3');
@@ -212,6 +265,9 @@ class SalesCustomerHistoryController extends AdminController
                 'ventasPorVendedor',
                 'barVendedorGrafica',
                 'ultimasInvoiceVendedor',
+                'ventasPorSucursal',
+                'barSucursalGrafica',
+                'ultimasInvoiceSucursal',
             )
         );
     }
