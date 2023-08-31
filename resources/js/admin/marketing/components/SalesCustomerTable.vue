@@ -102,6 +102,7 @@
                 </template> -->
               </v-select>
             </v-col>
+            <!--  -->
             <!-- <v-col cols="12" md="3" class="pa-2 flex-grow-1 flex-shrink-0">
               <v-select
                 v-model="filters.lineas"
@@ -120,12 +121,12 @@
                 small-chips
               >
               </v-select>
-            </v-col>
+            </v-col> -->
             <v-col cols="12" md="2" class="pa-2 flex-grow-1 flex-shrink-0">
               <v-select
                 v-model="filters.years"
-                label="AÑO"
-                :items="options.Años"
+                label="AÑO(s)"
+                :items="OptionsYears"
                 item-text="year"
                 item-value="year"
                 placeholder="Seleccionar Año"
@@ -140,7 +141,7 @@
               >
               </v-select>
             </v-col>
-            <v-col cols="12" md="2" class="pa-2 flex-grow-1 flex-shrink-0">
+            <!-- <v-col cols="12" md="2" class="pa-2 flex-grow-1 flex-shrink-0">
               <v-select
                 v-model="filters.currency"
                 label="MONEDA"
@@ -158,8 +159,8 @@
                 small-chips
               >
               </v-select>
-            </v-col>
-            <v-col cols="12" md="2" class="pa-2 flex-grow-1 flex-shrink-0">
+            </v-col> -->
+            <!-- <v-col cols="12" md="2" class="pa-2 flex-grow-1 flex-shrink-0">
               <v-select
                 v-model="filters.tipo_venta"
                 label="TIPO DE VENTA"
@@ -196,8 +197,8 @@
                   </v-list-item-content>
                 </template>
               </v-select>
-            </v-col>
-            <v-col cols="12" md="3" class="pa-2 flex-grow-1 flex-shrink-0">
+            </v-col> -->
+            <!-- <v-col cols="12" md="3" class="pa-2 flex-grow-1 flex-shrink-0">
               <v-combobox
                 v-model="filters.municipio"
                 label="Municipio"
@@ -213,8 +214,8 @@
                 small-chips
               >
               </v-combobox>
-            </v-col>
-            <v-col cols="12" md="3" class="pa-2 flex-grow-1 flex-shrink-0">
+            </v-col> -->
+            <!-- <v-col cols="12" md="3" class="pa-2 flex-grow-1 flex-shrink-0">
               <v-combobox
                 v-model="filters.estado"
                 label="Estado"
@@ -372,6 +373,7 @@
                 <tr>
                   <th>Cliente</th>
                   <th>Tipo de Venta</th>
+                  <th>Total Unidades</th>
                   <th>Total Venta</th>
                 </tr>
               </thead>
@@ -388,6 +390,7 @@
                     <div class="font-weight-bold">{{ venta.tipo }}</div>
                     {{ venta.tipo_venta || "Otro" }}
                   </td>
+                  <td>{{ venta.count }}</td>
                   <td>{{ venta.total_comprado | currency }}</td>
                 </tr>
               </tbody>
@@ -473,6 +476,7 @@
                 <tr>
                   <th>Vendedor</th>
                   <th>Tipo de Venta</th>
+                  <th>Total Unidades</th>
                   <th>Total Venta</th>
                 </tr>
               </thead>
@@ -489,6 +493,7 @@
                     <div class="font-weight-bold">{{ venta.tipo }}</div>
                     {{ venta.tipo_venta || "Otro" }}
                   </td>
+                  <td class="text-center">{{ venta.count }}</td>
                   <td>{{ venta.total_comprado | currency }}</td>
                 </tr>
               </tbody>
@@ -503,7 +508,26 @@
           />
         </v-col>
         <v-col cols="12">
-          <bar-chart :data-set="BarDataVendedorSet" :height="500"></bar-chart>
+          <v-card flat>
+            <v-card-title> Acumulado Venta por Año </v-card-title>
+            <v-card-text>
+              <bar-chart
+                :data-set="BarDataVendedorSet"
+                :height="500"
+              ></bar-chart>
+            </v-card-text>
+          </v-card>
+        </v-col>
+        <v-col cols="12">
+          <v-card flat>
+            <v-card-title> Acumulado Tractores por Año </v-card-title>
+            <v-card-text>
+              <bar-chart
+                :data-set="BarDataTraVendedorSet"
+                :height="500"
+              ></bar-chart>
+            </v-card-text>
+          </v-card>
         </v-col>
         <v-col cols="12">
           <v-card flat>
@@ -573,6 +597,7 @@
                 <tr>
                   <th>Sucursal</th>
                   <th>Tipo de Venta</th>
+                  <th>Total Unidades</th>
                   <th>Total Venta</th>
                 </tr>
               </thead>
@@ -589,6 +614,7 @@
                     <div class="font-weight-bold">{{ venta.tipo }}</div>
                     {{ venta.tipo_venta || "Otro" }}
                   </td>
+                  <td>{{ venta.count }}</td>
                   <td>{{ venta.total_comprado | currency }}</td>
                 </tr>
               </tbody>
@@ -603,7 +629,26 @@
           />
         </v-col>
         <v-col cols="12">
-          <bar-chart :data-set="BarDataSucursalSet" :height="500"></bar-chart>
+          <v-card flat>
+            <v-card-title> Acumulado Venta por Año </v-card-title>
+            <v-card-text>
+              <bar-chart
+                :data-set="BarDataSucursalSet"
+                :height="500"
+              ></bar-chart>
+            </v-card-text>
+          </v-card>
+        </v-col>
+        <v-col cols="12">
+          <v-card flat>
+            <v-card-title> Acumulado Tractores por Año </v-card-title>
+            <v-card-text>
+              <bar-chart
+                :data-set="BarDataTraSucursalSet"
+                :height="500"
+              ></bar-chart>
+            </v-card-text>
+          </v-card>
         </v-col>
         <v-col cols="12">
           <v-card flat>
@@ -734,7 +779,9 @@ export default {
       ultimasInvoiceVendedor: [],
       ventasPorSucursal: [],
       barSucursalGrafica: [],
+      barTipoVentaSucursalGrafica: [],
       ultimasInvoiceSucursal: [],
+      barTipoVentaVendedorGrafica: [],
       lastUpdated: "",
       totalItems: 0,
       pagination: {
@@ -775,8 +822,7 @@ export default {
     },
     dataSucursalLabels() {
       return this.ventasPorSucursal.map(
-        (item) =>
-          `${item.tipo_venta || "Otro"} (${item.tipo}) ${item.sucursal}`
+        (item) => `${item.tipo_venta || "Otro"} (${item.tipo}) ${item.sucursal}`
       );
     },
     dataSucursalValues() {
@@ -804,6 +850,19 @@ export default {
         })),
       };
     },
+    BarDataTraVendedorSet() {
+      const _this = this;
+      return {
+        labels: _this.barTipoVentaVendedorGrafica[0].years.map(String),
+        datasets: _this.barTipoVentaVendedorGrafica.map(
+          (clienteData, index) => ({
+            label: clienteData.cliente,
+            data: clienteData.acumulado,
+            backgroundColor: _this.getRandomColor(index),
+          })
+        ),
+      };
+    },
     BarDataSucursalSet() {
       const _this = this;
       return {
@@ -813,6 +872,19 @@ export default {
           data: clienteData.acumulado,
           backgroundColor: _this.getRandomColor(index),
         })),
+      };
+    },
+    BarDataTraSucursalSet() {
+      const _this = this;
+      return {
+        labels: _this.barTipoVentaSucursalGrafica[0].years.map(String),
+        datasets: _this.barTipoVentaSucursalGrafica.map(
+          (clienteData, index) => ({
+            label: clienteData.cliente,
+            data: clienteData.acumulado,
+            backgroundColor: _this.getRandomColor(index),
+          })
+        ),
       };
     },
     FilterClienteReduce() {
@@ -830,6 +902,12 @@ export default {
           : result.push(item);
         return result;
       }, []);
+    },
+    OptionsYears() {
+      const _this = this;
+      return _this.options.Años && _this.options.Años.length > 0
+        ? _this.options.Años.sort()
+        : [];
     },
   },
   watch: {
@@ -934,7 +1012,9 @@ export default {
             ultimasInvoiceVendedor,
             ventasPorSucursal,
             barSucursalGrafica,
+            barTipoVentaSucursalGrafica,
             ultimasInvoiceSucursal,
+            barTipoVentaVendedorGrafica,
           },
           message,
         },
@@ -955,6 +1035,8 @@ export default {
       this.ventasPorSucursal = ventasPorSucursal;
       this.barSucursalGrafica = barSucursalGrafica;
       this.ultimasInvoiceSucursal = ultimasInvoiceSucursal;
+      this.barTipoVentaVendedorGrafica = barTipoVentaVendedorGrafica;
+      this.barTipoVentaSucursalGrafica = barTipoVentaSucursalGrafica;
 
       this.$store.commit("showSnackbar", {
         message: message,
