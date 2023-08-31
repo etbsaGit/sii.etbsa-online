@@ -26,6 +26,8 @@ class SalesCustomerHistoryController extends AdminController
             'CVE_CLIENTE as clave_cliente',
             'fa.SUCURSAL AS sucursal',
             'fa.LINEA AS linea',
+            'CIUDAD / MUNICIPIO AS municipio',
+            'fa.CP',
             'NIP',
             'DESCRIPCION PRODUCTO AS producto',
             'NOMBRE CLIENTE AS cliente',
@@ -90,6 +92,8 @@ class SalesCustomerHistoryController extends AdminController
                     }
                 }
             });
+        })->when($filters['years'] ?? null, function ($query, $years) {
+            $query->whereIn(DB::raw('SUBSTR(`FECHA FACTURA`, -4)'), $years);
         });
 
         $query->when($request->search ?? null, function ($query, $search) {
@@ -109,6 +113,10 @@ class SalesCustomerHistoryController extends AdminController
             $results = $query->get();
             $allYears = $results->pluck('year')->unique()->sort()->values();
         }
+
+
+        // $ventasPorMunicipio = [];
+
         $query->chunk(2000, function ($invoices) {
             return $invoices;
         });
@@ -117,7 +125,7 @@ class SalesCustomerHistoryController extends AdminController
         $barGrafica = [];
         $ultimasInvoicePorCliente = [];
         if ($request->has('clave_cliente')) {
-        
+
             // Grafica de Pie y Tabla 
             $ventasPorCliente = $results->groupBy(function ($item) {
                 return $item->tipo_venta . '_' . $item->clave_cliente;
@@ -129,7 +137,8 @@ class SalesCustomerHistoryController extends AdminController
                     'cliente' => $groupedItems[0]->cliente,
                     'tipo' => $groupedItems[0]->tipo_venta,
                     'tipo_venta' => $groupedItems[0]->tipo_venta_nombre,
-                    'total_comprado' => $groupedItems->sum('precio_venta')
+                    'total_comprado' => $groupedItems->sum('precio_venta'),
+                    'count' => $groupedItems->count()
                 ];
             })->values();
 
@@ -163,6 +172,7 @@ class SalesCustomerHistoryController extends AdminController
 
         $ventasPorVendedor = [];
         $barVendedorGrafica = [];
+        $barTipoVentaVendedorGrafica = [];
         $ultimasInvoiceVendedor = [];
         if ($request->has('clave_vendedor')) {
             $ventasPorVendedor = $results->groupBy(function ($item) {
@@ -176,7 +186,8 @@ class SalesCustomerHistoryController extends AdminController
                     'vendedor' => $groupedItems[0]->nombre_vendedor,
                     'tipo' => $groupedItems[0]->tipo_venta,
                     'tipo_venta' => $groupedItems[0]->tipo_venta_nombre,
-                    'total_comprado' => $groupedItems->sum('precio_venta')
+                    'total_comprado' => $groupedItems->sum('precio_venta'),
+                    'count' => $groupedItems->count()
                 ];
             })->values();
 
@@ -185,6 +196,7 @@ class SalesCustomerHistoryController extends AdminController
                 $acumuladoPorYear = $ventasPorCliente->groupBy('year')->map(function ($ventasPorYear) {
                     return $ventasPorYear->sum('precio_venta');
                 });
+
 
                 // Rellenar con 0 los años sin ventas
                 $acumuladoPorYear = $acumuladoPorYear->union($allYears->flip()->map(function () {
@@ -199,6 +211,29 @@ class SalesCustomerHistoryController extends AdminController
                 ];
             })->values();
 
+            $barTipoVentaVendedorGrafica = $results->groupBy('clave_vendedor')->map(function ($ventasPorCliente, $cliente) use ($allYears) {
+                $acumuladoPorTipoVenta = $ventasPorCliente->groupBy('year')->map(function ($VentasYearTraVendedor) {
+
+                    return $VentasYearTraVendedor->filter(function ($value, $key) {
+                        return $value->tipo_venta == "TRA";
+                    })
+                        ->count();
+                });
+
+                // Rellenar con 0 los años sin ventas
+                $acumuladoPorTipoVenta = $acumuladoPorTipoVenta->union($allYears->flip()->map(function () {
+                    return 0;
+                }))->sortKeys()->values();
+
+
+                return [
+                    'cliente' => $cliente,
+                    'years' => $allYears,
+                    'acumulado' => $acumuladoPorTipoVenta,
+                ];
+            })->values();
+
+
             $ultimasInvoiceVendedor = $results->mapToGroups(function ($item) {
                 return [$item->clave_vendedor => $item];
             })->map(function ($invoiceDates) {
@@ -207,6 +242,7 @@ class SalesCustomerHistoryController extends AdminController
         }
         $ventasPorSucursal = [];
         $barSucursalGrafica = [];
+        $barTipoVentaSucursalGrafica = [];
         $ultimasInvoiceSucursal = [];
         if ($request->has('sucursales')) {
             $ventasPorSucursal = $results->groupBy(function ($item) {
@@ -217,14 +253,13 @@ class SalesCustomerHistoryController extends AdminController
                     'sucursal' => $groupedItems[0]->sucursal,
                     'tipo' => $groupedItems[0]->tipo_venta,
                     'tipo_venta' => $groupedItems[0]->tipo_venta_nombre,
-                    'total_comprado' => $groupedItems->sum('precio_venta')
+                    'total_comprado' => $groupedItems->sum('precio_venta'),
+                    'count' => $groupedItems->count()
                 ];
             })->values();
 
-            // $allYears = $results->pluck('year')->unique()->sort()->values();
-            // dd($results->toArray());
+
             $barSucursalGrafica = $results->groupBy('sucursal')->map(function ($ventasPorCliente, $cliente) use ($allYears) {
-                // dd($ventasPorCliente->toArray());
                 $acumuladoPorYear = $ventasPorCliente->groupBy('year')->map(function ($ventasPorYear) {
                     return $ventasPorYear->sum('precio_venta');
                 });
@@ -242,6 +277,28 @@ class SalesCustomerHistoryController extends AdminController
                 ];
             })->values();
 
+            $barTipoVentaSucursalGrafica = $results->groupBy('sucursal')->map(function ($ventasPorCliente, $cliente) use ($allYears) {
+                $acumuladoPorTipoVenta = $ventasPorCliente->groupBy('year')->map(function ($VentasYearTraVendedor) {
+
+                    return $VentasYearTraVendedor->filter(function ($value, $key) {
+                        return $value->tipo_venta == "TRA";
+                    })
+                        ->count();
+                });
+
+                // Rellenar con 0 los años sin ventas
+                $acumuladoPorTipoVenta = $acumuladoPorTipoVenta->union($allYears->flip()->map(function () {
+                    return 0;
+                }))->sortKeys()->values();
+
+
+                return [
+                    'cliente' => $cliente,
+                    'years' => $allYears,
+                    'acumulado' => $acumuladoPorTipoVenta,
+                ];
+            })->values();
+
             $ultimasInvoiceSucursal = $results->mapToGroups(function ($item) {
                 return [$item->sucursal => $item];
             })->map(function ($invoiceDates) {
@@ -249,7 +306,7 @@ class SalesCustomerHistoryController extends AdminController
             });
         }
 
-
+        // Municpios Default Chart
         $archivo = database_path('EquipDB.db3');
         $fechaModificacion = File::lastModified($archivo);
         $lastUpdated = date("Y-m-d H:i:s", $fechaModificacion);
@@ -264,10 +321,13 @@ class SalesCustomerHistoryController extends AdminController
                 'ultimasInvoicePorCliente',
                 'ventasPorVendedor',
                 'barVendedorGrafica',
+                'barTipoVentaVendedorGrafica',
                 'ultimasInvoiceVendedor',
                 'ventasPorSucursal',
                 'barSucursalGrafica',
+                'barTipoVentaSucursalGrafica',
                 'ultimasInvoiceSucursal',
+                // 'ventasPorMunicipio'
             )
         );
     }
@@ -301,26 +361,26 @@ class SalesCustomerHistoryController extends AdminController
             'Linea' => DB::connection('sqlite_equip_db')->table('catSucursales as cs')->distinct()
                 ->select('cs.linea')
                 ->get(),
-            'SerieFiscal' => DB::connection('sqlite_equip_db')->table('invoice_jd')->distinct()
-                ->select('SERIE FISCAL AS serie_fiscal')->whereNotNull('SERIE FISCAL')
-                ->pluck('serie_fiscal'),
-            'Moneda' => DB::connection('sqlite_equip_db')->table('invoice_jd')->distinct()
-                ->select('MONEDA')->whereNotNull('MONEDA')
-                ->get(),
+            // 'SerieFiscal' => DB::connection('sqlite_equip_db')->table('invoice_jd')->distinct()
+            //     ->select('SERIE FISCAL AS serie_fiscal')->whereNotNull('SERIE FISCAL')
+            //     ->pluck('serie_fiscal'),
+            // 'Moneda' => DB::connection('sqlite_equip_db')->table('invoice_jd')->distinct()
+            //     ->select('MONEDA')->whereNotNull('MONEDA')
+            //     ->get(),
             'TipoVenta' => DB::connection('sqlite_equip_db')->table('invoice_jd')->distinct()
                 ->select('ctv.clave', 'ctv.descripcion')
                 ->join('catTipoVenta as ctv', 'invoice_jd.TIPO DE VENTA', '=', 'ctv.clave')
                 ->whereNotNull('invoice_jd.TIPO DE VENTA')
                 ->get(),
-            'Años' => DB::connection('sqlite_equip_db')->table('invoice_jd')->distinct()
+            'Años' => DB::connection('sqlite_equip_db')->table('facturacion_utf8')->distinct()
                 ->select(DB::raw('SUBSTR(`FECHA FACTURA`, -4) as year'))
                 ->pluck('year'),
-            'Municipio' => DB::connection('sqlite_equip_db')->table('invoice_jd')->distinct()
-                ->select('CIUDAD as name')
-                ->pluck('name'),
-            'Estado' => DB::connection('sqlite_equip_db')->table('invoice_jd')->distinct()
-                ->select('ESTADO as name')
-                ->pluck('name'),
+            // 'Municipio' => DB::connection('sqlite_equip_db')->table('invoice_jd')->distinct()
+            //     ->select('CIUDAD as name')
+            //     ->pluck('name'),
+            // 'Estado' => DB::connection('sqlite_equip_db')->table('invoice_jd')->distinct()
+            //     ->select('ESTADO as name')
+            //     ->pluck('name'),
         ];
         return $this->sendResponseOk(compact('options'));
     }
