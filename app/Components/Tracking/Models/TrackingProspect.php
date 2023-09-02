@@ -16,13 +16,33 @@ class TrackingProspect extends Model
     protected $primaryKey = 'id';
 
     // 'currency'
-    protected $fillable = [
-        'title', 'reference', 'description_topic', 'price', 'currency_id', 'exchange_value',
-        'category_id', 'registered_by', 'prospect_id', 'customer_id', 'estatus_id', 'assigned_by', 'attended_by',
-        'agency_id', 'department_id',  'first_contact', 'assertiveness', 'tracking_condition', 'invoice',
-        'date_next_tracking', 'date_lost_sale', 'date_won_sale', 'date_invoice'
-    ];
 
+    protected $fillable = [
+        'title',
+        'reference',
+        'description_topic',
+        'price',
+        'currency_id',
+        'exchange_value',
+        'category_id',
+        'registered_by',
+        'prospect_id',
+        'customer_id',
+        'estatus_id',
+        'assigned_by',
+        'attended_by',
+        'agency_id',
+        'department_id',
+        'first_contact',
+        'assertiveness',
+        'tracking_condition',
+        'invoice',
+        'date_next_tracking',
+        'date_lost_sale',
+        'date_won_sale',
+        'date_invoice'
+    ];
+    protected $appends = ['amount'];
     protected $with = ['registered', 'assigned', 'prospect'];
 
     public function estatus()
@@ -188,5 +208,10 @@ class TrackingProspect extends Model
                 });
             }
         );
+    }
+
+    public function getAmountAttribute()
+    {
+        return $this->price * $this->exchange_value;
     }
 }
