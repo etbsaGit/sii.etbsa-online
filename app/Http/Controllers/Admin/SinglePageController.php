@@ -246,6 +246,16 @@ class SinglePageController extends AdminController
                         'visible' => true,
                     ]),
                     new MenuItem([
+                        'group_requirements' => ['GERENTE', 'DIRECCION','Super User'],
+                        'permission_requirements' => [],
+                        'label' => 'Reporte',
+                        'nav_type' => MenuItem::$NAV_TYPE_NAV,
+                        'icon' => 'mdi-chart-bar',
+                        'route_type' => 'vue',
+                        'route_name' => 'tracking.stat',
+                        'visible' => true,
+                    ]),
+                    new MenuItem([
                         'group_requirements' => ['Super User'],
                         'permission_requirements' => [],
                         'label' => 'Graficas',
@@ -264,7 +274,7 @@ class SinglePageController extends AdminController
                 'nav_type' => MenuItem::$NAV_TYPE_NAV,
                 'icon' => 'mdi-chart-areaspline',
                 'visible' => true,
-                'children'=> [
+                'children' => [
                     new MenuItem([
                         'group_requirements' => ['Super User'],
                         'permission_requirements' => [],
@@ -387,7 +397,7 @@ class SinglePageController extends AdminController
                     ]),
                     new MenuItem([
                         'group_requirements' => ['Compras', 'Super User'],
-                        'permission_requirements' => ['compras.admin','factura.pagada'],
+                        'permission_requirements' => ['compras.admin', 'factura.pagada'],
                         'label' => 'Facturas por Pagar',
                         'nav_type' => MenuItem::$NAV_TYPE_NAV,
                         'icon' => 'mdi-file',
@@ -397,7 +407,7 @@ class SinglePageController extends AdminController
                     ]),
                     new MenuItem([
                         'group_requirements' => ['Compras', 'Super User'],
-                        'permission_requirements' => ['compras.admin','factura.pagada'],
+                        'permission_requirements' => ['compras.admin', 'factura.pagada'],
                         'label' => 'Conceptos Compras',
                         'nav_type' => MenuItem::$NAV_TYPE_NAV,
                         'icon' => 'mdi-account-box-multiple-outline',

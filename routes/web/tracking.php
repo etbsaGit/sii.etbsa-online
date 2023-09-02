@@ -15,6 +15,9 @@ Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function
     // Route::post('tracking/message', 'MessageTrackingController@store')->name('message.tracking.store');
     // Route::get('tracking/messages/{tracking}', 'MessageTrackingController@getMessagesTracking')->name('message.tracking.getMessagesTracking');
 
+
+    Route::get('tracking/dashboard/stats', 'TrackingDashboardController@dashboard')->name('tracking.dashboard');
+
     // TRACKING_HISTORICAL
     Route::post('tracking/{tracking}/historical', 'TrackingProspectHistoricalController@store')->name('tracking.historical.store');
 
@@ -30,4 +33,9 @@ Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function
     Route::get('quote/options', 'TrackingQuoteController@getOptions')->name('tracking-quote.getOptions');
     Route::get('quote/products_by_category/{product_category}', 'TrackingQuoteController@getProductsByCategory')->name('tracking-quote.getProductsByCategory');
     Route::get('quote/{quote}/print', 'TrackingQuoteController@printQuote')->name('tracking-quote.print');
+    
+    
+
+    
+
 });

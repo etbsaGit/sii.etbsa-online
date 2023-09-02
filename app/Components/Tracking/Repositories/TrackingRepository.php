@@ -48,6 +48,39 @@ class TrackingRepository extends BaseRepository
             }
         );
     }
+
+    public function dashboardData($params)
+    {
+        $params['paginate'] = 'no';
+        return $this->get(
+            $params,
+            [
+                'estatus',
+                'prospect:id,full_name,company,phone,email',
+                'agency:id,title',
+                'department:id,title',
+                'attended.profiable:id,name,last_name,agency_id',
+                'attended.profiable.agency:id,title',
+                'estatus:id,title,key',
+                'moneda:id,name',
+            ],
+            function ($query) use ($params) {
+                $query->where(function ($query) use ($params) {
+                    $query->filter($params)
+                        ->filterByDateRange($params['dates'] ?? null, $params['estatus'] ?? null);
+                })->when(Auth::user()->isSuperUser(), function ($query) {
+                    return $query;
+                }, function ($query) {
+                    $query->where(function ($query) {
+                        $query->filterForManagers(Auth::user());
+                    });
+                });
+                return $query;
+            }
+        );
+
+    }
+
     public function diaryTracking($params)
     {
         return $this->get(
@@ -59,11 +92,11 @@ class TrackingRepository extends BaseRepository
                 });
                 $query->whereHas('historical')
                     ->where(function ($query) {
-                            $query->whereIn('estatus_id', [1]);
-                        })
+                        $query->whereIn('estatus_id', [1]);
+                    })
                     ->when(Auth::user()->isSuperUser(), function ($query) {
-                            return $query;
-                        }, function ($query) {
+                        return $query;
+                    }, function ($query) {
                     $query->where(function ($query) {
                         $query->filterForManagers(Auth::user());
                     });
