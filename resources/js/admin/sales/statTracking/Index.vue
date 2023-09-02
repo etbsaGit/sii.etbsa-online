@@ -10,7 +10,9 @@
     <v-card-subtitle class="py-4">
       <v-expansion-panels>
         <v-expansion-panel>
-          <v-expansion-panel-header>FILTROS DE BUSQUEDA</v-expansion-panel-header>
+          <v-expansion-panel-header
+            >FILTROS DE BUSQUEDA</v-expansion-panel-header
+          >
           <v-expansion-panel-content>
             <v-autocomplete
               v-model="filters.sellers"
@@ -195,7 +197,7 @@
         </v-col>
       </v-row>
     </v-card-text>
-    <v-card-text v-if="lineChart !== null">
+    <v-card-text v-if="Object.keys(lineChart).length > 0">
       <v-row dense>
         <v-col cols="12">
           <v-card-title class="text-wrap">
@@ -287,12 +289,16 @@ export default {
       const categorias = {};
       this.seguimientosPorCategoria.forEach((item) => {
         const { categoria, estatus, total_comprado, count } = item;
-        if (!categorias[categoria]) {
-          categorias[categoria] = {};
+        let category = categoria
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "");
+        if (!categorias[category]) {
+          categorias[category] = {};
         }
-        categorias[categoria][estatus] =
-          (categorias[categoria][estatus] || 0) + total_comprado;
-        categorias[categoria][`${estatus}_count`] = count;
+        categorias[category][estatus] =
+          (categorias[category][estatus] || 0) + total_comprado;
+        categorias[category][`${estatus}_count`] = count;
       });
       return categorias;
     },
