@@ -1,6 +1,5 @@
 <template>
   <v-card flat>
-    <!-- <v-card-title v-if="Category_id == null"> -->
     <v-card-title>
       <v-autocomplete
         v-model="select_category_id"
@@ -30,55 +29,23 @@
         dense
       ></v-select>
     </v-card-title>
-    <!-- <v-card-title v-else>
-      <v-spacer></v-spacer>
-      <v-select
-        v-model="Payment"
-        :items="optionsPaymentcondition"
-        label="Condicion de Pago"
-        placeholder="Placeholder"
-        class="py-2"
-        style="max-width: 250px"
-        outlined
-        dense
-        ></v-select>
-      :readonly="readOnly"
-        :hide-details="!readOnly"
-        :persistent-hint="readOnly"
-        hint="Este valor no puede ser Modificado" 
-    </v-card-title> -->
     <v-data-table
       :headers="headers"
       :items="items"
-      :items-per-page="-1"
       fixed-header
       hide-default-footer
-      mobile-breakpoint="0"
       dense
     >
       <template v-slot:[`item.name`]="{ item }">
-        <v-list-item dense class="pa-0">
-          <v-list-item-content>
-            <v-list-item-title class="title overline">
-              {{ item.name }}
-            </v-list-item-title>
-            <v-list-item-subtitle class="title overline">
-              SKU: {{ item.sku }}
-            </v-list-item-subtitle>
-            <div
-              v-text="item.description"
-              class="overflow-auto"
-              style="width: 120px"
-            />
-          </v-list-item-content>
-        </v-list-item>
+        <h3>{{ item.name }}</h3>
+        <h4>SKU: {{ item.sku }}</h4>
+        <v-card flat class="caption overflow-auto" max-height="160">
+          <v-card-text class="pa-0">
+            {{ item.description }}
+          </v-card-text>
+        </v-card>
       </template>
       <template v-slot:[`item.price`]="{ item, value }">
-        <!-- v-if="!$gate.allow('assignSeller', 'tracking')" -->
-        <!-- $gate.allow('isGerente', 'tracking') -->
-        <!-- v-if="$gate.allow('isGerente', 'tracking')" -->
-
-        <!-- :return-value.sync="item.price" -->
         <v-edit-dialog
           ref="refEditPriceProduct"
           :return-value="item.price"
@@ -166,28 +133,23 @@
         </div>
       </template>
     </v-data-table>
-    <v-dialog v-model="Dialog" max-width="90%">
-      <v-card>
-        <v-card-title>
-          <span class="text-h5">{{ Title }} Productos</span>
-          <v-spacer />
-          <v-btn icon color="red" @click="Dialog = false">
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-        </v-card-title>
-        <v-card-text>
-          <v-container>
-            <products-list
-              v-if="Dialog"
-              :Filters="{
-                price_type: Payment,
-                category_id: Category,
-              }"
-            ></products-list>
-          </v-container>
-        </v-card-text>
-      </v-card>
-    </v-dialog>
+    <dialog-component
+      :show="Dialog"
+      @close="(Dialog = false), loadOptions()"
+      :fullscreen="$vuetify.breakpoint.mobile"
+      :title="`${Title} Productos`"
+      :maxWidth="1200"
+      closeable
+      key="product-list"
+    >
+      <products-list
+        v-if="Dialog"
+        :Filters="{
+          price_type: Payment,
+          category_id: Category,
+        }"
+      ></products-list>
+    </dialog-component>
     <v-snackbar v-model="snack" :timeout="5000" :color="snackColor">
       {{ snackText }}
 
@@ -198,6 +160,7 @@
   </v-card>
 </template>
 <script>
+import DialogComponent from "../../../components/DialogComponent.vue";
 import ProductsList from "../../../products/product/Index.vue";
 
 const _paymentCondition = [
@@ -239,7 +202,7 @@ const _pricesConfig = [
 
 export default {
   name: "QuoteConceptTable",
-  components: { ProductsList },
+  components: { ProductsList, DialogComponent },
   props: {
     dialogForm: {
       default: false,
@@ -365,7 +328,6 @@ export default {
           text: "Cantidad",
           value: "qty",
           align: "center",
-          width: "120px",
         },
         { text: "Precio U.", value: "price", align: "right", width: "220px" },
         {
@@ -375,7 +337,7 @@ export default {
           align: "right",
           width: "220px",
         },
-        { value: "accion", sortable: false },
+        { text: "Accion", value: "accion", sortable: false },
       ],
     };
   },

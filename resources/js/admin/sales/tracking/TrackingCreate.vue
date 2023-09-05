@@ -1,6 +1,6 @@
 <template>
   <v-card flat>
-    <v-card-text>
+    <v-card-text class="pa-0">
       <tracking-form ref="form" :form.sync="form"></tracking-form>
     </v-card-text>
     <v-card-actions>
