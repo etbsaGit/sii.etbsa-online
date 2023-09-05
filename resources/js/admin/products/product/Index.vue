@@ -1,27 +1,34 @@
 <template>
   <div>
-    <v-toolbar flat class="text-h4 align-center">
+    <v-toolbar flat class="text-h4">
       <v-icon left x-large>mdi-tractor</v-icon>Lista de Productos
-      <v-spacer></v-spacer>
+    </v-toolbar>
+    <v-toolbar flat class="justify-end align-center flex-wrap mt-1">
       <v-text-field
         v-model="filter.search"
         outlined
         dense
         prepend-icon="mdi-magnify"
         label="Buscar Nombre o SKU"
+        placeholder="Buscar"
         class="mr-3"
         hide-details
         clearable
       ></v-text-field>
+    </v-toolbar>
+    <v-toolbar flat>
       <v-btn
         v-if="$gate.allow('isAdmin', 'products')"
         color="primary"
+        class="d-flex"
         dark
         @click="create"
       >
         Registrar Producto
       </v-btn>
-      <v-spacer />
+    </v-toolbar>
+
+    <v-toolbar flat class="d-flex justify-end mt-2">
       <table-header-buttons
         :updateSearchPanel="updateSearchPanel"
         :reloadTable="reloadTable"
@@ -166,9 +173,7 @@
         <span v-if="$router.currentRoute.name != 'products.index'">
           {{ header.text }}
         </span>
-        <span v-else>
-          Ultimo Cambio
-        </span>
+        <span v-else> Ultimo Cambio </span>
       </template>
       <template #[`item.name`]="{ item }">
         <div class="text-uppercase font-weight-bold">{{ item.name }}</div>
@@ -201,10 +206,8 @@
       </template>
       <template #[`item.action`]="{ item }">
         <td v-if="$router.currentRoute.name != 'products.index'">
-          <v-btn @click="select(item)" icon>
-            <v-icon class="green--text">
-              mdi-plus-thick
-            </v-icon>
+          <v-btn @click="select(item)" color="green" dark>
+            Agregar <v-icon right> mdi-plus-thick </v-icon>
           </v-btn>
         </td>
         <td v-else>
@@ -228,6 +231,9 @@
     >
       <v-card>
         <v-toolbar dense dark color="primary" class="text-h6">
+          <v-btn icon left color="red" @click="dialog = false">
+            <v-icon left>mdi-close</v-icon>
+          </v-btn>
           {{ formTitle }}
         </v-toolbar>
         <v-card-text class="pt-4">
@@ -456,12 +462,10 @@
           <div class="d-flex"></div>
         </v-card-text>
         <v-card-actions>
-          <v-btn text color="error" @click="dialog = false">
-            Cancel
-          </v-btn>
+          <v-btn text color="error" @click="dialog = false"> Cancelar </v-btn>
           <v-spacer />
           <v-btn :loading="loading" color="primary" @click="submit">
-            Save
+            Guardar
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -549,7 +553,7 @@ export default {
           sortable: false,
           width: "150",
         },
-        { text: "Action", value: "action", align: "left", sortable: false },
+        { text: "Accion", value: "action", align: "left", sortable: false },
       ],
       valid: true,
       dialog: false,
@@ -761,7 +765,7 @@ export default {
       _this.dialog = true;
       _this.editedId = -1;
       setTimeout(() => {
-        _this.$refs.formProduct.reset
+        _this.$refs.formProduct.reset;
         _this.$refs.formProduct.resetValidation();
         _this.form = { ...this.formDefault };
       }, 1000);

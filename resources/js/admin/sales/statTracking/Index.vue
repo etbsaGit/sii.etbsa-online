@@ -52,12 +52,39 @@
               item-value="name"
               item-text="name"
               label="Categoria:"
-              prepend-icon="mdi-magnify"
+              prepend-icon="mdi-filter-variant"
               hide-details
               clearable
               filled
               dense
             ></v-select>
+            <v-select
+              v-model="filters.assertiveness"
+              :items="options.assertiveness"
+              label="Certeza"
+              placeholder="Filtrar por Certeza"
+              prepend-icon="mdi-magnify"
+              chips
+              deletable-chips
+              small-chips
+              hide-details
+              clearable
+              multiple
+              filled
+            >
+              <template #item="data">
+                <v-list-item-content>
+                  <v-list-item-title class="overline">
+                    {{ data.item.text }}
+                  </v-list-item-title>
+                </v-list-item-content>
+                <v-list-item-action>
+                  <v-btn :color="data.item.color" dark>
+                    {{ data.item.value | percent }}
+                  </v-btn>
+                </v-list-item-action>
+              </template>
+            </v-select>
             <v-text-field
               v-model="filters.title"
               label="Buscar por Referencia"
@@ -217,6 +244,7 @@
 </template>
 <script>
 import LineChart from "./LineChart.vue";
+import Assertiveness from "@admin/sales/tracking/resources/assertiveness.json";
 export default {
   components: { LineChart },
   name: "StatTracking",
@@ -268,7 +296,7 @@ export default {
         departments: [],
         sellers: [],
         categories: [],
-        // assertiveness: [Assertiveness],
+        assertiveness: Assertiveness,
         estatus: [
           { text: "Activos", value: "activo" },
           { text: "Ventas Perdidas", value: "finalizado" },

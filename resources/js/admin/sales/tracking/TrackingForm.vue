@@ -2,8 +2,8 @@
   <v-form v-model="valid" ref="form" lazy-validation>
     <v-row dense class="overline mb-4">
       <v-col cols="12" class="d-flex align-stretch">
-        <v-card class="mx-auto" width="inherit">
-          <div class="d-flex">
+        <v-card class="mx-0" width="inherit">
+          <div class="d-flex align-center">
             <v-subheader>DATOS DEL Seguimiento:</v-subheader>
             <v-spacer />
             <template v-if="form.withQuote != undefined">
@@ -16,38 +16,42 @@
             </template>
           </div>
           <v-divider> </v-divider>
-          <v-card-text v-if="!form.withQuote" class="pt-0">
-            <v-col cols="12" class="px-0">
-              <p class="text-14 mb-1">Categoria de Seguimiento</p>
-              <v-autocomplete
-                v-model="form.title"
-                :items="options.categories"
-                item-value="name"
-                item-text="name"
-                placeholder="Seleccionar"
-                :rules="[(v) => !!v || 'Es Requerido']"
-                hide-details
-                outlined
-                filled
-                dense
-              >
-              </v-autocomplete>
-            </v-col>
-            <v-col cols="12" class="px-0">
-              <p class="text-14 mb-1">Nombre o Referencia del Seguimiento</p>
-              <v-text-field
-                v-model="form.reference"
-                placeholder="(Nombre Proyecto o Algo Referente a la Oportunidad)"
-                :rules="[(v) => !!v || 'Es Requerido']"
-                clearable
-                hide-details
-                outlined
-                filled
-                dense
-              >
-              </v-text-field>
-            </v-col>
-            <v-row v-if="!form.withQuote">
+          <v-card-text v-if="!form.withQuote">
+            <v-row dense>
+              <v-col cols="12" md="8">
+                <p class="text-14 mb-1">
+                  Titulo del Seguimiento (Modelo o Nombre Proyecto)
+                </p>
+                <v-text-field
+                  v-model="form.reference"
+                  placeholder="(Nombre Proyecto, Modelo del Equipo o Algo Referente a la Oportunidad)"
+                  :rules="[(v) => !!v || 'Es Requerido']"
+                  clearable
+                  hide-details
+                  outlined
+                  filled
+                  dense
+                >
+                </v-text-field>
+              </v-col>
+              <v-col cols="12" md="4">
+                <p class="text-14 mb-1">Categoria de Seguimiento</p>
+                <v-autocomplete
+                  v-model="form.title"
+                  :items="options.categories"
+                  item-value="name"
+                  item-text="name"
+                  placeholder="Seleccionar"
+                  :rules="[(v) => !!v || 'Es Requerido']"
+                  hide-details
+                  outlined
+                  filled
+                  dense
+                >
+                </v-autocomplete>
+              </v-col>
+              <!-- </v-row> -->
+              <!-- <v-row> -->
               <v-col cols="12" md="4">
                 <p class="text-14 mb-1">Valor Estimado</p>
                 <v-currency-field
@@ -95,9 +99,9 @@
                   disabled
                 ></v-currency-field>
               </v-col>
-            </v-row>
+              <!-- </v-row> -->
 
-            <v-row>
+              <!-- <v-row> -->
               <v-col cols="12" md="6">
                 <p class="text-14 mb-1">Origen del Seguimiento</p>
                 <v-select
@@ -110,7 +114,7 @@
                   dense
                 ></v-select>
               </v-col>
-              <v-col cols="12" md="6" v-if="!form.withQuote">
+              <v-col cols="12" md="6">
                 <p class="text-14 mb-1">Condicion de Pago</p>
                 <v-select
                   v-model="form.tracking_condition"
@@ -124,201 +128,40 @@
               </v-col>
             </v-row>
           </v-card-text>
-          <v-card-text v-else>
-            <v-card
-              class="mx-auto"
-              width="inherit"
-              min-height="200"
-              color="grey lighten-4"
-            >
-              <!-- <div class="d-flex">
-                <v-subheader>Partidas a Cotizar:</v-subheader>
-              </div> -->
-              <v-card-text>
-                <v-row dense>
-                  <v-col cols="12" md="6">
-                    <p class="text-14 mb-1">
-                      Titulo o Referencia del Seguimiento
-                    </p>
-                    <v-text-field
-                      v-model="form.reference"
-                      placeholder="(Nombre Proyecto o Algo Referente a la Oportunidad)"
-                      :rules="[(v) => !!v || 'Es Requerido']"
-                      clearable
-                      hide-details
-                      outlined
-                      filled
-                      dense
-                    >
-                    </v-text-field>
-                  </v-col>
-                  <v-col cols="12" md="6">
-                    <p class="text-14 mb-1">Origen del Seguimiento</p>
-                    <v-select
-                      v-model="form.first_contact"
-                      :items="options.origin"
-                      :rules="[(v) => !!v || 'Es Requerido']"
-                      hide-details
-                      outlined
-                      filled
-                      dense
-                    ></v-select>
-                  </v-col>
-                </v-row>
-              </v-card-text>
-              <v-card-text>
-                <quote-concept-table
-                  :dialogForm="dialogQuote"
-                  @edit="dialogQuote = true"
-                  @close="dialogQuote = false"
-                  :items.sync="form.products"
-                  :paymentCondition="form.tracking_condition"
-                  :Category_id="Category ? Category.id : null"
-                  @payment="(v) => (v ? (form.tracking_condition = v) : '')"
-                  @SELECTED_CATEGRORY="
-                    (v) => {
-                      if (v) {
-                        form.title = options.categories.find(
-                          (c) => c.id == v
-                        ).name;
-                      }
-                    }
-                  "
-                  :optionsPaymentcondition="PaymentConditionConfig"
-                ></quote-concept-table>
-              </v-card-text>
-              <v-card-actions>
-                <v-btn dark color="blue" block @click="ShowProducts">
-                  <v-icon left>mdi-plus</v-icon> Ver Lista de Precios
-                </v-btn>
-              </v-card-actions>
-              <v-card-text>
-                <v-row>
-                  <v-col cols="12" md="4">
-                    <v-textarea
-                      v-model="form.observation"
-                      label="Nota de Vendedor"
-                      outlined
-                      filled
-                      hide-details
-                    ></v-textarea>
-                  </v-col>
-                  <v-col cols="12" md="8">
-                    <v-simple-table dense class="pa-2">
-                      <template #default>
-                        <tbody>
-                          <tr>
-                            <td>Subtotal:</td>
-                            <td class="text-right text-h6">
-                              {{ Subtotal | money }} {{ Currency.name }}
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>IVA:</td>
-                            <td class="d-flex justify-end">
-                              <v-checkbox
-                                v-model="CheckedTax"
-                                class="ma-0"
-                                hide-details
-                              >
-                                <template v-slot:label>
-                                  <div>Con IVA: {{ form.tax | percent }}</div>
-                                </template>
-                              </v-checkbox>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>T.C.:</td>
-                            <td class="text-right text-h6">
-                              {{ form.exchange_value | currency }} MXN
-                            </td>
-                          </tr>
-                          <tr
-                            style="height: 50px"
-                            v-if="$gate.allow('isGerente', 'tracking')"
-                          >
-                            <td>Descuento:</td>
-                            <td>
-                              <span class="d-flex justify-end px-0">
-                                <v-currency-field
-                                  v-model.number="form.discount"
-                                  :default-value="form.discount"
-                                  type="number"
-                                  outlined
-                                  suffix="$"
-                                  hide-details
-                                  :prefix="Currency.name"
-                                  reverse
-                                  style="max-width: 250px"
-                                  dense
-                                ></v-currency-field>
-                              </span>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>Total:</td>
-                            <td class="text-right text-h6">
-                              {{ Total | money }} {{ Currency.name }}
-                            </td>
-                          </tr>
-                          <tr v-if="form.currency_id === 2">
-                            <td>Total MXN:</td>
-                            <th class="text-right pr-2 text-h6">
-                              {{ (Total * form.exchange_value) | money }} MXN
-                            </th>
-                          </tr>
-                        </tbody>
-                      </template>
-                    </v-simple-table>
-                  </v-col>
-                </v-row>
-              </v-card-text>
-            </v-card>
-          </v-card-text>
-        </v-card>
-      </v-col>
-      <!-- <v-scroll-y-transition mode="out-in">
-        <v-col v-if="form.withQuote" cols="12" class="d-flex align-stretch">
-          <v-row  class="overline">
-          <v-card
-            class="mx-auto"
-            width="inherit"
-            min-height="200"
-            color="grey lighten-3"
-          >
-            <div class="d-flex">
-              <v-subheader>Partidas a Cotizar:</v-subheader>
-            </div>
-            <v-row>
-              <v-col cols="12" md="6" class="px-0">
-              <p class="text-14 mb-1">Nombre o Referencia del Seguimiento</p>
-              <v-text-field
-                v-model="form.reference"
-                placeholder="Buscar por Nombre o SKU"
-                :rules="[(v) => !!v || 'Es Requerido']"
-                clearable
-                hide-details
-                outlined
-                filled
-                dense
-              >
-              </v-text-field>
-            </v-col>
-            <v-col cols="12" md="6">
-                <p class="text-14 mb-1">Origen del Seguimiento</p>
-                <v-select
-                  v-model="form.first_contact"
-                  :items="options.origin"
-                  placeholder="Placeholder"
-                  :rules="[(v) => !!v || 'Es Requerido']"
-                  hide-details
-                  outlined
-                  filled
-                  dense
-                ></v-select>
-              </v-col>
-            </v-row>
+          <v-card-text v-else class="px-0">
             <v-card-text>
+              <v-row dense>
+                <v-col cols="12" md="6">
+                  <p class="text-14 mb-1">
+                    Titulo del Seguimiento (Modelo o Nombre Proyecto)
+                  </p>
+                  <v-text-field
+                    v-model="form.reference"
+                    placeholder="(Nombre Proyecto, Modelo del Equipo o Algo Referente a la Oportunidad)"
+                    :rules="[(v) => !!v || 'Es Requerido']"
+                    clearable
+                    hide-details
+                    outlined
+                    filled
+                    dense
+                  >
+                  </v-text-field>
+                </v-col>
+                <v-col cols="12" md="6">
+                  <p class="text-14 mb-1">Origen del Seguimiento</p>
+                  <v-select
+                    v-model="form.first_contact"
+                    :items="options.origin"
+                    :rules="[(v) => !!v || 'Es Requerido']"
+                    hide-details
+                    outlined
+                    filled
+                    dense
+                  ></v-select>
+                </v-col>
+              </v-row>
+            </v-card-text>
+            <v-card-text class="pa-0">
               <quote-concept-table
                 :dialogForm="dialogQuote"
                 @edit="dialogQuote = true"
@@ -327,99 +170,110 @@
                 :paymentCondition="form.tracking_condition"
                 :Category_id="Category ? Category.id : null"
                 @payment="(v) => (v ? (form.tracking_condition = v) : '')"
+                @SELECTED_CATEGRORY="
+                  (v) => {
+                    if (v) {
+                      form.title = options.categories.find(
+                        (c) => c.id == v
+                      ).name;
+                    }
+                  }
+                "
                 :optionsPaymentcondition="PaymentConditionConfig"
               ></quote-concept-table>
             </v-card-text>
             <v-card-actions>
-              <v-btn dark color="blue" @click="ShowProducts">
-                <v-icon left>mdi-plus</v-icon> Agregar Producto
+              <v-btn dark color="blue" block @click="ShowProducts">
+                <v-icon left>mdi-plus</v-icon> Ver Lista de Precios
               </v-btn>
             </v-card-actions>
-            <v-col cols="12">
-              <v-simple-table dense class="pa-4 text-h6">
-                <tr>
-                  <td>Subtotal:</td>
-                  <th class="text-right pr-2 text-h5">
-                    {{ Subtotal | money }} {{ Currency.name }}
-                  </th>
-                </tr>
-                <tr>
-                  <td>IVA:</td>
-                  <th class="d-flex justify-end mb-3">
-                    <v-checkbox
-                      v-model="CheckedTax"
-                      hide-details
-                      class="shrink mr-2"
-                    >
-                      <template v-slot:label>
-                        <div>Con IVA: {{ form.tax | percent }}</div>
-                      </template>
-                    </v-checkbox>
-                  </th>
-                </tr>
-                <tr>
-                  <td>T.C.:</td>
-                  <th class="d-flex justify-end">
-                    <v-currency-field
-                      v-model.number="form.exchange_value"
-                      :default-value="form.exchange_value"
-                      placeholder="0.00"
-                      :rules="[(v) => !!v || 'Es Requerido']"
-                      style="max-width: 250px"
-                      prefix="MXN"
-                      type="number"
-                      suffix="$"
-                      reverse
-                      hide-details
-                      readonly
-                      outlined
-                      filled
-                      dense
-                    ></v-currency-field>
-                  </th>
-                </tr>
-                <tr v-if="$gate.allow('isGerente', 'tracking')">
-                  <td>Descuento:</td>
-                  <th class="d-flex justify-end">
-                    <v-currency-field
-                      v-model="form.discount"
-                      :default-value="form.discount"
-                      type="number"
-                      outlined
-                      suffix="$"
-                      hide-details
-                      :prefix="Currency.name"
-                      reverse
-                      class="py-2"
-                      style="max-width: 250px"
-                      dense
-                    ></v-currency-field>
-                  </th>
-                </tr>
-                <tr>
-                  <v-divider class="my-2" />
-                </tr>
-                <tr>
-                  <td>Total:</td>
-                  <th class="text-right pr-2 text-h5">
-                    {{ Total | money }} {{ Currency.name }}
-                  </th>
-                </tr>
-                <tr v-if="form.currency_id === 2">
-                  <td>Total MXN:</td>
-                  <th class="text-right pr-2 text-h5">
-                    {{ (Total * form.exchange_value) | money }} MXN
-                  </th>
-                </tr>
-              </v-simple-table>
-            </v-col>
-          </v-card>
-          </v-row>
-        </v-col>
-      </v-scroll-y-transition> -->
+            <v-card-text>
+              <v-row>
+                <v-col cols="12" md="4">
+                  <v-textarea
+                    v-model="form.observation"
+                    label="Nota de Vendedor"
+                    outlined
+                    filled
+                    hide-details
+                  ></v-textarea>
+                </v-col>
+                <v-col cols="12" md="8" class="px-0">
+                  <v-simple-table dense class="pa-0">
+                    <template #default>
+                      <tbody>
+                        <tr>
+                          <td>Subtotal:</td>
+                          <td class="text-right text-h6">
+                            {{ Subtotal | money }} {{ Currency.name }}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>IVA:</td>
+                          <td class="d-flex justify-end">
+                            <v-checkbox
+                              v-model="CheckedTax"
+                              class="ma-0"
+                              hide-details
+                            >
+                              <template v-slot:label>
+                                <div>IVA: {{ form.tax | percent }}</div>
+                              </template>
+                            </v-checkbox>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>T.C.:</td>
+                          <td class="text-right text-h6">
+                            {{ form.exchange_value | currency }} MXN
+                          </td>
+                        </tr>
+                        <tr
+                          style="height: 50px"
+                          v-if="$gate.allow('isGerente', 'tracking')"
+                        >
+                          <td>Descuento:</td>
+                          <td>
+                            <span class="d-flex justify-end px-0">
+                              <v-currency-field
+                                v-model.number="form.discount"
+                                :default-value="form.discount"
+                                type="number"
+                                outlined
+                                suffix="$"
+                                hide-details
+                                :prefix="Currency.name"
+                                reverse
+                                style="max-width: 250px"
+                                dense
+                              ></v-currency-field>
+                            </span>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>Total:</td>
+                          <td class="text-right text-h6">
+                            {{ Total | money }} {{ Currency.name }}
+                          </td>
+                        </tr>
+                        <tr v-if="form.currency_id === 2">
+                          <td>Total MXN:</td>
+                          <th class="text-right pr-2 text-h6">
+                            {{ (Total * form.exchange_value) | money }} MXN
+                          </th>
+                        </tr>
+                      </tbody>
+                    </template>
+                  </v-simple-table>
+                </v-col>
+              </v-row>
+            </v-card-text>
+          </v-card-text>
+        </v-card>
+      </v-col>
     </v-row>
 
-    <v-row dense class="overline mb-4">
+    <v-row dense class="overline">
       <v-col cols="12" md="4" class="d-flex align-stretch">
         <v-card class="mx-auto" width="inherit">
           <div class="d-flex">
@@ -528,7 +382,6 @@
           </v-card-actions>
         </v-card>
       </v-col>
-
       <v-col cols="12" md="4" class="d-flex align-stretch">
         <v-card class="mx-auto" width="inherit">
           <div class="d-flex">
@@ -592,12 +445,12 @@
       <v-col cols="12" md="4" class="d-flex align-stretch">
         <v-card class="mx-auto" width="inherit">
           <div class="d-flex">
-            <v-subheader>ETAPA Y DESCRIPCION DEL Seguimiento:</v-subheader>
+            <v-subheader>Etapa y Motivo del Seguimiento:</v-subheader>
           </div>
           <v-divider> </v-divider>
           <v-card-text class="pt-0">
             <v-col cols="12" class="px-0">
-              <p class="text-14 mb-1">Etapa del Seguimiento</p>
+              <p class="text-14 mb-1">Certeza del Seguimiento</p>
               <v-select
                 v-model="form.assertiveness"
                 :items="options.assertiveness"
@@ -658,6 +511,7 @@
               </v-dialog>
             </v-col>
             <v-col cols="12" class="px-0">
+              <p class="text-14 mb-1">Motivo del Seguimiento</p>
               <v-textarea
                 v-model="form.description_topic"
                 :rules="[(v) => !!v || 'Es requrido']"
