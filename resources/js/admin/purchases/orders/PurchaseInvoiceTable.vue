@@ -54,7 +54,7 @@
         </tbody>
       </template>
     </v-simple-table>
-    <v-dialog v-model="Dialog" max-width="600px" persistent>
+    <v-dialog v-model="Dialog" max-width="600px">
       <v-card>
         <v-card-title>
           <span class="text-h5">Configuracion Facturacion</span>

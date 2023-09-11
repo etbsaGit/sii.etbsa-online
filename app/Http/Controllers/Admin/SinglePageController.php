@@ -343,7 +343,7 @@ class SinglePageController extends AdminController
                 'label' => 'Cargos Internos',
                 'nav_type' => MenuItem::$NAV_TYPE_NAV,
                 'icon' => 'mdi-account-group-outline',
-                'visible' => true,
+                'visible' => false,
                 'children' => [
                     new MenuItem([
                         'group_requirements' => ['Super User'],

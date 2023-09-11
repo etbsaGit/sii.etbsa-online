@@ -225,7 +225,8 @@
                         <tr>
                           <td>T.C.:</td>
                           <td class="text-right text-h6">
-                            {{ form.exchange_value | currency }} MXN
+                            <!-- {{ form.exchange_value | currency }} MXN -->
+                            {{ ExchangeRate | currency }} MXN
                           </td>
                         </tr>
                         <tr
@@ -573,7 +574,7 @@ const _paymentCondition = [
   {
     text: "Contado",
     value: "contado",
-    config: [1, 2, 3, 10, 5, 6, 11, 16, 9, 17],
+    config: [1, 2, 3, 10, 5, 6, 11, 16, 9, 17, 14],
   },
   { text: "JDF 2 años", value: "jdf_2y", config: [1, 2, 3, 10, 17] },
   { text: "JDF 5 años", value: "jdf_5y", config: [1] },
