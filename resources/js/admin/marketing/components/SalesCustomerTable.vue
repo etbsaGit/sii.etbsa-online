@@ -366,7 +366,7 @@
     <v-card-text v-if="ventasPorCliente.length > 0">
       <div class="text-h3">Resumen Cliente(s)</div>
       <v-row dense>
-        <v-col cols="6">
+        <v-col cols="12" md="6">
           <v-simple-table class="elevation-4" height="500" fixed-header>
             <template #default>
               <thead>
@@ -397,17 +397,17 @@
             </template>
           </v-simple-table>
         </v-col>
-        <v-col cols="6">
+        <v-col cols="12" md="6">
           <pie-chart
             :data-labels="dataLabels"
             :data-values="dataValues"
             :height="500"
           />
         </v-col>
-        <v-col cols="6">
+        <v-col cols="12" md="6">
           <bar-chart :data-set="BarDataSet" :height="500"></bar-chart>
         </v-col>
-        <v-col cols="6">
+        <v-col cols="12" md="6">
           <v-card flat>
             <v-card-title> Ultima Compra Cliente </v-card-title>
             <v-card-text>
@@ -469,7 +469,7 @@
     <v-card-text v-if="ventasPorVendedor.length > 0">
       <div class="text-h3">Resumen Vendedor(es)</div>
       <v-row dense>
-        <v-col cols="6">
+        <v-col cols="12" md="6">
           <v-simple-table class="elevation-4" height="500" fixed-header>
             <template #default>
               <thead>
@@ -500,7 +500,7 @@
             </template>
           </v-simple-table>
         </v-col>
-        <v-col cols="6">
+        <v-col cols="12" md="6">
           <pie-chart
             :data-labels="dataVendedorLabels"
             :data-values="dataVendedorValues"
@@ -590,7 +590,7 @@
     <v-card-text v-if="ventasPorSucursal.length > 0">
       <div class="text-h3">Resumen Sucursal(es)</div>
       <v-row dense>
-        <v-col cols="6">
+        <v-col cols="12" md="6">
           <v-simple-table class="elevation-4" height="500" fixed-header>
             <template #default>
               <thead>
@@ -621,7 +621,7 @@
             </template>
           </v-simple-table>
         </v-col>
-        <v-col cols="6">
+        <v-col cols="12" md="6">
           <pie-chart
             :data-labels="dataSucursalLabels"
             :data-values="dataSucursalValues"
