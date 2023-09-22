@@ -5,6 +5,7 @@ namespace App\Components\Tracking\Repositories;
 use App\Components\Core\BaseRepository;
 use App\Components\Tracking\Models\TrackingProspect;
 use Auth;
+use Carbon\Carbon;
 
 class TrackingRepository extends BaseRepository
 {
@@ -66,8 +67,13 @@ class TrackingRepository extends BaseRepository
             ],
             function ($query) use ($params) {
                 $query->where(function ($query) use ($params) {
-                    $query->filter($params)
-                        ->filterByDateRange($params['dates'] ?? null, $params['estatus'] ?? null);
+                    $query->filter($params);
+                    if ($params['dates'] ?? false) {
+                        $query->filterByDateRange($params['dates'] ?? null, $params['estatus'] ?? null);
+                    } else {
+                        $query->filterByYear($params['year'] ?? Carbon::now()->year, $params['estatus'] ?? null)
+                            ->filterByMonths($params['months'] ?? null, $params['estatus'] ?? null);
+                    }
                 })->when(Auth::user()->isSuperUser(), function ($query) {
                     return $query;
                 }, function ($query) {
@@ -75,6 +81,7 @@ class TrackingRepository extends BaseRepository
                         $query->filterForManagers(Auth::user());
                     });
                 });
+                // return $query->whereYear('updated_at', $params['year'] ?? Carbon::now()->year);
                 return $query;
             }
         );

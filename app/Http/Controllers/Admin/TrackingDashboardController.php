@@ -33,10 +33,12 @@ class TrackingDashboardController extends AdminController
      */
     public function dashboard()
     {
+        $year = (int) request()->get('year') != 0 ? (int) request()->get('year') : Carbon::now()->year;
         $data = $this->trackingRepository->dashboardData(request()->all());
         $countActivos = $data->where('estatus_id', 1)->whereNotNull('date_next_tracking')->count();
         $countPerdidas = $data->where('estatus_id', 2)->whereNotNull('date_lost_sale')->count();
         $countGanadas = $data->where('estatus_id', 3)->whereNotNull('date_won_sale')->count();
+        $TotalCount = $countActivos + $countPerdidas + $countGanadas;
 
         // TODO: obtener Chart Categorias conteo de Activas Perdidad y Gandas
 
@@ -85,7 +87,7 @@ class TrackingDashboardController extends AdminController
         $activos = $data->where('estatus_id', 1);
 
         // Obtén el año actual
-        $year = Carbon::now()->year;
+        // $year = (int) request()->get('year') != 0 ? (int) request()->get('year') : Carbon::now()->year;
 
         // Filtra los registros para el año actual
         $lineChart['activosDelAñoActual'] = $data->where('estatus_id', 1)
@@ -144,7 +146,8 @@ class TrackingDashboardController extends AdminController
                 'seguimientosPorSucursal',
                 'countActivos',
                 'countPerdidas',
-                'countGanadas'
+                'countGanadas',
+                'TotalCount'
             ),
             "Dashboard Stats"
         );

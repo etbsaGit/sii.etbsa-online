@@ -9,6 +9,7 @@ use App\Components\User\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use App\Components\Core\Utilities\Helpers;
 use App\Components\Customers\Models\Customers;
+use Illuminate\Support\Facades\DB;
 
 class TrackingProspect extends Model
 {
@@ -189,6 +190,30 @@ class TrackingProspect extends Model
                 }
             });
         });
+    }
+    public function scopeFilterByMonths($query, $months = [], $estatus = null)
+    {
+
+        $query->when($months ?? null, function ($query, $months) {
+            $query->where(function ($q) use ($months) {
+                return $q->orWhereIn(DB::raw('MONTH(date_lost_sale)'), $months)
+                    ->OrWhereIn(DB::raw('MONTH(date_won_sale)'), $months)
+                    ->OrWhereIn(DB::raw('MONTH(date_next_tracking)'), $months);
+            });
+        });
+
+    }
+    public function scopeFilterByYear($query, $year = null, $estatus = null)
+    {
+
+        $query->when($year ?? null, function ($query, $year) {
+            $query->where(function ($q) use ($year) {
+                return $q->OrWhereYear('date_lost_sale', $year)
+                    ->OrWhereYear('date_won_sale', $year)
+                    ->OrWhereYear('date_next_tracking', $year);
+            });
+        });
+
     }
 
     public function scopeFilterForManagers($query, User $user)
