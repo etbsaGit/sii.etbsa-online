@@ -1,8 +1,11 @@
-import moment from 'moment';
-moment.locale('es');
+import moment from "moment";
+moment.locale("es");
 export const years = (back) => {
   const year = new Date().getFullYear();
   return Array.from({ length: back }, (v, i) => year - back + i + 2);
 };
 
-export const months = moment.months();
+export const months = moment.months().map((m, i) => ({
+  key: i + 1,
+  name: m,
+}));

@@ -10,9 +10,9 @@
     <v-card-subtitle class="py-4">
       <v-expansion-panels>
         <v-expansion-panel>
-          <v-expansion-panel-header
-            >FILTROS DE BUSQUEDA</v-expansion-panel-header
-          >
+          <v-expansion-panel-header>
+            FILTROS DE BUSQUEDA
+          </v-expansion-panel-header>
           <v-expansion-panel-content>
             <v-autocomplete
               v-model="filters.sellers"
@@ -92,6 +92,35 @@
               hide-details
               clearable
             ></v-text-field>
+
+            <div class="d-flex flex-row mt-4">
+              <v-select
+                v-model="filters.months"
+                :items="options.months"
+                label="Filtrar Meses:"
+                item-text="name"
+                item-value="key"
+                prepend-icon="mdi-filter-variant"
+                class="overline"
+                chips
+                deletable-chips
+                outlined
+                small-chips
+                hide-details
+                clearable
+                multiple
+              ></v-select>
+              <v-select
+                v-model="filters.year"
+                :items="[null, 2023, 2022]"
+                label="Filtrar Año:"
+                prepend-icon="mdi-filter-variant"
+                outlined
+                hide-details
+                clearable
+                filled
+              ></v-select>
+            </div>
           </v-expansion-panel-content>
         </v-expansion-panel>
       </v-expansion-panels>
@@ -100,7 +129,7 @@
       <v-row>
         <v-col
           cols="12"
-          md="4"
+          md="3"
           v-for="(estatus, key) in stats"
           :key="`estatus_${key}`"
         >
@@ -113,7 +142,7 @@
               </v-list-item-avatar>
 
               <v-list-item-content>
-                <v-list-item-subtitle>
+                <v-list-item-subtitle class="uppercase">
                   Seguimientos {{ estatus.title }}
                 </v-list-item-subtitle>
                 <br />
@@ -245,6 +274,7 @@
 <script>
 import LineChart from "./LineChart.vue";
 import Assertiveness from "@admin/sales/tracking/resources/assertiveness.json";
+import { months } from "../../../api/dates.js";
 export default {
   components: { LineChart },
   name: "StatTracking",
@@ -272,6 +302,10 @@ export default {
           title: "Ganadas",
           value: 0,
         },
+        total: {
+          title: "Total",
+          value: 0,
+        },
       },
       seguimientosPorCategoria: [],
       seguimientosPorSucursal: [],
@@ -288,6 +322,8 @@ export default {
         sellers: [],
         // dates: [],
         estatus: "todos",
+        year: null,
+        months: [],
         // first_contact: null,
       },
       options: {
@@ -297,6 +333,7 @@ export default {
         sellers: [],
         categories: [],
         assertiveness: Assertiveness,
+        months: months,
         estatus: [
           { text: "Activos", value: "activo" },
           { text: "Ventas Perdidas", value: "finalizado" },
@@ -309,6 +346,7 @@ export default {
         activos: "green",
         perdidas: "red",
         ganadas: "blue",
+        total: "grey",
       },
     };
   },
@@ -407,6 +445,7 @@ export default {
             countActivos,
             countPerdidas,
             countGanadas,
+            TotalCount,
             seguimientosPorCategoria,
             seguimientosPorSucursal,
             lineChart,
@@ -419,6 +458,7 @@ export default {
       _this.stats.activos.value = countActivos;
       _this.stats.perdidas.value = countPerdidas;
       _this.stats.ganadas.value = countGanadas;
+      _this.stats.total.value = TotalCount;
       _this.seguimientosPorCategoria = seguimientosPorCategoria;
       _this.seguimientosPorSucursal = seguimientosPorSucursal;
       _this.lineChart = lineChart;
