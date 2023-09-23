@@ -18,6 +18,12 @@ export const customers = [
         name: "customers.customers.show",
         component: require("@admin/customers/customers/Show").default,
       },
+      
+      {
+        path: "customers/portfolio",
+        name: "customers.portfolio",
+        component: require("@admin/customers/reports/DuePortFolio").default,
+      },
     ],
   },
 ];

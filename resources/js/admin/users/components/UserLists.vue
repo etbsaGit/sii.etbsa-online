@@ -9,6 +9,7 @@
     fixed-header
     caption
     dense
+    dark
   >
     <template v-slot:top>
       <v-toolbar flat>
@@ -223,7 +224,7 @@ export default {
           sortable: true,
         },
         {
-          text: "Activo",
+          text: "A2F",
           value: "active",
           align: "center",
           width: 10,
