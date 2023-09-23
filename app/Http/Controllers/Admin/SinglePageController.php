@@ -207,7 +207,7 @@ class SinglePageController extends AdminController
                 ]
             ]),
             new MenuItem([
-                'group_requirements' => ['GERENTE', 'DIRECCION', 'Vendedor', 'Super User'],
+                'group_requirements' => ['Gerente', 'DIRECCION', 'Vendedor', 'Super User'],
                 'permission_requirements' => [],
                 'label' => 'CRM',
                 'nav_type' => MenuItem::$NAV_TYPE_NAV,
@@ -215,7 +215,7 @@ class SinglePageController extends AdminController
                 'visible' => true,
                 'children' => [
                     new MenuItem([
-                        'group_requirements' => ['GERENTE', 'DIRECCION', 'Vendedor', 'Super User'],
+                        'group_requirements' => ['Gerente', 'DIRECCION', 'Vendedor', 'Super User'],
                         'permission_requirements' => [],
                         'label' => 'Seguimientos',
                         'nav_type' => MenuItem::$NAV_TYPE_NAV,
@@ -225,7 +225,7 @@ class SinglePageController extends AdminController
                         'visible' => true,
                     ]),
                     new MenuItem([
-                        'group_requirements' => ['GERENTE', 'DIRECCION', 'Vendedor', 'Super User'],
+                        'group_requirements' => ['Gerente', 'DIRECCION', 'Vendedor', 'Super User'],
                         'permission_requirements' => [],
                         'label' => 'Mi Calendario',
                         'nav_type' => MenuItem::$NAV_TYPE_NAV,
@@ -236,7 +236,7 @@ class SinglePageController extends AdminController
                     ]),
 
                     new MenuItem([
-                        'group_requirements' => ['GERENTE', 'DIRECCION', 'Vendedor', 'Super User'],
+                        'group_requirements' => ['Gerente', 'DIRECCION', 'Vendedor', 'Super User'],
                         'permission_requirements' => [],
                         'label' => 'Prospectos',
                         'nav_type' => MenuItem::$NAV_TYPE_NAV,
@@ -246,7 +246,7 @@ class SinglePageController extends AdminController
                         'visible' => true,
                     ]),
                     new MenuItem([
-                        'group_requirements' => ['GERENTE', 'DIRECCION','Super User'],
+                        'group_requirements' => ['Super User','Vendedor'],
                         'permission_requirements' => [],
                         'label' => 'Reporte',
                         'nav_type' => MenuItem::$NAV_TYPE_NAV,
@@ -303,6 +303,16 @@ class SinglePageController extends AdminController
                         'icon' => 'mdi-chart-areaspline',
                         'route_type' => 'vue',
                         'route_name' => 'sales.agencies',
+                        'visible' => true,
+                    ]),
+                    new MenuItem([
+                        'group_requirements' => ['Super User'],
+                        'permission_requirements' => [],
+                        'label' => 'Cartera Clientes',
+                        'nav_type' => MenuItem::$NAV_TYPE_NAV,
+                        'icon' => 'mdi-chart-areaspline',
+                        'route_type' => 'vue',
+                        'route_name' => 'customers.portfolio',
                         'visible' => true,
                     ]),
                 ]
