@@ -25,6 +25,7 @@ class Prospect extends Model
         'estate_id',
         'township_id',
         'segmentacion',
+        'rating',
         'capacidad_tech',
         'registered_by',
     ];

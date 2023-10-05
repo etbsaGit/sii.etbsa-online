@@ -32,7 +32,8 @@ class Customers extends Model
         'rfc',
         'customer_category_id',
         'town_id',
-        'capacidad_tech'
+        'capacidad_tech',
+        'rating'
     ];
 
     public function township()

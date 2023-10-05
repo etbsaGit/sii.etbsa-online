@@ -151,6 +151,18 @@
           dense
         />
       </v-col>
+      <v-col cols="12" md="6">
+          <v-select
+          v-model="form.rating"
+          :items="['AAA', 'AA', 'A', 'Lista Negra']"
+          label="Calificacion"
+          :rules="[(v) => !!v || 'Es Requerido']"
+          outlined
+          filled
+          dense
+          ></v-select>
+
+        </v-col>
     </v-row>
   </v-form>
 </template>
