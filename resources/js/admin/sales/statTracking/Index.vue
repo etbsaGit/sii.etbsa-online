@@ -155,6 +155,113 @@
         </v-col>
       </v-row>
     </v-card-text>
+
+    <v-card-text v-if="seguimientosPorVendedorCategoria">
+      <v-card-title class="text-wrap">
+        Resumen Seguimientos Por Vendedor y Categoria Prospeccion / Venta
+      </v-card-title>
+
+      <v-data-iterator
+        :items="VendedoresCategoriaGroup"
+        hide-default-footer
+        disable-pagination
+      >
+        <template v-slot:default="props">
+          <v-row>
+            <v-col
+              v-for="item in props.items"
+              :key="item.vendedor"
+              cols="12"
+              sm="6"
+              md="4"
+            >
+              <v-card color="indigo lighten-5">
+                <v-card-title class="subheading font-weight-bold">
+                  {{ item.vendedor }}
+                </v-card-title>
+
+                <v-simple-table dense class="text-uppercase">
+                  <template v-slot:default>
+                    <thead>
+                      <tr>
+                        <th>Categoria</th>
+                        <th class="text-right">Activos</th>
+                        <th class="text-right">Perdidas</th>
+                        <th class="text-right">Ganadas</th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      <tr
+                        v-for="(group, category) in item.categorias"
+                        :key="category"
+                      >
+                        <td>{{ category }}</td>
+                        <td class="text-right">
+                          {{ group.Activo || 0 | currency }} ({{
+                            group.Activo_count || 0
+                          }})
+                        </td>
+                        <td class="text-right">
+                          {{ group["Venta Perdida"] || 0 | currency }} ({{
+                            group["Venta Perdida_count"] || 0
+                          }})
+                        </td>
+                        <td class="text-right">
+                          {{ group["Venta Ganada"] || 0 | currency }} ({{
+                            group["Venta Ganada_count"] || 0
+                          }})
+                        </td>
+                      </tr>
+                    </tbody>
+                  </template>
+                </v-simple-table>
+              </v-card>
+            </v-col>
+          </v-row>
+        </template>
+      </v-data-iterator>
+    </v-card-text>
+
+    <v-card-text v-if="seguimientosPorVendedor">
+      <v-card-title class="text-wrap">
+        Resumen Seguimientos Por Vendedor
+      </v-card-title>
+      <v-simple-table dense class="text-uppercase" fixed-header height="250">
+        <template v-slot:default>
+          <thead>
+            <tr>
+              <th>Vendedor</th>
+              <th class="text-right">Activos</th>
+              <th class="text-right">Perdidas</th>
+              <th class="text-right">Ganadas</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr v-for="(group, seller) in vendedoresAgrupadas" :key="seller">
+              <td>{{ seller }}</td>
+              <td class="text-right">
+                {{ group.Activo || 0 | currency }} ({{
+                  group.Activo_count || 0
+                }})
+              </td>
+              <td class="text-right">
+                {{ group["Venta Perdida"] || 0 | currency }} ({{
+                  group["Venta Perdida_count"] || 0
+                }})
+              </td>
+              <td class="text-right">
+                {{ group["Venta Ganada"] || 0 | currency }} ({{
+                  group["Venta Ganada_count"] || 0
+                }})
+              </td>
+            </tr>
+          </tbody>
+        </template>
+      </v-simple-table>
+    </v-card-text>
+
     <v-card-text
       v-if="seguimientosPorCategoria && seguimientosPorCategoria.length > 0"
     >
@@ -167,7 +274,7 @@
             dense
             class="text-uppercase"
             fixed-header
-            height="400"
+            height="300"
           >
             <template v-slot:default>
               <thead>
@@ -213,7 +320,7 @@
             dense
             class="text-uppercase"
             fixed-header
-            height="400"
+            height="300"
           >
             <template v-slot:default>
               <thead>
@@ -309,6 +416,8 @@ export default {
       },
       seguimientosPorCategoria: [],
       seguimientosPorSucursal: [],
+      seguimientosPorVendedor: [],
+      seguimientosPorVendedorCategoria: [],
       lineChart: {},
       lineChartTotals: false,
       filters: {
@@ -351,6 +460,73 @@ export default {
     };
   },
   computed: {
+    VendedoresCategoriaGroup() {
+      return this.seguimientosPorVendedorCategoria.reduce(
+        (agrupados, vendedor) => {
+          const {
+            vendedor: nombreVendedor,
+            categoria,
+            estatus,
+            total_comprado,
+            count,
+          } = vendedor;
+
+          const category = categoria
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "");
+
+          // Buscar si ya existe un grupo para este vendedor
+          let grupoVendedor = agrupados.find(
+            (grupo) => grupo.vendedor === nombreVendedor
+          );
+
+          if (!grupoVendedor) {
+            // Si el vendedor no existe en el arreglo agrupados, agregarlo
+            grupoVendedor = {
+              vendedor: nombreVendedor,
+              categorias: {},
+            };
+            agrupados.push(grupoVendedor);
+          }
+
+          // Verificar si ya existe una categoría para este vendedor
+          if (!grupoVendedor.categorias[category]) {
+            grupoVendedor.categorias[category] = {};
+          }
+
+          // Agregar el total comprado y el count para esta categoría y estatus
+          grupoVendedor.categorias[category][estatus] =
+            (grupoVendedor.categorias[category][estatus] || 0) + total_comprado;
+          grupoVendedor.categorias[category][`${estatus}_count`] = count;
+          // grupoVendedor.categorias[category][estatus] = {
+          //   total_comprado,
+          //   count,
+          // };
+
+          return agrupados;
+        },
+        []
+      );
+    },
+
+    vendedoresAgrupadas() {
+      const Sellers = {};
+      this.seguimientosPorVendedor.forEach((item) => {
+        const { vendedor, estatus, total_comprado, count } = item;
+        let seller = vendedor
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "");
+        if (!Sellers[seller]) {
+          Sellers[seller] = {};
+        }
+        Sellers[seller][estatus] =
+          (Sellers[seller][estatus] || 0) + total_comprado;
+        Sellers[seller][`${estatus}_count`] = count;
+      });
+      return Sellers;
+    },
     categoriasAgrupadas() {
       const categorias = {};
       this.seguimientosPorCategoria.forEach((item) => {
@@ -448,6 +624,8 @@ export default {
             TotalCount,
             seguimientosPorCategoria,
             seguimientosPorSucursal,
+            seguimientosPorVendedor,
+            seguimientosPorVendedorCategoria,
             lineChart,
           },
         },
@@ -461,6 +639,8 @@ export default {
       _this.stats.total.value = TotalCount;
       _this.seguimientosPorCategoria = seguimientosPorCategoria;
       _this.seguimientosPorSucursal = seguimientosPorSucursal;
+      _this.seguimientosPorVendedor = seguimientosPorVendedor;
+      _this.seguimientosPorVendedorCategoria = seguimientosPorVendedorCategoria;
       _this.lineChart = lineChart;
     },
     async loadResources(cb) {

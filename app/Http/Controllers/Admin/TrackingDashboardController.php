@@ -42,6 +42,40 @@ class TrackingDashboardController extends AdminController
 
         // TODO: obtener Chart Categorias conteo de Activas Perdidad y Gandas
 
+        $seguimientosPorVendedor = $data->groupBy(function ($item) {
+            if (
+                ($item->estatus_id == 1 && $item->date_next_tracking != null) ||
+                ($item->estatus_id == 2 && $item->date_lost_sale != null) ||
+                ($item->estatus_id == 3 && $item->date_won_sale != null)
+            ) {
+                return $item->attended_by . '_' . $item->estatus_id;
+            }
+        })->map(function ($groupedItems) {
+            return [
+                'vendedor' => $groupedItems[0]->attended->name,
+                'estatus' => $groupedItems[0]->estatus->title,
+                'total_comprado' => $groupedItems->sum('amount'),
+                'count' => $groupedItems->count()
+            ];
+        })->values();
+        $seguimientosPorVendedorCategoria = $data->groupBy(function ($item) {
+            if (
+                ($item->estatus_id == 1 && $item->date_next_tracking != null) ||
+                ($item->estatus_id == 2 && $item->date_lost_sale != null) ||
+                ($item->estatus_id == 3 && $item->date_won_sale != null)
+            ) {
+                return $item->attended_by . '_' . $item->title . '_' . $item->estatus_id;
+            }
+        })->map(function ($groupedItems) {
+            return [
+                'vendedor' => $groupedItems[0]->attended->name,
+                'categoria' => $groupedItems[0]->title,
+                'estatus' => $groupedItems[0]->estatus->title,
+                'total_comprado' => $groupedItems->sum('amount'),
+                'count' => $groupedItems->count()
+            ];
+        })->values();
+
         $seguimientosPorCategoria = $data->groupBy(function ($item) {
             if (
                 ($item->estatus_id == 1 && $item->date_next_tracking != null) ||
@@ -144,6 +178,8 @@ class TrackingDashboardController extends AdminController
                 'lineChart',
                 'seguimientosPorCategoria',
                 'seguimientosPorSucursal',
+                'seguimientosPorVendedor',
+                'seguimientosPorVendedorCategoria',
                 'countActivos',
                 'countPerdidas',
                 'countGanadas',
