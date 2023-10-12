@@ -1,15 +1,15 @@
 <template>
-  <div class="component-wrap">
+  <div class="component-">
     <!-- form -->
     <v-card>
       <v-card-title>
         <v-icon>mdi-account</v-icon> Configurar Vendedor
       </v-card-title>
       <v-divider class="mb-2"></v-divider>
-      <v-form v-model="valid" ref="permissionFormEdit" lazy-validation>
-        <v-container grid-list-md>
-          <v-layout row wrap>
-            <v-flex xs12 md3>
+      <v-card-text>
+        <v-form v-model="valid" ref="permissionFormEdit" lazy-validation>
+          <v-row dense>
+            <v-col cols="12" md="3">
               <div class="text-h6">Vendedor(a): {{ Seller.name }}</div>
               <v-text-field
                 label="Clave Vendedor"
@@ -17,62 +17,64 @@
                 filled
                 hide-details
               ></v-text-field>
-            </v-flex>
-            <v-flex xs12>
-              <h1 class="title">
-                <v-icon>mdi-domain</v-icon> Configuracion Vendedor Sucursal
-              </h1>
-              <v-divider></v-divider>
-            </v-flex>
-            <v-layout wrap mx-2 class="caption">
-              <v-flex
-                xs12
-                md3
-                v-for="(g, k) in options.agencies"
-                :key="k"
-                class="caption"
-              >
-                <v-switch
-                  dense
-                  hide-details
-                  v-bind:label="g.title"
-                  v-model="seller_agency[g.id]"
-                ></v-switch>
-              </v-flex>
-            </v-layout>
-            <v-flex xs12 mt-4>
+            </v-col>
+            <v-col cols="12">
+              <v-card>
+                <v-card-title>
+                  <v-icon>mdi-domain</v-icon> Configuracion Vendedor Sucursal
+                </v-card-title>
+                <v-divider></v-divider>
+                <v-row dense>
+                  <v-col
+                    cols="12"
+                    md="3"
+                    v-for="(g, k) in options.agencies"
+                    :key="k"
+                    class="caption"
+                  >
+                    <v-switch
+                      dense
+                      hide-details
+                      v-bind:label="g.title"
+                      v-model="seller_agency[g.id]"
+                    ></v-switch>
+                  </v-col>
+                </v-row>
+              </v-card>
+            </v-col>
+            <v-col cols="12" mt-4>
               <h1 class="title">
                 <v-icon>mdi-office-building</v-icon> Configuracion Vendedor
                 Departamentos
               </h1>
               <v-divider></v-divider>
-            </v-flex>
-            <v-layout wrap mx-2 class="caption">
-              <v-flex
-                xs12
-                md3
-                v-for="(g, k) in options.departments"
-                :key="k"
-                class="caption"
-              >
-                <v-switch
-                  dense
-                  hide-details
-                  v-bind:label="g.title"
-                  v-model="seller_type[g.id]"
-                ></v-switch>
-              </v-flex>
-              <v-flex xs12 mt-4>
-                <h1 class="title">
-                  <v-icon>mdi-office-building</v-icon> Configuracion Gerente
-                  Categorias
-                </h1>
-                <v-divider></v-divider>
-              </v-flex>
-              <v-layout wrap mx-2 class="caption">
-                <v-flex
-                  xs12
-                  md3
+              <v-row dense>
+                <v-col
+                  cols="12"
+                  md="3"
+                  v-for="(g, k) in options.departments"
+                  :key="k"
+                  class="caption"
+                >
+                  <v-switch
+                    dense
+                    hide-details
+                    v-bind:label="g.title"
+                    v-model="seller_type[g.id]"
+                  ></v-switch>
+                </v-col>
+              </v-row>
+            </v-col>
+            <v-col cols="12" mt-4>
+              <h1 class="title">
+                <v-icon>mdi-office-building</v-icon> Configuracion Gerente
+                Categorias
+              </h1>
+              <v-divider></v-divider>
+              <v-row dense>
+                <v-col
+                  cols="12"
+                  md="3"
                   v-for="(g, k) in options.categories"
                   :key="k"
                   class="caption"
@@ -83,17 +85,17 @@
                     v-bind:label="g.name"
                     v-model="seller_category[g.id]"
                   ></v-switch>
-                </v-flex>
-              </v-layout>
-              <v-flex xs12>
-                <v-btn block @click="save()" :disabled="!valid" color="primary">
-                  Guardar
-                </v-btn>
-              </v-flex>
-            </v-layout>
-          </v-layout>
-        </v-container>
-      </v-form>
+                </v-col>
+              </v-row>
+            </v-col>
+            <v-col cols="12">
+              <v-btn block @click="save()" :disabled="!valid" color="primary">
+                Guardar
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-form>
+      </v-card-text>
     </v-card>
     <!-- /form -->
   </div>
@@ -121,6 +123,12 @@ export default {
         categories: [],
       },
     };
+  },
+  mounted() {
+    const self = this;
+    self.$store.commit("setBreadcrumbs", [
+      { label: "Vendedores", to: { name: "sellers.list" } },
+    ]);
   },
   created() {
     this.loadSeller(() => {});
