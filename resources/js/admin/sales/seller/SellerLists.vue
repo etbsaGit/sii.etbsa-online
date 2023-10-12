@@ -179,12 +179,18 @@ export default {
     self.$store.commit("setBreadcrumbs", [{ label: "Vendedores", name: "" }]);
   },
   watch: {
-    "pagination.page": function () {
-      this.loadSellers(() => {});
+    pagination: {
+      handler() {
+        this.loadSellers(() => {});
+      },
+      deep: true,
     },
-    "pagination.rowsPerPage": function () {
-      this.loadSellers(() => {});
-    },
+    // "pagination.page": function () {
+    //   this.loadSellers(() => {});
+    // },
+    // "pagination.rowsPerPage": function () {
+    //   this.loadSellers(() => {});
+    // },
     "filters.title": _.debounce(function () {
       const self = this;
       self.loadSellers(() => {});
@@ -242,7 +248,7 @@ export default {
         name: self.filters.title,
         email: self.filters.email,
         page: self.pagination.page,
-        per_page: self.pagination.rowsPerPage,
+        per_page: self.pagination.itemsPerPage,
       };
 
       axios.get("/admin/sellers", { params: params }).then(function (response) {

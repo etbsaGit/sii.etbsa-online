@@ -177,6 +177,14 @@
             >
               <v-card color="indigo lighten-5">
                 <v-card-title class="subheading font-weight-bold">
+                  <v-avatar size="48px">
+                    <img
+                      :alt="item.vendedor"
+                      :src="item.photo"
+                    />
+                  </v-avatar>
+                  <v-spacer/>
+
                   {{ item.vendedor }}
                 </v-card-title>
 
@@ -469,6 +477,7 @@ export default {
             estatus,
             total_comprado,
             count,
+            photo,
           } = vendedor;
 
           const category = categoria
@@ -485,6 +494,7 @@ export default {
             // Si el vendedor no existe en el arreglo agrupados, agregarlo
             grupoVendedor = {
               vendedor: nombreVendedor,
+              photo: photo,
               categorias: {},
             };
             agrupados.push(grupoVendedor);

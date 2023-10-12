@@ -4,6 +4,7 @@ namespace App\Components\User\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Class User
@@ -25,8 +26,16 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'remember_token',
-        'permissions', 'last_login', 'active', 'activation_key', 'seller_key'
+        'name',
+        'email',
+        'password',
+        'remember_token',
+        'permissions',
+        'last_login',
+        'active',
+        'activation_key',
+        'seller_key',
+        'photo_path'
     ];
     // 'agency_id', 'departments_id', 'job_title', 'seller_key'
 
@@ -38,10 +47,11 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'password',
+        'remember_token',
     ];
 
-    // protected $appends = ['groups', 'all_permissions'];
+    protected $appends = ['path'];
 
     /**
      * the validation rules
@@ -57,4 +67,21 @@ class User extends Authenticatable
     {
         return $this->morphTo();
     }
+
+    public function getPathAttribute()
+    {
+        return $this->pathURL();
+    }
+
+    public function pathURL()
+    {
+        // if ($this->file_path) {
+        //     return URL::to($this->file_path);
+        // }
+        return $this->photo_path ? Storage::url($this->photo_path) : null;
+    }
+
+
+
+
 }
