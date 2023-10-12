@@ -53,6 +53,7 @@ class TrackingDashboardController extends AdminController
         })->map(function ($groupedItems) {
             return [
                 'vendedor' => $groupedItems[0]->attended->name,
+               
                 'estatus' => $groupedItems[0]->estatus->title,
                 'total_comprado' => $groupedItems->sum('amount'),
                 'count' => $groupedItems->count()
@@ -69,6 +70,7 @@ class TrackingDashboardController extends AdminController
         })->map(function ($groupedItems) {
             return [
                 'vendedor' => $groupedItems[0]->attended->name,
+                'photo' => $groupedItems[0]->attended->path ?? null,
                 'categoria' => $groupedItems[0]->title,
                 'estatus' => $groupedItems[0]->estatus->title,
                 'total_comprado' => $groupedItems->sum('amount'),

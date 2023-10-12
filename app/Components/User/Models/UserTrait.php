@@ -100,7 +100,7 @@ trait UserTrait
     }
     public function seller_category()
     {
-        return $this->belongsToMany(SellerCategory::class, 'seller_category_pivot', 'user_id','category_id');
+        return $this->belongsToMany(SellerCategory::class, 'seller_category_pivot', 'user_id', 'category_id');
     }
 
     // public function agency()
@@ -559,5 +559,11 @@ trait UserTrait
         return $q->whereHas('seller_agency', function ($q) use ($v) {
             return $q->whereIn('agencies.id', $v);
         });
+    }
+
+
+    public function getFolderPath()
+    {
+        return 'users/id_' . $this->id . '/photo_profile';
     }
 }

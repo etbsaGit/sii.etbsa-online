@@ -33,4 +33,8 @@ class SellerRepository extends BaseRepository
             return $q;
         });
     }
+
+    public function deletePhoto($params){
+        
+    }
 }

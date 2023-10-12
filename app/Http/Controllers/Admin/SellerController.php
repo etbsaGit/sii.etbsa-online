@@ -6,6 +6,8 @@ use App\Components\Core\Utilities\Helpers;
 use App\Components\Tracking\Repositories\SellerRepository;
 use App\Components\User\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class SellerController extends AdminController
 {
@@ -30,21 +32,11 @@ class SellerController extends AdminController
      */
     public function index()
     {
-        $sellers = [];
         $data = $this->sellerRepository->listSellers(request()->all());
         return $this->sendResponseOk($data, "list sellers ok.");
 
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-    }
 
     /**
      * Display the specified resource.
@@ -54,7 +46,7 @@ class SellerController extends AdminController
      */
     public function show($id)
     {
-        $seller = $this->sellerRepository->find($id, ['seller_type','seller_agency','seller_category']);
+        $seller = $this->sellerRepository->find($id, ['seller_type', 'seller_agency', 'seller_category']);
 
         if (!$seller) {
             return $this->sendResponseNotFound();
@@ -70,78 +62,140 @@ class SellerController extends AdminController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, User $seller)
     {
-        $validate = validator($request->all(),[
-            'seller_key' => 'string',
-            'seller_type' => 'array',
-            'seller_agency' => 'array',
-            'seller_category' => 'array',
+        $validate = validator($request->all(), [
+            'seller_key' => ['required', 'max:50', Rule::unique('users', 'seller_key')->ignore($seller)],
+            'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($seller)],
+            'photo' => 'file',
+
         ]);
 
-        if($validate->fails()) return $this->sendResponseBadRequest($validate->errors()->first());
 
-        $payload = $request->all();
 
-        // if password field is present but has empty value or null value
-        // we will remove it to avoid updating password with unexpected value
-        if(!Helpers::hasValue($payload['password'])) unset($payload['password']);
+        if ($validate->fails())
+            return $this->sendResponseBadRequest($validate->errors()->first());
 
-        $updated = $this->sellerRepository->update($id,$payload);
 
-        if(!$updated) return $this->sendResponseBadRequest("Failed update");
+        if ($request->file("photo") && !!$seller->photo_path)
+            $this->deletePhoto($seller->photo_path);
 
-        // re-sync seller_type
+        $payload = array_merge(
+            $request->all(),
+            [
+                'photo_path' => $request->file("photo") ? $request->file("photo")->store($seller->getFolderPath(), 's3') : null,
+            ]
+        );
 
-        /** @var User $seller */
-        $seller = $this->sellerRepository->find($id);
+        if (!Helpers::hasValue($payload['password']))
+            unset($payload['password']);
+
+        // $updated = $this->sellerRepository->update($id, $payload);
+        $updated = $seller->update($payload);
+
+        if (!$updated)
+            return $this->sendResponseBadRequest("Failed update");
+
+        return $this->sendResponseUpdated(compact('seller'));
+    }
+
+    public function updateSellerType(Request $request, User $seller)
+    {
+        $validate = validator($request->all(), [
+            'seller_type' => 'array',
+        ]);
+
+        if ($validate->fails())
+            return $this->sendResponseBadRequest($validate->errors()->first());
+
+
+        // $seller = $this->sellerRepository->find($seller);
 
         $sellerTypeIds = [];
-        $sellerAgencyIds = [];
-        $sellerCategoryIds = [];
 
-        if($seller_type = $request->get('seller_type',[]))
-        {
-            foreach ($seller_type as $sellerTypeId => $shouldAttach)
-            {
-                if($shouldAttach) $sellerTypeIds[] = $sellerTypeId;
-            }
-        }
-        if($seller_agency = $request->get('seller_agency',[]))
-        {
-            foreach ($seller_agency as $sellerAgencyId => $shouldAttach)
-            {
-                if($shouldAttach) $sellerAgencyIds[] = $sellerAgencyId;
-            }
-        }
-        if($seller_category = $request->get('seller_category',[]))
-        {
-            foreach ($seller_category as $sellerCategoryId => $shouldAttach)
-            {
-                if($shouldAttach) $sellerCategoryIds[] = $sellerCategoryId;
+        if ($seller_type = $request->get('seller_type', [])) {
+            foreach ($seller_type as $sellerTypeId => $shouldAttach) {
+                if ($shouldAttach)
+                    $sellerTypeIds[] = $sellerTypeId;
             }
         }
 
         $seller->seller_type()->sync($sellerTypeIds);
+        return $this->sendResponseUpdated([], "Departamentos Configurados");
+
+    }
+    public function updateSellerAgency(Request $request, User $seller)
+    {
+
+        $validate = validator($request->all(), [
+            'seller_agency' => 'array',
+        ]);
+
+        if ($validate->fails())
+            return $this->sendResponseBadRequest($validate->errors()->first());
+
+
+        // $seller = $this->sellerRepository->find($seller);
+
+        $sellerAgencyIds = [];
+
+        if ($seller_agency = $request->get('seller_agency', [])) {
+            foreach ($seller_agency as $sellerAgencyId => $shouldAttach) {
+                if ($shouldAttach)
+                    $sellerAgencyIds[] = $sellerAgencyId;
+            }
+        }
+
         $seller->seller_agency()->sync($sellerAgencyIds);
+
+        return $this->sendResponseUpdated([], 'Sucursales Configuradas');
+
+    }
+    public function updateSellerCategory(Request $request, User $seller)
+    {
+
+        $validate = validator($request->all(), [
+            'seller_category' => 'array',
+        ]);
+
+        if ($validate->fails())
+            return $this->sendResponseBadRequest($validate->errors()->first());
+
+
+        // $seller = $this->sellerRepository->find($seller);
+
+        $sellerCategoryIds = [];
+
+        if ($seller_category = $request->get('seller_category', [])) {
+            foreach ($seller_category as $sellerCategoryId => $shouldAttach) {
+                if ($shouldAttach)
+                    $sellerCategoryIds[] = $sellerCategoryId;
+            }
+        }
         $seller->seller_category()->sync($sellerCategoryIds);
+        return $this->sendResponseUpdated([], 'Categorias Configuradas');
+    }
+   
+    public function deleteSellerPhoto(Request $request, User $seller)
+    {
 
-        return $this->sendResponseUpdated();
+        if ($this->deletePhoto($seller->photo_path)) {
+            $seller->photo_path = null;
+            $seller->save();
+            return $this->sendResponseDeleted();
+        } else
+            return $this->sendResponseBadRequest();
+
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
+    function deletePhoto($path)
     {
-        //
-    }
+        if (Storage::exists($path)) {
 
-    public function resource()
-    {
-        # code...
+            Storage::disk('s3')->delete($path);
+            return true;
+        }
+
+        return false;
     }
 }

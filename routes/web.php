@@ -32,7 +32,7 @@ Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function
 
     // resource routes
     Route::resource('users', 'UserController');
-    Route::resource('sellers', 'SellerController');
+    
 
     Route::resource('groups', 'GroupController');
     Route::resource('permissions', 'PermissionController');
