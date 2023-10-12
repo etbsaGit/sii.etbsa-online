@@ -41,7 +41,8 @@ export const sales = [
       {
         path: "seller/edit/:propSellerId",
         name: "sellers.edit",
-        component: require("@admin/sales/seller/SellerFormEdit").default,
+        component: require("@admin/sales/seller/SellerProfileConfig").default,
+        // component: require("@admin/sales/seller/SellerFormEdit").default,
         props: true,
       },
       {
