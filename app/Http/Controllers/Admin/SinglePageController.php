@@ -265,6 +265,16 @@ class SinglePageController extends AdminController
                         'route_name' => 'charts.index',
                         'visible' => true,
                     ]),
+                    new MenuItem([
+                        'group_requirements' => ['Super User'],
+                        'permission_requirements' => [],
+                        'label' => 'Vendedores',
+                        'nav_type' => MenuItem::$NAV_TYPE_NAV,
+                        'icon' => 'mdi-account',
+                        'route_type' => 'vue',
+                        'route_name' => 'sellers.list',
+                        'visible' => true,
+                    ]),
                 ]
             ]),
             new MenuItem([
