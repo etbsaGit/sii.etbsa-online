@@ -2,7 +2,7 @@
   <v-card flat>
     <v-card-text class="overflow-y-auto">
       <v-form ref="form" v-model="valid" lazy-validation>
-        <gps-form :form.sync="form" :options="options" editing></gps-form>
+        <gps-form :form.sync="form" :options="options"></gps-form>
       </v-form>
       <v-simple-table
         v-show="historical.length > 0"
