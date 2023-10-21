@@ -63,6 +63,7 @@ class TrackingQuoteController extends AdminController
             $request['date_due'] = Carbon::now()->addDays(30);
             $request['currency_id'] = $request['currency.id'];
 
+            
             $quotation = $this->trackingQuoteRepository->create($request->all());
             if ($products = $request->get('products', [])) {
                 foreach ($products as $product => $value) {
@@ -104,19 +105,22 @@ class TrackingQuoteController extends AdminController
 
         return DB::transaction(function () use ($quote, $request) {
             $request['date_due'] = Carbon::now()->addDays(30);
+            $request['currency_id'] = $request['currency.id'];
             $this->trackingQuoteRepository->update($quote->id, $request->all());
             $quote->refresh();
             $syncConcept = [];
             if ($products = $request->get('products', [])) {
                 foreach ($products as $product => $value) {
                     if ($value) {
-                        $pivotConcept =  [
+                        $pivotConcept = [
                             'price_unit' => $value['price'],
                             'quantity' => $value['qty'],
-                            'currency' => $value['currency']['name'],
+                            // 'currency' => $value['currency']['name'],
+                            // 'currency' => Currency::find($value['currency_id'])->name,
+                            'currency' => Currency::find($value['currency']['id'])->name,
                             'subtotal' => $value['subtotal']
                         ];
-                        $syncConcept[$value['id']] =  $pivotConcept;
+                        $syncConcept[$value['id']] = $pivotConcept;
                     }
                 }
                 $quote->products()->sync($syncConcept);

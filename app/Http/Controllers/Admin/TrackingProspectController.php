@@ -6,6 +6,7 @@ use App\Components\Common\Models\Currency;
 use App\Components\Common\Models\Estatus;
 use App\Components\Common\Models\ExchangeRates;
 use App\Components\Common\Models\SellerCategory;
+use App\Components\Product\Models\ProductCategory;
 use App\Components\RRHH\Models\Employee;
 use App\Components\Tracking\Models\Prospect;
 use App\Components\Tracking\Models\TrackingProspect;
@@ -148,6 +149,8 @@ class TrackingProspectController extends AdminController
 
             if ($request['withQuote']) {
                 $request['date_due'] = Carbon::now()->addDays(30);
+                $request['category_id'] = ProductCategory::where('name',$request['title'])->first()->id;
+                $request['currency_id'] = $request['currency.id'];
                 $quotation
                     = $tracking->quotation()->create($request->all());
                 if ($products = $request->get('products', [])) {
@@ -427,9 +430,7 @@ class TrackingProspectController extends AdminController
 
     public function print(TrackingProspect $trackingProspect)
     {
-        // return dd($trackingProspect);
         $data = $trackingProspect->load('prospect', 'assigned');
-        // dd(compact('data'));
         $pdf = \PDF::loadView('pdf.quote', compact('data'));
         return $pdf->stream();
     }

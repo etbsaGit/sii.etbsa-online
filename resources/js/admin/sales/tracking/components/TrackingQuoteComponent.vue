@@ -16,7 +16,11 @@
             </v-card-title>
 
             <v-card-text class="grey-lighten-2">
-              <quote-form ref="form" :form.sync="editedItem"></quote-form>
+              <quote-form
+                v-if="dialog"
+                ref="form"
+                :form.sync="editedItem"
+              ></quote-form>
             </v-card-text>
 
             <v-card-actions>
@@ -112,7 +116,7 @@ export default {
       discount: 0,
       tax: 0.16,
       total: 0,
-      currency: null,
+      currency: { id: 1, name: "MXN" },
       products: [],
       exchange_value: 1,
       payment_condition: "por_definir",
@@ -123,7 +127,7 @@ export default {
       discount: 0,
       tax: 0.16,
       total: 0,
-      currency: null,
+      currency: { id: 1, name: "MXN" },
       products: [],
       exchange_value: 1,
       payment_condition: "por_definir",
@@ -166,8 +170,14 @@ export default {
       _this.items = await axios.get("/admin/quotes", { params }).then((res) => {
         return res.data.data;
       });
+      await axios
+        .get("/admin/tracking/sales_history/resources")
+        .then(function (response) {
+          let { exchange_value } = response.data.data;
+          _this.editedItem.exchange_value = exchange_value;
+          _this.editedItemDefault.exchange_value = exchange_value;
+        });
     },
-    showItem(item) {},
     async editItem(item) {
       const _this = this;
       _this.editedIndex = item.id;
@@ -183,12 +193,13 @@ export default {
           price: product.quotation.price_unit,
           qty: product.quotation.quantity,
           subtotal: product.quotation.subtotal,
-          currency: item.currency,
+          // currency: item.currency,
+          currency: product.currency,
           category_id: product.category.id,
         };
       });
       const [primerProduct = null] = item.products;
-      item.category_id = primerProduct ? primerProduct.category.id : null;
+      // item.category_id = primerProduct ? primerProduct.category.id : null;
       item.read_only = true;
       _this.editedItem = Object.assign({}, item);
       _this.dialog = true;

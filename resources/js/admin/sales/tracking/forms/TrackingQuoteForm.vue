@@ -10,9 +10,12 @@
               @close="dialog = false"
               :items.sync="form.products"
               :Category_id="form.category_id"
+              :propCurrency="form.currency"
+              :exchangeValue="form.exchange_value"
               :paymentCondition="form.payment_condition"
               :readOnly="form.read_only"
               @payment="(v) => (form.payment_condition = v)"
+              @currency="(v) => (form.currency = v)"
             ></quote-concept-table>
           </v-card-text>
           <v-card-actions>
@@ -28,7 +31,8 @@
           <tr class="py-3">
             <td>Subtotal:</td>
             <th class="text-right pr-2 text-h5">
-              {{ Subtotal | money }} {{ Currency.name }}
+              <!-- {{ Subtotal | money }} {{ Currency.name }} -->
+              {{ Subtotal | money }} {{ form.currency.name }}
             </th>
           </tr>
           <tr class="py-3">
@@ -72,7 +76,7 @@
                 outlined
                 suffix="$"
                 hide-details
-                :prefix="Currency.name"
+                :prefix="form.currency.name"
                 reverse
                 style="max-width: 200px"
                 dense
@@ -85,15 +89,16 @@
           <tr>
             <td>Total:</td>
             <th class="text-right pr-2 text-h4">
-              {{ Total | money }} {{ Currency.name }}
+              <!-- {{ Total | money }} {{ Currency.name }} -->
+              {{ Total | money }} {{ form.currency.name }}
             </th>
           </tr>
-          <tr v-if="Currency.id === 2">
+          <!-- <tr v-if="Currency.id === 2">
             <td>Total MXN:</td>
             <th class="text-right pr-2 text-h4">
               {{ (Total * form.exchange_value) | money }} MXN
             </th>
-          </tr>
+          </tr> -->
         </v-simple-table>
         <v-col cols="12">
           <v-textarea
@@ -125,14 +130,14 @@ export default {
   }),
 
   computed: {
-    Currency() {
-      const _this = this;
-      let _currency = { currency: { id: 1, name: "MXN" } };
-      if (_this.form.products.length > 0) {
-        _currency = _this.form.products.values().next().value;
-      }
-      return (_this.form.currency = _currency.currency);
-    },
+    // Currency() {
+    //   const _this = this;
+    //   let _currency = { currency: { id: 1, name: "MXN" } };
+    //   if (_this.form.products.length > 0) {
+    //     _currency = _this.form.products.values().next().value;
+    //   }
+    //   return (_this.form.currency = _currency.currency);
+    // },
     CheckedTax: {
       get() {
         return this.form.tax == 0.16;
@@ -168,18 +173,13 @@ export default {
     dialogDelete(val) {
       val || this.closeDelete();
     },
-    Currency: function (v) {
-      const _this = this;
-      if (v.id === 2) {
-        _this.form.exchange_value = _this.exchange_value;
-      } else {
-        _this.form.exchange_value = 1;
-      }
-    },
+    // Currency: function (v) {
+    //   _this.form.exchange_value = _this.exchange_value;
+    // },
   },
 
   mounted() {
-    this.initialize();
+    // this.initialize();
   },
 
   methods: {

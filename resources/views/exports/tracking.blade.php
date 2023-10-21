@@ -19,6 +19,9 @@
             <th>Medio Contacto</th>
             <th>Ultimo Cambio</th>
             <th>Fecha Registro</th>
+            <th>Fecha Factura</th>
+            <th>Folio Factura</th>
+            <th>Importe Factura</th>
             <th>Utimo Comentario</th>
         </tr>
     </thead>
@@ -43,6 +46,9 @@
                 <td>{{ $item->first_contact ?? 'S/A' }}</td>
                 <td>{{ \Carbon\Carbon::parse($item->updated_at)->format('d/m/Y g:i:s') ?? 'S/A' }}</td>
                 <td>{{ \Carbon\Carbon::parse($item->created_at)->format('d/m/Y g:i:s')  ?? 'S/A' }}</td>
+                <td>{{ \Carbon\Carbon::parse($item->date_won_sale)->format('d/m/Y')  ?? 'S/A' }}</td>
+                <td>{{ $item->invoice ?? '' }}</td>
+                <td>{{ '$' . $item->price ?? 'S/A' }} {{ $item->currency ?? 'MXN' }}</td>
                 <td>{{ $item->historical->last()->message ?? '' }}</td>
             </tr>
         @endforeach

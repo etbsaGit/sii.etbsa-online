@@ -29,7 +29,7 @@ export default {
         title: null,
         reference: null,
         price: 0,
-        currency: 1,
+        currency: {id:1,name:"MXN"},
         currency_id: 1,
         exchange_value: 1,
         agency_id: null,
@@ -46,7 +46,6 @@ export default {
         discount: 0,
         tax: 0,
         total: 0,
-        currency: null,
         products: [],
       },
     };

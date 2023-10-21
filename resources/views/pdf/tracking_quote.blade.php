@@ -200,6 +200,21 @@
         }
     </style>
 
+    @php
+
+        function convertExchange($value, $currentTo, $currentFrom, $exchange)
+        {
+            if ($currentTo == $currentFrom) {
+                return $value;
+            } elseif ($currentTo == 'USD' && $currentFrom == 'MXN') {
+                return $value / $exchange;
+            } elseif ($currentTo == 'MXN' && $currentFrom == 'USD') {
+                return $value * $exchange;
+            }
+        }
+
+    @endphp
+
 </head>
 
 <body>
@@ -332,31 +347,46 @@
                 <tr class="heading">
                     <td colspan="1" style="text-align: center;">Cant.</td>
                     <td colspan="3" style="text-align: center;">SKU. / Producto</td>
-                    <td colspan="2" style="text-align: right;">Precio</td>
+                    <td colspan="2" style="text-align: right;">Precio U.</td>
                     <td colspan="2" style="text-align: right;">Subtotal</td>
                 </tr>
                 @foreach ($data->products as $product)
-                <tr class="item">
-                    <td colspan="1" style="text-align: center;">
-                        {{ $product->quotation->quantity }}
-                    </td>
+                    <tr class="item">
+                        <td colspan="1" style="text-align: center;">
+                            {{ $product->quotation->quantity }}
+                        </td>
 
-                    <td colspan="3" style="width: 324px;">
-                        <div style="text-align: start">
-                            <b>{{ $product->sku }}</b>
-                            ({{ $product->name }})
-                        </div>
-                        <div style="text-align: justify; font-size: 0.5rem; padding-top: 5px;">
-                            {{ $product->description }}
-                        </div>
-                    </td>
-                    <td colspan="2" style="text-align: right;font-size: 0.8rem;">
-                        {{ '$ ' . number_format($product->quotation->price_unit, 2, '.', ',') }}
-                        {{ $data->currency->name }}</td>
-                    <td colspan="2" style="text-align: right;font-size: 0.8rem;">
-                        {{ '$ ' . number_format($product->quotation->subtotal, 2, '.', ',') }}
-                        {{ $data->currency->name }}</td>
-                </tr>
+                        <td colspan="3" style="width: 324px;">
+                            <div style="text-align: start">
+                                <b>{{ $product->sku }}</b>
+                                ({{ $product->name }})
+                            </div>
+                            <div style="text-align: justify; font-size: 0.5rem; padding-top: 5px;">
+                                {{ $product->description }}
+                            </div>
+                        </td>
+                        <td colspan="2" style="text-align: right;font-size: 0.8rem;">
+                            {{-- {{ '$ ' . number_format($product->quotation->price_unit, 2, '.', ',') }} --}}
+                            {{ '$ ' .
+                                number_format(
+                                    convertExchange(
+                                        $product->quotation->price_unit,
+                                        $data->currency->name,
+                                        $product->quotation->currency,
+                                        $data->exchange_value,
+                                    ),
+                                    2,
+                                    '.',
+                                    ',',
+                                ) }}
+
+                            {{-- {{ $product->quotation->currency }} --}}
+                            {{ $data->currency->name }}
+                        </td>
+                        <td colspan="2" style="text-align: right;font-size: 0.8rem;">
+                            {{ '$ ' . number_format($product->quotation->subtotal, 2, '.', ',') }}
+                            {{ $data->currency->name }}</td>
+                    </tr>
                 @endforeach
                 <tr class="total" style="text-align: end;">
                     <td colspan="4"></td>
@@ -368,30 +398,30 @@
                 </tr>
                 <tr class="total" style="text-align: end;">
                     <td colspan="4"></td>
-                    <td colspan="2">IVA:</td>
+                    <td colspan="2">IVA ({{ number_format($data->tax, 2, '.', ',') * 100 }}%) :</td>
                     <td colspan="2" style="text-align: right;font-size: 0.8rem;">
-                        {{ number_format($data->tax, 2, '.', ',') * 100 }}%
-                    </td>
-                </tr>
-                @if ($data->discount > 0)
-                <tr class="total" style="text-align: end;">
-                    <td colspan="4"></td>
-                    <td colspan="2">IVA Descuento:</td>
-                    <td colspan="2" style="text-align: right;font-size: 0.8rem;">
-                        {{ '$ ' . number_format($data->discount, 2, '.', ',') }}
+                        {{ '$ ' . number_format($data->subtotal * $data->tax, 2, '.', ',') }}
                         {{ $data->currency->name }}
                     </td>
                 </tr>
+                @if ($data->discount > 0)
+                    <tr class="total" style="text-align: end;">
+                        <td colspan="4"></td>
+                        <td colspan="2">IVA Descuento:</td>
+                        <td colspan="2" style="text-align: right;font-size: 0.8rem;">
+                            {{ '$ ' . number_format($data->discount, 2, '.', ',') }}
+                            {{ $data->currency->name }}
+                        </td>
+                    </tr>
                 @endif
-                @if ($data->currency->name == 'USD')
+
                 <tr class="total" style="text-align: right">
                     <td colspan="4"></td>
                     <td colspan="2">T.C.: </td>
                     <td colspan="2" style="font-size: 0.8rem;">
                         {{ '$ ' . number_format($data->exchange_value, 2, '.', ',') }}
-                        {{ $data->currency->name }} </td>
+                        MXN </td>
                 </tr>
-                @endif
                 <tr class="total" style="text-align: end;">
                     <td colspan="4"></td>
                     <td colspan="2">Total:</td>
@@ -404,12 +434,12 @@
                     <td colspan="8" style="padding-top: 40px;">
                         <table>
                             @if ($data->observation)
-                            <tr style="padding-bottom: 0px;">
-                                <td style="padding-bottom: 5px; font-size: 0.8rem;">
-                                    <b>NOTA del Vendedor:</b><br /><br/>
-                                    {{ $data->observation }}
-                                </td>
-                            </tr>
+                                <tr style="padding-bottom: 0px;">
+                                    <td style="padding-bottom: 5px; font-size: 0.8rem;">
+                                        <b>NOTA del Vendedor:</b><br /><br />
+                                        {{ $data->observation }}
+                                    </td>
+                                </tr>
                             @endif
                             <tr style="padding-bottom: 0px;">
                                 <td style="padding-bottom: 0px;">
