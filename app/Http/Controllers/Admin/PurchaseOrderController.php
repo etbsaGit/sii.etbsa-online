@@ -431,6 +431,8 @@ class PurchaseOrderController extends AdminController
 
         $purchase = [
             'id' => $purchaseOrder->id,
+            'purchase_number' => $purchaseOrder->purchase_number,
+            'currency' => $purchaseOrder->currency,
             'estatus' => $purchaseOrder->estatus->only('id', 'key', 'title'),
             'elaborated' => $purchaseOrder->elaborated->only('id', 'name', 'email'),
             'supplier' => $purchaseOrder->supplier->only('id', 'code_equip', 'business_name', 'rfc', 'email', 'credit_days'),

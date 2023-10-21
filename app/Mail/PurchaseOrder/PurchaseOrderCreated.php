@@ -59,6 +59,8 @@ class PurchaseOrderCreated extends Mailable
     {
         $purchase = [
             'id' => $order->id,
+            'purchase_number' => $order->purchase_number,
+            'currency' => $order->currency,
             'estatus' => $order->estatus->only('id', 'key', 'title'),
             'elaborated' => $order->elaborated->only('id', 'name', 'email'),
             'supplier' => $order->supplier->only('id', 'code_equip', 'business_name', 'rfc', 'email', 'credit_days'),

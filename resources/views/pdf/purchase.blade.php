@@ -279,7 +279,7 @@
                                     Direccion:
                                     {{ $item->ship->address ??
                                         'Carretera Celaya-Salamanca Km. 61 Primera Frac. de
-                                                                        Crespo 38120' }}<br>
+                                                                                                            Crespo 38120' }}<br>
                                     Comprador: {{ $item->elaborated->name }}<br>
                                     Email:{{ $item->elaborated->email }}<br>
                                 </td>
@@ -308,11 +308,11 @@
                         <table>
                             <tr class="heading">
                                 <td>Uso CFDI:</td>
-                                <td>G03</td>
+                                <td>{{ $item->invoice->uso_cfdi->clave }}</td>
                             </tr>
                             <tr class="heading">
                                 <td>Metodo de Pago:</td>
-                                <td>PPD</td>
+                                <td>{{ $item->invoice->metodo_pago->clave }}</td>
                             </tr>
 
                         </table>
@@ -321,7 +321,7 @@
                         <table>
                             <tr class="heading">
                                 <td>Forma de Pago:</td>
-                                <td>99</td>
+                                <td>{{ $item->invoice->forma_pago->clave }}</td>
                             </tr>
                             <tr class="heading">
                                 <td>
@@ -422,6 +422,12 @@
                             {{ '$ ' . number_format($item->amounts->discount, 2, '.', ',') }}</td>
                     </tr>
                 @endif
+                <tr class="total" style="text-align: end;">
+                    <td colspan="6"></td>
+                    <td colspan="1">Moneda:</td>
+                    <td colspan="1" style="text-align: right;">
+                        {{ $item->currency['name'] }}</td>
+                </tr>
                 <tr class="total" style="text-align: end;">
                     <td colspan="6"></td>
                     <td colspan="1">Total:</td>

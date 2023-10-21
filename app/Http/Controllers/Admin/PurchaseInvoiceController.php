@@ -56,7 +56,7 @@ class PurchaseInvoiceController extends AdminController
 
         $payload = [
             'folio' => $data_xml['Folio'][0],
-            'serie' => $data_xml['Serie'][0],
+            'serie' => $data_xml['Serie'][0] ?? null,
             'invoice_date' => $data_xml['Fecha'][0],
             // 'folio_fiscal' => $data_xml['UUID'][0],
             'folio_fiscal' => json_decode(json_encode(($data_xml['UUID'])), true)[0],
@@ -78,7 +78,7 @@ class PurchaseInvoiceController extends AdminController
                 'folio_fiscal' => "required|unique:invoices"
             ],
             [
-                'folio_fiscal.unique' => "El Folio Fiscal ya fue Registardo anteriormente"
+                'folio_fiscal.unique' => "El Folio Fiscal ya fue Registrado anteriormente"
             ]
         );
 
