@@ -28,6 +28,21 @@
         outlined
         dense
       ></v-select>
+      <v-select
+        v-model="Currency"
+        :items="options.currency"
+        item-value="id"
+        item-text="name"
+        placeholder="Moneda"
+        label="Moneda"
+        class="ml-2"
+        style="max-width: 250px"
+        hide-details
+        outlined
+        filled
+        dense
+        return-object
+      ></v-select>
     </v-card-title>
     <v-data-table
       :headers="headers"
@@ -58,8 +73,13 @@
           persistent
           large
         >
-          <v-chip outlined label large color="primary">
+          <!-- <v-chip outlined label large color="primary">
             {{ item.price | currency }} {{ item.currency.name }}
+          </v-chip> -->
+          <v-chip outlined label large color="primary">
+            <span class="font-weight-bold">
+              {{ ConvertionExchange(item) | money }} {{ Currency.name }}
+            </span>
           </v-chip>
 
           <template v-slot:input>
@@ -120,9 +140,10 @@
           </template>
         </v-edit-dialog>
       </template>
-      <template v-slot:[`item.subtotal`]="{ item, value }">
+      <template v-slot:[`item.subtotal`]="{ value }">
         <v-chip outlined label large>
-          {{ value | money }} {{ item.currency.name }}
+          <!-- {{ value | money }} {{ item.currency.name }} -->
+          {{ value | money }} {{ Currency.name }}
         </v-chip>
       </template>
       <template v-slot:[`item.accion`]="{ item }">
@@ -173,7 +194,7 @@ const _paymentCondition = [
   {
     text: "Contado",
     value: "contado",
-    config: [1, 2, 3, 10, 5, 6, 11, 16, 9, 17,14],
+    config: [1, 2, 3, 10, 5, 6, 11, 16, 9, 17, 14],
   },
   { text: "JDF 2 años", value: "jdf_2y", config: [1, 2, 3, 10, 17] },
   { text: "JDF 5 años", value: "jdf_5y", config: [1] },
@@ -214,6 +235,20 @@ export default {
       type: Number | String,
       require: false,
       default: null,
+    },
+    propCurrency: {
+      type: Object,
+      require: false,
+      default: () => {},
+    },
+    exchangeValue: {
+      type: Number | String,
+      require: true,
+    },
+    currency_id: {
+      type: Number | String,
+      require: false,
+      default: 1,
     },
     optionsPaymentcondition: {
       type: Array,
@@ -272,6 +307,15 @@ export default {
         this.$nextTick(() => {});
       },
     },
+    Currency: {
+      get() {
+        return this.propCurrency;
+      },
+      set(v) {
+        this.$emit("currency", v);
+        this.$nextTick(() => {});
+      },
+    },
     Category() {
       return this.Category_id ? this.Category_id : this.select_category_id;
     },
@@ -303,8 +347,26 @@ export default {
       //   _paymentCondition.find((p) => p.value == v).type_price ?? "";
 
       _this.items.forEach((product) => {
-        product.price = product.prices[_this.TypePrice] ?? product.price;
-        product.subtotal = product.qty * product.price;
+        product.price = !product.quotation
+          ? product.prices[_this.TypePrice] ?? product.price
+          : product.quotation.price_unit;
+        // product.subtotal = product.qty * product.price;
+        product.subtotal = product.qty * this.ConvertionExchange(product);
+      });
+    },
+    Currency(v, old) {
+      // console.log(v, old);
+      const _this = this;
+      // let price_type =
+      //   _paymentCondition.find((p) => p.value == v).type_price ?? "";
+
+      _this.items.forEach((product) => {
+        product.price = !product.quotation
+          ? product.prices[_this.TypePrice] ?? product.price
+          : product.quotation.price_unit;
+
+        // product.subtotal = product.qty * product.price;
+        product.subtotal = product.qty * this.ConvertionExchange(product);
       });
     },
   },
@@ -354,13 +416,16 @@ export default {
       await axios
         .get("/admin/tracking/sales_history/resources")
         .then(function (response) {
-          let { categories } = response.data.data;
+          let { categories, currency, exchange_value } = response.data.data;
 
           _this.options.categories = categories;
+          _this.options.currency = currency;
+          _this.options.exchange_value = exchange_value;
         });
     },
     saveSnack(product) {
-      product.subtotal = product.price * product.qty;
+      // product.subtotal =  product.price * product.qty;
+      product.subtotal = this.ConvertionExchange(product) * product.qty;
       this.snack = true;
       this.snackColor = "success";
       this.snackText = "Cantidad Actualizada";
@@ -376,7 +441,7 @@ export default {
           product.price = priceBase;
         }
       }
-      product.subtotal = product.price * product.qty;
+      product.subtotal = this.ConvertionExchange(product) * product.qty;
       return product;
     },
     cancelSnack() {
@@ -418,25 +483,25 @@ export default {
           duration: 3000,
         });
       }
-      if (_this.sameCurrency(product)) {
-        return _this.$store.commit("showSnackbar", {
-          message: "Moneda no Valida",
-          color: "warning",
-          duration: 3000,
-        });
-      }
+      // if (_this.sameCurrency(product)) {
+      //   return _this.$store.commit("showSnackbar", {
+      //     message: "Moneda no Valida",
+      //     color: "warning",
+      //     duration: 3000,
+      //   });
+      // }
       return _this.addItem(product);
     },
     duplicateExists(product_selected) {
       const _this = this;
       return _this.items.some((item) => item.sku == product_selected.sku);
     },
-    sameCurrency(product_selected) {
-      const _this = this;
-      return !_this.items.every(
-        (item) => item.currency.id === product_selected.currency.id
-      );
-    },
+    // sameCurrency(product_selected) {
+    //   const _this = this;
+    //   return !_this.items.every(
+    //     (item) => item.currency.id === product_selected.currency.id
+    //   );
+    // },
     addItem(item) {
       const _this = this;
       let concept = {};
@@ -474,7 +539,9 @@ export default {
       };
       concept.qty = item.qty;
       concept.currency = item.currency;
-      concept.subtotal = item.qty * item.suggested_price;
+      concept.subtotal =
+        item.qty *
+        _this.ConvertionExchange({ ...item, price: item.suggested_price });
 
       _this.items.push(concept);
       _this.$store.commit("showSnackbar", {
@@ -482,6 +549,15 @@ export default {
         color: "success",
         duration: 3000,
       });
+    },
+    ConvertionExchange(item) {
+      const _this = this;
+      if (_this.propCurrency.id === item.currency.id) {
+        return item.price;
+      } else if (_this.propCurrency.id === 2 && item.currency.id === 1)
+        return item.price / _this.options.exchange_value;
+      else if (_this.propCurrency.id === 1 && item.currency.id === 2)
+        return item.price * _this.options.exchange_value;
     },
   },
 };
