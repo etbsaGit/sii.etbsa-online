@@ -107,7 +107,6 @@ class PurchaseOrderObserver
             $toEmails = [$purchaseOrder->elaborated];
             // $toEmails = [$purchaseOrder->elaborated, $purchaseOrder->supplier];
         }
-
         Mail::to($toEmails)->cc($ccEmails)->send(new PurchaseOrderCreated($purchaseOrder, $subjectMessage));
     }
     /**
@@ -132,6 +131,9 @@ class PurchaseOrderObserver
                     }
                 })->filter()->toArray();
         }
+
+        
+
         Mail::to($toEmails)->cc($ccEmails)->send(new PurchaseOrderCreated($purchaseOrder, $subjectMessage));
     }
 
@@ -157,6 +159,7 @@ class PurchaseOrderObserver
                     }
                 })->filter()->toArray();
         }
+        
         Mail::to($toEmails)->cc($ccEmails)->send(new PurchaseOrderCreated($purchaseOrder, $subjectMessage));
     }
 
