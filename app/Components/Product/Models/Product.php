@@ -41,6 +41,7 @@ class Product extends Model
     const PRODUCT_INCOME = 0;
     const PRODUCT_PRICE = 0;
     protected $appends = ['type', 'qty', 'discount'];
+    protected $with = ['currency'];
 
     public function scopeSearch($query, string $search)
     {

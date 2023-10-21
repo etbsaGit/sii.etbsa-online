@@ -141,6 +141,7 @@ export default {
         date_invoice,
         date_won_sale,
         date_lost_sale,
+        first_contact,
       } = this.Tracking.detail;
       let currency = this.Tracking.currency;
       let estatus = this.Tracking.estatus;
@@ -157,6 +158,7 @@ export default {
         date_invoice,
         date_won_sale,
         date_lost_sale,
+        first_contact,
       };
     },
     percenAssertiveness() {

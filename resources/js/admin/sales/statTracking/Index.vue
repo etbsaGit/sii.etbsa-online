@@ -178,12 +178,9 @@
               <v-card color="indigo lighten-5">
                 <v-card-title class="subheading font-weight-bold">
                   <v-avatar size="48px">
-                    <img
-                      :alt="item.vendedor"
-                      :src="item.photo"
-                    />
+                    <img :alt="item.vendedor" :src="item.photo" />
                   </v-avatar>
-                  <v-spacer/>
+                  <v-spacer />
 
                   {{ item.vendedor }}
                 </v-card-title>
@@ -457,7 +454,7 @@ export default {
           { text: "Ventas Ganadas", value: "formalizado" },
           { text: "Todos", value: "todos" },
         ],
-        origin: ["Online", "Visita en Agencia", "Visita de Campo"],
+        origin: ["Online", "Visita en Agencia", "Visita de Campo", "Expo"],
       },
       colors: {
         activos: "green",

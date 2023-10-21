@@ -46,10 +46,14 @@ class MessageTrackingSent extends Notification
      */
     public function toMail($notifiable)
     {
+
+        $uri = url('/admin#/ventas/tracking');
+
         return (new MailMessage)
             ->subject('Mensaje de Apoyo en Seguimiento')
             ->line('Solicitud de Apoyo.')
             ->line($this->msg['body.message'] . ' Seguimiento #' . $this->msg['messageable_id'])
+            ->action('Ir al Seguimiento', $uri)
             ->line('Gracias por usas La Aplicacion!');
         // ->action('Notificacion', url('/'))
     }

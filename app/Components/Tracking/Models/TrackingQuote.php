@@ -16,6 +16,7 @@ class TrackingQuote extends Model
     protected $fillable = [
         'date_due',
         'tracking_id',
+        'category_id',
         'currency_id',
         'exchange_value',
         'subtotal',
@@ -32,6 +33,7 @@ class TrackingQuote extends Model
     {
         return $this->belongsTo(TrackingProspect::class, 'tracking_id');
     }
+
     public function currency()
     {
         return $this->belongsTo(Currency::class, 'currency_id');
@@ -50,7 +52,7 @@ class TrackingQuote extends Model
             ->as('quotation');
     }
 
-    public function scopeSearch($query, String $search)
+    public function scopeSearch($query, string $search)
     {
         $query->when($search ?? null, function ($query, $search) {
             $query->where(function ($query) use ($search) {

@@ -42,7 +42,7 @@
           class="ma-1"
           color="indigo"
           @click="dialogFormalize = true"
-          v-if="propTracking.estatus.key == 'activo' && timeline.length >= 3"
+          v-if="propTracking.estatus.key == 'activo' && (timeline.length >= 3 || propTracking.first_contact == 'Visita en Agencia') "
         >
           Venta Ganada <v-icon right>mdi-receipt</v-icon>
         </v-btn>

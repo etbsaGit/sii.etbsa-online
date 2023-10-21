@@ -169,7 +169,9 @@
                 :items.sync="form.products"
                 :paymentCondition="form.tracking_condition"
                 :Category_id="Category ? Category.id : null"
+                :propCurrency="form.currency"
                 @payment="(v) => (v ? (form.tracking_condition = v) : '')"
+                @currency="(v) => (form.currency = v)"
                 @SELECTED_CATEGRORY="
                   (v) => {
                     if (v) {
@@ -205,7 +207,7 @@
                         <tr>
                           <td>Subtotal:</td>
                           <td class="text-right text-h6">
-                            {{ Subtotal | money }} {{ Currency.name }}
+                            {{ Subtotal | money }} {{ form.currency.name }}
                           </td>
                         </tr>
                         <tr>
@@ -243,7 +245,7 @@
                                 outlined
                                 suffix="$"
                                 hide-details
-                                :prefix="Currency.name"
+                                :prefix="form.currency.name"
                                 reverse
                                 style="max-width: 250px"
                                 dense
@@ -254,15 +256,15 @@
                         <tr>
                           <td>Total:</td>
                           <td class="text-right text-h6">
-                            {{ Total | money }} {{ Currency.name }}
+                            {{ Total | money }} {{ form.currency.name }}
                           </td>
                         </tr>
-                        <tr v-if="form.currency_id === 2">
+                        <!-- <tr v-if="form.currency_id === 2">
                           <td>Total MXN:</td>
                           <th class="text-right pr-2 text-h6">
                             {{ (Total * form.exchange_value) | money }} MXN
                           </th>
-                        </tr>
+                        </tr> -->
                       </tbody>
                     </template>
                   </v-simple-table>
@@ -620,7 +622,7 @@ export default {
         //   TRACTORES: ["Contado", "JDF 2 años", "JDF 5 años", "Expo"],
         //   IMPLEMENTOS: ["Contado", "JDF 2 años"],
         // },
-        origin: ["Online", "Visita en Agencia", "Visita de Campo"],
+        origin: ["Online", "Visita en Agencia", "Visita de Campo", "Expo"],
         categories: [],
         currency: [],
         exchange_value: 1,
@@ -655,8 +657,9 @@ export default {
     ExchangeRate: {
       get() {
         const _this = this;
-        return (_this.form.exchange_value =
-          _this.form.currency_id == 2 ? _this.options.exchange_value : 1);
+        // return (_this.form.exchange_value =
+        //   _this.form.currency_id == 2 ? _this.options.exchange_value : 1);
+        return (_this.form.exchange_value = _this.options.exchange_value);
       },
     },
     SelectedProspect() {
