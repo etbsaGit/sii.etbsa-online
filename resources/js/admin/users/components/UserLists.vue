@@ -4,7 +4,7 @@
     :items="items"
     :options.sync="pagination"
     :server-items-length="totalItems"
-    class="text-truncate blue--text caption"
+    class="text-truncate white--text caption font-weight-bold text-uppercase"
     calculate-widths
     fixed-header
     caption
@@ -165,16 +165,19 @@
       </v-btn>
     </template>
     <template v-slot:[`item.groups`]="{ item }">
-      <v-chip
-        v-for="group in item.groups"
-        :key="group.id"
-        outlined
-        color="secondary"
-        text-color="accent"
-        small
-      >
-        {{ group.name }}
-      </v-chip>
+      <div class="d-flex flex-wrap">
+        <v-chip
+          v-for="group in item.groups"
+          :key="group.id"
+          outlined
+          color="secondary"
+          text-color="accent"
+          class="mx-1"
+          small
+        >
+          {{ group.name }}
+        </v-chip>
+      </div>
     </template>
     <template v-slot:[`item.last_login`]="{ item }">
       {{ $appFormatters.formatDate(item.last_login) }}
