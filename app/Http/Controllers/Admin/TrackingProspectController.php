@@ -6,6 +6,7 @@ use App\Components\Common\Models\Currency;
 use App\Components\Common\Models\Estatus;
 use App\Components\Common\Models\ExchangeRates;
 use App\Components\Common\Models\SellerCategory;
+use App\Components\File\Services\FileService;
 use App\Components\Product\Models\ProductCategory;
 use App\Components\RRHH\Models\Employee;
 use App\Components\Tracking\Models\Prospect;
@@ -21,6 +22,9 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Components\File\Models\File as FileTracking;
+use Illuminate\Support\Facades\Storage;
+use League\Flysystem\FileNotFoundException;
 
 class TrackingProspectController extends AdminController
 {
@@ -29,14 +33,16 @@ class TrackingProspectController extends AdminController
      */
     private $trackingRepository;
     private $trackingQuote;
+    private $fileService;
 
     /**
      * ProspectController constructor.
      * @param TrackingRepository $trackingRepository
      */
-    public function __construct(TrackingRepository $trackingRepository)
+    public function __construct(TrackingRepository $trackingRepository, FileService $fileService)
     {
         $this->trackingRepository = $trackingRepository;
+        $this->fileService = $fileService;
     }
 
     /**
@@ -64,20 +70,23 @@ class TrackingProspectController extends AdminController
             'profiable',
             [Employee::class],
         )->whereHas(
-            'groups',
-            function ($query) {
-                return $query->whereIn('groups.name', ['Vendedor']);
-            }
-        )->with('profiable:id,name,last_name,agency_id,department_id')->get();
+                'groups',
+                function ($query) {
+                    return $query->whereIn('groups.name', ['Vendedor']);
+                }
+            )->with('profiable:id,name,last_name,agency_id,department_id')->get();
 
-        return $this->sendResponseOk(compact(
-            'prospects',
-            'categories',
-            'currency',
-            'agencies',
-            'departments',
-            'sellers'
-        ), "Create Tracking Prospect");
+        return $this->sendResponseOk(
+            compact(
+                'prospects',
+                'categories',
+                'currency',
+                'agencies',
+                'departments',
+                'sellers'
+            ),
+            "Create Tracking Prospect"
+        );
     }
 
     /**
@@ -117,7 +126,8 @@ class TrackingProspectController extends AdminController
         return DB::transaction(function () use ($request) {
             $request['registered_by'] = Auth::user()->id;
             $request['assigned_by'] = Auth::user()->id;
-            $currency_name = Currency::where('id', $request['currency_id'])->first();
+            $request['currency_id'] = $request['currency.id'];
+            $currency_name = Currency::where('id', $request['currency.id'])->first();
 
             $date_next_lead = $request->get('date_next_tracking', Carbon::now()->addDays(15));
             if (empty($date_next_lead) || is_null($date_next_lead)) {
@@ -143,13 +153,13 @@ class TrackingProspectController extends AdminController
                 'last_currency' => $currency_name->name,
                 'type_contacted' => 'Llamada',
                 'user_id' => $request['attended_by'],
-                'date_next_tracking' =>  $date_next_lead,
+                'date_next_tracking' => $date_next_lead,
                 'last_assertiveness' => $request['assertiveness'],
             ]);
 
             if ($request['withQuote']) {
                 $request['date_due'] = Carbon::now()->addDays(30);
-                $request['category_id'] = ProductCategory::where('name',$request['title'])->first()->id;
+                $request['category_id'] = ProductCategory::where('name', $request['title'])->first()->id;
                 $request['currency_id'] = $request['currency.id'];
                 $quotation
                     = $tracking->quotation()->create($request->all());
@@ -232,6 +242,7 @@ class TrackingProspectController extends AdminController
                     'created_at' => $H->created_at,
                 ];
             }),
+            'files' => $tracking->files->map->only('id', 'name', 'file_path', 'file_type', 'created_at')
         ];
 
         if (!$tracking) {
@@ -381,7 +392,7 @@ class TrackingProspectController extends AdminController
             // });
         }
         $categories = DB::table('cat_product_category')->get(['id', 'name']);
-       
+
         $currency = DB::table('currency')->get(['id', 'name']);
         $prospects = Prospect::with('township')->get()->map->only(['id', 'full_name', 'email', 'company', 'rfc', 'town', 'phone', 'township']);
         $exchange_value = ExchangeRates::latest()->first()->value;
@@ -434,4 +445,90 @@ class TrackingProspectController extends AdminController
         $pdf = \PDF::loadView('pdf.quote', compact('data'));
         return $pdf->stream();
     }
+
+
+    public function destroyFile(FileTracking $file)
+    {
+
+        // dd($file,Storage::disk('s3')->exists($file->path));
+        try {
+            $file->delete();
+            if (Storage::disk('s3')->exists($file->path)) {
+                Storage::disk('s3')->delete($file->path);
+            }
+        } catch (\Throwable $th) {
+            //throw $th;
+            return $this->sendResponseDeleted("Error de Servidor");
+        }
+        return $this->sendResponseDeleted("Archivo Eliminado");
+    }
+
+    public function attachFiles(Request $request, TrackingProspect $tracking)
+    {
+        // dd($request->hasFile('file'), $request->file('file'));
+
+        if ($request->hasFile('file')) {
+            $files = $request->file('file');
+            $error = false;
+            $errorMessage = '';
+            $fileRecord = null;
+            foreach ($files as $file) {
+                try {
+                    $fileOriginalName = $file->getClientOriginalName();
+                    $filePath = $file->store('trackings/id_' . $tracking->id . '/files', 's3');
+
+                    if (!$filePath) {
+                        $this->addError("Failed to upload.", 400);
+                        return false;
+                    }
+
+                    // other data
+                    $ext = pathinfo(config('filesystems.disks.local.root') . '/' . $filePath, PATHINFO_EXTENSION);
+                    $size = Storage::disk('s3')->getSize($filePath);
+                    $type = Storage::disk('s3')->getMimetype($filePath);
+
+                    $fileData = [
+                        'original_name' => $fileOriginalName,
+                        'path' => $filePath,
+                        'ext' => $ext,
+                        'size' => $size,
+                        'type' => $type,
+                    ];
+                } catch (FileNotFoundException $e) {
+                    $error = true;
+                    $errorMessage = $e->getMessage();
+                    break;
+                }
+                if (!$fileData) {
+                    $error = true;
+                    $errorMessage = $this->fileService->getErrors()->first();
+                    break;
+                }
+                $fileRecord = $tracking->files()->create([
+                    'name' => $fileData['original_name'],
+                    'uploaded_by' => Auth::user()->id,
+                    'file_type' => $fileData['type'],
+                    'extension' => $fileData['ext'],
+                    'size' => $fileData['size'],
+                    'path' => $fileData['path'],
+                ]);
+
+                if (!$fileRecord) {
+                    if (Storage::disk('s3')->exists($fileData['path'])) {
+                        Storage::disk('s3')->delete($fileData['path']);
+                    }
+                    $error = true;
+                    $errorMessage = "Failed to create record.";
+                    break;
+                }
+
+            }
+            if ($error) {
+                return $this->sendResponseBadRequest($errorMessage);
+            }
+
+            return $this->sendResponseCreated();
+        }
+    }
+
 }
