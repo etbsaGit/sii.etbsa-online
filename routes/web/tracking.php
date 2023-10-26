@@ -34,7 +34,9 @@ Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function
     Route::get('quote/products_by_category/{product_category}', 'TrackingQuoteController@getProductsByCategory')->name('tracking-quote.getProductsByCategory');
     Route::get('quote/{quote}/print', 'TrackingQuoteController@printQuote')->name('tracking-quote.print');
     
-    
+    // FILES
+    Route::delete('tracking-file/{file}','TrackingProspectController@destroyFile')->name('tracking-file.destroy');
+    Route::post('tracking-file/attach/{tracking}','TrackingProspectController@attachFiles')->name('tracking-file.attach');
 
     
 

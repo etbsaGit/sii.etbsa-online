@@ -53,6 +53,7 @@
           <v-tabs color="deep-purple accent-3" right>
             <v-tab>Actividades</v-tab>
             <v-tab>Cotizaciones</v-tab>
+            <v-tab>Archivos</v-tab>
             <v-tab>Mensajes de Apoyo</v-tab>
 
             <v-tab-item>
@@ -69,6 +70,41 @@
                 ></tracking-quote-component>
               </v-container>
             </v-tab-item>
+            <v-tab-item>
+              <v-toolbar>
+                <v-file-input
+                  v-model="files"
+                  label="Archivo"
+                  placeholder="Seleccionar Archivo"
+                  persistent-placeholder
+                  accept="image/png, image/jpeg, image/bmp,application/pdf"
+                  :rules="[
+                    (value) =>
+                      !value ||
+                      value.every((file) => file.size < 4000000) ||
+                      'El Archivo debe ser Menor de 4 MB!',
+                  ]"
+                  show-size
+                  multiple
+                  hide-details
+                  outlined
+                  dense
+                ></v-file-input>
+                <v-btn
+                  v-if="
+                    files.length > 0 &&
+                    files.every((file) => file.size < 4000000)
+                  "
+                  class="ml-2"
+                  dark
+                  @click="attachFiles"
+                >
+                  Subir Archivo
+                </v-btn>
+              </v-toolbar>
+              <tracking-files :files="Files"></tracking-files>
+            </v-tab-item>
+
             <v-tab-item>
               <message-tracking
                 :seller-id="propTracking.owner"
@@ -89,6 +125,7 @@ import MessageTracking from "@admin/sales/tracking/components/TrackingMessages.v
 import Assertiveness from "@admin/sales/tracking/resources/assertiveness.json";
 import TrackingActivity from "@admin/sales/tracking/components/TrackingActivityComponent.vue";
 import TrackingQuoteComponent from "@admin/sales/tracking/components/TrackingQuoteComponent.vue";
+import TrackingFiles from "./TrackingFiles.vue";
 
 export default {
   components: {
@@ -97,6 +134,7 @@ export default {
     MessageTracking,
     TrackingActivity,
     TrackingQuoteComponent,
+    TrackingFiles,
   },
   props: {
     propTrackingId: {
@@ -108,6 +146,7 @@ export default {
     return {
       Tracking: null,
       tab: null,
+      files: [],
       color: {
         activo: "primary",
         finalizado: "red",
@@ -123,13 +162,16 @@ export default {
       { label: "Detalle Seguimiento", to: "" },
     ]);
     self.loadTracking(() => {});
-    self.$eventBus.$on(["MESSAGE_ADDED"], () => {
+    self.$eventBus.$on(["MESSAGE_ADDED", "TRACKING_REFRESH"], () => {
       self.loadTracking(() => {});
     });
   },
   computed: {
     timeline() {
       return this.Tracking.historical.slice().reverse();
+    },
+    Files() {
+      return this.Tracking.files;
     },
     propTracking() {
       let {
@@ -177,6 +219,20 @@ export default {
           self.Tracking = response.data.data;
           cb();
         });
+    },
+    async attachFiles() {
+      const _this = this;
+      const formData = new FormData();
+      _this.files.forEach((item) => {
+        formData.append("file[]", item);
+      });
+      await axios.post(
+        `/admin/tracking-file/attach/${_this.propTrackingId}`,
+        formData
+      );
+      _this.files = [];
+      // _this.$eventBus.$emit("ORDERS_REFRESH");
+      _this.loadTracking(() => {});
     },
   },
 };

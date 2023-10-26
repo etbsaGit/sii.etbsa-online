@@ -108,10 +108,11 @@ class TrackingProspect extends Model
         return $this->historical()->count();
     }
 
-    // public function messages()
-    // {
-    //     return $this->hasMany(MessageTracking::class, 'tracking_id', 'id');
-    // }
+    public function files()
+    {
+        return $this->morphMany('App\Components\File\Models\File', 'fileable');
+    }
+
     public function messages()
     {
         return $this->morphMany(Message::class, 'messageable');
@@ -239,4 +240,8 @@ class TrackingProspect extends Model
     {
         return $this->price * $this->exchange_value;
     }
+    // public function getFilesAttribute()
+    // {
+    //     return $this->files->map->only('id', 'name', 'file_path', 'file_type', 'created_at');
+    // }
 }
