@@ -119,9 +119,27 @@
         </v-row>
       </v-card>
     </v-card-text>
+    <v-card-text>
+      <v-card flat>
+        <v-row dense>
+          <v-col cols="12" md="4">
+            <v-card-title
+              >Configuracion Metas del Vendedor (Gerente)</v-card-title
+            >
+            <v-card-subtitle>
+              Metas por Categoria y Periodo asignadas al Vendedor
+            </v-card-subtitle>
+          </v-col>
+          <v-col cols="12" md="8" class="elevation-2">
+           <update-metas-seller propSellerId="propSellerId"></update-metas-seller>
+          </v-col>
+        </v-row>
+      </v-card>
+    </v-card-text>
   </v-card>
 </template>
 <script>
+import UpdateMetasSeller from "./UpdateMetasSeller.vue";
 import UpdateProfileInformationForm from "./UpdateProfileInformationForm.vue";
 import UpdateSellerAgencyForm from "./UpdateSellerAgencyForm.vue";
 import UpdateSellerCategoryForm from "./UpdateSellerCategoryForm.vue";
@@ -133,7 +151,8 @@ export default {
     UpdateSellerAgencyForm,
     UpdateSellerTypeForm,
     UpdateSellerCategoryForm,
-  },
+    UpdateMetasSeller
+},
   name: "SellerProfileConfig",
   props: {
     propSellerId: {
