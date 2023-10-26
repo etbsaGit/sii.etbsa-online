@@ -92,7 +92,6 @@
           v-model="form.segmentacion"
           :items="['Chico', 'Mediano', 'Grande', 'Agroindustrial', 'Jardinero']"
           label="Segmentacion Cliente"
-          :rules="[(v) => !!v || 'Es Requerido']"
           outlined
           filled
           dense
@@ -104,7 +103,6 @@
           v-model="form.capacidad_tech"
           :items="['Baja', 'Mediana', 'Alta', 'Experto']"
           label="Capacidad de Tecnologia"
-          :rules="[(v) => !!v || 'Es Requerido']"
           outlined
           filled
           dense
@@ -115,7 +113,6 @@
           v-model="form.rating"
           :items="['AAA', 'AA', 'A', 'Lista Negra']"
           label="Calificacion"
-          :rules="[(v) => !!v || 'Es Requerido']"
           outlined
           filled
           dense
