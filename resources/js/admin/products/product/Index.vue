@@ -371,6 +371,17 @@
               dense
             />
             <v-currency-field
+              v-model.number="form.price_12"
+              :default-value="form.price_12"
+              label="Precio Financiamiento a 3 Años sin Intereses"
+              prefix="$"
+              :suffix="form.is_dollar ? 'USD' : 'MXN'"
+              type="number"
+              :rules="[(v) => !!v || 'Es Requerido o Poner Valor en Cero']"
+              outlined
+              dense
+            />
+            <v-currency-field
               v-model.number="form.price_4"
               :default-value="form.price_4"
               label="Precio Financiamiento a 5 años"
@@ -583,6 +594,7 @@ export default {
         price_9: 0,
         price_10: 0,
         price_11: 0,
+        price_12: 0,
       },
       formDefault: {
         product_category_id: null,
@@ -607,6 +619,7 @@ export default {
         price_9: 0,
         price_10: 0,
         price_11: 0,
+        price_12: 0,
       },
       rules: {},
       items: [],
@@ -628,6 +641,7 @@ export default {
         { text: "P. Lista", value: "precio_lista" },
         { text: "Contado", value: "contado" },
         { text: "JDF 2 años", value: "jdf_2y" },
+        { text: "Financiamiento 3 Años S/I", value: "jdf_3y_si" },
         { text: "JDF 5 años", value: "jdf_5y" },
         { text: "Expo", value: "precio_expo" },
         { text: "Precio Volumen", value: "por_volumen" },
@@ -798,6 +812,7 @@ export default {
         _this.form.price_9 = item.price_9;
         _this.form.price_10 = item.price_10;
         _this.form.price_11 = item.price_11;
+        _this.form.price_12 = item.price_12;
       }, 1000);
     },
     async submit() {

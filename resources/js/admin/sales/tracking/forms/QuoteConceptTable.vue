@@ -198,6 +198,7 @@ const _paymentCondition = [
   },
   { text: "JDF 2 años", value: "jdf_2y", config: [1, 2, 3, 10, 17] },
   { text: "JDF 5 años", value: "jdf_5y", config: [1] },
+  { text: "Financiamiento 3 años S/I", value: "jdf_3y_si", config: [1] },
   { text: "Expo", value: "precio_expo", config: [1, 5] },
   { text: "Precio Volumen", value: "por_volumen", config: [5, 14] },
   { text: "Arrendamiento", value: "renta_1", config: [6, 15] },
@@ -219,6 +220,7 @@ const _pricesConfig = [
   { renta_3: "price_9" },
   { credito_30d: "price_10" },
   { arrendadoras: "price_11" },
+  { jdf_3y_si: "price_12" },
 ];
 
 export default {

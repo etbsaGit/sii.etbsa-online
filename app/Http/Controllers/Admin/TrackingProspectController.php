@@ -114,8 +114,8 @@ class TrackingProspectController extends AdminController
             'agency_id.required' => 'Agencia Asignada es Requerido',
             'department_id.required' => 'A quien Corresponde es Requerido',
             'prospect_id.required' => 'El Prospecto es Requerido',
-            'price.required' => 'El Precio es Requerido',
-            'price.numeric' => 'El Precio debe ser un Numero Valido',
+            'price.required' => 'El Valor es Requerido',
+            'price.numeric' => 'El Valor debe ser un Numero Valido',
         ]);
 
         if ($validate->fails()) {
