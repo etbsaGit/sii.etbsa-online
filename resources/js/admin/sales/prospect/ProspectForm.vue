@@ -41,7 +41,6 @@
         <v-text-field
           v-model="form.phone"
           label="Telefono *"
-          :rules="rules"
           counter="10"
           outlined
           filled
@@ -66,7 +65,7 @@
           item-text="name"
           item-value="id"
           label="Estado *"
-          :rules="rules"
+          
           outlined
           filled
           dense
@@ -80,7 +79,6 @@
           label="Municipio *"
           item-text="name"
           item-value="id"
-          :rules="rules"
           outlined
           filled
           dense
