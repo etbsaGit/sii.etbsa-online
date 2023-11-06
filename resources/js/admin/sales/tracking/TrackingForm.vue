@@ -16,6 +16,146 @@
             </template>
           </div>
           <v-divider> </v-divider>
+          <v-card-text>
+            <v-row dense>
+              <v-col cols="12" class="d-flex align-stretch">
+                <v-card class="mx-auto" width="inherit">
+                  <div class="d-flex flex-wrap">
+                    <v-subheader>CON ATENCION A:</v-subheader>
+                    <v-spacer />
+                    <v-btn @click="dialog = true" color="green" dark>
+                      Registrar Prospecto
+                      <v-icon right>mdi-account-plus </v-icon>
+                    </v-btn>
+                  </div>
+                  <v-divider> </v-divider>
+                  <v-card-text class="pa-4">
+                    <v-autocomplete
+                      v-model="form.prospect_id"
+                      :items="options.prospects"
+                      item-text="full_name"
+                      item-value="id"
+                      placeholder="Buscar por Nombre o Telefono o Razon social"
+                      :rules="[(v) => !!v || 'Es Requerido']"
+                      :filter="customFilter"
+                      hide-details
+                      clearable
+                      outlined
+                      filled
+                      class="overline align-center"
+                    >
+                      <template v-slot:prepend-item>
+                        <v-btn
+                          @click="dialog = true"
+                          color="green"
+                          class="ma-2"
+                          dark
+                          block
+                        >
+                          Registrar Prospecto
+                          <v-icon right>mdi-account-plus </v-icon>
+                        </v-btn>
+                      </template>
+
+                      <template #item="{ item }">
+                        <v-list-item-content>
+                          <v-list-item-subtitle>
+                            {{ item.company }}
+                          </v-list-item-subtitle>
+                          <v-list-item-title
+                            class="text-uppercase font-weight-bold"
+                          >
+                            {{ item.full_name }}
+                          </v-list-item-title>
+                          <v-list-item-subtitle>
+                            Tel: {{ item.phone }}
+                          </v-list-item-subtitle>
+                        </v-list-item-content>
+                      </template>
+                    </v-autocomplete>
+                    <v-subheader class="pl-0">DATOS DEL PROSPECTO</v-subheader>
+
+                    <v-divider></v-divider>
+                    <v-scroll-y-transition mode="out-in">
+                      <div
+                        v-if="!SelectedProspect"
+                        class="text-h6 grey--text text--lighten-1 font-weight-light"
+                        style="align-self: center"
+                      >
+                        Selecciona a un Prospecto
+                      </div>
+                      <v-card v-else :key="SelectedProspect.id" flat>
+                        <v-row dense>
+                          <v-col
+                            class="text-left mr-4 mb-2"
+                            tag="strong"
+                            cols="6"
+                          >
+                            Nombre:
+                          </v-col>
+                          <v-col class="overline text-right">
+                            {{ SelectedProspect.full_name }}
+                          </v-col>
+                          <v-col
+                            class="text-left mr-4 mb-2"
+                            tag="strong"
+                            cols="6"
+                          >
+                            Razon Social:
+                          </v-col>
+                          <v-col class="overline text-right">
+                            {{ SelectedProspect.company }}
+                          </v-col>
+                          <v-col
+                            class="text-left mr-4 mb-2"
+                            tag="strong"
+                            cols="6"
+                          >
+                            RFC:
+                          </v-col>
+                          <v-col class="overline text-right">
+                            {{ SelectedProspect.rfc }}
+                          </v-col>
+                          <v-col
+                            class="text-left mr-4 mb-2"
+                            tag="strong"
+                            cols="6"
+                          >
+                            Telefono:
+                          </v-col>
+                          <v-col class="overline text-right">
+                            {{ SelectedProspect.phone }}
+                          </v-col>
+                          <v-col
+                            class="text-left mr-4 mb-2"
+                            tag="strong"
+                            cols="6"
+                          >
+                            Domicilio:
+                          </v-col>
+                          <v-col class="overline text-right">
+                            {{ SelectedProspect.town }}
+                          </v-col>
+                        </v-row>
+                      </v-card>
+                    </v-scroll-y-transition>
+                  </v-card-text>
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                      :disabled="!SelectedProspect"
+                      color="blue"
+                      dark
+                      @click="dialogEdit = true"
+                    >
+                      Editar Prospecto
+                      <v-icon right> mdi-pencil </v-icon>
+                    </v-btn>
+                  </v-card-actions>
+                </v-card>
+              </v-col>
+            </v-row>
+          </v-card-text>
           <v-card-text v-if="!form.withQuote">
             <v-row dense>
               <v-col cols="12" md="8">
@@ -42,7 +182,6 @@
                   item-value="name"
                   item-text="name"
                   placeholder="Seleccionar"
-                  :rules="[(v) => !!v || 'Es Requerido']"
                   hide-details
                   outlined
                   filled
@@ -259,12 +398,6 @@
                             {{ Total | money }} {{ form.currency.name }}
                           </td>
                         </tr>
-                        <!-- <tr v-if="form.currency_id === 2">
-                          <td>Total MXN:</td>
-                          <th class="text-right pr-2 text-h6">
-                            {{ (Total * form.exchange_value) | money }} MXN
-                          </th>
-                        </tr> -->
                       </tbody>
                     </template>
                   </v-simple-table>
@@ -277,115 +410,7 @@
     </v-row>
 
     <v-row dense class="overline">
-      <v-col cols="12" md="4" class="d-flex align-stretch">
-        <v-card class="mx-auto" width="inherit">
-          <div class="d-flex">
-            <v-subheader>CON ATENCION A:</v-subheader>
-          </div>
-          <v-divider> </v-divider>
-          <v-card-text class="pa-4">
-            <v-autocomplete
-              v-model="form.prospect_id"
-              :items="options.prospects"
-              item-text="full_name"
-              item-value="id"
-              placeholder="Buscar por Nombre o Telefono o Razon social"
-              :rules="[(v) => !!v || 'Es Requerido']"
-              :filter="customFilter"
-              hide-details
-              clearable
-              outlined
-              filled
-              class="overline align-center"
-            >
-              <template v-slot:prepend-item>
-                <v-btn
-                  @click="dialog = true"
-                  color="green"
-                  class="ma-2"
-                  dark
-                  block
-                >
-                  Registrar Nuevo
-                  <v-icon right>mdi-account-plus </v-icon>
-                </v-btn>
-              </template>
-
-              <template #item="{ item }">
-                <v-list-item-content>
-                  <v-list-item-subtitle>
-                    {{ item.company }}
-                  </v-list-item-subtitle>
-                  <v-list-item-title class="text-uppercase font-weight-bold">
-                    {{ item.full_name }}
-                  </v-list-item-title>
-                  <v-list-item-subtitle>
-                    Tel: {{ item.phone }}
-                  </v-list-item-subtitle>
-                </v-list-item-content>
-              </template>
-            </v-autocomplete>
-            <v-subheader class="pl-0">DATOS DEL PROSPECTO</v-subheader>
-            <v-divider></v-divider>
-            <v-scroll-y-transition mode="out-in">
-              <div
-                v-if="!SelectedProspect"
-                class="text-h6 grey--text text--lighten-1 font-weight-light"
-                style="align-self: center"
-              >
-                Selecciona a un Prospecto
-              </div>
-              <v-card v-else :key="SelectedProspect.id" flat>
-                <v-row dense>
-                  <v-col class="text-left mr-4 mb-2" tag="strong" cols="6">
-                    Nombre:
-                  </v-col>
-                  <v-col class="overline text-right">
-                    {{ SelectedProspect.full_name }}
-                  </v-col>
-                  <v-col class="text-left mr-4 mb-2" tag="strong" cols="6">
-                    Razon Social:
-                  </v-col>
-                  <v-col class="overline text-right">
-                    {{ SelectedProspect.company }}
-                  </v-col>
-                  <v-col class="text-left mr-4 mb-2" tag="strong" cols="6">
-                    RFC:
-                  </v-col>
-                  <v-col class="overline text-right">
-                    {{ SelectedProspect.rfc }}
-                  </v-col>
-                  <v-col class="text-left mr-4 mb-2" tag="strong" cols="6">
-                    Telefono:
-                  </v-col>
-                  <v-col class="overline text-right">
-                    {{ SelectedProspect.phone }}
-                  </v-col>
-                  <v-col class="text-left mr-4 mb-2" tag="strong" cols="6">
-                    Domicilio:
-                  </v-col>
-                  <v-col class="overline text-right">
-                    {{ SelectedProspect.town }}
-                  </v-col>
-                </v-row>
-              </v-card>
-            </v-scroll-y-transition>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn
-              :disabled="!SelectedProspect"
-              color="blue"
-              dark
-              @click="dialogEdit = true"
-            >
-              Editar Prospecto
-              <v-icon right> mdi-pencil </v-icon>
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-col>
-      <v-col cols="12" md="4" class="d-flex align-stretch">
+      <v-col cols="12" md="6" class="d-flex align-stretch">
         <v-card class="mx-auto" width="inherit">
           <div class="d-flex">
             <v-subheader>VENDEDOR ASIGNADO:</v-subheader>
@@ -445,7 +470,7 @@
           </v-card-text>
         </v-card>
       </v-col>
-      <v-col cols="12" md="4" class="d-flex align-stretch">
+      <v-col cols="12" md="6" class="d-flex align-stretch">
         <v-card class="mx-auto" width="inherit">
           <div class="d-flex">
             <v-subheader>Etapa y Motivo del Seguimiento:</v-subheader>
@@ -539,7 +564,17 @@
       closeable
       key="create"
     >
-      <prospect-create></prospect-create>
+      <prospect-create
+        @success="
+          (prospect_id) => {
+            form.prospect_id = prospect_id;
+            $nextTick(() => {
+              dialog = false;
+              loadOptions();
+            });
+          }
+        "
+      ></prospect-create>
     </dialog-component>
     <dialog-component
       v-if="dialogEdit && SelectedProspect.id"
@@ -567,7 +602,7 @@ import QuoteConceptTable from "@admin/sales/tracking/forms/QuoteConceptTable.vue
 import Assertiveness from "@admin/sales/tracking/resources/assertiveness.json";
 
 const _paymentCondition = [
-  { text: "Por Definir", value: "por_definir", config: [] },
+  { text: "Por Definir", value: "por_definir", config: [18] },
   {
     text: "P. Lista",
     value: "precio_lista",
@@ -580,6 +615,7 @@ const _paymentCondition = [
   },
   { text: "JDF 2 años", value: "jdf_2y", config: [1, 2, 3, 10, 17] },
   { text: "JDF 5 años", value: "jdf_5y", config: [1] },
+  { text: "Financiamiento 3 Años S/I", value: "jdf_3y_si", config: [1, 2, 3, 10, 17] },
   { text: "Expo", value: "precio_expo", config: [1, 5] },
   { text: "Precio Volumen", value: "por_volumen", config: [5, 14] },
   { text: "Arrendamiento", value: "renta_1", config: [6, 15] },
@@ -618,10 +654,6 @@ export default {
         departments: [],
         sellers: [],
         price_types: _paymentCondition,
-        // payment_conditions: {
-        //   TRACTORES: ["Contado", "JDF 2 años", "JDF 5 años", "Expo"],
-        //   IMPLEMENTOS: ["Contado", "JDF 2 años"],
-        // },
         origin: ["Online", "Visita en Agencia", "Visita de Campo", "Expo"],
         categories: [],
         currency: [],
@@ -644,21 +676,12 @@ export default {
       const _this = this;
       _this.form.products = [];
     },
-    // "form.currency_id": function (v) {
-    //   const _this = this;
-    //   if (v === 2) {
-    //     _this.form.exchange_value = _this.options.exchange_value;
-    //   } else {
-    //     _this.form.exchange_value = 1;
-    //   }
-    // },
   },
   computed: {
     ExchangeRate: {
       get() {
         const _this = this;
-        // return (_this.form.exchange_value =
-        //   _this.form.currency_id == 2 ? _this.options.exchange_value : 1);
+
         return (_this.form.exchange_value = _this.options.exchange_value);
       },
     },
@@ -789,19 +812,6 @@ export default {
           _this.$store.commit("hideLoader");
         });
     },
-    // async loadProductsByCategory(cb) {
-    //   const _this = this;
-
-    //   let params = {
-    //     category_name: _this.form.title,
-    //     paginate: "no",
-    //   };
-
-    //   await axios.get("/admin/products", { params }).then((response) => {
-    //     _this.options.products = response.data.data.data;
-    //     (cb || Function)();
-    //   });
-    // },
     customFilter(item, queryText, itemText) {
       const words = queryText.toLowerCase().split(" ");
 
