@@ -33,7 +33,10 @@ export default {
             color: "success",
             duration: 3000,
           });
-          _this.$emit("success");
+          let {
+            prospect: { id },
+          } = response.data.data;
+          _this.$emit("success", id);
         })
         .catch(function (error) {
           _this.$store.commit("hideLoader");
