@@ -33,7 +33,8 @@ class Product extends Model
         'price_8',
         'price_9',
         'price_10',
-        'price_11'
+        'price_11',
+        'price_12',
     ];
 
     const PRODUCT_QTY = 1;
@@ -104,6 +105,7 @@ class Product extends Model
             'price_9' => "renta_3",
             'price_10' => "credito_30d",
             'price_11' => "arrendadoras",
+            'price_12' => "jdf_3y_si",
         );
 
         $price = array_search($price_type, $prices);

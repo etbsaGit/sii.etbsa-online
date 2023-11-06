@@ -80,6 +80,7 @@ class TrackingQuote extends Model
             "precio_lista" => "P. Lista",
             "contado" => "Contado",
             "jdf_2y" => "JDF 2 años",
+            "jdf_3y_si" => "Financiamiento 3 años S/I",
             "jdf_5y" => "JDF 5 años",
             "precio_expo" => "Expo",
             "por_volumen" => "Precio Volumen",
