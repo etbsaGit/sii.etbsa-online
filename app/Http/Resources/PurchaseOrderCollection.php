@@ -55,6 +55,8 @@ class PurchaseOrderCollection extends JsonResource
             'purchase_type_id' => $this->purchase_type_id,
             'purchase_type' => $this->purchaseType->only('id', 'name'),
             'agency_id' => $this->agency_id,
+            'ship' => $this->ship,
+            'elaborated' => $this->elaborated,
             'observation' => $this->observation,
             'note' => $this->note,
             'payment_condition' => $this->payment_condition,

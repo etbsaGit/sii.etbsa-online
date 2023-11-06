@@ -382,6 +382,7 @@ export default {
         agencies: [],
         departments: [],
         payment_condition: [
+          { text: "Requiere Anticipo", value: 1 },
           { text: "Contado", value: 5 },
           { text: "8 Dias", value: 8 },
           { text: "15 Dias", value: 15 },

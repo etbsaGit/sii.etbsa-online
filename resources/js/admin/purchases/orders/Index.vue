@@ -303,7 +303,7 @@
       </v-menu>
     </template>
     <template #[`item.purchase_number`]="{ value }">
-      <span> #{{value}} </span>
+      <span> #{{ value }} </span>
     </template>
     <template #[`item.supplier`]="{ value }">
       <v-list-item-content>
@@ -407,7 +407,13 @@
       </v-list-item-content>
     </template>
     <template #[`item.payment_condition`]="{ value }">
-      {{ value < 8 ? "CONTADO" : `${value} dias` }}
+      {{
+        value == 1
+          ? "Requiere Anticipo"
+          : value < 8
+          ? "Contado"
+          : `${value} dias`
+      }}
     </template>
     <template #[`item.charges`]="{ value }">
       <div v-if="value.length == 0">Sin Cargos</div>

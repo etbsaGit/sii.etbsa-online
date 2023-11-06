@@ -39,7 +39,8 @@ class PurchaseOrderCreated extends Mailable
     public function build()
     {
         $url = url('/admin#/purchases/' . $this->order->id . '/edit');
-        return $this->subject($this->subjectMessage . ' #' . $this->order->id)
+        $subject = $this->subjectMessage . ' #' . $this->order->id . ' ' . $this->order->ship->title . ' ' . $this->order->elaborated->name;
+        return $this->subject($subject)
             ->markdown('emails.purchaseOrders.created')
             ->with(['url' => $url])
             ->when($this->hasAttachment($this->order->estatus->key), function ($mail) {
