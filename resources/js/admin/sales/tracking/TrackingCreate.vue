@@ -13,6 +13,7 @@
 
 <script>
 import TrackingForm from "./TrackingForm.vue";
+import { mapGetters } from "vuex";
 export default {
   components: { TrackingForm },
   props: {
@@ -26,10 +27,10 @@ export default {
       valid: true,
       form: {
         prospect_id: null,
-        title: null,
-        reference: null,
+        title: "FUTURA OPORTUNIDAD",
+        reference: "Nueva Oportunidad",
         price: 0,
-        currency: {id:1,name:"MXN"},
+        currency: { id: 1, name: "MXN" },
         currency_id: 1,
         exchange_value: 1,
         agency_id: null,
@@ -39,7 +40,7 @@ export default {
         assertiveness: 0.01,
         tracking_condition: "por_definir",
         date_next_tracking: null,
-        first_contact: "Online",
+        first_contact: "Expo",
         description_topic: null,
         withQuote: false,
         subtotal: 0,
@@ -51,9 +52,15 @@ export default {
     };
   },
   mounted() {
-    if (this.propProspectId) {
-      this.form.prospect_id = this.propProspectId;
+    const _this = this
+    if (_this.propProspectId) {
+      _this.form.prospect_id = _this.propProspectId;
     }
+    _this.form.attended_by = _this.user_id
+    _this.form.seller_id = _this.user_id
+  },
+  computed: {
+    ...mapGetters("user", ["user_id"]),
   },
   methods: {
     async save() {

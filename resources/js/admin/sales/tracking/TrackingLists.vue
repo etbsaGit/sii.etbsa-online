@@ -44,7 +44,7 @@
                 filled
                 dense
               ></v-select>
-            
+
               <v-autocomplete
                 v-model="filters.prospect"
                 :items="options.prospects"
@@ -63,7 +63,6 @@
                 filled
                 dense
               >
-               
                 <template #item="{ item }">
                   <v-list-item-content>
                     <v-list-item-subtitle>
@@ -240,16 +239,23 @@
             :exportTable="exportTable"
           />
         </v-card>
-        <v-toolbar flat>
-          <v-toolbar-title>Seguimiento a Prospectos</v-toolbar-title>
-          <v-divider class="mx-4" inset vertical></v-divider>
-          <v-spacer></v-spacer>
+        <v-card
+          class="d-flex justify-end align-center flex-wrap px-3 py-1"
+          flat
+        >
+          <v-card
+            flat
+            class="d-flex d-flex justify-space-between align-center flex-wrap py-2"
+            :class="'flex-grow-1 flex-shrink-0'"
+          >
+            <v-toolbar-title> Seguimiento a Prospectos </v-toolbar-title>
+            <v-divider class="mx-4" inset vertical></v-divider>
+          </v-card>
           <v-btn color="primary" class="ml-2" @click="dialogs.create = true">
-            <!-- @click="$router.push({ name: 'tracking.create' })" -->
             Nuevo Seguimiento
             <v-icon small right>mdi-plus-box</v-icon>
           </v-btn>
-        </v-toolbar>
+        </v-card>
 
         <!-- Dialog -->
         <dialog-component
@@ -342,7 +348,6 @@
           <td></td>
           <td>
             <div class="d-flex flex-column py-2">
-            
               <v-autocomplete
                 v-model="filters.prospect"
                 :items="options.prospects"
@@ -361,8 +366,6 @@
                 filled
                 dense
               >
-                
-
                 <template #item="{ item }">
                   <v-list-item-content>
                     <v-list-item-subtitle>
