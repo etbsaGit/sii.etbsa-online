@@ -61,7 +61,7 @@ class PurchaseOrderObserver
         $current_estatus = $purchaseOrder->estatus->key;
         $cargos = $purchaseOrder->charges;
         if ($current_estatus == Estatus::ESTATUS_VERIFICADO) {
-            $subjectMessage = 'Orden de Compra Verificada';
+            $subjectMessage = 'OC Verificada';
             $toEmails = User::All()
                 ->map(function ($user) {
                     if ($user->hasPermission('compras.autorizar')) {
@@ -70,15 +70,15 @@ class PurchaseOrderObserver
                 })->filter()->toArray();
         }
         if ($current_estatus == Estatus::ESTATUS_AUTORIZADO) {
-            $subjectMessage = 'Orden de Compra Autorizada';
+            $subjectMessage = 'OC Autorizada';
             $toEmails = $purchaseOrder->elaborated;
         }
         if ($current_estatus == Estatus::ESTATUS_DENEGAR) {
-            $subjectMessage = 'Orden de Compra Rechazada';
+            $subjectMessage = 'OC Rechazada';
             $toEmails = $purchaseOrder->elaborated;
         }
         if ($current_estatus == Estatus::ESTATUS_PROGRAMAR_PAGO) {
-            $subjectMessage = 'Orden de Compra Solictud de Prog. de Pago para OC:';
+            $subjectMessage = 'OC Solictud de Prog. de Pago para OC:';
             $toEmails = User::All()
                 ->map(function ($user) {
                     if ($user->hasPermission('compras.autorizar')) {
@@ -87,23 +87,23 @@ class PurchaseOrderObserver
                 })->filter()->toArray();
         }
         if ($current_estatus == Estatus::ESTATUS_POR_PAGAR) {
-            $subjectMessage = 'Orden de Compra Programada para Pago para OC:';
+            $subjectMessage = 'OC Programada para Pago para OC:';
             foreach ($cargos as $cargo) {
                 $toEmails[] = $this->emailSucursales['contabilidad'][explode(' ', $cargo['agency']['code'])[0]];
             }
         }
         if ($current_estatus == Estatus::ESTATUS_PAGADA) {
-            $subjectMessage = 'Orden de Compra Pagada';
+            $subjectMessage = 'OC Pagada';
             $toEmails = [$purchaseOrder->elaborated];
             // $toEmails = [$purchaseOrder->elaborated, $purchaseOrder->supplier];
         }
         if ($current_estatus == Estatus::ESTATUS_POR_FACTURAR) {
-            $subjectMessage = 'Orden de Compra Solicitud  de Factura para OC:';
+            $subjectMessage = 'OC Solicitud  de Factura para OC:';
             $toEmails = [$purchaseOrder->elaborated];
             // $toEmails = [$purchaseOrder->elaborated, $purchaseOrder->supplier];
         }
         if ($current_estatus == Estatus::ESTATUS_PAGADA_PORFACTURAR) {
-            $subjectMessage = 'Orden de Compra Pagada, Pendiente de Factura para OC:';
+            $subjectMessage = 'OC Pagada, Pendiente de Factura para OC:';
             $toEmails = [$purchaseOrder->elaborated];
             // $toEmails = [$purchaseOrder->elaborated, $purchaseOrder->supplier];
         }
@@ -123,7 +123,7 @@ class PurchaseOrderObserver
         $subjectMessage = '';
         $bodyMessage = '';
         if ($purchaseOrder->estatus->key == Estatus::ESTATUS_PENDIENTE) {
-            $subjectMessage = 'Orden de Compra CREADA';
+            $subjectMessage = 'OC CREADA';
             $toEmails = User::All()
                 ->map(function ($user) {
                     if ($user->hasPermission('compras.validar')) {
@@ -151,7 +151,7 @@ class PurchaseOrderObserver
         $subjectMessage = '';
         $bodyMessage = '';
         if ($purchaseOrder->estatus->key == Estatus::ESTATUS_PENDIENTE) {
-            $subjectMessage = 'Orden de Compra MODIFICADA';
+            $subjectMessage = 'OC MODIFICADA';
             $toEmails = User::All()
                 ->map(function ($user) {
                     if ($user->hasPermission('compras.validar')) {

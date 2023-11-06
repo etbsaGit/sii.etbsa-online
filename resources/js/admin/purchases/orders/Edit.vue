@@ -584,6 +584,7 @@ export default {
         agencies: [],
         departments: [],
         payment_condition: [
+          { text: "Requiere Anticipo", value: 1 },
           { text: "Contado", value: 5 },
           { text: "8 Dias", value: 8 },
           { text: "15 Dias", value: 15 },
@@ -652,16 +653,16 @@ export default {
       },
       flush: "post",
     },
-    "form.supplier": {
-      handler(newVal) {
-        const _this = this;
-        if (_this.HasSupplier && newVal) {
-          _this.form.payment_condition = _this.form.supplier.credit_days || 30;
-          _this.alertSupplier = !!!_this.form.supplier.code_equip;
-        }
-      },
-      flush: "post",
-    },
+    // "form.supplier": {
+    //   handler(newVal) {
+    //     const _this = this;
+    //     if (_this.HasSupplier && newVal) {
+    //       _this.form.payment_condition = _this.form.supplier.credit_days || 30;
+    //       _this.alertSupplier = !!!_this.form.supplier.code_equip;
+    //     }
+    //   },
+    //   flush: "post",
+    // },
   },
   methods: {
     async loadPurchaseEdit() {
