@@ -186,7 +186,7 @@ class TrackingProspect extends Model
                 $dates = Helpers::commasToArray($dates) ?? null;
                 if (count($dates) == 2) {
                     $from = date($dates[0]);
-                    $to = date($dates[1]);
+                    $to = date($dates[1].' 23:59:59');
                     $query->whereBetween($searchBy, [$from, $to]);
                 }
             });
