@@ -26,7 +26,7 @@ class TrackingRepository extends BaseRepository
             $params,
             [
                 'estatus',
-                'prospect:id,full_name,company,phone,email',
+                'prospect:id,full_name,company,phone,email,township_id',
                 'agency:id,title',
                 'department:id,title',
                 'attended.profiable:id,name,last_name,agency_id',
