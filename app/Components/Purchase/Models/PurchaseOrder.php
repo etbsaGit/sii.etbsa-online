@@ -238,34 +238,46 @@ class PurchaseOrder extends Model
         });
 
         $query->when($filters['date_range'] ?? null, function ($query, $dates) use ($estatus) {
-            if ($estatus == "todos" || $estatus == "pendiente")
-                return $query->whereBetween('created_at', [$dates[0], $dates[1]]);
-            if ($estatus == "autorizado" || $estatus == 'verificado')
-                return $query->whereBetween('authorization_date', [$dates[0], $dates[1]]);
-            if ($estatus == "por_facturar")
-                return $query->whereBetween('updated_at', [$dates[0], $dates[1]]);
-            if ($estatus == "programar_pago")
-                // return $query->whereHas('invoice', function ($query) use ($dates) {
-                return $query->whereNull('date_to_pay')
-                    ->whereBetween('invoice_date', [$dates[0], $dates[1]]);
-            // });
-            // return $query->whereHas('invoice', function ($query) use ($dates) {
-            //     return $query->whereNull('date_to_pay')
-            //         ->whereBetween('invoice_date', [$dates[0], $dates[1]]);
-            // });
-            if ($estatus == "por_pagar")
+            $datesRange = [$dates[0], $dates[1] . ' 23:59:59'];
+            if ($estatus == "todos" || $estatus == "pendiente") {
+                if ($dates[0] == $dates[1])
+                    return $query->whereDate('created_at', $dates);
+                return $query->whereBetween('created_at', $datesRange);
+            }
+            if ($estatus == "autorizado" || $estatus == 'verificado') {
+                if ($dates[0] == $dates[1])
+                    return $query->whereDate('created_at', $dates);
+                return $query->whereBetween('authorization_date', $datesRange);
+            }
+            if ($estatus == "por_facturar") {
+                if ($dates[0] == $dates[1])
+                    return $query->whereDate('created_at', $dates);
+                return $query->whereBetween('updated_at', $datesRange);
+            }
+            if ($estatus == "programar_pago") {
+                return $query->whereHas('invoice', function ($query) use ($dates, $datesRange) { {
+                        if ($dates[0] == $dates[1])
+                            return $query->whereDate('invoice_date', $dates);
+                        return $query->whereNull('date_to_pay')
+                            ->whereBetween('invoice_date', $datesRange);
+                    }
+                });
+
+            }
+            if ($estatus == "por_pagar") {
+                if ($dates[0] == $dates[1])
+                    return $query->whereDate('date_to_pay', $dates);
                 // return $query->whereHas('invoice', function ($query) use ($dates) {
                 return $query->whereNull('payment_date')
-                    ->whereBetween('date_to_pay', [$dates[0], $dates[1]]);
-            // });
-            // return $query->whereHas('invoice', function ($query) use ($dates) {
-            //     return $query->whereNull('payment_date')
-            //         ->whereBetween('date_to_pay', [$dates[0], $dates[1]]);
-            // });
-            if ($estatus == "pagada")
-                return $query->whereHas('invoice', function ($query) use ($dates) {
-                    return $query->whereBetween('payment_date', [$dates[0], $dates[1]]);
+                    ->whereBetween('date_to_pay', $datesRange);
+            }
+            if ($estatus == "pagada") {
+                return $query->whereHas('invoice', function ($query) use ($dates, $datesRange) {
+                    if ($dates[0] == $dates[1])
+                        return $query->whereDate('payment_date', $dates);
+                    return $query->whereBetween('payment_date', $datesRange);
                 });
+            }
         });
     }
 
