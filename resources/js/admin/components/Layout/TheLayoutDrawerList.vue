@@ -5,8 +5,22 @@
       :key="`nav-${i}`"
     >
       <v-divider v-if="nav.navType == 'divider'"></v-divider>
+
       <v-list-item
-        v-else-if="isVisibleItem(nav)"
+        v-else-if="isVisibleItem(nav) && nav.routeType == 'external'"
+        :href="nav.routeUrl"
+        target="_blank"
+        dense
+      >
+        <v-list-item-icon>
+          <v-icon> {{ nav.icon }} </v-icon>
+        </v-list-item-icon>
+        <v-list-item-content>
+          <v-list-item-title> {{ nav.label }} </v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+      <v-list-item
+        v-else-if="isVisibleItem(nav) && nav.routeType == 'vue'"
         :to="{ name: nav.routeName }"
         :exact="false"
         dense

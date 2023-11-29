@@ -106,6 +106,7 @@ class MenuItem
                 $this->icon = $menuData['icon'];
                 $this->routeType = $menuData['route_type'] ?? '';
                 $this->routeName = $menuData['route_name'] ?? '';
+                $this->routeUrl = $menuData['route_url'] ?? '';
                 $this->visible = $menuData['visible'] ?? true;
                 $this->children = $menuData['children'] ?? null;
             } else {
