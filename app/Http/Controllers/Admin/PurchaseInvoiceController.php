@@ -38,7 +38,7 @@ class PurchaseInvoiceController extends AdminController
                 'max:2048',
                 function ($attribute, $value, $fail) {
                     if ($value->getClientMimeType() !== 'text/xml') {
-                        $fail($attribute.'\'s extension is invalid.');
+                        $fail($attribute . '\'s extension is invalid.');
                     }
                 },
             ]
@@ -64,7 +64,7 @@ class PurchaseInvoiceController extends AdminController
         }
 
         $payload = [
-            'folio' => $data_xml['Folio'][0],
+            'folio' => $data_xml['Folio'][0] ?? null,
             'serie' => $data_xml['Serie'][0] ?? null,
             'invoice_date' => $data_xml['Fecha'][0],
             // 'folio_fiscal' => $data_xml['UUID'][0],
@@ -205,7 +205,7 @@ class PurchaseInvoiceController extends AdminController
                 'max:2048',
                 function ($attribute, $value, $fail) {
                     if ($value->getClientMimeType() !== 'text/xml') {
-                        $fail($attribute.'\'s extension is invalid.');
+                        $fail($attribute . '\'s extension is invalid.');
                     }
                 },
             ]
