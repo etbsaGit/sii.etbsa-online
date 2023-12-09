@@ -279,7 +279,7 @@
                                     Direccion:
                                     {{ $item->ship->address ??
                                         'Carretera Celaya-Salamanca Km. 61 Primera Frac. de
-                                                                                                            Crespo 38120' }}<br>
+                                                                                                                                                Crespo 38120' }}<br>
                                     Comprador: {{ $item->elaborated->name }}<br>
                                     Email:{{ $item->elaborated->email }}<br>
                                 </td>
@@ -439,9 +439,11 @@
                         <table>
                             @if ($item->note)
                                 <tr style="padding-bottom: 0px;">
-                                    <td style="padding-bottom: 0px;">
-                                        NOTA para el Proveedor:<br />
+                                    <td style="padding-bottom: 0px">
+                                        NOTA para el Proveedor:<br /><br />
+                                        <span style="font-size: 1.2em;">
                                         {{ $item->note }}
+                                        </span>
                                     </td>
                                 </tr>
                             @endif
