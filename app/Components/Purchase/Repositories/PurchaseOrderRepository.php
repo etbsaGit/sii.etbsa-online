@@ -31,6 +31,7 @@ class PurchaseOrderRepository extends BaseRepository
             'estatus:id,title,key',
             'purchase_concept:id,name',
             'purchaseType:id,name',
+            'ship',
             'files'
 
         ], function ($query) use ($params) {
