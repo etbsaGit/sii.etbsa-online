@@ -51,6 +51,12 @@ const router = new Router({
         .default,
     },
     {
+      name: "lastSales.customers",
+      path: "/ultima-ventas-clientes",
+      component: require("@admin/marketing/components/LastSalesCustomerTable")
+        .default,
+    },
+    {
       name: "sales.agencies",
       path: "/ventas-sucursales",
       component: require("@admin/marketing/components/SalesAgencyTable")

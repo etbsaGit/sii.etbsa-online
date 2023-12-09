@@ -57,6 +57,12 @@ Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function
     // SalesCustomerHistory
     Route::get('marketing/sales-customer', 'SalesCustomerHistoryController@index')->name('salesCustomerHistory');
     Route::get('marketing/sales-customer/filters', 'SalesCustomerHistoryController@getOptions')->name('getOptionsEquipDB');
+    
+    Route::get('marketing/sales-customer-latest', 'SalesCustomerHistoryController@CustomerLatestInvoices')->name('CustomerLatestInvoices');
+    Route::get('marketing/invoices-by-customer', 'SalesCustomerHistoryController@InvoicesByCliente')->name('InvoicesByCliente');
+    Route::get('marketing/trackings-by-customer', 'SalesCustomerHistoryController@TrackingsByCliente')->name('TrackingsByCliente');
+    Route::post('marketing/create-tracking-to-customer', 'SalesCustomerHistoryController@CreateTrackingsByCliente')->name('CreateTrackingsByCliente');
+
 
     Route::get('marketing/sales-agencies', 'SalesAgencyHistoryController@index')->name('salesAgencyHistory');
     

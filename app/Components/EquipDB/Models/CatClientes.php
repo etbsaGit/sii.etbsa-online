@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class CatClientes extends Model
 {
     protected $connection = 'sqlite_equip_db';
-    protected $table = 'catClientes';
+    protected $table = 'clientes_utf8';
     protected $primaryKey = 'CLAVE CLIENTE';
     protected $keyType = 'string';
     public $incrementing = false;
