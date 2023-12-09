@@ -753,6 +753,9 @@ export default {
 
     self.$store.commit("setBreadcrumbs", [{ label: "Seguimientos", name: "" }]);
     self.loadResources(() => {});
+    self.$eventBus.$on(["REFRESH_TRACKING"], () => {
+      self.refresh()
+    });
     self.$eventBus.$on(["CLOSE_TRACKING_DIALOG"], () => {
       self.dialogs = Object.assign(
         {},
