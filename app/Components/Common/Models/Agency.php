@@ -21,7 +21,7 @@ class Agency extends Model
      *
      * @var array
      */
-    protected $fillable = ['code', 'title', 'line_id', 'address'];
+    protected $fillable = ['code', 'title', 'line_id', 'address', 'phone', 'email'];
 
     public function users()
     {
@@ -41,7 +41,7 @@ class Agency extends Model
     public function purchaseOrders()
     {
         return $this->belongsToMany(PurchaseOrder::class, 'purchase_order_pivot')
-                    ->using(PurchasePivotCharge::class);
+            ->using(PurchasePivotCharge::class);
     }
     // public function purchaseOrder()
     // {
