@@ -4,6 +4,11 @@ export const rrhh = [
     component: require("@admin/rrhh/RRHH").default,
     children: [
       {
+        path: "catalogos",
+        name: "rrhh.catalogs",
+        component: require("@admin/rrhh/catalogs/Index").default,
+      },
+      {
         path: "employees/list",
         name: "rrhh.employees.list",
         component: require("@admin/rrhh/employees/Index").default,
