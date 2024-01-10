@@ -27,6 +27,14 @@ class VoyagerMediaController extends AdminController
         $this->filesystem = 's3';
     }
 
+    // public function index()
+    // {
+    //     // Check permission
+    //     // $this->authorize('browse_media');
+
+    //     // return Voyager::view('voyager::media.index');
+    // }
+
     public function files(Request $request)
     {
         // Check permission
@@ -51,12 +59,63 @@ class VoyagerMediaController extends AdminController
         $files = $this->getFilesAndFoldersRecursive($dir, $thumbnail_names, $thumbnails);
 
         return $this->sendResponseOk($files, "Lista de Files");
+        // 
 
+        // $files = [];
+        // $storage = Storage::disk($this->filesystem)->addPlugin(new ListWith());
+        // $storageItems = $storage->listWith(['mimetype'], $dir, true);
+        // foreach ($storageItems as $item) {
+        //     if ($item['type'] == 'dir') {
+        //         $files[] = [
+        //             'name'          => $item['basename'],
+        //             'type'          => 'folder',
+        //             'path'          => Storage::disk($this->filesystem)->url($item['path']),
+        //             'relative_path' => $item['path'],
+        //             'items'         => '',
+        //             'last_modified' => '',
+        //         ];
+        //     } else {
+        //         if (empty(pathinfo($item['path'], PATHINFO_FILENAME))) {
+        //             continue;
+        //         }
+        //         // Its a thumbnail and thumbnails should be hidden
+        //         if (Str::endsWith($item['filename'], $thumbnail_names)) {
+        //             $thumbnails[] = $item;
+        //             continue;
+        //         }
+        //         $files[] = [
+        //             'name'          => $item['basename'],
+        //             'filename'      => $item['filename'],
+        //             'type'          => $item['mimetype'] ?? 'file',
+        //             'path'          => Storage::disk($this->filesystem)->url($item['path']),
+        //             'relative_path' => $item['path'],
+        //             'size'          => $item['size'],
+        //             'last_modified' => $item['timestamp'],
+        //             'thumbnails'    => [],
+        //         ];
+        //     }
+        // }
+
+        // foreach ($files as $key => $file) {
+        //     foreach ($thumbnails as $thumbnail) {
+        //         if ($file['type'] != 'folder' && Str::startsWith($thumbnail['filename'], $file['filename'])) {
+        //             $thumbnail['thumb_name'] = str_replace($file['filename'] . '-', '', $thumbnail['filename']);
+        //             $thumbnail['path'] = Storage::disk($this->filesystem)->url($thumbnail['path']);
+        //             $files[$key]['thumbnails'][] = $thumbnail;
+        //         }
+        //     }
+        // }
+
+        // return $this->sendResponseOk($files, "Lista de Files");
     }
 
     private function getFilesAndFoldersRecursive($dir, $thumbnail_names, &$thumbnails)
     {
         $result = [];
+
+        // $storage = Storage::disk($this->filesystem)->addPlugin(new ListWith());
+        // $storageItems = $storage->listWith(['mimetype'], $dir, true);
+
         $storage = Storage::disk($this->filesystem);
         $storageItems = $storage->listContents($dir);
 
