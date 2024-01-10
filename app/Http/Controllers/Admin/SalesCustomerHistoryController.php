@@ -477,6 +477,16 @@ class SalesCustomerHistoryController extends AdminController
             $query->whereIn(DB::raw('SUBSTR(`FECHA FACTURA`, -4)'), $years);
         });
 
+        // permisos de sucursal
+        $query->when(
+            auth()->user()->inGroup('Gerente') ?? null,
+            function ($query) {
+                $query->whereIn('ID_SUC', auth()->user()->seller_agency->pluck('code'));
+            }
+        );
+
+
+
         if ($request['per_page'] == -1) {
             $request['per_page'] = 999999;
         }
@@ -622,7 +632,7 @@ class SalesCustomerHistoryController extends AdminController
                 'last_currency' => $currency_name->name,
                 'type_contacted' => 'Llamada',
                 'user_id' => $request['attended_by'],
-                'date_next_tracking' =>  $request['date_next_tracking'],
+                'date_next_tracking' => $request['date_next_tracking'],
                 'last_assertiveness' => $request['assertiveness'],
             ]);
 

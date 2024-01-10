@@ -306,7 +306,7 @@ class SinglePageController extends AdminController
                         'visible' => true,
                     ]),
                     new MenuItem([
-                        'group_requirements' => ['Super User'],
+                        'group_requirements' => [],
                         'permission_requirements' => [],
                         'label' => 'Ultimas Ventas Clientes',
                         'nav_type' => MenuItem::$NAV_TYPE_NAV,
@@ -388,7 +388,7 @@ class SinglePageController extends AdminController
                 'visible' => true,
                 'children' => [
                     new MenuItem([
-                        'group_requirements' => ['RRHH', 'Super User'],
+                        'group_requirements' => ['Super User'],
                         'permission_requirements' => [],
                         'label' => 'Requisicion de Personal',
                         'nav_type' => MenuItem::$NAV_TYPE_NAV,
@@ -405,6 +405,16 @@ class SinglePageController extends AdminController
                         'icon' => 'mdi-sitemap',
                         'route_type' => 'vue',
                         'route_name' => 'rrhh.employees.list',
+                        'visible' => true,
+                    ]),
+                    new MenuItem([
+                        'group_requirements' => ['RRHH', 'Super User'],
+                        'permission_requirements' => ['admin.rrhh'],
+                        'label' => 'Catalogos',
+                        'nav_type' => MenuItem::$NAV_TYPE_NAV,
+                        'icon' => 'mdi-sitemap',
+                        'route_type' => 'vue',
+                        'route_name' => 'rrhh.catalogs',
                         'visible' => true,
                     ]),
                 ]

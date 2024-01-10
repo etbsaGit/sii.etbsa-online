@@ -6,9 +6,9 @@
     :options.sync="pagination"
     :server-items-length="totalItems"
     :single-expand="true"
-    show-selectitem-key="folio"
+    show-selectitem-key="folio_fiscal"
     show-expand
-    item-key="folio"
+    item-key="folio_fiscal"
     show-select
     calculate-widths
     fixed-header
@@ -352,7 +352,7 @@
         </v-btn>
       </v-toolbar>
     </template>
-    <template v-slot:[`item.folio`]="{ item }">
+    <template v-slot:[`item.folio_fiscal`]="{ item }">
       <v-list-item dense class="pa-0 caption">
         <v-list-item-content class="pa-0 text-wrap">
           <v-list-item-subtitle class="button">
@@ -432,7 +432,7 @@ export default {
         text: "Folio Fiscal",
         align: "left",
         sortable: false,
-        value: "folio",
+        value: "folio_fiscal",
         fixed: true,
       },
       {
