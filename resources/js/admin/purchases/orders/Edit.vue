@@ -1,8 +1,9 @@
 <template>
   <v-card>
     <v-card-title class="overline align-center">
-      <v-icon left>mdi-file-document</v-icon> Detalle Orden de compra #{{ form.purchase_number }}
-      <v-spacer></v-spacer>
+      <v-icon left>mdi-file-document</v-icon> Detalle Orden de compra #
+      {{ form.purchase_number }}
+      <v-spacer />
       <b>Acciones:</b>
       <v-btn v-if="canSave" class="ml-2" color="green " @click="update" dark>
         Guardar Cambios de OC
@@ -122,18 +123,15 @@
         v-if="canReject"
         class="ml-2"
         color="red"
-        @click="updateEstatusPurchase('denegar')"
+        @click="updateEstatusPurchase('denegar'), (dialogMessages = true)"
         dark
       >
         Rechazar <v-icon right>mdi-close-octagon</v-icon>
       </v-btn>
-      <v-btn class="ml-2" color="blue" @click="dialogMessages = true" dark>
-        Mensajes <v-icon right>mdi-forum</v-icon>
-      </v-btn>
     </v-card-title>
-    <v-card-subtitle class="mt-2">
-      <b>Estatus Actual:</b>
-      <template v-if="form.estatus">
+    <v-card-subtitle class="mt-2 d-flex flex-wrap align-center">
+      <b class="mr-2">Estatus Actual:</b>
+      <div v-if="form.estatus">
         <v-chip
           label
           :color="getColorByStatus(form.estatus.key)"
@@ -142,8 +140,9 @@
         >
           {{ form.estatus.title }}
         </v-chip>
-      </template>
-      <template v-if="IsContado">
+      </div>
+      <v-spacer />
+      <div v-if="IsContado">
         <v-chip
           outlined
           color="pink"
@@ -180,7 +179,32 @@
               : "Sin fecha de Pago"
           }}
         </v-chip>
-      </template>
+      </div>
+    </v-card-subtitle>
+    <v-card-subtitle>
+      <b>Elaboro:</b>
+      <v-chip
+        v-if="form.elaborated"
+        label
+        color="primary"
+        outlined
+        class="overline"
+        dark
+      >
+        {{ form.elaborated.name }}
+      </v-chip>
+      <v-btn class="ml-2" color="blue" @click="dialogMessages = true" dark>
+        Mensajes <v-icon right>mdi-forum</v-icon>
+      </v-btn>
+      <v-btn
+        v-if="form.supplier"
+        class="ml-2"
+        color="accent"
+        @click="dialogSuuplier.show = true"
+        dark
+      >
+        Ver Info Proveedor <v-icon right>mdi-account</v-icon>
+      </v-btn>
     </v-card-subtitle>
 
     <v-divider></v-divider>
@@ -316,7 +340,7 @@
                   :items.sync="form.products"
                 ></purchase-products-table>
               </v-card-text>
-              <v-card-actions>
+              <v-card-actions class="d-flex flex-wrap">
                 <v-btn text color="blue" @click="dialogSupplierProducts = true">
                   <v-icon left>mdi-plus</v-icon> Agregar Articulo o Servicio
                 </v-btn>
@@ -364,7 +388,7 @@
                           dark
                           color="primary"
                           :disabled="files.length == 0"
-                          @click="attachFiles()"
+                          @click="attachFiles(), (dialog.value = false)"
                         >
                           Adjuntar
                         </v-btn>
@@ -375,7 +399,7 @@
 
                 <!-- END Adjuntar Cotizacion -->
               </v-card-actions>
-              <v-card-text v-if="form.file.length > 0">
+              <v-card-text v-if="HasFiles">
                 <purchase-files-list
                   :files.sync="form.file"
                 ></purchase-files-list>
@@ -497,6 +521,19 @@
         :purchaseId="purchaseId"
       ></purchase-order-messages>
     </dialog-component>
+    <dialog-component
+      :show="dialogSuuplier.show"
+      @close="(dialogSuuplier.show = false), loadOptions()"
+      :maxWidth="600"
+      closeable
+      title="Info Proveedor"
+      fullscreen
+    >
+      <SupplierShow
+        v-if="dialogSuuplier.show && form.supplier.id"
+        :supplierId="form.supplier.id"
+      ></SupplierShow>
+    </dialog-component>
   </v-card>
 </template>
 <script>
@@ -509,6 +546,7 @@ import SearchClvProduct from "./SearchClvProduct.vue";
 import PurchaseImportCsvProducts from "./PurchaseImportCsvProducts.vue";
 import InvoiceTable from "./InvoiceTable.vue";
 import PurchaseOrderMessages from "../components/PurchaseOrderMessages.vue";
+import SupplierShow from "../suppliers/Edit.vue";
 import DialogComponent from "../../components/DialogComponent.vue";
 export default {
   name: "PurchaseOrderEdit",
@@ -523,6 +561,7 @@ export default {
     InvoiceTable,
     PurchaseOrderMessages,
     DialogComponent,
+    SupplierShow,
   },
   props: {
     purchaseId: {
@@ -533,6 +572,10 @@ export default {
   data() {
     return {
       dialogMessages: false,
+      dialogSuuplier: {
+        id: null,
+        show: false,
+      },
       modalDateToPay: false,
       modalPaymentDate: false,
       canUpdate: false,
@@ -801,6 +844,7 @@ export default {
           color: "success",
           duration: 3000,
         });
+        _this.$eventBus.$emit("ORDERS_REFRESH");
       } catch (error) {
         if (error.response) {
           _this.$store.commit("showSnackbar", {
@@ -824,10 +868,17 @@ export default {
       _this.files.forEach((item) => {
         formData.append("file[]", item);
       });
-      await axios.post(`/admin/purchase-file/attach/${_this.purchaseId}`, formData);
-      _this.dialog.value = false;
+      await axios.post(
+        `/admin/purchase-file/attach/${_this.purchaseId}`,
+        formData
+      );
       _this.files = [];
-      _this.$eventBus.$emit("ORDERS_REFRESH");
+      _this.$store.commit("showSnackbar", {
+        message: "Archivo Adjunto",
+        color: "success",
+        duration: 3000,
+      });
+      _this.loadPurchaseEdit();
     },
     async loadOptions(cb) {
       const _this = this;
@@ -877,7 +928,7 @@ export default {
             color: "success",
             duration: 3000,
           });
-          // _this.$eventBus.$emit("ORDERS_REFRESH");
+          _this.$eventBus.$emit("ORDERS_REFRESH");
           _this.loadPurchaseEdit();
           // _this.$eventBus.$emit("CLOSE_DIALOG");
         })
@@ -913,6 +964,7 @@ export default {
             duration: 3000,
           });
           _this.loadPurchaseEdit();
+          _this.$eventBus.$emit("ORDERS_REFRESH");
         })
         .catch(function (error) {
           _this.$store.commit("hideLoader");
@@ -1099,6 +1151,10 @@ export default {
       };
       return !!this.form.estatus ? !!estatus[this.form.estatus.key] : false;
     },
+    HasFiles(){
+      const _this =this;
+      return _this.form.file.length > 0
+    }
   },
 };
 </script>

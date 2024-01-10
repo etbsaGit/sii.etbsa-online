@@ -49,11 +49,13 @@ class EmployeeController extends AdminController
         $users = DB::table('users')->get(['id', 'email', 'name']);
         $agencies = DB::table('agencies')->get(['id', 'code', 'title']);
         $departments = DB::table('departments')->get(['id', 'title']);
-        $direct_boss = Employee::all('id', 'name', 'last_name');
+        $jobs = DB::table('jobs')->get(['id', 'title']);
+        $direct_boss = Employee::all('id', 'name', 'second_name', 'last_name', 'second_last_name');
         return $this->sendResponseOk(
             compact(
                 'agencies',
                 'departments',
+                'jobs',
                 'direct_boss',
                 'users',
             ),
@@ -62,34 +64,58 @@ class EmployeeController extends AdminController
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created resource in storage.sisabr
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
+
+        // dd($request->get('user_email'), $request->has('user_email'), is_null($request->user_email));
         $request['created_by'] = Auth::user()->id;
         $validate = validator($request->all(), [
-            'photo' => ['nullable', 'image'],
+            'photo' => ['nullable', 'file'],
         ]);
 
         if ($validate->fails()) {
             return $this->sendResponseBadRequest($validate->errors()->first());
         }
+        return DB::transaction(function () use ($request) {
 
-        $employee = $this->employeeRepository->create(
-            [
+            $employee = $this->employeeRepository->create(
+                // [
                 $request->all(),
-                'photo_path' => $request->file('photo') ? $request->file('photo')->store('avatares') : null,
-            ]
-        );
+                // 'photo_path' => $request->file('photo') ? $request->file('photo')->store('avatares/employees/'.) : null,
+                // ]
+            );
+            if (!$employee) {
+                return $this->sendResponseBadRequest("Failed create.");
+            }
 
-        if (!$employee) {
-            return $this->sendResponseBadRequest("Failed create.");
-        }
+            $employee->update([
+                'photo_path' => $request->file('photo')
+                    ? $request->file('photo')->store('avatares/employees/' . $employee->id, 's3')
+                    : null
+            ]);
+            if ($request->has('user_id')) {
+                if (is_null($request->user_id)) {
+                    $employee->user->profiable()->dissociate();
+                    $employee->user->save();
+                } else {
+                    return $this->assignedUser(
+                        $employee,
+                        User::firstOrCreate(
+                            ['email' => $request->user_id['email'] ?? $request->user_email],
+                            ['name' => $request->name, 'password' => $request->name]
+                        )
+                    );
+                }
+            }
 
-        return $this->sendResponseCreated($employee);
+            return $this->sendResponseCreated(compact('employee'));
+        });
+
     }
 
     /**
@@ -106,6 +132,7 @@ class EmployeeController extends AdminController
             'number_employee' => $employee->number_employee ?? '',
             'agency' => $employee->agency->title ?? '',
             'department' => $employee->department->title ?? '',
+            'jobs' => $employee->job->title ?? '',
             'job' => $employee->job_title ?? '',
             'phone' => $employee->phone ?? '',
             'address' => $employee->address . ' ' . $employee->colonia . ',' . $employee->code_postal,
@@ -114,6 +141,7 @@ class EmployeeController extends AdminController
             'boss' => $employee->boss->full_name ?? '',
             'user' => $employee->user->email ?? null,
             'user_id' => $employee->user->id ?? null,
+            'user_email' => $employee->user->email ?? null,
             'photo' => $employee->profile_photo_url,
         ];
 
@@ -140,31 +168,46 @@ class EmployeeController extends AdminController
      */
     public function update(Request $request, Employee $employee)
     {
+
+        // dd(
+        //     $request->all(),
+        //     $request->user_id['email'] ?? $request->user_email
+        // );
         $validate = validator($request->all(), [
-            'photo' => ['nullable', 'image'],
+            'photo' => ['nullable', 'file'],
         ]);
         if ($validate->fails()) {
             return $this->sendResponseBadRequest($validate->errors()->first());
         }
-        $updated = $employee->update($request->all());
-        if (!$updated) {
-            return $this->sendResponseBadRequest("Failed to update");
-        }
-        if ($request->file('photo')) {
-            if (Storage::disk('s3')->exists($employee->photo_path)) {
-                $delete = Storage::disk('s3')->delete($employee->photo_path);
+        return DB::transaction(function () use ($request, $employee) {
+
+            $updated = $employee->update($request->all());
+            if (!$updated) {
+                return $this->sendResponseBadRequest("Failed to update");
             }
-            $employee->update(['photo_path' => $request->file('photo')->store('avatares/' . $employee->id, 's3')]);
-        }
-        if ($request->has('user_id')) {
-            if (is_null($request->user_id)) {
-                $employee->user->profiable()->dissociate();
-                $employee->user->save();
-            } else {
-                return $this->assignedUser($employee, User::find($request->user_id));
+            if ($request->file('photo')) {
+                if (Storage::disk('s3')->exists($employee->photo_path)) {
+                    $delete = Storage::disk('s3')->delete($employee->photo_path);
+                }
+                $employee->update(['photo_path' => $request->file('photo')->store('avatares/employees/' . $employee->id, 's3')]);
             }
-        }
-        return $this->sendResponseUpdated([$updated]);
+            if ($request->has('user_id')) {
+                if (is_null($request->user_id)) {
+                    $employee->user->profiable()->dissociate();
+                    $employee->user->save();
+                } else {
+
+                    return $this->assignedUser(
+                        $employee,
+                        User::firstOrCreate(
+                            ['email' => $request->user_id['email'] ?? $request->user_email],
+                            ['name' => $request->name, 'password' => $request->name]
+                        )
+                    );
+                }
+            }
+            return $this->sendResponseUpdated([$updated]);
+        });
     }
 
     /**

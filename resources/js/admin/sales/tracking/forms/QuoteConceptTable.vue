@@ -50,6 +50,7 @@
       fixed-header
       hide-default-footer
       dense
+      disable-pagination
     >
       <template v-slot:[`item.name`]="{ item }">
         <h3>{{ item.name }}</h3>

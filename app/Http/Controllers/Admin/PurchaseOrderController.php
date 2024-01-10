@@ -66,7 +66,7 @@ class PurchaseOrderController extends AdminController
         $suppliers = Supplier::with([])->get()->map->only(['id', 'code_equip', 'business_name', 'rfc', 'phone', 'email', 'credit_days']);
         // $suppliers = Supplier::IsActive()->get()->map->only(['id', 'code_equip', 'business_name', 'rfc', 'phone', 'email', 'credit_days']);
         $agencies = DB::table('agencies')->get(['id', 'code', 'title']);
-        $departments = DB::table('departments')->get(['id', 'title']);
+        $departments = DB::table('departments')->whereNotNull('code')->get(['id', 'title']);
         $metodoPago = DB::table('cat_metodo_pago')->get(['clave', 'description']);
         $usoCFDI = DB::table('cat_uso_cfdi')->get(['clave', 'description']);
         $formaPago = DB::table('cat_forma_pago')->get(['clave', 'description']);
@@ -481,6 +481,8 @@ class PurchaseOrderController extends AdminController
         return DB::transaction(
             function () use ($purchase_order, $request) {
 
+                
+
                 $estatus = Estatus::where('key', $request['estatus_key'])->first();
                 if ($request['estatus_key'] == Estatus::ESTATUS_AUTORIZADO)
                     $purchase_order->authorization_date = Carbon::now();
@@ -535,6 +537,7 @@ class PurchaseOrderController extends AdminController
 
                 $purchase_order->estatus()->associate($estatus);
                 $purchase_order->updated_by = Auth::user()->id;
+                
                 $updated = $purchase_order->save();
                 if (!$updated) {
                     return $this->sendResponseBadRequest("Error en la Actualizacion");

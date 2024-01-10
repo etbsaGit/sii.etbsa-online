@@ -244,8 +244,8 @@ export default {
       const result =
         this.form.tax_isr -
         this.form.tax_iva_retenido -
-        this.form.tax_retencion_cedular +
-        this.form.tax_retencion_125 +
+        this.form.tax_retencion_cedular -
+        this.form.tax_retencion_125 -
         this.form.tax_flete;
 
       return parseFloat(result);

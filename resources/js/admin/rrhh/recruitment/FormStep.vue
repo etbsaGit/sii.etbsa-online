@@ -450,6 +450,10 @@ export default {
       get: function () {
         return (this.form.competencias = [
           {
+            name: "Nueva Competencia",
+            value: 0,
+          },
+          {
             name: "ADAPTACIÓN AL CAMBIO",
             value: 0,
           },

@@ -7,10 +7,11 @@
 {{ config('app.name') }}
 @endcomponent
 @endslot
-# {{$subjectMessage . ' #' . $order->id}}
+# {{$subjectMessage . ' #' . $order->purchase_number}}
 
 @component('mail::panel')
-Revisar la Orden de Compra.
+Estatus Actual: {{ $order->estatus->key }}.
+Revisar la Orden de Compra. 
 @endcomponent
 
 {{-- @component('mail::table')

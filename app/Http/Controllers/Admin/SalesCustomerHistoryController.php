@@ -2,10 +2,17 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Components\Common\Models\Currency;
+use App\Components\Common\Models\Estatus;
 use App\Components\Core\Utilities\Helpers;
 use App\Components\EquipDB\Models\CatClientes;
 use App\Components\EquipDB\Models\FacturacionAG;
+use App\Components\Product\Models\ProductCategory;
+use App\Components\Tracking\Models\Prospect;
+use App\Components\Tracking\Models\TrackingProspect;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 
@@ -59,9 +66,12 @@ class SalesCustomerHistoryController extends AdminController
         )
             ->leftJoin('vendedores_utf8 AS cv', 'cv.clave_vendodor', '=', 'fa.CVE_VENDEDOR')
             ->leftJoin('catTipoVenta AS ctv', 'ctv.clave', '=', 'fa.TIPO DE VENTA')
-            ->orderByRaw("SUBSTR(`FECHA FACTURA`, -4)");
+            ->orderByRaw("SUBSTR(`FECHA FACTURA`, -4) DESC");
+        // ->orderBy('invoice_date', "desc");
         // ->orderBy('invoice_date');
         // ->orderByRaw("strftime('%Y', fa.`FECHA FACTURA`)");
+
+
 
         $query->when($filters['clave_cliente'] ?? null, function ($query, $clave_cliente) {
             $query->where(function ($q) use ($clave_cliente) {
@@ -110,7 +120,7 @@ class SalesCustomerHistoryController extends AdminController
 
         $sumatoriaTotal = $query->sum('PRECIO VENTA');
         if ($request->has('clave_cliente') || $request->has('clave_vendedor') || $request->has('sucursales')) {
-            $results = $query->get();
+            $results = $query->orderByRaw("SUBSTR(`FECHA FACTURA`, -4) DESC")->get();
             $allYears = $results->pluck('year')->unique()->sort()->values();
         }
 
@@ -121,6 +131,7 @@ class SalesCustomerHistoryController extends AdminController
             return $invoices;
         });
         $items = $query->paginate($request['per_page'] ?? 10);
+
         $ventasPorCliente = [];
         $barGrafica = [];
         $ultimasInvoicePorCliente = [];
@@ -164,9 +175,10 @@ class SalesCustomerHistoryController extends AdminController
 
             // Tabla Ultima Venta
             $ultimasInvoicePorCliente = $results->mapToGroups(function ($item) {
-                return [$item->clave_cliente => $item];
-            })->map(function ($invoiceDates) {
-                return $invoiceDates->last();
+                $key = $item->clave_cliente . '-' . $item->year;
+                return [$key => $item];
+            })->map(function ($invoiceDates) use ($filters) {
+                return $filters['years'] ?? false ? $invoiceDates->last() : $invoiceDates->first();
             });
         }
 
@@ -235,7 +247,7 @@ class SalesCustomerHistoryController extends AdminController
 
 
             $ultimasInvoiceVendedor = $results->mapToGroups(function ($item) {
-                return [$item->clave_vendedor => $item];
+                return [$item->clave_vendedor . '-' . $item->year => $item];
             })->map(function ($invoiceDates) {
                 return $invoiceDates->last();
             });
@@ -384,4 +396,252 @@ class SalesCustomerHistoryController extends AdminController
         ];
         return $this->sendResponseOk(compact('options'));
     }
+
+
+    public function CustomerLatestInvoices(Request $request)
+    {
+
+        $filters = $request->all();
+        $query = FacturacionAG::from('facturacion_utf8 AS fa')->select(
+            'CVE_CLIENTE as clave_cliente',
+            'RFC CLIENTE as rfc_cliente',
+            'NOMBRE CLIENTE AS cliente',
+            'fa.SUCURSAL AS sucursal',
+            'fa.LINEA AS linea',
+            'CIUDAD / MUNICIPIO AS municipio',
+            'fa.CP',
+            'NIP',
+            'DESCRIPCION PRODUCTO AS producto',
+            'PRECIO VENTA AS precio_venta',
+            'FECHA FACTURA AS invoice_date',
+            'ctv.clave AS tipo_venta',
+            'ctv.descripcion AS tipo_venta_nombre',
+            DB::raw("
+            COALESCE(
+            CASE
+                WHEN cv.clave_vendodor <> '' THEN cv.clave_vendodor
+                ELSE fa.CVE_VENDEDOR
+            END , 'N/E')
+            AS clave_vendedor"
+            ),
+            DB::raw("
+            COALESCE(
+            CASE
+                WHEN cv.nombre_vendor <> '' THEN cv.nombre_vendor
+                ELSE fa.`NOMBRE VENDEDOR`
+            END , 'N/E')
+            AS nombre_vendedor"
+            ),
+            DB::raw("fa.CALLE ||','|| fa.`COLONIA /COMUNIDAD`||','|| fa.CP ||','||fa.`CIUDAD / MUNICIPIO`||','|| fa.ESTADO ||','|| fa.PAIS AS addresses"),
+            DB::raw("fa.`Telefono 1` ||','|| fa.`Telefono 2`||','|| fa.`Telefono 3` AS phones"),
+            DB::raw('SUBSTR(`FECHA FACTURA`, -4) as year')
+        )
+            ->leftJoin('vendedores_utf8 AS cv', 'cv.clave_vendodor', '=', 'fa.CVE_VENDEDOR')
+            ->leftJoin('catTipoVenta AS ctv', 'ctv.clave', '=', 'fa.TIPO DE VENTA')
+            ->orderByRaw("SUBSTR(`FECHA FACTURA`, -4) DESC")
+            ->groupBy('cliente')
+            ->latest('invoice_date');
+        // ->paginate($request['per_page'] ?? 10);
+        // ->groupBy('cliente')->latest('invoice_date')->get()->map(function ($groupedItems) {
+
+        $query->when($filters['clave_cliente'] ?? null, function ($query, $clave_cliente) {
+            $query->where(function ($q) use ($clave_cliente) {
+                if (is_array($clave_cliente)) {
+                    foreach ($clave_cliente as $term) {
+                        $q->orWhere('fa.CVE_CLIENTE', 'LIKE', "{$term}");
+                        $q->orWhere('fa.NOMBRE CLIENTE', 'LIKE', "%{$term}%");
+                    }
+                }
+            });
+        })->when($filters['clave_vendedor'] ?? null, function ($query, $clave_vendedor) {
+            $query->where(function ($q) use ($clave_vendedor) {
+                if (is_array($clave_vendedor)) {
+                    foreach ($clave_vendedor as $term) {
+                        $q->orWhere('cv.clave_vendodor', 'LIKE', "%{$term}%");
+                        $q->orWhere('cv.nombre_vendor', 'LIKE', "%{$term}%");
+
+                    }
+                }
+            });
+        })->when($filters['sucursales'] ?? null, function ($query, $sucursales) {
+            // $query->whereIn('fa.SUCURSAL', $sucursales);
+            $query->where(function ($q) use ($sucursales) {
+                if (is_array($sucursales)) {
+                    foreach ($sucursales as $term) {
+                        $q->orWhere('fa.SUCURSAL', 'LIKE', "%{$term}%");
+
+                    }
+                }
+            });
+        })->when($filters['years'] ?? null, function ($query, $years) {
+            $query->whereIn(DB::raw('SUBSTR(`FECHA FACTURA`, -4)'), $years);
+        });
+
+        // permisos de sucursal
+        $query->when(
+            auth()->user()->inGroup('Gerente') ?? null,
+            function ($query) {
+                $query->whereIn('ID_SUC', auth()->user()->seller_agency->pluck('code'));
+            }
+        );
+
+
+
+        if ($request['per_page'] == -1) {
+            $request['per_page'] = 999999;
+        }
+        // $ventasPorMunicipio = [];
+
+        $query->chunk(2000, function ($invoices) {
+            return $invoices;
+        });
+        $items = $query->paginate($request['per_page'] ?? 10);
+
+        return $this->sendResponseOk(
+            compact(
+                'items',
+            )
+        );
+
+    }
+
+    public function TrackingsByCliente(Request $request)
+    {
+
+        $filters = $request->all();
+        // "clave_cliente": "LAPUERTADELOS62",
+        // "rfc_cliente": "PFO170403LDA",
+        // "nombre": " LA PUERTA DE LOS FRUTOS ORGANICOS",     
+
+        $items = TrackingProspect::with('attended', 'estatus')->whereHas('prospect', function ($query) use ($filters) {
+            $query->where(function ($q) use ($filters) {
+                $term = $filters['nombre'];
+                $q->orWhere('full_name', 'like', "%$term%")
+                    ->orWhere('company', 'like', "%$term%");
+            });
+
+        })->get();
+
+        return $this->sendResponseOk(
+            compact(
+                'items',
+            )
+        );
+    }
+    public function InvoicesByCliente(Request $request)
+    {
+
+        $filters = $request->all();
+        $items = FacturacionAG::from('facturacion_utf8 AS fa')->select(
+            'CVE_CLIENTE as clave_cliente',
+            'RFC CLIENTE as rfc_cliente',
+            'NOMBRE CLIENTE AS cliente',
+            'fa.SUCURSAL AS sucursal',
+            'fa.LINEA AS linea',
+            'CIUDAD / MUNICIPIO AS municipio',
+            'fa.CP',
+            'NIP',
+            'DESCRIPCION PRODUCTO AS producto',
+            'PRECIO VENTA AS precio_venta',
+            'FECHA FACTURA AS invoice_date',
+            'ctv.clave AS tipo_venta',
+            'ctv.descripcion AS tipo_venta_nombre',
+            DB::raw("
+            COALESCE(
+            CASE
+                WHEN cv.clave_vendodor <> '' THEN cv.clave_vendodor
+                ELSE fa.CVE_VENDEDOR
+            END , 'N/E')
+            AS clave_vendedor"
+            ),
+            DB::raw("
+            COALESCE(
+            CASE
+                WHEN cv.nombre_vendor <> '' THEN cv.nombre_vendor
+                ELSE fa.`NOMBRE VENDEDOR`
+            END , 'N/E')
+            AS nombre_vendedor"
+            ),
+            DB::raw("fa.CALLE ||','|| fa.`COLONIA /COMUNIDAD`||','|| fa.CP ||','||fa.`CIUDAD / MUNICIPIO`||','|| fa.ESTADO ||','|| fa.PAIS AS addresses"),
+            DB::raw("fa.`Telefono 1` ||','|| fa.`Telefono 2`||','|| fa.`Telefono 3` AS phones"),
+            DB::raw('SUBSTR(`FECHA FACTURA`, -4) as year')
+        )
+            ->leftJoin('vendedores_utf8 AS cv', 'cv.clave_vendodor', '=', 'fa.CVE_VENDEDOR')
+            ->leftJoin('catTipoVenta AS ctv', 'ctv.clave', '=', 'fa.TIPO DE VENTA')
+            ->orderByRaw("SUBSTR(`FECHA FACTURA`, -4) DESC")
+            ->where(function ($q) use ($filters) {
+
+                // $q->orWhere('fa.CVE_CLIENTE', 'LIKE', "{$filters['clave_cliente']}");
+                $q->orWhere('fa.NOMBRE CLIENTE', 'LIKE', "%{$filters['nombre']}%");
+
+            })->get();
+
+        return $this->sendResponseOk(
+            compact(
+                'items',
+            )
+        );
+
+    }
+    public function CreateTrackingsByCliente(Request $request)
+    {
+        $validate = validator($request->all(), [
+            'agency_id' => 'required',
+            'department_id' => 'required',
+            'attended_by' => 'required',
+        ]);
+        if ($validate->fails()) {
+            return $this->sendResponseBadRequest($validate->errors()->first());
+        }
+
+        return DB::transaction(function () use ($request) {
+            $request['registered_by'] = Auth::user()->id;
+            $request['assigned_by'] = Auth::user()->id;
+            $request['currency_id'] = 1;
+            $request['description_topic'] = "Contactar para Obtener Informacion, si desea algun Producto";
+            $request['title'] = ProductCategory::where('name', 'FUTURA OPORTUNIDAD')->first()->name;
+            $request['reference'] = "Asignado por Sistema";
+            $request['assertiveness'] = 0.01;
+            $request['date_next_tracking'] = Carbon::now()->addDays(15);
+            $currency_name = Currency::where('id', $request['currency_id'])->first();
+            $prospect = Prospect::firstOrCreate(
+                ['full_name' => $request['cliente']],
+                [
+                    'company' => $request['cliente'],
+                    'town' => $request['addresses'],
+                    'phone' => $request['phones'],
+                    'rfc' => $request['rfc_cliente'],
+                    'registered_by' => Auth::user()->id,
+                ]
+            );
+
+            $tracking = $prospect->tracking()->create($request->all());
+
+            if (!$tracking) {
+                return $this->sendResponseBadRequest("Failed create.");
+            }
+
+            $estatus = Estatus::where('key', Estatus::ESTATUS_ACTIVO)->first();
+            $tracking->estatus()->associate($estatus);
+            $tracking->save();
+            $tracking->refresh();
+
+            $tracking->historical()->create([
+                'message' => 'Llamar para dar Seguimiento',
+                'last_price' => $request['price'],
+                'last_currency' => $currency_name->name,
+                'type_contacted' => 'Llamada',
+                'user_id' => $request['attended_by'],
+                'date_next_tracking' => $request['date_next_tracking'],
+                'last_assertiveness' => $request['assertiveness'],
+            ]);
+
+            return $this->sendResponseCreated(compact('tracking'), 'Se Registro Nuevo Seguimiento');
+        });
+
+
+
+
+    }
+
 }

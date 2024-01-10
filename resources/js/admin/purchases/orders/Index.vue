@@ -1,468 +1,488 @@
 <template>
-  <v-data-table
-    :headers="headers"
-    :items="items"
-    :options.sync="pagination"
-    :server-items-length="totalItems"
-    calculate-widths
-    fixed-header
-    caption
-    dense
-    class="black--text caption font-weight-bold text-uppercase text-wrap"
-  >
-    <template #top>
-      <search-panel
-        :rightDrawer="rightDrawer"
-        @cancelSearch="cancelSearch"
-        @resetFilter="resetFilter"
-      >
-        <v-form ref="formFilter">
-          <div class="d-flex flex-column ma-2">
-            <v-select
-              v-model="filters.purchase_type"
-              :items="options.purchase_types"
-              item-text="name"
-              item-value="id"
-              label="Tipo de O.C."
-              prepend-icon="mdi-filter-variant"
-              hide-details
-              outlined
-              filled
-              clearable
-              dense
-              class="mb-2"
-            ></v-select>
-            <v-select
-              v-model="filters.purchase_concept"
-              label="Concepto de Compra"
-              :disabled="PurchaseConcept.length == 0"
-              :items="PurchaseConcept"
-              item-value="id"
-              item-text="name"
-              prepend-icon="mdi-filter-variant"
-              hide-details
-              outlined
-              filled
-              clearable
-              dense
-              class="mb-2"
-              multiple
-              chips
-              deletable-chips
-            ></v-select>
-            <v-autocomplete
-              v-model="filters.supplier"
-              :items="options.suppliers"
-              item-text="business_name"
-              item-value="id"
-              label="Proveedor:"
-              prepend-icon="mdi-filter-variant"
-              hide-details
-              outlined
-              filled
-              clearable
-              dense
-              class="mb-3"
-            ></v-autocomplete>
-            <v-select
-              v-model="filters.agencie"
-              :items="options.agencies"
-              item-text="title"
-              item-value="id"
-              label="Cargo Sucursal"
-              prepend-icon="mdi-filter-variant"
-              hide-details
-              outlined
-              filled
-              clearable
-              dense
-              class="mb-2"
-              multiple
-              chips
-              deletable-chips
-            ></v-select>
-            <v-select
-              v-model="filters.department"
-              :items="options.departments"
-              item-text="title"
-              item-value="id"
-              label="Cargo Departamento"
-              prepend-icon="mdi-filter-variant"
-              hide-details
-              outlined
-              filled
-              clearable
-              dense
-              class="mb-2"
-              multiple
-              chips
-              deletable-chips
-            ></v-select>
-            <v-select
-              v-model="filters.forma_pago"
-              :items="options.formaPago"
-              label="Forma Pago:"
-              item-text="clave"
-              item-value="clave"
-              prepend-icon="mdi-filter-variant"
-              hide-details
-              outlined
-              filled
-              clearable
-              dense
-              class="mb-2"
-            ></v-select>
-            <v-select
-              v-model="filters.uso_cfdi"
-              :items="options.usoCFDI"
-              label="UsoCFDI"
-              persistent-hint
-              item-text="clave"
-              item-value="clave"
-              prepend-icon="mdi-filter-variant"
-              hide-details
-              outlined
-              filled
-              clearable
-              dense
-              class="mb-2"
-            ></v-select>
-            <v-select
-              v-model="filters.metodo_pago"
-              :items="options.metodoPago"
-              label="Metodo Pago:"
-              persistent-hint
-              item-text="clave"
-              item-value="clave"
-              prepend-icon="mdi-filter-variant"
-              hide-details
-              outlined
-              filled
-              clearable
-              dense
-              class="mb-2"
-            ></v-select>
-            <v-select
-              v-model="filters.ship"
-              :items="options.agencies"
-              item-text="title"
-              item-value="id"
-              label="Sucursal de Embarque"
-              prepend-icon="mdi-filter-variant"
-              hide-details
-              outlined
-              filled
-              clearable
-              dense
-              class="mb-2"
-              multiple
-              chips
-              deletable-chips
-            ></v-select>
-          </div>
-        </v-form>
-      </search-panel>
-      <v-card class="d-flex justify-end align-center flex-wrap px-3 py-1" flat>
-        <v-card
-          flat
-          class="d-flex d-flex justify-space-between align-center flex-wrap py-2"
-          :class="'flex-grow-1 flex-shrink-0'"
+  <div>
+    <v-data-table
+      :headers="headers"
+      :items="items"
+      :options.sync="pagination"
+      :server-items-length="totalItems"
+      calculate-widths
+      fixed-header
+      caption
+      dense
+      class="black--text caption font-weight-bold text-uppercase text-wrap"
+    >
+      <template #top>
+        <search-panel
+          :rightDrawer="rightDrawer"
+          @cancelSearch="cancelSearch"
+          @resetFilter="resetFilter"
         >
-          <v-text-field
-            v-model="search"
-            label="Search"
-            class="pa-2"
-            outlined
-            filled
-            append-icon="mdi-magnify"
-            hide-details
-            clearable
-            dense
-          ></v-text-field>
-          <v-select
-            v-model="filters.estatus"
-            :items="options.estatus"
-            label="Estatus"
-            class="pa-2"
-            outlined
-            filled
-            hide-details
-            dense
-          ></v-select>
-          <v-dialog
-            ref="dialog"
-            v-model="modalDateRange"
-            :return-value.sync="filters.date_range"
-            persistent
-            width="450px"
-          >
-            <template #activator="{ on, attrs }">
-              <v-text-field
-                v-model="filters.date_range"
-                label="Rango de Fechas"
-                prepend-icon="mdi-calendar"
-                readonly
-                v-bind="attrs"
-                v-on="on"
-                class="pa-2"
+          <v-form ref="formFilter">
+            <div class="d-flex flex-column ma-2">
+              <v-select
+                v-model="filters.purchase_type"
+                :items="options.purchase_types"
+                item-text="name"
+                item-value="id"
+                label="Tipo de O.C."
+                prepend-icon="mdi-filter-variant"
+                hide-details
                 outlined
                 filled
-                hide-details
-                dense
                 clearable
-              ></v-text-field>
-            </template>
-            <v-date-picker v-model="filters.date_range" scrollable range>
-              <v-spacer></v-spacer>
-              <v-btn text color="primary" @click="modalDateRange = false">
-                Cancel
-              </v-btn>
-              <v-btn
-                text
-                color="primary"
-                @click="$refs.dialog.save(filters.date_range)"
-              >
-                OK
-              </v-btn>
-            </v-date-picker>
-          </v-dialog>
+                dense
+                class="mb-2"
+              ></v-select>
+              <v-select
+                v-model="filters.purchase_concept"
+                label="Concepto de Compra"
+                :disabled="PurchaseConcept.length == 0"
+                :items="PurchaseConcept"
+                item-value="id"
+                item-text="name"
+                prepend-icon="mdi-filter-variant"
+                hide-details
+                outlined
+                filled
+                clearable
+                dense
+                class="mb-2"
+                multiple
+                chips
+                deletable-chips
+              ></v-select>
+              <v-autocomplete
+                v-model="filters.supplier"
+                :items="options.suppliers"
+                item-text="business_name"
+                item-value="id"
+                label="Proveedor:"
+                prepend-icon="mdi-filter-variant"
+                hide-details
+                outlined
+                filled
+                clearable
+                dense
+                class="mb-3"
+              ></v-autocomplete>
+              <v-select
+                v-model="filters.agencie"
+                :items="options.agencies"
+                item-text="title"
+                item-value="id"
+                label="Cargo Sucursal"
+                prepend-icon="mdi-filter-variant"
+                hide-details
+                outlined
+                filled
+                clearable
+                dense
+                class="mb-2"
+                multiple
+                chips
+                deletable-chips
+              ></v-select>
+              <v-select
+                v-model="filters.department"
+                :items="options.departments"
+                item-text="title"
+                item-value="id"
+                label="Cargo Departamento"
+                prepend-icon="mdi-filter-variant"
+                hide-details
+                outlined
+                filled
+                clearable
+                dense
+                class="mb-2"
+                multiple
+                chips
+                deletable-chips
+              ></v-select>
+              <v-select
+                v-model="filters.forma_pago"
+                :items="options.formaPago"
+                label="Forma Pago:"
+                item-text="clave"
+                item-value="clave"
+                prepend-icon="mdi-filter-variant"
+                hide-details
+                outlined
+                filled
+                clearable
+                dense
+                class="mb-2"
+              ></v-select>
+              <v-select
+                v-model="filters.uso_cfdi"
+                :items="options.usoCFDI"
+                label="UsoCFDI"
+                persistent-hint
+                item-text="clave"
+                item-value="clave"
+                prepend-icon="mdi-filter-variant"
+                hide-details
+                outlined
+                filled
+                clearable
+                dense
+                class="mb-2"
+              ></v-select>
+              <v-select
+                v-model="filters.metodo_pago"
+                :items="options.metodoPago"
+                label="Metodo Pago:"
+                persistent-hint
+                item-text="clave"
+                item-value="clave"
+                prepend-icon="mdi-filter-variant"
+                hide-details
+                outlined
+                filled
+                clearable
+                dense
+                class="mb-2"
+              ></v-select>
+              <v-select
+                v-model="filters.ship"
+                :items="options.agencies"
+                item-text="title"
+                item-value="id"
+                label="Sucursal de Solicitante"
+                prepend-icon="mdi-filter-variant"
+                hide-details
+                outlined
+                filled
+                clearable
+                dense
+                class="mb-2"
+                multiple
+                chips
+                deletable-chips
+              ></v-select>
+            </div>
+          </v-form>
+        </search-panel>
+        <v-card class="d-flex justify-end align-center flex-wrap px-3 py-1" flat>
+          <v-card
+            flat
+            class="d-flex d-flex justify-space-between align-center flex-wrap py-2"
+            :class="'flex-grow-1 flex-shrink-0'"
+          >
+            <v-text-field
+              v-model="search"
+              label="Search"
+              class="pa-2"
+              outlined
+              filled
+              append-icon="mdi-magnify"
+              hide-details
+              clearable
+              dense
+            ></v-text-field>
+            <v-select
+              v-model="filters.estatus"
+              :items="options.estatus"
+              label="Estatus"
+              class="pa-2"
+              outlined
+              filled
+              hide-details
+              dense
+            ></v-select>
+            <v-dialog
+              ref="dialog"
+              v-model="modalDateRange"
+              :return-value.sync="filters.date_range"
+              persistent
+              width="450px"
+            >
+              <template #activator="{ on, attrs }">
+                <v-text-field
+                  v-model="filters.date_range"
+                  label="Rango de Fechas"
+                  prepend-icon="mdi-calendar"
+                  readonly
+                  v-bind="attrs"
+                  v-on="on"
+                  class="pa-2"
+                  outlined
+                  filled
+                  hide-details
+                  dense
+                  clearable
+                ></v-text-field>
+              </template>
+              <v-date-picker v-model="filters.date_range" scrollable range>
+                <v-spacer></v-spacer>
+                <v-btn text color="primary" @click="modalDateRange = false">
+                  Cancel
+                </v-btn>
+                <v-btn
+                  text
+                  color="primary"
+                  @click="$refs.dialog.save(filters.date_range)"
+                >
+                  OK
+                </v-btn>
+              </v-date-picker>
+            </v-dialog>
+          </v-card>
+          <v-spacer></v-spacer>
+          <v-divider class="mx-2" inset vertical></v-divider>
+          <table-header-buttons
+            :updateSearchPanel="updateSearchPanel"
+            :reloadTable="reloadTable"
+          ></table-header-buttons>
         </v-card>
-        <v-spacer></v-spacer>
-        <v-divider class="mx-2" inset vertical></v-divider>
-        <table-header-buttons
-          :updateSearchPanel="updateSearchPanel"
-          :reloadTable="reloadTable"
-        ></table-header-buttons>
-      </v-card>
-      <v-toolbar flat>
-        <v-toolbar-title>Ordenes de Compra</v-toolbar-title>
-        <v-divider class="mx-4" inset vertical></v-divider>
-        <v-spacer></v-spacer>
-        <v-btn
-          color="primary"
-          rounded
-          class="mb-2"
-          :to="{ name: 'purchase.create' }"
-        >
-          Crear Orden de Compra
-        </v-btn>
-      </v-toolbar>
-    </template>
-    <template #[`item.actions`]="{ item }">
-      <v-menu offset-x transition="slide-x-transition" rounded="r-xl">
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn icon v-bind="attrs" v-on="on">
-            <v-icon>mdi-dots-vertical</v-icon>
+        <v-toolbar flat>
+          <v-toolbar-title>Ordenes de Compra</v-toolbar-title>
+          <v-divider class="mx-4" inset vertical></v-divider>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="primary"
+            rounded
+            class="mb-2"
+            :to="{ name: 'purchase.create' }"
+          >
+            Crear Orden de Compra
           </v-btn>
-        </template>
-        <v-list shaped dense>
-          <v-list-item-group>
-            <v-list-item
-              :to="{ name: 'purchase.edit', params: { purchaseId: item.id } }"
-            >
-              <v-list-item-icon>
-                <v-icon class="blue--text">mdi-information-outline</v-icon>
-              </v-list-item-icon>
-              <v-list-item-content>
-                <v-list-item-title>Detalle OC</v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-            <v-list-item
-              v-if="canPrint(item.estatus.key)"
-              icon
-              :href="`/admin/purchase-order/${item.id}/resources/print`"
-              target="_blank"
-            >
-              <v-list-item-icon>
-                <v-icon class="blue--text">mdi-printer</v-icon>
-              </v-list-item-icon>
-              <v-list-item-content>
-                <v-list-item-title>Descargar OC PDF</v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-            <v-list-item
-              v-if="canMarkAsSend(item.estatus.key)"
-              icon
-              @click="markAsSend(item)"
-            >
-              <v-list-item-icon>
-                <v-icon class="blue--text">mdi-send-check</v-icon>
-              </v-list-item-icon>
-              <v-list-item-content>
-                <v-list-item-title>
-                  {{
-                    item.payment_condition < 8
-                      ? "Solicitar Prog. Pago"
-                      : "Enviar a Proveedor"
-                  }}
-                </v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-          </v-list-item-group>
-        </v-list>
-      </v-menu>
-    </template>
-    <template #[`item.purchase_number`]="{ value }">
-      <span> #{{ value }} </span>
-    </template>
-    <template #[`item.supplier`]="{ value }">
-      <v-list-item-content>
-        <v-list-item-subtitle>{{ value.code_equip }}</v-list-item-subtitle>
-        <v-list-item-title
-          class="d-block font-weight-semibold text-primary text-wrap"
+        </v-toolbar>
+      </template>
+      <template #[`item.actions`]="{ item }">
+        <v-menu offset-x transition="slide-x-transition" rounded="r-xl">
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn icon v-bind="attrs" v-on="on">
+              <v-icon>mdi-dots-vertical</v-icon>
+            </v-btn>
+          </template>
+          <v-list shaped dense>
+            <v-list-item-group>
+              <!-- :to="{ name: 'purchase.edit', params: { purchaseId: item.id } }" -->
+              <v-list-item
+                @click="(dialogs.id = item.id), (dialogs.show = true)"
+              >
+                <v-list-item-icon>
+                  <v-icon class="blue--text">mdi-information-outline</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-item-title>Detalle OC</v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+              <v-list-item
+                v-if="canPrint(item.estatus.key)"
+                icon
+                :href="`/admin/purchase-order/${item.id}/resources/print`"
+                target="_blank"
+              >
+                <v-list-item-icon>
+                  <v-icon class="blue--text">mdi-printer</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-item-title>Descargar OC PDF</v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+              <v-list-item
+                v-if="canMarkAsSend(item.estatus.key)"
+                icon
+                @click="markAsSend(item)"
+              >
+                <v-list-item-icon>
+                  <v-icon class="blue--text">mdi-send-check</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-item-title>
+                    {{
+                      item.payment_condition < 8
+                        ? "Solicitar Prog. Pago"
+                        : "Enviar a Proveedor"
+                    }}
+                  </v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+            </v-list-item-group>
+          </v-list>
+        </v-menu>
+      </template>
+      <template #[`item.purchase_number`]="{ value }">
+        <span> #{{ value }} </span>
+      </template>
+      <template #[`item.supplier`]="{ value }">
+        <v-list-item-content>
+          <v-list-item-subtitle>{{ value.code_equip }}</v-list-item-subtitle>
+          <v-list-item-title
+            class="d-block font-weight-semibold text-primary text-wrap"
+          >
+            {{ value.business_name }}
+          </v-list-item-title>
+          <v-list-item-subtitle class="text--secondary">
+            {{ value.rfc }}
+          </v-list-item-subtitle>
+        </v-list-item-content>
+      </template>
+      <template #[`item.elaborated`]="{ item }">
+        <v-menu
+          bottom
+          left
+          offset-x
+          transition="scale-transition"
+          origin="top right"
         >
-          {{ value.business_name }}
-        </v-list-item-title>
-        <v-list-item-subtitle class="text--secondary">
-          {{ value.rfc }}
-        </v-list-item-subtitle>
-      </v-list-item-content>
-    </template>
-    <template #[`item.elaborated`]="{ item }">
-      <v-menu
-        bottom
-        left
-        offset-x
-        transition="scale-transition"
-        origin="top right"
-      >
-        <template v-slot:activator="{ on }">
-          <v-chip pill color="black" dark v-on="on">
-            <v-avatar left>
-              <img
-                v-if="item.elaborated.profiable"
-                :src="item.elaborated.profiable.profile_photo_url"
-                :alt="item.elaborated.name"
-              />
-              <v-icon v-else class="blue--text"> mdi-account </v-icon>
-            </v-avatar>
-
-            {{
-              item.elaborated.profiable
-                ? item.elaborated.profiable.name
-                : item.elaborated.name
-            }}
-          </v-chip>
-        </template>
-        <v-card width="400">
-          <v-list dark>
-            <v-list-item>
-              <v-list-item-avatar>
+          <template v-slot:activator="{ on }">
+            <v-chip pill color="black" dark v-on="on">
+              <v-avatar left>
                 <img
                   v-if="item.elaborated.profiable"
                   :src="item.elaborated.profiable.profile_photo_url"
                   :alt="item.elaborated.name"
                 />
                 <v-icon v-else class="blue--text"> mdi-account </v-icon>
-              </v-list-item-avatar>
-              <v-list-item-content>
-                <v-list-item-title>
-                  {{
-                    item.elaborated.profiable
-                      ? item.elaborated.profiable.full_name
-                      : item.elaborated.name
-                  }}
-                </v-list-item-title>
-                <v-list-item-subtitle>
-                  {{ item.elaborated.email }}
-                </v-list-item-subtitle>
-                <v-list-item-subtitle v-if="item.elaborated.profiable">
-                  {{
-                    `${item.elaborated.profiable.agency.title} ${item.elaborated.profiable.department.title}`
-                  }}
-                </v-list-item-subtitle>
-              </v-list-item-content>
-              <v-list-item-action>
-                <v-btn icon>
-                  <v-icon>mdi-close-circle</v-icon>
-                </v-btn>
-              </v-list-item-action>
-            </v-list-item>
-          </v-list>
-        </v-card>
-      </v-menu>
-    </template>
-    <template #[`item.total`]="{ item }">
-      <b>{{ item.total | money }}</b>
-    </template>
-    <template #[`item.estatus`]="{ item }">
-      <v-chip
-        label
-        small
-        :color="getColorByStatus(item.estatus.key)"
-        text-color="white"
-        dark
-      >
-        {{ item.estatus.title }}
-      </v-chip>
-    </template>
-    <template #[`item.purchaseType`]="{ item }">
-      <v-list-item-content>
-        <v-list-item-title>
-          {{ item.purchase_type.name }}
-        </v-list-item-title>
-        <v-list-item-subtitle>
-          {{ item.purchase_concept.name }}
-        </v-list-item-subtitle>
-      </v-list-item-content>
-    </template>
-    <template #[`item.payment_condition`]="{ value }">
-      {{
-        value == 1
-          ? "Requiere Anticipo"
-          : value < 8
-          ? "Contado"
-          : `${value} dias`
-      }}
-    </template>
-    <template #[`item.charges`]="{ value }">
-      <div v-if="value.length == 0">Sin Cargos</div>
-      <v-menu
-        v-else
-        :close-on-content-click="false"
-        offset-x
-        transition="scale-transition"
-        origin="top left"
-      >
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn color="indigo" dark v-bind="attrs" small v-on="on">
-            Cargos ({{ value.length }})
-          </v-btn>
-        </template>
-
-        <v-card>
-          <v-card-title class="white--text text-title text-uppercase indigo">
-            Cargos a Sucursales
-          </v-card-title>
-
-          <v-card-text>
-            <v-list>
-              <v-list-item
-                v-for="(item, index) in value"
-                :key="`cargo-${index}`"
-              >
+              </v-avatar>
+  
+              {{
+                item.elaborated.profiable
+                  ? item.elaborated.profiable.name
+                  : item.elaborated.name
+              }}
+            </v-chip>
+          </template>
+          <v-card width="400">
+            <v-list dark>
+              <v-list-item>
+                <v-list-item-avatar>
+                  <img
+                    v-if="item.elaborated.profiable"
+                    :src="item.elaborated.profiable.profile_photo_url"
+                    :alt="item.elaborated.name"
+                  />
+                  <v-icon v-else class="blue--text"> mdi-account </v-icon>
+                </v-list-item-avatar>
                 <v-list-item-content>
-                  <v-list-item-title>{{ item.agency.title }}</v-list-item-title>
+                  <v-list-item-title>
+                    {{
+                      item.elaborated.profiable
+                        ? item.elaborated.profiable.full_name
+                        : item.elaborated.name
+                    }}
+                  </v-list-item-title>
                   <v-list-item-subtitle>
-                    {{ item.department.title }}
+                    {{ item.elaborated.email }}
+                  </v-list-item-subtitle>
+                  <v-list-item-subtitle v-if="item.elaborated.profiable">
+                    {{
+                      `${item.elaborated.profiable.agency.title} ${item.elaborated.profiable.department.title}`
+                    }}
                   </v-list-item-subtitle>
                 </v-list-item-content>
-
-                <v-list-item-action-text>
-                  <v-chip color="blue" dark label>
-                    {{ item.percent }} %
-                  </v-chip>
-                </v-list-item-action-text>
+                <v-list-item-action>
+                  <v-btn icon>
+                    <v-icon>mdi-close-circle</v-icon>
+                  </v-btn>
+                </v-list-item-action>
               </v-list-item>
             </v-list>
-          </v-card-text>
-        </v-card>
-      </v-menu>
-    </template>
-    <template #[`item.created_at`]="{ value }">
-      {{ $appFormatters.formatDate(value, "l") }}
-    </template>
-  </v-data-table>
+          </v-card>
+        </v-menu>
+      </template>
+      <template #[`item.total`]="{ item }">
+        <b>{{ item.total | money }}</b>
+      </template>
+      <template #[`item.estatus`]="{ item }">
+        <v-chip
+          label
+          small
+          :color="getColorByStatus(item.estatus.key)"
+          text-color="white"
+          dark
+        >
+          {{ item.estatus.title }}
+        </v-chip>
+      </template>
+      <template #[`item.purchaseType`]="{ item }">
+        <v-list-item-content>
+          <v-list-item-title>
+            {{ item.purchase_type.name }}
+          </v-list-item-title>
+          <v-list-item-subtitle>
+            {{ item.purchase_concept.name }}
+          </v-list-item-subtitle>
+        </v-list-item-content>
+      </template>
+      <template #[`item.payment_condition`]="{ value }">
+        {{
+          value == 1
+            ? "Requiere Anticipo"
+            : value < 8
+            ? "Contado"
+            : `${value} dias`
+        }}
+      </template>
+      <template #[`item.charges`]="{ value }">
+        <div v-if="value.length == 0">Sin Cargos</div>
+        <v-menu
+          v-else
+          :close-on-content-click="false"
+          offset-x
+          transition="scale-transition"
+          origin="top left"
+        >
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn color="indigo" dark v-bind="attrs" small v-on="on">
+              Cargos ({{ value.length }})
+            </v-btn>
+          </template>
+  
+          <v-card>
+            <v-card-title class="white--text text-title text-uppercase indigo">
+              Cargos a Sucursales
+            </v-card-title>
+  
+            <v-card-text>
+              <v-list>
+                <v-list-item
+                  v-for="(item, index) in value"
+                  :key="`cargo-${index}`"
+                >
+                  <v-list-item-content>
+                    <v-list-item-title>{{ item.agency.title }}</v-list-item-title>
+                    <v-list-item-subtitle>
+                      {{ item.department.title }}
+                    </v-list-item-subtitle>
+                  </v-list-item-content>
+  
+                  <v-list-item-action-text>
+                    <v-chip color="blue" dark label>
+                      {{ item.percent }} %
+                    </v-chip>
+                  </v-list-item-action-text>
+                </v-list-item>
+              </v-list>
+            </v-card-text>
+          </v-card>
+        </v-menu>
+      </template>
+      <template #[`item.created_at`]="{ value }">
+        {{ $appFormatters.formatDate(value, "l") }}
+      </template>
+      <template #[`item.updated_at`]="{ value }">
+        {{ $appFormatters.formatDate(value, "l") }}
+      </template>
+    </v-data-table>
+
+    <dialog-component
+          :show="dialogs.show"
+          @close="(dialogs.show = false), (dialogs.id = null)"
+          title="Detalle Orden de Compra"
+          fullscreen
+          closeable
+        >
+          <EditPurchase
+            v-if="dialogs.show && dialogs.id"
+            :purchaseId="dialogs.id"
+          ></EditPurchase>
+        </dialog-component>
+
+  </div>
 </template>
 <script>
 import DialogComponent from "@admin/components/DialogComponent.vue";
@@ -483,6 +503,12 @@ export default {
     TableHeaderButtons,
   },
   data: () => ({
+    dialogs: {
+        create: false,
+        quote: false,
+        show: false,
+        id: null,
+      },
     chipExpande: false,
     valid: true,
     modalDateRange: false,
@@ -511,6 +537,13 @@ export default {
         fixed: true,
         sortable: false,
       },
+      {
+        text: "Agencia Solc.",
+        value: "ship.title",
+        align: "center",
+        fixed: true,
+        sortable: false,
+      },
       { text: "Tipo O.C.", value: "purchaseType", width: 200 },
       {
         text: "Condicion Pago",
@@ -522,6 +555,7 @@ export default {
       { text: "Realizado por", value: "elaborated", width: 175 },
       { text: "Estatus", value: "estatus", align: "center" },
       { text: "Creada", value: "created_at", align: "right" },
+      { text: "Ultimo Cambio", value: "updated_at", align: "right" },
     ],
     editedId: -1,
     items: [],

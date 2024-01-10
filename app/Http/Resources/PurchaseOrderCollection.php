@@ -23,6 +23,7 @@ class PurchaseOrderCollection extends JsonResource
             'id' => $this->id,
             'purchase_number' => $this->purchase_number,
             'estatus' => $this->estatus->only('id', 'key', 'title'),
+            'currency_id' =>$this->currency->id,
             'created_by' => $this->created_by,
             'supplier' => $this->supplier->only('id', 'code_equip', 'business_name', 'rfc', 'credit_days', 'isActive'),
             'amounts' => collect(
