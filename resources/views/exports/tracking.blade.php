@@ -6,6 +6,8 @@
             <th>Compañia</th>
             <th>Tel. Prospecto</th>
             <th>Email. Prospecto</th>
+            <th>Municipio</th>
+            <th>Estado</th>
             <th>Categoria</th>
             <th>Referencia</th>
             <th>Precio</th>
@@ -33,6 +35,8 @@
                 <td>{{ $item->prospect->company ?? '' }}</td>
                 <td>{{ $item->prospect->phone }}</td>
                 <td>{{ $item->prospect->email ?? '' }}</td>
+                <td>{{ $item->prospect->township->name ?? '' }}</td>
+                <td>{{ $item->prospect->township->estate->name ?? '' }}</td>
                 <td>{{ $item->title ?? 'S/A' }}</td>
                 <td>{{ $item->reference ?? 'S/A' }}</td>
                 <td>{{ '$' . $item->price ?? 'S/A' }}</td>
@@ -45,8 +49,8 @@
                 <td>{{ $item->estatus->title ?? 'S/A' }}</td>
                 <td>{{ $item->first_contact ?? 'S/A' }}</td>
                 <td>{{ \Carbon\Carbon::parse($item->updated_at)->format('d/m/Y g:i:s') ?? 'S/A' }}</td>
-                <td>{{ \Carbon\Carbon::parse($item->created_at)->format('d/m/Y g:i:s')  ?? 'S/A' }}</td>
-                <td>{{ \Carbon\Carbon::parse($item->date_won_sale)->format('d/m/Y')  ?? 'S/A' }}</td>
+                <td>{{ \Carbon\Carbon::parse($item->created_at)->format('d/m/Y g:i:s') ?? 'S/A' }}</td>
+                <td>{{ \Carbon\Carbon::parse($item->date_won_sale)->format('d/m/Y') ?? 'S/A' }}</td>
                 <td>{{ $item->invoice ?? '' }}</td>
                 <td>{{ '$' . $item->price ?? 'S/A' }} {{ $item->currency ?? 'MXN' }}</td>
                 <td>{{ $item->historical->last()->message ?? '' }}</td>

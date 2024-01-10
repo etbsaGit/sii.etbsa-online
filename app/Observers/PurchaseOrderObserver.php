@@ -61,7 +61,7 @@ class PurchaseOrderObserver
         $current_estatus = $purchaseOrder->estatus->key;
         $cargos = $purchaseOrder->charges;
         if ($current_estatus == Estatus::ESTATUS_VERIFICADO) {
-            $subjectMessage = 'OC Verificada';
+            $subjectMessage = 'OC Verificada, Solicita Autorizacion';
             $toEmails = User::All()
                 ->map(function ($user) {
                     if ($user->hasPermission('compras.autorizar')) {
@@ -98,7 +98,7 @@ class PurchaseOrderObserver
             // $toEmails = [$purchaseOrder->elaborated, $purchaseOrder->supplier];
         }
         if ($current_estatus == Estatus::ESTATUS_POR_FACTURAR) {
-            $subjectMessage = 'OC Solicitud  de Factura para OC:';
+            $subjectMessage = 'OC Solicitud de Factura para OC:';
             $toEmails = [$purchaseOrder->elaborated];
             // $toEmails = [$purchaseOrder->elaborated, $purchaseOrder->supplier];
         }
@@ -107,7 +107,13 @@ class PurchaseOrderObserver
             $toEmails = [$purchaseOrder->elaborated];
             // $toEmails = [$purchaseOrder->elaborated, $purchaseOrder->supplier];
         }
-        Mail::to($toEmails)->cc($ccEmails)->send(new PurchaseOrderCreated($purchaseOrder, $subjectMessage));
+        try {
+            //code...
+            Mail::to($toEmails)->cc($ccEmails)->send(new PurchaseOrderCreated($purchaseOrder, $subjectMessage));
+        } catch (\Throwable $th) {
+            dd('error', $th);
+            throw $th;
+        }
     }
     /**
      * Handle the purchase order "created" event.
@@ -132,7 +138,7 @@ class PurchaseOrderObserver
                 })->filter()->toArray();
         }
 
-        
+
 
         Mail::to($toEmails)->cc($ccEmails)->send(new PurchaseOrderCreated($purchaseOrder, $subjectMessage));
     }
@@ -159,7 +165,7 @@ class PurchaseOrderObserver
                     }
                 })->filter()->toArray();
         }
-        
+
         Mail::to($toEmails)->cc($ccEmails)->send(new PurchaseOrderCreated($purchaseOrder, $subjectMessage));
     }
 

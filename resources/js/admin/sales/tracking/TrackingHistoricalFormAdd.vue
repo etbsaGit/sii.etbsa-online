@@ -171,6 +171,7 @@ export default {
         .then((response) => {
           _this.$refs.form.resetValidation();
           _this.$eventBus.$emit("MESSAGE_ADDED");
+          _this.$eventBus.$emit("REFRESH_TRACKING");
           _this.$store.commit("showSnackbar", {
             message: response.data.message,
             color: "success",

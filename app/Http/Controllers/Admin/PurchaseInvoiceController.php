@@ -32,7 +32,16 @@ class PurchaseInvoiceController extends AdminController
     public function storeInvoicePurchase(Request $request, PurchaseOrder $purchase_order)
     {
         $request->validate([
-            'file' => 'required|mimes:xml|max:2048',
+            'file' => [
+                'bail',
+                'required',
+                'max:2048',
+                function ($attribute, $value, $fail) {
+                    if ($value->getClientMimeType() !== 'text/xml') {
+                        $fail($attribute . '\'s extension is invalid.');
+                    }
+                },
+            ]
         ]);
         $xml = simplexml_load_file($request->file);
         $ns = $xml->getNamespaces(true);
@@ -55,7 +64,7 @@ class PurchaseInvoiceController extends AdminController
         }
 
         $payload = [
-            'folio' => $data_xml['Folio'][0],
+            'folio' => $data_xml['Folio'][0] ?? null,
             'serie' => $data_xml['Serie'][0] ?? null,
             'invoice_date' => $data_xml['Fecha'][0],
             // 'folio_fiscal' => $data_xml['UUID'][0],
@@ -189,7 +198,17 @@ class PurchaseInvoiceController extends AdminController
     {
 
         $request->validate([
-            'file' => 'required|mimes:xml|max:2048',
+            // 'file' => 'bail|required|mimes:application/xml,xml|max:2048',
+            'file' => [
+                'bail',
+                'required',
+                'max:2048',
+                function ($attribute, $value, $fail) {
+                    if ($value->getClientMimeType() !== 'text/xml') {
+                        $fail($attribute . '\'s extension is invalid.');
+                    }
+                },
+            ]
         ]);
 
         $xml = simplexml_load_file($request->file);

@@ -11,6 +11,7 @@
 |
  */
 
+use App\Components\Common\Models\Agency;
 use Illuminate\Support\Facades\DB;
 
 Route::get('/', 'Front\\HomeController@index')->name('front.home');
@@ -57,6 +58,12 @@ Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function
     // SalesCustomerHistory
     Route::get('marketing/sales-customer', 'SalesCustomerHistoryController@index')->name('salesCustomerHistory');
     Route::get('marketing/sales-customer/filters', 'SalesCustomerHistoryController@getOptions')->name('getOptionsEquipDB');
+    
+    Route::get('marketing/sales-customer-latest', 'SalesCustomerHistoryController@CustomerLatestInvoices')->name('CustomerLatestInvoices');
+    Route::get('marketing/invoices-by-customer', 'SalesCustomerHistoryController@InvoicesByCliente')->name('InvoicesByCliente');
+    Route::get('marketing/trackings-by-customer', 'SalesCustomerHistoryController@TrackingsByCliente')->name('TrackingsByCliente');
+    Route::post('marketing/create-tracking-to-customer', 'SalesCustomerHistoryController@CreateTrackingsByCliente')->name('CreateTrackingsByCliente');
+
 
     Route::get('marketing/sales-agencies', 'SalesAgencyHistoryController@index')->name('salesAgencyHistory');
     
@@ -64,6 +71,7 @@ Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function
     Route::get('resource/agencies', 'ResourcesShareController@getAgencies')->name('resources.agencies');
     Route::get('resource/users', 'ResourcesShareController@getUser')->name('resources.users');
     Route::get('resource/options', 'ResourcesShareController@getOptions')->name('resources.options');
+
 
     // Resources Grafics Metas
     Route::get('metas_sucursal', function () {

@@ -4,11 +4,12 @@
     :items="items"
     :options.sync="pagination"
     :server-items-length="totalItems"
-    class="text-truncate blue--text font-weight-bold text-uppercase caption"
+    class="text-truncate font-weight-bold text-uppercase"
     calculate-widths
     fixed-header
     caption
     dense
+    
   >
     <template #top>
       <search-panel
@@ -139,7 +140,7 @@
         closeable
         :fullscreen="$vuetify.breakpoint.mobile"
         title="Registrar Nuevo Empleado"
-        max-width="600"
+        max-width="800"
       >
         <create-employee
           v-if="dialogCreate"
@@ -152,7 +153,7 @@
         closeable
         :fullscreen="$vuetify.breakpoint.mobile"
         title="Informacion del Empleado"
-        max-width="600"
+        max-width="800"
       >
         <edit-employee
           v-if="dialogShow"
@@ -183,7 +184,7 @@
         </v-avatar>
 
         <div class="d-flex flex-column">
-          <div class="text-h6 font-weight-medium mb-0">
+          <div class="font-weight-medium mb-0">
             {{ item.full_name }}
           </div>
           <span v-if="item.user" class="text-caption">
@@ -228,13 +229,13 @@ export default {
       showSearchPanel: false,
       dialogDelete: false,
       headers: [
-        {
-          text: "Num. Empleado",
-          align: "center",
-          sortable: false,
-          fixed: true,
-          value: "number_employee",
-        },
+        // {
+        //   text: "Num. Empleado",
+        //   align: "center",
+        //   sortable: false,
+        //   fixed: true,
+        //   value: "number_employee",
+        // },
         {
           text: "Nombre Completo",
           align: "left",
@@ -254,7 +255,14 @@ export default {
           align: "left",
           sortable: false,
           fixed: true,
-          value: "job_title",
+          value: "job.title",
+        },
+        {
+          text: "Jefe Directo",
+          align: "left",
+          sortable: false,
+          fixed: true,
+          value: "boss.full_name",
         },
         {
           text: "Fecha de Ingreso",

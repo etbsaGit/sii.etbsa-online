@@ -39,7 +39,7 @@ class PurchaseOrderCreated extends Mailable
     public function build()
     {
         $url = url('/admin#/purchases/' . $this->order->id . '/edit');
-        $subject = $this->subjectMessage . ' #' . $this->order->id . ' ' . $this->order->ship->title . ' ' . $this->order->elaborated->name;
+        $subject = $this->subjectMessage . ' OC#' . $this->order->purchase_number . ' ' . $this->order->ship->title . ' ' . $this->order->elaborated->name;
         return $this->subject($subject)
             ->markdown('emails.purchaseOrders.created')
             ->with(['url' => $url])
@@ -48,7 +48,7 @@ class PurchaseOrderCreated extends Mailable
                     'mime' => 'application/pdf',
                 ]);
             });
-        ;
+
     }
 
     public function hasAttachment($current_estatus)
