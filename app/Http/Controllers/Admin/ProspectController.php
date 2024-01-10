@@ -45,12 +45,12 @@ class ProspectController extends AdminController
         $validate = validator($request->all(), [
             'full_name' => 'required',
             // 'township_id' => 'required',
-            // 'phone' => 'size:10|required|unique:prospect,phone',
+            'phone' => 'size:10|required|unique:prospect,phone',
             // 'is_moral' => 'required',
         ], [
-            // 'phone.unique' => 'El Telefono ya se encuentra registrado',
-            // 'phone.size' => 'El Telefono debe tener 10 Digitos',
-            // 'phone.required' => 'El Telefono es requerido',
+            'phone.unique' => 'El Telefono ya se encuentra registrado',
+            'phone.size' => 'El Telefono debe tener 10 Digitos',
+            'phone.required' => 'El Telefono es requerido',
             // 'township_id.required' => 'El Municipio es requerido',
             'full_name.required' => 'El Nombre es requerido',
         ]);

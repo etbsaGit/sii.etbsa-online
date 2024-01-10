@@ -112,7 +112,7 @@
               ></v-select>
               <v-select
                 v-model="filters.year"
-                :items="[null, 2023, 2022]"
+                :items="[null, 2024, 2023, 2022]"
                 label="Filtrar Año:"
                 prepend-icon="mdi-filter-variant"
                 outlined

@@ -196,7 +196,7 @@ class TrackingDashboardController extends AdminController
     {
         if (Auth::user()->isSuperUser()) {
             $agencies = DB::table('agencies')->get(['id', 'code', 'title']);
-            $departments = DB::table('departments')->get(['id', 'title']);
+            $departments = DB::table('departments')->whereNotNull('code')->get(['id', 'title']);
             // $categories = DB::table('cat_product_category')->get(['id', 'name']);
         } else {
             $agencies = Auth::user()->seller_agency->map(function ($i, $k) {

@@ -226,6 +226,7 @@ export default {
       _this.files.forEach((item) => {
         formData.append("file[]", item);
       });
+
       await axios.post(
         `/admin/tracking-file/attach/${_this.propTrackingId}`,
         formData

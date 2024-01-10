@@ -64,7 +64,7 @@ class TrackingProspectController extends AdminController
         // $categories = auth()->user()->seller_category;
         $currency = DB::table('currency')->get(['id', 'name']);
         $agencies = DB::table('agencies')->get(['id', 'code', 'title']);
-        $departments = DB::table('departments')->get(['id', 'title']);
+        $departments = DB::table('departments')->whereNotNull('code')->get(['id', 'title']);
 
         $sellers = User::whereHasMorph(
             'profiable',
@@ -378,7 +378,7 @@ class TrackingProspectController extends AdminController
     {
         if (Auth::user()->isSuperUser()) {
             $agencies = DB::table('agencies')->get(['id', 'code', 'title']);
-            $departments = DB::table('departments')->get(['id', 'title']);
+            $departments = DB::table('departments')->whereNotNull('code')->get(['id', 'title']);
             // $categories = DB::table('cat_product_category')->get(['id', 'name']);
         } else {
             $agencies = Auth::user()->seller_agency->map(function ($i, $k) {

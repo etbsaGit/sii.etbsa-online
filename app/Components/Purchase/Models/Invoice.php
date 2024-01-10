@@ -33,7 +33,7 @@ class Invoice extends Model
     {
         $query->when($search ?? null, function ($query, $search) {
             $query->orWhere(function ($query) use ($search) {
-                $query->orWhere('folio', 'like', $search)
+                $query->orWhere('folio', 'like', "%{$search}%")
                     ->orWhere('folio_fiscal', 'like', "%{$search}%");
             });
         });
