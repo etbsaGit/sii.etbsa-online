@@ -14,9 +14,10 @@ export const customers = [
         component: require("@admin/customers/customers/Create").default,
       },
       {
-        path: "customers/show",
+        path: "customers/show/:itemId",
         name: "customers.customers.show",
         component: require("@admin/customers/customers/Show").default,
+        props: true,
       },
 
       {
