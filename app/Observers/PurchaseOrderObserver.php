@@ -107,7 +107,13 @@ class PurchaseOrderObserver
             $toEmails = [$purchaseOrder->elaborated];
             // $toEmails = [$purchaseOrder->elaborated, $purchaseOrder->supplier];
         }
-        Mail::to($toEmails)->cc($ccEmails)->send(new PurchaseOrderCreated($purchaseOrder, $subjectMessage));
+        try {
+            //code...
+            Mail::to($toEmails)->cc($ccEmails)->send(new PurchaseOrderCreated($purchaseOrder, $subjectMessage));
+        } catch (\Throwable $th) {
+            dd('error', $th);
+            throw $th;
+        }
     }
     /**
      * Handle the purchase order "created" event.
@@ -132,7 +138,7 @@ class PurchaseOrderObserver
                 })->filter()->toArray();
         }
 
-        
+
 
         Mail::to($toEmails)->cc($ccEmails)->send(new PurchaseOrderCreated($purchaseOrder, $subjectMessage));
     }
@@ -159,7 +165,7 @@ class PurchaseOrderObserver
                     }
                 })->filter()->toArray();
         }
-        
+
         Mail::to($toEmails)->cc($ccEmails)->send(new PurchaseOrderCreated($purchaseOrder, $subjectMessage));
     }
 
