@@ -2,7 +2,7 @@
   <v-card flat>
     <v-card-title>
       <v-autocomplete
-        v-model="select_category_id"
+        v-model="Category"
         :items="options.categories"
         item-value="id"
         item-text="name"
@@ -319,8 +319,16 @@ export default {
         this.$nextTick(() => {});
       },
     },
-    Category() {
-      return this.Category_id ? this.Category_id : this.select_category_id;
+    Category: {
+      get() {
+        return this.Category_id;
+        // return this.Category_id ? this.Category_id : this.select_category_id;
+      },
+      set(v) {
+        this.select_category_id = v;
+        this.$emit("category", v);
+        this.$nextTick(() => {});
+      },
     },
     PaymentConditionConfig() {
       const _this = this;

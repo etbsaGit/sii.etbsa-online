@@ -16,6 +16,7 @@
               :readOnly="form.read_only"
               @payment="(v) => (form.payment_condition = v)"
               @currency="(v) => (form.currency = v)"
+              @category="(v) => (form.category_id = v)"
             ></quote-concept-table>
           </v-card-text>
           <v-card-actions>
