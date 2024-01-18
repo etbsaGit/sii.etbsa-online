@@ -55,6 +55,8 @@
             <v-tab>Cotizaciones</v-tab>
             <v-tab>Archivos</v-tab>
             <v-tab>Mensajes de Apoyo</v-tab>
+            <!-- <v-tab>Credito</v-tab>
+            <v-tab>Mapa</v-tab> -->
 
             <v-tab-item>
               <tracking-activity
@@ -111,6 +113,9 @@
                 :tracking-id="propTracking.id"
               ></message-tracking>
             </v-tab-item>
+
+            <!-- <v-tab-item></v-tab-item>
+            <v-tab-item></v-tab-item> -->
           </v-tabs>
         </v-col>
       </v-row>
