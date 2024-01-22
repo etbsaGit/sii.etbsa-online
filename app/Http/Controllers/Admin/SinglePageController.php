@@ -36,6 +36,16 @@ class SinglePageController extends AdminController
             ]),
 
             new MenuItem([
+                'group_requirements' => ['Super User'],
+                'permission_requirements' => [],
+                'label' => 'Flujo Efectivo',
+                'nav_type' => MenuItem::$NAV_TYPE_NAV,
+                'icon' => 'mdi-crosshairs-gps',
+                'route_type' => 'vue',
+                'route_name' => 'poliza.ingresos.list',
+                'visible' => true,
+            ]),
+            new MenuItem([
                 'group_requirements' => ['Super User', 'GPS'],
                 'permission_requirements' => [],
                 'label' => 'GPS',
