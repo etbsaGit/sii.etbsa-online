@@ -3,6 +3,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Components\Common\Models\Agency;
 use App\Components\Common\Models\AgencyBankAccount;
 use Illuminate\Http\Request;
 
@@ -16,16 +17,9 @@ class AgencyBankAccountController extends AdminController
     public function index()
     {
         //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        $accounts = AgencyBankAccount::with('agency:id,title')->get();
+        $options['agencies'] = Agency::all('id', 'title', 'code');
+        return $this->sendResponse(compact('accounts', 'options'), 'cuentas de Sucursales');
     }
 
     /**
@@ -36,29 +30,15 @@ class AgencyBankAccountController extends AdminController
      */
     public function store(Request $request)
     {
-        //
-    }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Components\Common\Models\AgencyBankAccount  $agencyBankAccount
-     * @return \Illuminate\Http\Response
-     */
-    public function show(AgencyBankAccount $agencyBankAccount)
-    {
-        //
-    }
+        $validate = validator($request->all(), []);
+        if ($validate->fails()) {
+            return $this->sendResponseBadRequest($validate->errors()->first());
+        }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Components\Common\Models\AgencyBankAccount  $agencyBankAccount
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(AgencyBankAccount $agencyBankAccount)
-    {
-        //
+        $account = AgencyBankAccount::create($request->all());
+
+        return $this->sendResponseCreated(compact('account'));
     }
 
     /**
@@ -70,7 +50,15 @@ class AgencyBankAccountController extends AdminController
      */
     public function update(Request $request, AgencyBankAccount $agencyBankAccount)
     {
-        //
+
+        $validate = validator($request->all(), []);
+        if ($validate->fails()) {
+            return $this->sendResponseBadRequest($validate->errors()->first());
+        }
+
+        $updated = $agencyBankAccount->update($request->all());
+
+        return $this->sendResponseUpdated(compact('updated'));
     }
 
     /**
@@ -81,6 +69,9 @@ class AgencyBankAccountController extends AdminController
      */
     public function destroy(AgencyBankAccount $agencyBankAccount)
     {
-        //
+
+        $agencyBankAccount->delete();
+
+        return $this->sendResponseDeleted();
     }
 }
