@@ -13,24 +13,11 @@ export const flujo_efectivo = [
         name: "poliza.egresos.list",
         component: require("@admin/FlujoEfectivo/PolizaEgresos/Index").default,
       },
-      // {
-      //   path: ":propGpsId/edit",
-      //   name: "gps.edit",
-      //   component: require("@admin/gps/gps/Edit").default,
-      //   props: true,
-      // },
-      // {
-      //   path: "customes",
-      //   name: "gps.customer.list",
-      //   component: require("@admin/gps/groups/Index").default,
-      //   props: true,
-      // },
-      // {
-      //   path: "chips",
-      //   name: "gps.chips.list",
-      //   component: require("@admin/gps/chips/Index").default,
-      //   props: true,
-      // },
     ],
+  },
+  {
+    path: "/cuentas-sucursal",
+    name: "cuentas.agencias",
+    component: require("@admin/FlujoEfectivo/agencyBankAccounts/Index").default,
   },
 ];
