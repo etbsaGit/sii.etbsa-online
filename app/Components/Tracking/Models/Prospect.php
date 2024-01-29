@@ -3,6 +3,7 @@
 namespace App\Components\Tracking\Models;
 
 use App\Components\Common\Models\Estate;
+use App\Components\Customers\Models\Customers;
 use App\Components\User\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use App\Components\Common\Models\Township;
@@ -22,6 +23,7 @@ class Prospect extends Model
         'is_moral',
         'rfc',
         'company',
+        'customer_id',
         'estate_id',
         'township_id',
         'segmentacion',
@@ -60,6 +62,11 @@ class Prospect extends Model
         return $this->belongsTo(Township::class, 'township_id');
     }
 
+    public function customer()
+    {
+        return $this->belongsTo(Customers::class, 'customer_id');
+    }
+
     public function getTrackingCountAttribute()
     {
         return $this->tracking()->whereHas('estatus', function ($q) {
@@ -67,7 +74,7 @@ class Prospect extends Model
         })->count();
     }
 
-    public function scopeSearch($query, String $search)
+    public function scopeSearch($query, string $search)
     {
         $query->when($search ?? null, function ($query, $search) {
             $query->where(function ($query) use ($search) {
