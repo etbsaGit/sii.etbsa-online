@@ -11,6 +11,7 @@
             outlined
             elevation="4"
             color="light-blue lighten-5"
+            rounded="xl"
           >
             <v-toolbar flat dense class="overline">
               {{ info.detail.title }}
@@ -53,74 +54,24 @@
             <v-toolbar flat dense class="overline">
               Prospecto
               <v-spacer />
-              <v-dialog v-model="customer_dialog" persistent max-width="600px">
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn color="primary" dark v-bind="attrs" v-on="on">
-                    Asociar Cliente
-                  </v-btn>
-                </template>
-                <v-card>
-                  <v-card-title>
-                    <span class="text-h5">Asociar con un Cliente</span>
-                  </v-card-title>
-                  <v-card-text>
-                    <v-container>
-                      <v-row>
-                        <v-col cols="12">
-                          <v-autocomplete
-                            v-model="customer_id"
-                            :items="customers"
-                            item-value="id"
-                            item-text="full_name"
-                            label="Seleccionar Cliente"
-                            outlined
-                            required
-                          >
-                            <template v-slot:prepend-item>
-                              <v-list dense color="grey lighten-3">
-                                <v-list-item>
-                                  <v-list-item-content>
-                                    <v-list-item-title />
-                                    Registar Nuevo Cliente
-                                  </v-list-item-content>
-                                  <v-list-item-action>
-                                    <v-icon>mdi-account-plus</v-icon>
-                                  </v-list-item-action>
-                                </v-list-item>
-                              </v-list>
-                            </template>
-                            <template v-slot:item="{ item }">
-                              <v-list-item-title>
-                                {{ item.full_name }}
-                              </v-list-item-title>
-                              <v-list-item-subtitle>
-                                {{ item.rfc }}
-                              </v-list-item-subtitle>
-                            </template>
-                          </v-autocomplete>
-                        </v-col>
-                      </v-row>
-                    </v-container>
-                  </v-card-text>
-                  <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn
-                      color="blue darken-1"
-                      text
-                      @click="customer_dialog = false"
-                    >
-                      Cancelar
-                    </v-btn>
-                    <v-btn
-                      color="blue darken-1"
-                      text
-                      @click="associateCustomer()"
-                    >
-                      Guardar
-                    </v-btn>
-                  </v-card-actions>
-                </v-card>
-              </v-dialog>
+
+              <v-btn color="primary" dark @click="dialogEdit = true">
+                Editar Prospecto
+              </v-btn>
+
+              <dialog-component
+                :show="dialogEdit"
+                @close="dialogEdit = false"
+                closeable
+                :fullscreen="$vuetify.breakpoint.mobile"
+                title="Editar Prospecto"
+                :maxWidth="600"
+              >
+                <prospect-edit
+                  :propProspectId="info.prospect.id"
+                  :key="info.prospect.full_name"
+                ></prospect-edit>
+              </dialog-component>
             </v-toolbar>
             <v-divider></v-divider>
             <v-list-item three-line>
@@ -129,7 +80,7 @@
                   {{ info.prospect.full_name }}
                 </v-list-item-title>
                 <v-list-item-subtitle class="body-1">
-                  {{ info.prospect.company || "" }}
+                  {{ info.prospect?.customer?.full_name || "Prospecto Sin Cliente Asociado" }}
                 </v-list-item-subtitle>
                 <v-list-item-subtitle class="body-1">
                   <span class="text--primary">RFC:</span>
@@ -160,7 +111,7 @@
           </v-card>
         </v-list-item-content>
       </v-list-item>
-      <v-list-item v-if="info.customer">
+      <!-- <v-list-item v-if="info.customer">
         <v-list-item-icon v-show="this.$vuetify.breakpoint.mdAndUp">
           <v-icon color="indigo"> mdi-account </v-icon>
         </v-list-item-icon>
@@ -209,7 +160,7 @@
             </v-list-item>
           </v-card>
         </v-list-item-content>
-      </v-list-item>
+      </v-list-item> -->
 
       <v-list-item>
         <v-list-item-icon v-show="this.$vuetify.breakpoint.mdAndUp">
@@ -252,8 +203,11 @@
 </template>
 
 <script>
+import DialogComponent from "@admin/components/DialogComponent.vue";
 import Assertiveness from "@admin/sales/tracking/resources/assertiveness.json";
+import ProspectEdit from "@admin/sales/prospect/ProspectEdit.vue";
 export default {
+  components: { DialogComponent, ProspectEdit },
   props: {
     info: {
       required: true,
@@ -261,10 +215,11 @@ export default {
     },
   },
   mounted() {
-    this.loadCustomers();
+    // this.loadCustomers();
   },
   data() {
     return {
+      dialogEdit: false,
       customer_dialog: false,
       customers: [],
       customer_id: null,
@@ -294,40 +249,40 @@ export default {
       else if (value == "formalizado") return "blue";
       else return "primary";
     },
-    async loadCustomers() {
-      const _this = this;
-      let params = {
-        paginate: "no",
-      };
-      await axios
-        .get("/admin/customers", { params: params })
-        .then(function (response) {
-          let { data } = response.data;
-          _this.customers = data;
-        });
-    },
-    associateCustomer() {
-      const _this = this;
-      let params = {
-        customer_id: _this.customer_id,
-      };
-      axios
-        .put(
-          `/admin/tracking/associateCustomer/${_this.info.detail.id}`,
-          params
-        )
-        .then(function (response) {
-          _this.$store.commit("showSnackbar", {
-            message: response.data.message,
-            color: "success",
-            duration: 3000,
-          });
-          _this.customer_dialog = false;
-          _this.$eventBus.$emit("MESSAGE_ADDED");
-          // self.loadTrackings(() => {});
-          // cb();
-        });
-    },
+    // async loadCustomers() {
+    //   const _this = this;
+    //   let params = {
+    //     paginate: "no",
+    //   };
+    //   await axios
+    //     .get("/admin/customers", { params: params })
+    //     .then(function (response) {
+    //       let { data } = response.data;
+    //       _this.customers = data;
+    //     });
+    // },
+    // associateCustomer() {
+    //   const _this = this;
+    //   let params = {
+    //     customer_id: _this.customer_id,
+    //   };
+    //   axios
+    //     .put(
+    //       `/admin/tracking/associateCustomer/${_this.info.detail.id}`,
+    //       params
+    //     )
+    //     .then(function (response) {
+    //       _this.$store.commit("showSnackbar", {
+    //         message: response.data.message,
+    //         color: "success",
+    //         duration: 3000,
+    //       });
+    //       _this.customer_dialog = false;
+    //       _this.$eventBus.$emit("MESSAGE_ADDED");
+    //       // self.loadTrackings(() => {});
+    //       // cb();
+    //     });
+    // },
   },
 };
 </script>

@@ -4,7 +4,7 @@
     :options.sync="pagination"
     :items="items"
     :server-items-length="totalItems"
-    class="elevation-1 text-uppercase caption ma-2"
+    class="elevation-1 text-uppercase font-weight-bold caption ma-2"
     fixed-header
     dense
   >
@@ -30,6 +30,9 @@
           <v-btn class="primary" @click="dialogCreate = true">
             Registrar Prospecto
             <v-icon right>mdi-plus</v-icon>
+          </v-btn>
+          <v-btn class="accent ml-2" @click="loadProspects()">
+            <v-icon>mdi-refresh</v-icon>
           </v-btn>
         </v-card-title>
       </v-card>
@@ -67,12 +70,6 @@
         <v-list shaped>
           <v-list-item-group>
             <v-list-item @click="(editedId = item.id), (dialogEdit = true)">
-              <!-- @click="
-                $router.push({
-                  name: 'prospect.edit',
-                  params: { propProspectId: item.id },
-                })
-              " -->
               <v-list-item-icon>
                 <v-icon class="blue--text" left>mdi-pencil</v-icon>
               </v-list-item-icon>
@@ -80,34 +77,9 @@
                 <v-list-item-title>Editar Prospecto</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
-            <!-- <v-list-item
-              @click="
-                $router.push({
-                  name: 'tracking.create',
-                  params: { propProspectId: item.id },
-                })
-              "
-            >
-              <v-list-item-icon>
-                <v-icon class="blue--text">mdi-information-outline</v-icon>
-              </v-list-item-icon>
-              <v-list-item-content>
-                <v-list-item-title>Crear Seguimiento</v-list-item-title>
-              </v-list-item-content>
-            </v-list-item> -->
           </v-list-item-group>
         </v-list>
       </v-menu>
-    </template>
-    <template #[`item.full_name`]="{ item }">
-      <v-list-item dense class="pa-0">
-        <v-list-item-content class="pa-0">
-          <v-list-item-title>{{ item.full_name }}</v-list-item-title>
-          <v-list-item-subtitle v-if="item.is_moral">
-            {{ item.company }}
-          </v-list-item-subtitle>
-        </v-list-item-content>
-      </v-list-item>
     </template>
   </v-data-table>
 </template>
@@ -130,19 +102,25 @@ export default {
           align: "left",
           sortable: false,
         },
+        {
+          text: "Organizacion / Cliente",
+          value: "customer.full_name",
+          align: "left",
+          sortable: false,
+        },
         { text: "Telefono", value: "phone", align: "left", sortable: false },
-        {
-          text: "Email",
-          value: "email",
-          align: "left",
-          sortable: false,
-        },
-        {
-          text: "Proviene:",
-          value: "town",
-          align: "left",
-          sortable: false,
-        },
+        // {
+        //   text: "Email",
+        //   value: "email",
+        //   align: "left",
+        //   sortable: false,
+        // },
+        // {
+        //   text: "Proviene:",
+        //   value: "town",
+        //   align: "left",
+        //   sortable: false,
+        // },
         {
           text: "Seguimientos Activos:",
           value: "tracking_count",
@@ -156,6 +134,9 @@ export default {
         rowsPerPage: 10,
       },
       editedId: null,
+      options: {
+        customers: {},
+      },
 
       filters: {
         search: "",
@@ -198,6 +179,10 @@ export default {
         _this.pagination.totalItems = response.data.data.total;
         (cb || Function)();
       });
+    },
+    async getOptions() {
+      let res = await axios.get("/admin/options/prospects");
+      this.options = res.data.data.options;
     },
   },
 };

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Components\Customers\Repositories\CustomerRepository;
 use App\Components\Tracking\Repositories\ProspectRepository;
 use Illuminate\Http\Request;
 use Auth;
@@ -14,14 +15,17 @@ class ProspectController extends AdminController
      * @var ProspectRepository
      */
     private $prospectRepository;
+    private $customerRepository;
 
     /**
      * ProspectController constructor.
      * @param ProspectRepository $prospectRepository
+     * @param CustomerRepository $customerRepository
      */
-    public function __construct(ProspectRepository $prospectRepository)
+    public function __construct(ProspectRepository $prospectRepository, CustomerRepository $customerRepository)
     {
         $this->prospectRepository = $prospectRepository;
+        $this->customerRepository = $customerRepository;
     }
     /**
      * Display a listing of the resource.
@@ -31,7 +35,15 @@ class ProspectController extends AdminController
     public function index()
     {
         $data = $this->prospectRepository->listProspect(request()->all());
+        
         return $this->sendResponseOk($data, "list prospect ok.");
+    }
+
+    public function options() {
+
+;        $options['customers'] = $this->customerRepository->list(['paginate' => 'no'])->map->only('id', 'full_name', 'rfc');
+
+        return $this->sendResponseOk(compact('options'), "list prospect ok.");
     }
 
     /**
@@ -110,13 +122,15 @@ class ProspectController extends AdminController
             'full_name.required' => 'El Nombre es requerido',
         ]);
 
-        if ($validate->fails()) return $this->sendResponseBadRequest($validate->errors()->first());
+        if ($validate->fails())
+            return $this->sendResponseBadRequest($validate->errors()->first());
 
         $payload = $request->all();
 
         $updated = $this->prospectRepository->update($id, $payload);
 
-        if (!$updated) return $this->sendResponseBadRequest();
+        if (!$updated)
+            return $this->sendResponseBadRequest();
         return $this->sendResponseUpdated();
     }
 

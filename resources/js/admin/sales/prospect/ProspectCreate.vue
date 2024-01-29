@@ -15,6 +15,7 @@ export default {
         email: null,
         phone: null,
         company: null,
+        customer_id: null,
         full_name: null,
         is_moral: 0,
         estate_id: null,
