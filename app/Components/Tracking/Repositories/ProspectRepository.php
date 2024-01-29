@@ -20,7 +20,7 @@ class ProspectRepository extends BaseRepository
      */
     public function listProspect($params)
     {
-        return $this->get($params, ['user'], function ($q) use ($params) {
+        return $this->get($params, ['user','customer:id,full_name'], function ($q) use ($params) {
             $q->search($params['search'] ?? '');
             return $q;
         });
