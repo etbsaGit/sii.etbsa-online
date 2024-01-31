@@ -117,6 +117,7 @@
           outlined
           filled
           dense
+          clearable
         ></v-select>
       </v-col>
       <v-col cols="12">
