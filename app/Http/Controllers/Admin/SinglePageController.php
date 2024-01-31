@@ -40,10 +40,30 @@ class SinglePageController extends AdminController
                 'permission_requirements' => [],
                 'label' => 'Flujo Efectivo',
                 'nav_type' => MenuItem::$NAV_TYPE_NAV,
-                'icon' => 'mdi-crosshairs-gps',
-                'route_type' => 'vue',
-                'route_name' => 'poliza.ingresos.list',
+                'icon' => 'mdi-crosshairs-gps',  
                 'visible' => true,
+                'children' => [
+                    new MenuItem([
+                        'group_requirements' => ['Super User'],
+                        'permission_requirements' => [],
+                        'label' => 'Polizas',
+                        'nav_type' => MenuItem::$NAV_TYPE_NAV,
+                        'icon' => 'mdi-car-info',
+                        'route_type' => 'vue',
+                        'route_name' => 'poliza.ingresos.list',
+                        'visible' => true,
+                    ]),
+                    new MenuItem([
+                        'group_requirements' => ['Super User'],
+                        'permission_requirements' => [],
+                        'label' => 'Cuentas Sucursales',
+                        'nav_type' => MenuItem::$NAV_TYPE_NAV,
+                        'icon' => 'mdi-car-info',
+                        'route_type' => 'vue',
+                        'route_name' => 'cuentas.agencias',
+                        'visible' => true,
+                    ]),
+                ]
             ]),
             new MenuItem([
                 'group_requirements' => ['Super User', 'GPS'],
@@ -256,7 +276,7 @@ class SinglePageController extends AdminController
                         'visible' => true,
                     ]),
                     new MenuItem([
-                        'group_requirements' => ['Super User','Vendedor'],
+                        'group_requirements' => ['Super User', 'Vendedor'],
                         'permission_requirements' => [],
                         'label' => 'Reporte',
                         'nav_type' => MenuItem::$NAV_TYPE_NAV,

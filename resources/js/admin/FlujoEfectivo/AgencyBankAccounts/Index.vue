@@ -190,10 +190,9 @@ export default {
 
     async deleteItemConfirm() {
       const _this = this;
-      try {
-        console.log("DELETE", _this.editedIndex);
+      // try {
         await axios.delete(`/admin/agency-bank-accounts/${_this.editedIndex}`);
-      } catch (error) {}
+      // } catch (error) {}
       this.closeDelete();
       this.initialize();
     },
