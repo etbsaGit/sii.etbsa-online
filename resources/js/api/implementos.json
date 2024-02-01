@@ -1,0 +1,1010 @@
+[
+  {
+    "Categoria": "ARADOS",
+    "Modelo": "635-3 DISCOS",
+    "LISTA": "112644",
+    "FINANCIADO": "107012",
+    "CONTADO": "101379"
+  },
+  {
+    "Categoria": "ARADOS",
+    "Modelo": "645-4 DISCOS",
+    "LISTA": "130113",
+    "FINANCIADO": "123607",
+    "CONTADO": "117102"
+  },
+  {
+    "Categoria": "ARADOS",
+    "Modelo": "945-3 VERTEDERAS",
+    "LISTA": "109822",
+    "FINANCIADO": "104331",
+    "CONTADO": "98840"
+  },
+  {
+    "Categoria": "ARADOS",
+    "Modelo": "975 3 VERTEDERAS",
+    "LISTA": "250548",
+    "FINANCIADO": "238020",
+    "CONTADO": "225493"
+  },
+  {
+    "Categoria": "ARADOS",
+    "Modelo": "975 4 VERTEDERAS",
+    "LISTA": "309107",
+    "FINANCIADO": "293652",
+    "CONTADO": "278196"
+  },
+  {
+    "Categoria": "ARADOS",
+    "Modelo": "975 5 VERTEDERAS",
+    "LISTA": "360746",
+    "FINANCIADO": "342709",
+    "CONTADO": "324672"
+  },
+  {
+    "Categoria": "ARADOS",
+    "Modelo": "995 5 VERTEDERAS CON RUEDA APOYO",
+    "LISTA": "443817",
+    "FINANCIADO": "421626",
+    "CONTADO": "399435"
+  },
+  {
+    "Categoria": "ARADOS",
+    "Modelo": "3745 4 DISCOS REFORZADO",
+    "LISTA": "172923",
+    "FINANCIADO": "164276",
+    "CONTADO": "155630"
+  },
+  {
+    "Categoria": "ARADOS",
+    "Modelo": "3755 5 DISCOS REFORZADO",
+    "LISTA": "210848",
+    "FINANCIADO": "200306",
+    "CONTADO": "189763"
+  },
+  {
+    "Categoria": "ARADOS",
+    "Modelo": "610 8 PIES",
+    "LISTA": "129453",
+    "FINANCIADO": "122981",
+    "CONTADO": "116508"
+  },
+  {
+    "Categoria": "ROTURADOR",
+    "Modelo": "913/3",
+    "LISTA": "61580",
+    "FINANCIADO": "58501",
+    "CONTADO": "55422"
+  },
+  {
+    "Categoria": "ROTURADOR",
+    "Modelo": "913/3 RESORTES",
+    "LISTA": "216116",
+    "FINANCIADO": "205310",
+    "CONTADO": "194504"
+  },
+  {
+    "Categoria": "ROTURADOR",
+    "Modelo": "915/5",
+    "LISTA": "140808",
+    "FINANCIADO": "133768",
+    "CONTADO": "126727"
+  },
+  {
+    "Categoria": "ROTURADOR",
+    "Modelo": "915/7",
+    "LISTA": "159609",
+    "FINANCIADO": "151628",
+    "CONTADO": "143648"
+  },
+  {
+    "Categoria": "ROTURADOR",
+    "Modelo": "915/7 bast 7x7",
+    "LISTA": "173936",
+    "FINANCIADO": "165239",
+    "CONTADO": "156542"
+  },
+  {
+    "Categoria": "ROTURADOR",
+    "Modelo": "915/9 CON RUEDA SENCILLA",
+    "LISTA": "258569",
+    "FINANCIADO": "245641",
+    "CONTADO": "232712"
+  },
+  {
+    "Categoria": "ROTURADOR",
+    "Modelo": "915/9 con RUEDA DOBLE",
+    "LISTA": "296895",
+    "FINANCIADO": "282050",
+    "CONTADO": "267206"
+  },
+  {
+    "Categoria": "ROTURADOR",
+    "Modelo": "915/11 CON RUEDA DOBLE",
+    "LISTA": "424840",
+    "FINANCIADO": "403598",
+    "CONTADO": "382356"
+  },
+  {
+    "Categoria": "ROTURADOR",
+    "Modelo": "915/13 CON RUEDA DOBLE",
+    "LISTA": "435308",
+    "FINANCIADO": "413543",
+    "CONTADO": "391777"
+  },
+  {
+    "Categoria": "CULTIVADORAS",
+    "Modelo": "812 / 4",
+    "LISTA": "57498",
+    "FINANCIADO": "54623",
+    "CONTADO": "51748"
+  },
+  {
+    "Categoria": "CULTIVADORAS",
+    "Modelo": "812 / 6",
+    "LISTA": "74335",
+    "FINANCIADO": "70618",
+    "CONTADO": "66901"
+  },
+  {
+    "Categoria": "CULTIVADORAS",
+    "Modelo": "812 / 6 CON LLANTAS",
+    "LISTA": "93929",
+    "FINANCIADO": "89232",
+    "CONTADO": "84536"
+  },
+  {
+    "Categoria": "CULTIVADORAS",
+    "Modelo": "RUEDA ESTABILIZADORA PARA 812 *",
+    "LISTA": "26122",
+    "FINANCIADO": "24816",
+    "CONTADO": "23510"
+  },
+  {
+    "Categoria": "CULTIVADORAS",
+    "Modelo": "MX10 2.44MTS 6 RECTOS 3 CURVOS",
+    "LISTA": "53364",
+    "FINANCIADO": "50696",
+    "CONTADO": "48027"
+  },
+  {
+    "Categoria": "CULTIVADORAS",
+    "Modelo": "MX10 2.44MTS 2 RECTOS 3 CURVOS",
+    "LISTA": "38259",
+    "FINANCIADO": "36346",
+    "CONTADO": "34433"
+  },
+  {
+    "Categoria": "CULTIVADORAS",
+    "Modelo": "MX10 4.27MTS 8 RECTOS 5 CURVOS",
+    "LISTA": "74125",
+    "FINANCIADO": "70419",
+    "CONTADO": "66713"
+  },
+  {
+    "Categoria": "CULTIVADORAS",
+    "Modelo": "BARRA 2.44  *",
+    "LISTA": "31991",
+    "FINANCIADO": "30392",
+    "CONTADO": "28792"
+  },
+  {
+    "Categoria": "CULTIVADORAS",
+    "Modelo": "BARRA 3.05 *",
+    "LISTA": "33497",
+    "FINANCIADO": "31822",
+    "CONTADO": "30147"
+  },
+  {
+    "Categoria": "CULTIVADORAS",
+    "Modelo": "BARRA 3.66 *",
+    "LISTA": "34560",
+    "FINANCIADO": "32832",
+    "CONTADO": "31104"
+  },
+  {
+    "Categoria": "CULTIVADORAS",
+    "Modelo": "BARRA 4.27 *",
+    "LISTA": "35870",
+    "FINANCIADO": "34076",
+    "CONTADO": "32283"
+  },
+  {
+    "Categoria": "CULTIVADORAS",
+    "Modelo": "TIMON RECTO *",
+    "LISTA": "4176",
+    "FINANCIADO": "3967",
+    "CONTADO": "3759"
+  },
+  {
+    "Categoria": "CULTIVADORAS",
+    "Modelo": "TIMON CURVO  *",
+    "LISTA": "5068",
+    "FINANCIADO": "4814",
+    "CONTADO": "4561"
+  },
+  {
+    "Categoria": "DESVARADORAS",
+    "Modelo": "MX5 1.50 MTS",
+    "LISTA": "72816",
+    "FINANCIADO": "69175",
+    "CONTADO": "65534"
+  },
+  {
+    "Categoria": "DESVARADORAS",
+    "Modelo": "MX6 1.80 MTS",
+    "LISTA": "85068",
+    "FINANCIADO": "80815",
+    "CONTADO": "76561"
+  },
+  {
+    "Categoria": "DESVARADORAS",
+    "Modelo": "MX7 2.10 MTS",
+    "LISTA": "98143",
+    "FINANCIADO": "93236",
+    "CONTADO": "88329"
+  },
+  {
+    "Categoria": "DESVARADORAS",
+    "Modelo": "MX8 TIRO 2.5 MTS",
+    "LISTA": "188941",
+    "FINANCIADO": "179494",
+    "CONTADO": "170047"
+  },
+  {
+    "Categoria": "DESVARADORAS",
+    "Modelo": "MX8 LEVANTE 2.5 MTS",
+    "LISTA": "163550",
+    "FINANCIADO": "155372",
+    "CONTADO": "147195"
+  },
+  {
+    "Categoria": "DESVARADORAS",
+    "Modelo": "E12 TIRON FLEX",
+    "LISTA": "414013",
+    "FINANCIADO": "393312",
+    "CONTADO": "372611"
+  },
+  {
+    "Categoria": "DESVARADORAS",
+    "Modelo": "M15 TIRON  4.6 MTS FLEXIBLE",
+    "LISTA": "451510",
+    "FINANCIADO": "428934",
+    "CONTADO": "406359"
+  },
+  {
+    "Categoria": "DESVARADORAS",
+    "Modelo": "M20 TIRON   MTS FLEXIBLE",
+    "LISTA": "562226",
+    "FINANCIADO": "534115",
+    "CONTADO": "506004"
+  },
+  {
+    "Categoria": "DESVARADORAS",
+    "Modelo": "HX10 TIRON  3.2 MTS",
+    "LISTA": "239329",
+    "FINANCIADO": "227362",
+    "CONTADO": "215396"
+  },
+  {
+    "Categoria": "DESVARADORAS",
+    "Modelo": "HX14 LEVANTE PTO 1000",
+    "LISTA": "286326",
+    "FINANCIADO": "272010",
+    "CONTADO": "257694"
+  },
+  {
+    "Categoria": "DESVARADORAS",
+    "Modelo": "HX14 TIRO  PTO 1000",
+    "LISTA": "352760",
+    "FINANCIADO": "335122",
+    "CONTADO": "317484"
+  },
+  {
+    "Categoria": "DESVARADORAS",
+    "Modelo": "HX14 TIRO REFORZADA PTO 1000",
+    "LISTA": "288630",
+    "FINANCIADO": "274198",
+    "CONTADO": "259767"
+  },
+  {
+    "Categoria": "SEMBRADORAS",
+    "Modelo": "1015-2",
+    "LISTA": "164091",
+    "FINANCIADO": "155886",
+    "CONTADO": "147682"
+  },
+  {
+    "Categoria": "SEMBRADORAS",
+    "Modelo": "1015-4",
+    "LISTA": "327396",
+    "FINANCIADO": "311026",
+    "CONTADO": "294656"
+  },
+  {
+    "Categoria": "SEMBRADORAS",
+    "Modelo": "1015-4 machetes y dedos",
+    "LISTA": "347581",
+    "FINANCIADO": "330202",
+    "CONTADO": "312823"
+  },
+  {
+    "Categoria": "SEMBRADORAS",
+    "Modelo": "1015-4 discos, monitor, marcadores, micros",
+    "LISTA": "344265",
+    "FINANCIADO": "327052",
+    "CONTADO": "309839"
+  },
+  {
+    "Categoria": "SEMBRADORAS",
+    "Modelo": "1015-4 discos, sin momitor, marcadores micros",
+    "LISTA": "319981",
+    "FINANCIADO": "303982",
+    "CONTADO": "287983"
+  },
+  {
+    "Categoria": "SEMBRADORAS",
+    "Modelo": "1015 4 discos con monitor, marcadores micros disco doble fertilizante",
+    "LISTA": "384392",
+    "FINANCIADO": "365172",
+    "CONTADO": "345953"
+  },
+  {
+    "Categoria": "SEMBRADORAS",
+    "Modelo": "1035-4 MECANICA SIN MARCADORES",
+    "LISTA": "455849",
+    "FINANCIADO": "433057",
+    "CONTADO": "410265"
+  },
+  {
+    "Categoria": "SEMBRADORAS",
+    "Modelo": "1035-4 mecanica dedos comp micros sin marcadores",
+    "LISTA": "486426",
+    "FINANCIADO": "462104",
+    "CONTADO": "437783"
+  },
+  {
+    "Categoria": "SEMBRADORAS",
+    "Modelo": "1035-4 neumatica discos siembra reja abresurco\r\ncomputer",
+    "LISTA": "553674",
+    "FINANCIADO": "525990",
+    "CONTADO": "498307"
+  },
+  {
+    "Categoria": "SEMBRADORAS",
+    "Modelo": "1035 MECANICA DISCOS MARCADORES MICROS COMPUTER",
+    "LISTA": "521811",
+    "FINANCIADO": "495721",
+    "CONTADO": "469630"
+  },
+  {
+    "Categoria": "SEMBRADORAS",
+    "Modelo": "1035-4 NEUMATICA SIN MARCADORES, SIN LUCES DE SEG. SIN COMP, DISCO PROMAX 40",
+    "LISTA": "516014",
+    "FINANCIADO": "490214",
+    "CONTADO": "464413"
+  },
+  {
+    "Categoria": "SEMBRADORAS",
+    "Modelo": "1035-4 NEUMATICA DE DISCOS SIN MARCADORES SIN MONITOR",
+    "LISTA": "535811",
+    "FINANCIADO": "509020",
+    "CONTADO": "482230"
+  },
+  {
+    "Categoria": "SEMBRADORAS",
+    "Modelo": "1035-4 NEUMATICA EQUIPADA (MACHETE SIEMBRA, MARCADORES MONITOR LUCES DISCO PROMAX 40)",
+    "LISTA": "532772",
+    "FINANCIADO": "506133",
+    "CONTADO": "479494"
+  },
+  {
+    "Categoria": "SEMBRADORAS",
+    "Modelo": "1035-4 equipada de discos sin marcadores",
+    "LISTA": "553866",
+    "FINANCIADO": "526173",
+    "CONTADO": "498479"
+  },
+  {
+    "Categoria": "SEMBRADORAS",
+    "Modelo": "1035 6 SURCOS DISCO TRUVEE, MARCADORES,\r\nMICROS, LUCES, MONITOR",
+    "LISTA": "763192",
+    "FINANCIADO": "725032",
+    "CONTADO": "686872"
+  },
+  {
+    "Categoria": "SEMBRADORAS",
+    "Modelo": "1035 6 SURCOS DISCO TRUVEE SIN MARCADORES",
+    "LISTA": "587543",
+    "FINANCIADO": "558166",
+    "CONTADO": "528789"
+  },
+  {
+    "Categoria": "SEMBRADORAS",
+    "Modelo": "MARCADORES *",
+    "LISTA": "51744",
+    "FINANCIADO": "49156",
+    "CONTADO": "46569"
+  },
+  {
+    "Categoria": "SEMBRADORAS",
+    "Modelo": "KIT MACHETE DE SIEMBRA *",
+    "LISTA": "21828",
+    "FINANCIADO": "20737",
+    "CONTADO": "19646"
+  },
+  {
+    "Categoria": "SEMBRADORAS",
+    "Modelo": "MICROGRANULADORES*",
+    "LISTA": "25634",
+    "FINANCIADO": "24352",
+    "CONTADO": "23070"
+  },
+  {
+    "Categoria": "SEMBRADORAS",
+    "Modelo": "COMPUTER TRACK 150 *",
+    "LISTA": "25505",
+    "FINANCIADO": "24230",
+    "CONTADO": "22955"
+  },
+  {
+    "Categoria": "SEMBRADORAS",
+    "Modelo": "unidad de siembra unitaria 1035",
+    "LISTA": "117491",
+    "FINANCIADO": "111617",
+    "CONTADO": "105742"
+  },
+  {
+    "Categoria": "SEMBRADORAS",
+    "Modelo": "1755 4 surcos",
+    "LISTA": "953053",
+    "FINANCIADO": "905400",
+    "CONTADO": "857747"
+  },
+  {
+    "Categoria": "SEGADORA - DESMENUZADORA",
+    "Modelo": "390 DESP. 12\"",
+    "LISTA": "132804",
+    "FINANCIADO": "126163",
+    "CONTADO": "119523"
+  },
+  {
+    "Categoria": "SEGADORA - DESMENUZADORA",
+    "Modelo": "112 DESMENUZADORA CUCH LISAS",
+    "LISTA": "340369",
+    "FINANCIADO": "323350",
+    "CONTADO": "306332"
+  },
+  {
+    "Categoria": "SEGADORA - DESMENUZADORA",
+    "Modelo": "112 DESMENUZADORA CUCH REVESTIDAS",
+    "LISTA": "368858",
+    "FINANCIADO": "350415",
+    "CONTADO": "331972"
+  },
+  {
+    "Categoria": "SEGADORA - DESMENUZADORA",
+    "Modelo": "115 DESMENUZADORA CUCH LISAS",
+    "LISTA": "372011",
+    "FINANCIADO": "353411",
+    "CONTADO": "334810"
+  },
+  {
+    "Categoria": "SEGADORA - DESMENUZADORA",
+    "Modelo": "115 DESMENUZADORA CUCH REVESTIDAS",
+    "LISTA": "403384",
+    "FINANCIADO": "383215",
+    "CONTADO": "363045"
+  },
+  {
+    "Categoria": "SEGADORA - DESMENUZADORA",
+    "Modelo": "972 PICADORA DE FORRAJE",
+    "LISTA": "262874",
+    "FINANCIADO": "249730",
+    "CONTADO": "236587"
+  },
+  {
+    "Categoria": "SEGADORA - DESMENUZADORA",
+    "Modelo": "EXTENSION VERTICAL DE 972 *",
+    "LISTA": "6472",
+    "FINANCIADO": "6148",
+    "CONTADO": "5824"
+  },
+  {
+    "Categoria": "SEGADORA - DESMENUZADORA",
+    "Modelo": "EXTENSION HORIZONTAL DE 972 *",
+    "LISTA": "5095",
+    "FINANCIADO": "4840",
+    "CONTADO": "4585"
+  },
+  {
+    "Categoria": "FORRAJERO IMPORTADO",
+    "Modelo": "348 EMPACADORA  DE ALAMBRE (DOLARES)",
+    "LISTA": "34936",
+    "FINANCIADO": "33189",
+    "CONTADO": "31442"
+  },
+  {
+    "Categoria": "FORRAJERO IMPORTADO",
+    "Modelo": "348 EMPACADORA  DE HILO (DOLARES)",
+    "LISTA": "32189",
+    "FINANCIADO": "30580",
+    "CONTADO": "28970"
+  },
+  {
+    "Categoria": "FORRAJERO IMPORTADO",
+    "Modelo": "328 EMPACADORA  (DOLARES)",
+    "LISTA": "28565",
+    "FINANCIADO": "27137",
+    "CONTADO": "25708"
+  },
+  {
+    "Categoria": "FORRAJERO IMPORTADO",
+    "Modelo": "338 EMPACADORA  (DOLARES)",
+    "LISTA": "27124",
+    "FINANCIADO": "25768",
+    "CONTADO": "24412"
+  },
+  {
+    "Categoria": "FORRAJERO IMPORTADO",
+    "Modelo": "331 EMPACADORA GIGANTE  (DOLARES)",
+    "LISTA": "178942",
+    "FINANCIADO": "169995",
+    "CONTADO": "161047"
+  },
+  {
+    "Categoria": "FORRAJERO IMPORTADO",
+    "Modelo": "341 EMPACADORA GIGANTE  (DOLARES)",
+    "LISTA": "218147",
+    "FINANCIADO": "207240",
+    "CONTADO": "196332"
+  },
+  {
+    "Categoria": "FORRAJERO IMPORTADO",
+    "Modelo": "630 MOCO  MAYALES  (DOLARES)",
+    "LISTA": "38448",
+    "FINANCIADO": "36526",
+    "CONTADO": "34603"
+  },
+  {
+    "Categoria": "FORRAJERO IMPORTADO",
+    "Modelo": "630 MOCO  RODILLOS URETANO (DOLARES)",
+    "LISTA": "40471",
+    "FINANCIADO": "38447",
+    "CONTADO": "36424"
+  },
+  {
+    "Categoria": "FORRAJERO IMPORTADO",
+    "Modelo": "635 MOCO RODILLOS URETANO (DOLARES)",
+    "LISTA": "42755",
+    "FINANCIADO": "40617",
+    "CONTADO": "38480"
+  },
+  {
+    "Categoria": "FORRAJERO IMPORTADO",
+    "Modelo": "R160 SEGADORA DE 4 DISCOS",
+    "LISTA": "11802",
+    "FINANCIADO": "11212",
+    "CONTADO": "10622"
+  },
+  {
+    "Categoria": "FORRAJERO IMPORTADO",
+    "Modelo": "R200 SEGADORA DE 5 DISCOS",
+    "LISTA": "13554",
+    "FINANCIADO": "12876",
+    "CONTADO": "12199"
+  },
+  {
+    "Categoria": "FORRAJERO IMPORTADO",
+    "Modelo": "R240 SEGADORA DE 6 DISCOS",
+    "LISTA": "17205",
+    "FINANCIADO": "16345",
+    "CONTADO": "15485"
+  },
+  {
+    "Categoria": "FORRAJERO IMPORTADO",
+    "Modelo": "R280 SEGADORA DE 7 DISCOS",
+    "LISTA": "18587",
+    "FINANCIADO": "17658",
+    "CONTADO": "16728"
+  },
+  {
+    "Categoria": "FORRAJERO IMPORTADO",
+    "Modelo": "R310 SEGADORA DE 8 DISCOS",
+    "LISTA": "20750",
+    "FINANCIADO": "19713",
+    "CONTADO": "18675"
+  },
+  {
+    "Categoria": "RASTRAS",
+    "Modelo": "660 16 disco 22\" sin limpiadores",
+    "LISTA": "80985",
+    "FINANCIADO": "76936",
+    "CONTADO": "72886"
+  },
+  {
+    "Categoria": "RASTRAS",
+    "Modelo": "660 16 disco 24\"",
+    "LISTA": "104740",
+    "FINANCIADO": "99503",
+    "CONTADO": "94266"
+  },
+  {
+    "Categoria": "RASTRAS",
+    "Modelo": "660 18 disco 22\" sin limpiadores",
+    "LISTA": "82995",
+    "FINANCIADO": "78846",
+    "CONTADO": "74696"
+  },
+  {
+    "Categoria": "RASTRAS",
+    "Modelo": "660 18 1.90 MTS",
+    "LISTA": "109504",
+    "FINANCIADO": "104029",
+    "CONTADO": "98554"
+  },
+  {
+    "Categoria": "RASTRAS",
+    "Modelo": "660 20 2.10 MTS sin limpiadores",
+    "LISTA": "97709",
+    "FINANCIADO": "92823",
+    "CONTADO": "87938"
+  },
+  {
+    "Categoria": "RASTRAS",
+    "Modelo": "225-18 1.90 MTS",
+    "LISTA": "194931",
+    "FINANCIADO": "185184",
+    "CONTADO": "175438"
+  },
+  {
+    "Categoria": "RASTRAS",
+    "Modelo": "225-20 2.11 MTS",
+    "LISTA": "200576",
+    "FINANCIADO": "190547",
+    "CONTADO": "180518"
+  },
+  {
+    "Categoria": "RASTRAS",
+    "Modelo": "225-22 2.35 MTS",
+    "LISTA": "204880",
+    "FINANCIADO": "194636",
+    "CONTADO": "184392"
+  },
+  {
+    "Categoria": "RASTRAS",
+    "Modelo": "225-24 2.60 MTS",
+    "LISTA": "219912",
+    "FINANCIADO": "208917",
+    "CONTADO": "197921"
+  },
+  {
+    "Categoria": "RASTRAS",
+    "Modelo": "225-26 2.80 MTS",
+    "LISTA": "231519",
+    "FINANCIADO": "219943",
+    "CONTADO": "208367"
+  },
+  {
+    "Categoria": "RASTRAS",
+    "Modelo": "225-28 3.05 MTS",
+    "LISTA": "240750",
+    "FINANCIADO": "228712",
+    "CONTADO": "216675"
+  },
+  {
+    "Categoria": "RASTRAS",
+    "Modelo": "425-22 2.35 MTS",
+    "LISTA": "260492",
+    "FINANCIADO": "247467",
+    "CONTADO": "234443"
+  },
+  {
+    "Categoria": "RASTRAS",
+    "Modelo": "425-24 2.60 MTS",
+    "LISTA": "273454",
+    "FINANCIADO": "259782",
+    "CONTADO": "246109"
+  },
+  {
+    "Categoria": "RASTRAS",
+    "Modelo": "425-26 2.80 MTS",
+    "LISTA": "292110",
+    "FINANCIADO": "277504",
+    "CONTADO": "262899"
+  },
+  {
+    "Categoria": "RASTRAS",
+    "Modelo": "425-28 CON LUCES 3.05 MTS",
+    "LISTA": "306355",
+    "FINANCIADO": "291037",
+    "CONTADO": "275719"
+  },
+  {
+    "Categoria": "RASTRAS",
+    "Modelo": "425-36 CON LUCES",
+    "LISTA": "353897",
+    "FINANCIADO": "336202",
+    "CONTADO": "318508"
+  },
+  {
+    "Categoria": "RASTRAS",
+    "Modelo": "425-32 CON LUCES 3.50 MTS",
+    "LISTA": "329446",
+    "FINANCIADO": "312974",
+    "CONTADO": "296502"
+  },
+  {
+    "Categoria": "RASTRAS",
+    "Modelo": "425-28 SEP 11 CON LUCES 3.70 MTS",
+    "LISTA": "340208",
+    "FINANCIADO": "323198",
+    "CONTADO": "306188"
+  },
+  {
+    "Categoria": "RASTRAS",
+    "Modelo": "670-32 SEP. 9\" tiron hidraulico luces 3.50 mts",
+    "LISTA": "566014",
+    "FINANCIADO": "537713",
+    "CONTADO": "509413"
+  },
+  {
+    "Categoria": "RASTRAS",
+    "Modelo": "670-36 SEP. 9\" tiron hidraulico luces 4.00 mts",
+    "LISTA": "567622",
+    "FINANCIADO": "539240",
+    "CONTADO": "510859"
+  },
+  {
+    "Categoria": "RASTRAS",
+    "Modelo": "670-28 SEP. 11\"  tiron hidraulico luces 3.71 mts",
+    "LISTA": "564400",
+    "FINANCIADO": "536180",
+    "CONTADO": "507960"
+  },
+  {
+    "Categoria": "RASTRAS",
+    "Modelo": "670-42 SEP. 11\" tiron hidraulico luces 5.70 mts",
+    "LISTA": "570841",
+    "FINANCIADO": "542299",
+    "CONTADO": "513757"
+  },
+  {
+    "Categoria": "RASTRAS",
+    "Modelo": "670-50 discos sep 9",
+    "LISTA": "574862",
+    "FINANCIADO": "546119",
+    "CONTADO": "517376"
+  },
+  {
+    "Categoria": "RASTRAS",
+    "Modelo": "670 46 discos sep 11",
+    "LISTA": "573530",
+    "FINANCIADO": "544853",
+    "CONTADO": "516177"
+  },
+  {
+    "Categoria": "RASTRAS",
+    "Modelo": "680-24 SEP. 11\" 3.15 MTS",
+    "LISTA": "413025",
+    "FINANCIADO": "392374",
+    "CONTADO": "371722"
+  },
+  {
+    "Categoria": "RASTRAS",
+    "Modelo": "680-28 SEP. 11\" 3.70 MTS",
+    "LISTA": "437805",
+    "FINANCIADO": "415914",
+    "CONTADO": "394024"
+  },
+  {
+    "Categoria": "RASTRAS",
+    "Modelo": "DESTERRONADOR PARA 680",
+    "LISTA": "89423",
+    "FINANCIADO": "84952",
+    "CONTADO": "80480"
+  },
+  {
+    "Categoria": "RASTRAS",
+    "Modelo": "DISCO CERRADOR 14\" (Causa IVA si se vende solo)",
+    "LISTA": "3823",
+    "FINANCIADO": "3631",
+    "CONTADO": "3440"
+  },
+  {
+    "Categoria": "MONOSEM",
+    "Modelo": "SEMBRADORA   NC DE 4 HILERAS  NC 4-3-1MEX",
+    "LISTA": "28902",
+    "FINANCIADO": "27457",
+    "CONTADO": "26012"
+  },
+  {
+    "Categoria": "MONOSEM",
+    "Modelo": "SEMBRADORA   NC DE 4 HILERAS  NC 4-3-2MEX",
+    "LISTA": "30436",
+    "FINANCIADO": "28915",
+    "CONTADO": "27393"
+  },
+  {
+    "Categoria": "MONOSEM",
+    "Modelo": "SEMBRADORA   NC DE 4 HILERAS NC 4-3-3MEX",
+    "LISTA": "26017",
+    "FINANCIADO": "24716",
+    "CONTADO": "23415"
+  },
+  {
+    "Categoria": "MONOSEM",
+    "Modelo": "SEMBRADORA   NC DE 6 HILERAS",
+    "LISTA": "38121",
+    "FINANCIADO": "36215",
+    "CONTADO": "34309"
+  },
+  {
+    "Categoria": "MONOSEM",
+    "Modelo": "SEMBRADORA   NC DE 6 HILERAS NC 6-3-5MEX",
+    "LISTA": "40433",
+    "FINANCIADO": "38411",
+    "CONTADO": "36390"
+  },
+  {
+    "Categoria": "MONOSEM",
+    "Modelo": "SEMBRADORA   NC DE 6 HILERAS  NC 6-3-6MEX",
+    "LISTA": "33992",
+    "FINANCIADO": "32292",
+    "CONTADO": "30592"
+  },
+  {
+    "Categoria": "MONOSEM",
+    "Modelo": "SEMBRADORA   NG+ DE 4 HILERAS NG+ 4-3-1MEX",
+    "LISTA": "30242",
+    "FINANCIADO": "28730",
+    "CONTADO": "27218"
+  },
+  {
+    "Categoria": "MONOSEM",
+    "Modelo": "SEMBRADORA   NG+ DE 4 HILERAS NG+ 4-3-2MEX",
+    "LISTA": "30417",
+    "FINANCIADO": "28896",
+    "CONTADO": "27375"
+  },
+  {
+    "Categoria": "MONOSEM",
+    "Modelo": "SEMBRADORA   NG+ DE 4 HILERAS NG+ 4-3-3MEX",
+    "LISTA": "27367",
+    "FINANCIADO": "25999",
+    "CONTADO": "24630"
+  },
+  {
+    "Categoria": "MONOSEM",
+    "Modelo": "SEMBRADORA   NG+ DE 6 HILERAS NG+ 6-3-4MEX",
+    "LISTA": "40724",
+    "FINANCIADO": "38688",
+    "CONTADO": "36652"
+  },
+  {
+    "Categoria": "MONOSEM",
+    "Modelo": "SEMBRADORA   NG+ DE 6 HILERAS NG+ 6-3-5MEX",
+    "LISTA": "40987",
+    "FINANCIADO": "38937",
+    "CONTADO": "36888"
+  },
+  {
+    "Categoria": "MONOSEM",
+    "Modelo": "DOBLE HILERA NG+ DE 4 HILERAS MACHETE ABRESURCO/DISCO",
+    "LISTA": "34305",
+    "FINANCIADO": "32590",
+    "CONTADO": "30875"
+  },
+  {
+    "Categoria": "PALAS CARGADORAS",
+    "Modelo": "120R CARGADOR FRONTAL",
+    "LISTA": "74367",
+    "FINANCIADO": "70648",
+    "CONTADO": "66930"
+  },
+  {
+    "Categoria": "PALAS CARGADORAS",
+    "Modelo": "D120 CARGADOR FRONTAL",
+    "LISTA": "67545",
+    "FINANCIADO": "64167",
+    "CONTADO": "60790"
+  },
+  {
+    "Categoria": "PALAS CARGADORAS",
+    "Modelo": "512 CON JOYSTICK",
+    "LISTA": "122802",
+    "FINANCIADO": "116662",
+    "CONTADO": "110522"
+  },
+  {
+    "Categoria": "PALAS CARGADORAS",
+    "Modelo": "553  PARA 5E PR",
+    "LISTA": "158104",
+    "FINANCIADO": "150199",
+    "CONTADO": "142294"
+  },
+  {
+    "Categoria": "PALAS CARGADORAS",
+    "Modelo": "553 PARA 5E 9X3",
+    "LISTA": "155256",
+    "FINANCIADO": "147494",
+    "CONTADO": "139731"
+  },
+  {
+    "Categoria": "PALAS CARGADORAS",
+    "Modelo": "562 CON NIV PR",
+    "LISTA": "178928",
+    "FINANCIADO": "169981",
+    "CONTADO": "161035"
+  },
+  {
+    "Categoria": "PALAS CARGADORAS",
+    "Modelo": "562 CON NIV 9X3",
+    "LISTA": "180766",
+    "FINANCIADO": "171728",
+    "CONTADO": "162689"
+  },
+  {
+    "Categoria": "PALAS CARGADORAS",
+    "Modelo": "JOYSTICK",
+    "LISTA": "30705",
+    "FINANCIADO": "29170",
+    "CONTADO": "27634"
+  },
+  {
+    "Categoria": "PALAS CARGADORAS",
+    "Modelo": "563 SIN NIV 5E PR",
+    "LISTA": "146630",
+    "FINANCIADO": "139298",
+    "CONTADO": "131967"
+  },
+  {
+    "Categoria": "PALAS CARGADORAS",
+    "Modelo": "563 SIN NIV 6D CON JOYSTICK",
+    "LISTA": "195177",
+    "FINANCIADO": "185418",
+    "CONTADO": "175659"
+  },
+  {
+    "Categoria": "PALAS CARGADORAS",
+    "Modelo": "563 SIN NIV 6403",
+    "LISTA": "175140",
+    "FINANCIADO": "166383",
+    "CONTADO": "157626"
+  },
+  {
+    "Categoria": "PALAS CARGADORAS",
+    "Modelo": "563 CON NIV. 6D 6E 6403",
+    "LISTA": "186087",
+    "FINANCIADO": "176783",
+    "CONTADO": "167478"
+  },
+  {
+    "Categoria": "PALAS CARGADORAS",
+    "Modelo": "563 CON NIV 6J 4 CIL",
+    "LISTA": "212499",
+    "FINANCIADO": "201874",
+    "CONTADO": "191249"
+  },
+  {
+    "Categoria": "PALAS CARGADORAS",
+    "Modelo": "673 6E 6D 6603",
+    "LISTA": "229836",
+    "FINANCIADO": "218344",
+    "CONTADO": "206852"
+  },
+  {
+    "Categoria": "PALAS CARGADORAS",
+    "Modelo": "673 6J 4 CIL",
+    "LISTA": "256248",
+    "FINANCIADO": "243435",
+    "CONTADO": "230623"
+  },
+  {
+    "Categoria": "PALAS CARGADORAS",
+    "Modelo": "741 6140/6155J 7425/7525",
+    "LISTA": "316493",
+    "FINANCIADO": "300668",
+    "CONTADO": "284843"
+  }
+]
