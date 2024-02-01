@@ -1,8 +1,13 @@
 <template>
-  <v-data-table :headers="headers" :items="items" class="elevation-1" dense>
+  <v-data-table
+    :headers="headers"
+    :items="items"
+    class="elevation-3 text-uppercase font-weight-bold"
+    dense
+  >
     <template v-slot:top>
       <v-toolbar flat class="align-center">
-        <v-toolbar-title>Polizas</v-toolbar-title>
+        <v-toolbar-title>Polizas Ingresos</v-toolbar-title>
         <v-divider class="mx-4" inset vertical></v-divider>
         <v-spacer></v-spacer>
 
@@ -91,7 +96,7 @@
                   <v-col cols="12">
                     <v-textarea
                       v-model="editedItem.description"
-                      label="Descripcion d ePoliza"
+                      label="Descripcion de Poliza"
                       outlined
                     ></v-textarea>
                   </v-col>
@@ -129,6 +134,12 @@
         </v-btn>
       </v-toolbar>
     </template>
+    <template v-slot:[`item.amount`]="{ item, value }">
+      {{ value | money }} - {{ item?.currency?.name }}
+    </template>
+    <template v-slot:[`item.date_apply`]="{ value }">
+      {{ $appFormatters.formatDate(value, "LL") }}
+    </template>
     <template v-slot:[`item.actions`]="{ item }">
       <v-icon small class="mr-2" @click="editItem(item)"> mdi-pencil </v-icon>
       <v-icon small @click="deleteItem(item)"> mdi-delete </v-icon>
@@ -154,6 +165,7 @@ export default {
       },
       { text: "Origen Deposito", value: "payment_source" },
       { text: "Importe", value: "amount" },
+      { text: "Fecha Deposito", value: "date_apply" },
       { text: "Actions", value: "actions", sortable: false },
     ],
     items: [],
