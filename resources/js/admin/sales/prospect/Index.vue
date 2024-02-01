@@ -256,17 +256,21 @@
             <v-divider class="my-2" />
             <v-subheader>Etiquetas: </v-subheader>
             <v-chip-group active-class="white--text" column>
-              <v-chip color="blue" v-if="!!itemRow?.segmentacion">
-                {{ itemRow?.segmentacion }}
+              <v-chip color="pink" v-if="!!itemRow?.segmentacion" label>
+                <strong> {{ itemRow?.segmentacion }}</strong> &nbsp;
+                <span>(Segmentacion)</span>
               </v-chip>
-              <v-chip color="blue" v-if="!!itemRow?.capacidad_tech">
-                {{ itemRow?.capacidad_tech }}
+              <v-chip color="orange" v-if="!!itemRow?.capacidad_tech" label>
+                <strong> {{ itemRow?.capacidad_tech }}</strong> &nbsp;
+                <span>(Cap. Tech)</span>
               </v-chip>
-              <v-chip color="blue" v-if="!!itemRow?.rating">
-                {{ itemRow?.rating }}
+              <v-chip color="blue" v-if="!!itemRow?.rating" label>
+                <strong> {{ itemRow?.rating }}</strong> &nbsp;
+                <span>(Calif. Credito)</span>
               </v-chip>
-              <v-chip color="blue" v-if="!!itemRow?.tactica_jd">
-                {{ itemRow?.tactica_jd }}
+              <v-chip color="green" v-if="!!itemRow?.tactica_jd" label>
+                <strong> {{ itemRow?.tactica_jd }}</strong> &nbsp;
+                <span>(Tactica JD)</span>
               </v-chip>
             </v-chip-group>
           </v-card-text>
