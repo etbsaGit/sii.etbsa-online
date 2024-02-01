@@ -189,7 +189,7 @@
       <v-col v-if="show" cols="12" md="3">
         <v-card style="height: 100%" class="overflow-auto" dark>
           <v-toolbar dense flat class="pt-4">
-            <v-toolbar-title class="text-wrap">
+            <v-toolbar-title class="text-wrap text-uppercase">
               {{ itemRow?.full_name }}
             </v-toolbar-title>
             <v-spacer />
@@ -208,7 +208,7 @@
                   <v-list-item-title>{{
                     itemRow?.phone | VMask("(###) ###-####")
                   }}</v-list-item-title>
-                  <v-list-item-subtitle>Mobile</v-list-item-subtitle>
+                  <v-list-item-subtitle>Telefono</v-list-item-subtitle>
                 </v-list-item-content>
 
                 <v-list-item-icon>
@@ -218,23 +218,14 @@
 
               <v-divider inset></v-divider>
 
-              <v-list-item>
+              <v-list-item v-if="!!itemRow?.email">
                 <v-list-item-icon>
                   <v-icon color="indigo"> mdi-email </v-icon>
                 </v-list-item-icon>
 
                 <v-list-item-content>
-                  <v-list-item-title>aliconnors@example.com</v-list-item-title>
+                  <v-list-item-title>{{ itemRow?.email }}</v-list-item-title>
                   <v-list-item-subtitle>Personal</v-list-item-subtitle>
-                </v-list-item-content>
-              </v-list-item>
-
-              <v-list-item>
-                <v-list-item-action></v-list-item-action>
-
-                <v-list-item-content>
-                  <v-list-item-title>ali_connors@example.com</v-list-item-title>
-                  <v-list-item-subtitle>Work</v-list-item-subtitle>
                 </v-list-item-content>
               </v-list-item>
 
@@ -246,16 +237,36 @@
                 </v-list-item-icon>
 
                 <v-list-item-content>
-                  <v-list-item-title>1400 Main Street</v-list-item-title>
-                  <v-list-item-subtitle>Orlando, FL 79938</v-list-item-subtitle>
+                  <v-list-item-title>{{ itemRow?.town }}</v-list-item-title>
+                  <v-list-item-subtitle>
+                    {{ itemRow?.township?.estate?.name }},
+                    {{ itemRow?.township?.name }}
+                  </v-list-item-subtitle>
                 </v-list-item-content>
               </v-list-item>
             </v-list>
           </v-card-text>
-          <v-card-text class="overflow-auto">
+          <v-card-text class="overflow-auto text-uppercase">
+            <v-subheader>Cultivos: </v-subheader>
             <v-chip-group active-class="primary--text" column>
               <v-chip v-for="tag in cultivos" :key="tag">
                 {{ tag }}
+              </v-chip>
+            </v-chip-group>
+            <v-divider class="my-2" />
+            <v-subheader>Etiquetas: </v-subheader>
+            <v-chip-group active-class="white--text" column>
+              <v-chip color="blue" v-if="!!itemRow?.segmentacion">
+                {{ itemRow?.segmentacion }}
+              </v-chip>
+              <v-chip color="blue" v-if="!!itemRow?.capacidad_tech">
+                {{ itemRow?.capacidad_tech }}
+              </v-chip>
+              <v-chip color="blue" v-if="!!itemRow?.rating">
+                {{ itemRow?.rating }}
+              </v-chip>
+              <v-chip color="blue" v-if="!!itemRow?.tactica_jd">
+                {{ itemRow?.tactica_jd }}
               </v-chip>
             </v-chip-group>
           </v-card-text>
@@ -317,39 +328,39 @@ export default {
       options: {
         customers: [],
         cultivos: [
-        "Ajo",
-        "Alfalfa",
-        "Apio",
-        "Avena",
-        "Brócoli",
-        "Calabaza",
-        "Cebada",
-        "Cebada",
-        "Cebolla",
-        "Chile Poblano",
-        "Cilantro",
-        "Col",
-        "Coliflor",
-        "Esparrago",
-        "Espinaca",
-        "Fresa",
-        "Frijol",
-        "Lechuga",
-        "Maiz",
-        "Papa",
-        "Sorgo",
-        "Trigo",
-        "Zanahoria",
-        "Zanahoria",
-        "Zarzamora",
-        "Jicama",
-        "Hortalizas",
-        "Fresa",
-        "Jitomate",
-        "Chile Jalapeño",
-        "Chile Chilaca",
-        "Tomate",
-      ],
+          "Ajo",
+          "Alfalfa",
+          "Apio",
+          "Avena",
+          "Brócoli",
+          "Calabaza",
+          "Cebada",
+          "Cebada",
+          "Cebolla",
+          "Chile Poblano",
+          "Cilantro",
+          "Col",
+          "Coliflor",
+          "Esparrago",
+          "Espinaca",
+          "Fresa",
+          "Frijol",
+          "Lechuga",
+          "Maiz",
+          "Papa",
+          "Sorgo",
+          "Trigo",
+          "Zanahoria",
+          "Zanahoria",
+          "Zarzamora",
+          "Jicama",
+          "Hortalizas",
+          "Fresa",
+          "Jitomate",
+          "Chile Jalapeño",
+          "Chile Chilaca",
+          "Tomate",
+        ],
       },
 
       filters: {
@@ -357,7 +368,7 @@ export default {
         full_name: "",
         phone: "",
         segmentacion: [],
-        cultivos:[],
+        cultivos: [],
         rating: [],
         tactica_jd: [],
         capacidad_tech: [],
