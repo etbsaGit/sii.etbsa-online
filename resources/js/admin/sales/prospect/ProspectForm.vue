@@ -145,19 +145,55 @@
           filled
           dense
           clearable
-        />
+        >
+          <template v-slot:prepend-item>
+            <v-btn color="green" class="ma-2" dark block @click="dialog = true">
+              Registrar Cliente/Organizacion
+              <v-icon right>mdi-account-plus </v-icon>
+            </v-btn>
+          </template>
+
+          <template #item="{ item }">
+            <v-list-item-content>
+              <v-list-item-title class="text-uppercase font-weight-bold">
+                {{ item.full_name }}
+              </v-list-item-title>
+              <v-list-item-subtitle> RFC: {{ item.rfc }} </v-list-item-subtitle>
+            </v-list-item-content>
+          </template>
+        </v-autocomplete>
       </v-col>
     </v-row>
 
     <v-btn block type="submit" color="primary" :disabled="!valid">
       {{ textBtn }}
     </v-btn>
+
+    <dialog-component
+      :show="dialog"
+      @close="dialog = false"
+      :fullscreen="$vuetify.breakpoint.mobile"
+      title="Registrar Nuevo Cliente"
+      :maxWidth="600"
+      closeable
+      key="createCustomer"
+    >
+      <create-customer
+        @cancel="
+          dialog = false;
+          getFormOptions();
+        "
+      ></create-customer>
+    </dialog-component>
   </v-form>
 </template>
 <script>
 import { mixinEstates } from "~/common/mixin/estate_township.js";
+import DialogComponent from "@admin/components/DialogComponent.vue";
+import CreateCustomer from "@admin/customers/customers/Create.vue";
 export default {
   mixins: [mixinEstates],
+  components: { DialogComponent, CreateCustomer },
   props: {
     form: {
       type: Object,
@@ -175,6 +211,7 @@ export default {
   data() {
     return {
       valid: true,
+      dialog: false,
       rules: [(v) => !!v || "campo requerido."],
       formOptions: {
         customers: [],
