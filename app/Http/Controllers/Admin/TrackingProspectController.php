@@ -441,7 +441,7 @@ class TrackingProspectController extends AdminController
 
     public function print(TrackingProspect $trackingProspect)
     {
-        $data = $trackingProspect->load('prospect', 'assigned');
+        $data = $trackingProspect->load('prospect','prospect.township', 'assigned');
         $pdf = \PDF::loadView('pdf.quote', compact('data'));
         return $pdf->stream();
     }
