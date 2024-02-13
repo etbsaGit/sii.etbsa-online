@@ -6,7 +6,7 @@
           <v-icon color="indigo"> mdi-file-document </v-icon>
         </v-list-item-icon>
         <v-list-item-content class="px-2">
-          <!-- <v-card
+          <v-card
             class="mx-auto"
             outlined
             elevation="4"
@@ -36,9 +36,9 @@
                 {{ info.detail.description_topic }}
               </v-list-item-content>
             </v-list-item>
-          </v-card> -->
+          </v-card>
 
-          <v-card>
+          <!-- <v-card>
             <v-card-title>
               {{ info.detail.title }}
               <v-spacer />
@@ -106,7 +106,7 @@
                 </VCol>
               </VRow>
             </VCardText>
-          </v-card>
+          </v-card> -->
         </v-list-item-content>
       </v-list-item>
 
@@ -235,7 +235,7 @@
         </v-list-item-content>
       </v-list-item> -->
 
-      <!-- <v-list-item>
+      <v-list-item>
         <v-list-item-icon v-show="this.$vuetify.breakpoint.mdAndUp">
           <v-icon color="indigo"> mdi-account-box-outline </v-icon>
         </v-list-item-icon>
@@ -270,7 +270,7 @@
             </v-list-item>
           </v-card>
         </v-list-item-content>
-      </v-list-item> -->
+      </v-list-item>
     </v-list>
   </v-card>
 </template>
