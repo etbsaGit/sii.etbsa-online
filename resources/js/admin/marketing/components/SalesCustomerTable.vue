@@ -285,15 +285,16 @@
           <v-btn icon @click="cleanFilter" class="mr-2">
             <v-icon color="red">mdi-filter-remove-outline</v-icon>
           </v-btn>
-          <v-btn
+          <!-- <v-btn
             class="mr-2"
             @click="exportToCsv('sales_customers.xlsx', items)"
             color="grey"
             dark
+
           >
             Exportar
             <v-icon right color="green">mdi-file-excel</v-icon>
-          </v-btn>
+          </v-btn> -->
           <v-btn @click="searchBtn()" dark>
             Buscar
             <v-icon right color="blue">mdi-magnify</v-icon>
