@@ -33,6 +33,7 @@ class TrackingRepository extends BaseRepository
                 'attended.profiable.agency:id,title',
                 'estatus:id,title,key',
                 'moneda:id,name',
+                'quotation',
             ],
             function ($query) use ($params) {
                 $query->where(function ($query) use ($params) {

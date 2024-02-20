@@ -1,6 +1,6 @@
 <template>
   <v-card flat>
-    <v-app-bar>
+    <!-- <v-app-bar>
       <v-tabs v-model="tab" icons-and-text centered grow>
         <v-tabs-slider color="purple"></v-tabs-slider>
         <v-tab
@@ -11,12 +11,12 @@
           {{ item.title }} <v-icon>{{ item.icon }}</v-icon>
         </v-tab>
       </v-tabs>
-    </v-app-bar>
+    </v-app-bar> -->
 
     <v-slide-x-transition>
-      <keep-alive>
+      <!-- <keep-alive> -->
         <router-view></router-view>
-      </keep-alive>
+      <!-- </keep-alive> -->
     </v-slide-x-transition>
   </v-card>
 </template>
