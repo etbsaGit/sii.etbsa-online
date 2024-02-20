@@ -3,8 +3,8 @@
     <v-card-title>
       DASHBOARD CRM
       <v-spacer />
-      <v-btn icon @click="getData()">
-        <v-icon>mdi-refresh</v-icon>
+      <v-btn color="primary" @click="getData()" dark>
+        Actualizar <v-icon right>mdi-refresh</v-icon>
       </v-btn>
     </v-card-title>
     <v-card-subtitle class="py-4">
@@ -172,8 +172,7 @@
               v-for="item in props.items"
               :key="item.vendedor"
               cols="12"
-              sm="6"
-              md="4"
+              md="6"
             >
               <v-card color="indigo lighten-5">
                 <v-card-title class="subheading font-weight-bold">
@@ -193,6 +192,7 @@
                         <th class="text-right">Activos</th>
                         <th class="text-right">Perdidas</th>
                         <th class="text-right">Ganadas</th>
+                        <th class="text-right">Comision</th>
                       </tr>
                     </thead>
 
@@ -217,6 +217,21 @@
                             group["Venta Ganada_count"] || 0
                           }})
                         </td>
+                        <!-- TD Comision -->
+                        <td class="text-right">
+                          <span
+                            v-if="
+                              category == 'tractores' ||
+                              category == 'construccion'
+                            "
+                          >
+                            {{
+                              group["Venta Ganada_commission"] || 0 | currency
+                            }}
+                          </span>
+                          <span v-else> N/A </span>
+                          ({{ group["Venta Ganada_quotation_count"] || 0 }})
+                        </td>
                       </tr>
                     </tbody>
                   </template>
@@ -240,6 +255,7 @@
               <th class="text-right">Activos</th>
               <th class="text-right">Perdidas</th>
               <th class="text-right">Ganadas</th>
+              <th class="text-right">Comision</th>
             </tr>
           </thead>
 
@@ -247,19 +263,22 @@
             <tr v-for="(group, seller) in vendedoresAgrupadas" :key="seller">
               <td>{{ seller }}</td>
               <td class="text-right">
-                {{ group.Activo || 0 | currency }} ({{
-                  group.Activo_count || 0
-                }})
+                {{ group.Activo || 0 | currency }}
+                ({{ group.Activo_count || 0 }})
               </td>
               <td class="text-right">
-                {{ group["Venta Perdida"] || 0 | currency }} ({{
-                  group["Venta Perdida_count"] || 0
-                }})
+                {{ group["Venta Perdida"] || 0 | currency }}
+                ({{ group["Venta Perdida_count"] || 0 }})
               </td>
               <td class="text-right">
-                {{ group["Venta Ganada"] || 0 | currency }} ({{
-                  group["Venta Ganada_count"] || 0
-                }})
+                {{ group["Venta Ganada"] || 0 | currency }}
+                ({{ group["Venta Ganada_count"] || 0 }})
+              </td>
+              <td class="text-right">
+                <span>
+                  {{ group["Venta Ganada_comission"] || 0 | currency }}
+                </span>
+                ({{ group["Venta Ganada_quotation_count"] || 0 }})
               </td>
             </tr>
           </tbody>
@@ -474,6 +493,8 @@ export default {
             estatus,
             total_comprado,
             count,
+            quotation_count,
+            commission,
             photo,
           } = vendedor;
 
@@ -506,6 +527,12 @@ export default {
           grupoVendedor.categorias[category][estatus] =
             (grupoVendedor.categorias[category][estatus] || 0) + total_comprado;
           grupoVendedor.categorias[category][`${estatus}_count`] = count;
+
+          grupoVendedor.categorias[category][`${estatus}_commission`] =
+            (grupoVendedor.categorias[category][`${estatus}_commission`] || 0) +
+            commission;
+          grupoVendedor.categorias[category][`${estatus}_quotation_count`] =
+            quotation_count;
           // grupoVendedor.categorias[category][estatus] = {
           //   total_comprado,
           //   count,
@@ -520,7 +547,14 @@ export default {
     vendedoresAgrupadas() {
       const Sellers = {};
       this.seguimientosPorVendedor.forEach((item) => {
-        const { vendedor, estatus, total_comprado, count } = item;
+        const {
+          vendedor,
+          estatus,
+          total_comprado,
+          count,
+          commission,
+          quotation_count,
+        } = item;
         let seller = vendedor
           .toLowerCase()
           .normalize("NFD")
@@ -531,6 +565,9 @@ export default {
         Sellers[seller][estatus] =
           (Sellers[seller][estatus] || 0) + total_comprado;
         Sellers[seller][`${estatus}_count`] = count;
+        Sellers[seller][`${estatus}_comission`] =
+          (Sellers[seller][`${estatus}_comission`] || 0) + commission;
+        Sellers[seller][`${estatus}_quotation_count`] = quotation_count;
       });
       return Sellers;
     },

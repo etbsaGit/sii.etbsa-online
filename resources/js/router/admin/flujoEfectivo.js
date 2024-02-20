@@ -6,11 +6,35 @@ export const flujo_efectivo = [
       {
         path: "ingresos",
         name: "poliza.ingresos.list",
+        props: () => ({ propTipoPoliza: "ingresos" }),
+        component: require("@admin/FlujoEfectivo/PolizaIngresos/Index").default,
+      },
+      {
+        path: "create",
+        name: "poliza.ingresos.create",
+        props: () => ({ propTipoPoliza: "ingresos" }),
+        component: require("@admin/FlujoEfectivo/PolizaIngresos/Create")
+          .default,
+      },
+      {
+        path: "no-identificados",
+        name: "poliza.ingresos.unidentified",
+        props: () => ({
+          propTipoPoliza: "ingresos",
+          unidentified: true,
+        }),
         component: require("@admin/FlujoEfectivo/PolizaIngresos/Index").default,
       },
       {
         path: "egresos",
         name: "poliza.egresos.list",
+        props: () => ({ propTipoPoliza: "egresos" }),
+        component: require("@admin/FlujoEfectivo/PolizaEgresos/Index").default,
+      },
+      {
+        path: "transferencias",
+        name: "poliza.tranferencias.list",
+        props: () => ({ propTipoPoliza: "Tranferencias" }),
         component: require("@admin/FlujoEfectivo/PolizaEgresos/Index").default,
       },
     ],

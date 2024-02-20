@@ -51,12 +51,19 @@ class TrackingDashboardController extends AdminController
                 return $item->attended_by . '_' . $item->estatus_id;
             }
         })->map(function ($groupedItems) {
+            $groupedItemsWithQuotations = $groupedItems->filter(function ($item) {
+                return $item->quotation->count() >= 1 && ($item->title == 'TRACTORES' || $item->title == 'CONSTRUCCION');
+            });
+
+            // Calcular la comisión solo para los $groupedItems que tienen una o más cotizaciones
+            $commission = $groupedItemsWithQuotations->isEmpty() ? null : $groupedItemsWithQuotations->sum('amount') * 0.01;
             return [
                 'vendedor' => $groupedItems[0]->attended->name,
-               
                 'estatus' => $groupedItems[0]->estatus->title,
                 'total_comprado' => $groupedItems->sum('amount'),
-                'count' => $groupedItems->count()
+                'count' => $groupedItems->count(),
+                'quotation_count' => $groupedItemsWithQuotations->count(),
+                'commission' => $commission
             ];
         })->values();
         $seguimientosPorVendedorCategoria = $data->groupBy(function ($item) {
@@ -68,13 +75,26 @@ class TrackingDashboardController extends AdminController
                 return $item->attended_by . '_' . $item->title . '_' . $item->estatus_id;
             }
         })->map(function ($groupedItems) {
+            // $quotationCountSum = $groupedItems->sum(function ($item) {
+            //     return $item->quotation->count();
+            // });
+            // Filtrar $groupedItems que tienen una o más cotizaciones
+            $groupedItemsWithQuotations = $groupedItems->filter(function ($item) {
+                return $item->quotation->count() >= 1;
+            });
+
+            // Calcular la comisión solo para los $groupedItems que tienen una o más cotizaciones
+            $commission = $groupedItemsWithQuotations->isEmpty() ? null : $groupedItemsWithQuotations->sum('amount') * 0.01;
+
             return [
                 'vendedor' => $groupedItems[0]->attended->name,
                 'photo' => $groupedItems[0]->attended->path ?? null,
                 'categoria' => $groupedItems[0]->title,
                 'estatus' => $groupedItems[0]->estatus->title,
                 'total_comprado' => $groupedItems->sum('amount'),
-                'count' => $groupedItems->count()
+                'count' => $groupedItems->count(),
+                'quotation_count' => $groupedItemsWithQuotations->count(),
+                'commission' => $commission
             ];
         })->values();
 
@@ -137,43 +157,43 @@ class TrackingDashboardController extends AdminController
                     'total' => $item->amount,
                 ];
             })->groupBy('month')->map(function ($group) {
-            return [
-                'total' => $group->sum('total'),
-                'count' => $group->count(),
-            ];
-        })->sortKeys()->union(array_fill_keys(range(1, 12), ['total' => 0, 'count' => 0]))->sortKeys();
+                return [
+                    'total' => $group->sum('total'),
+                    'count' => $group->count(),
+                ];
+            })->sortKeys()->union(array_fill_keys(range(1, 12), ['total' => 0, 'count' => 0]))->sortKeys();
 
         $lineChart['perdidasDelAñoActual'] = $data->where('estatus_id', 2)
             ->whereNotNull('date_lost_sale')
             ->filter(function ($item) use ($year) {
                 return Carbon::parse($item->date_lost_sale)->year === $year;
             })->map(function ($item) {
-            return [
-                'month' => Carbon::parse($item->date_lost_sale)->month,
-                'total' => $item->amount,
-            ];
-        })->groupBy('month')->map(function ($group) {
-            return [
-                'total' => $group->sum('total'),
-                'count' => $group->count(),
-            ];
-        })->sortKeys()->union(array_fill_keys(range(1, 12), ['total' => 0, 'count' => 0]))->sortKeys();
+                return [
+                    'month' => Carbon::parse($item->date_lost_sale)->month,
+                    'total' => $item->amount,
+                ];
+            })->groupBy('month')->map(function ($group) {
+                return [
+                    'total' => $group->sum('total'),
+                    'count' => $group->count(),
+                ];
+            })->sortKeys()->union(array_fill_keys(range(1, 12), ['total' => 0, 'count' => 0]))->sortKeys();
 
         $lineChart['ganadasDelAñoActual'] = $data->where('estatus_id', 3)
             ->whereNotNull('date_won_sale')
             ->filter(function ($item) use ($year) {
                 return Carbon::parse($item->date_won_sale)->year === $year;
             })->map(function ($item) {
-            return [
-                'month' => Carbon::parse($item->date_won_sale)->month,
-                'total' => $item->amount,
-            ];
-        })->groupBy('month')->map(function ($group) {
-            return [
-                'total' => $group->sum('total'),
-                'count' => $group->count(),
-            ];
-        })->sortKeys()->union(array_fill_keys(range(1, 12), ['total' => 0, 'count' => 0]))->sortKeys();
+                return [
+                    'month' => Carbon::parse($item->date_won_sale)->month,
+                    'total' => $item->amount,
+                ];
+            })->groupBy('month')->map(function ($group) {
+                return [
+                    'total' => $group->sum('total'),
+                    'count' => $group->count(),
+                ];
+            })->sortKeys()->union(array_fill_keys(range(1, 12), ['total' => 0, 'count' => 0]))->sortKeys();
 
         return $this->sendResponseOk(
             compact(
