@@ -1,17 +1,30 @@
 <template>
-  <v-data-table :headers="headers" :items="items" class="elevation-1" dense>
+  <v-data-table
+    :headers="headers"
+    :items="items"
+    :options.sync="pagination"
+    :server-items-length="totalItems"
+    class="elevation-3 text-uppercase font-weight-bold"
+    dense
+  >
     <template v-slot:top>
       <v-toolbar flat class="align-center">
-        <v-toolbar-title>Cuentas de Sucursales</v-toolbar-title>
+        <v-toolbar-title>{{ propTipoPoliza }}</v-toolbar-title>
         <v-divider class="mx-4" inset vertical></v-divider>
         <v-spacer></v-spacer>
 
-        <v-text-field label="Buscar" class="mr-1" hide-details outlined dense></v-text-field>
+        <v-text-field
+          label="Buscar"
+          class="mr-1"
+          hide-details
+          outlined
+          dense
+        ></v-text-field>
 
-        <v-dialog v-model="dialog" max-width="500px">
+        <v-dialog v-model="dialog" max-width="600px">
           <template v-slot:activator="{ on, attrs }">
             <v-btn color="primary" dark v-bind="attrs" v-on="on">
-              Registrar Nueva Cuenta
+              Registrar Ingreso
             </v-btn>
           </template>
           <v-card>
@@ -23,35 +36,94 @@
               <v-container>
                 <v-row>
                   <v-col cols="12">
-                    <v-text-field
-                      v-model="editedItem.bank_name"
-                      label="Nombre del Banco"
+                    <v-select
+                      v-model.number="editedItem.apply_bank_accounts_id"
+                      :items="options.agency_bank_accounts"
+                      item-value="id"
+                      item-text="bank_name"
+                      label="Cuenta de Sucursal"
                       outlined
+                      dense
+                    ></v-select>
+                  </v-col>
+
+                  <v-col cols="12" md="6">
+                    <v-text-field
+                      v-model.number="editedItem.amount"
+                      label="Importe"
+                      outlined
+                      dense
                     ></v-text-field>
                   </v-col>
-                  <v-col cols="12">
+                  <v-col cols="12" md="6">
                     <v-select
-                      v-model="editedItem.agency_id"
-                      :items="options.agencies"
+                      v-model.number="editedItem.currency_id"
+                      :items="options.currencies"
+                      item-value="id"
+                      item-text="name"
+                      label="Moneda"
+                      outlined
+                      dense
+                    ></v-select>
+                  </v-col>
+
+                  <v-col cols="12" md="6">
+                    <v-select
+                      v-model.number="editedItem.payment_source_id"
+                      :items="options.payment_sources"
                       item-value="id"
                       item-text="title"
-                      label="Sucursal"
+                      label="Forma Pago"
                       outlined
+                      dense
+                    ></v-select>
+                  </v-col>
+                  <v-col cols="12" md="6">
+                    <v-select
+                      v-model.number="editedItem.category_id"
+                      :items="options.category"
+                      item-value="id"
+                      item-text="name"
+                      label="Categoria"
+                      outlined
+                      dense
                     ></v-select>
                   </v-col>
                   <v-col cols="12">
                     <v-text-field
-                      v-model="editedItem.account_number"
-                      label="Numeor de Cuenta"
+                      v-model="editedItem.reference_number"
+                      label="Numero Cliente"
+                      persistent-hint
                       outlined
+                      dense
                     ></v-text-field>
                   </v-col>
                   <v-col cols="12">
                     <v-text-field
-                      v-model="editedItem.balance"
-                      label="Balance"
+                      v-model="editedItem.reference_name"
+                      label="Nombre Cliente"
+                      persistent-hint
                       outlined
+                      dense
                     ></v-text-field>
+                  </v-col>
+                  <v-col cols="12">
+                    <v-text-field
+                      v-model="editedItem.reference_concept"
+                      label="Referencia"
+                      hint="Folio, Factura, Numero de Referencia"
+                      persistent-hint
+                      outlined
+                      dense
+                    ></v-text-field>
+                  </v-col>
+                  <v-col cols="12">
+                    <v-textarea
+                      v-model="editedItem.description"
+                      label="Descripcion"
+                      outlined
+                      dense
+                    ></v-textarea>
                   </v-col>
                 </v-row>
               </v-container>
@@ -60,14 +132,14 @@
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn color="blue darken-1" text @click="close"> Cancel </v-btn>
-              <v-btn color="blue darken-1" text @click="save"> Save </v-btn>
+              <v-btn color="blue darken-1" text @click="save"> Guardar </v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
         <v-dialog v-model="dialogDelete" max-width="500px">
           <v-card>
             <v-card-title class="text-h5">
-              Seguro en Elimar Cuenta de Sucursal?
+              Seguro en Elimar Polizal?
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
@@ -82,8 +154,22 @@
           </v-card>
         </v-dialog>
 
-        <v-btn color="accent" class="ml-2" @click="initialize" dark> Actualizar </v-btn>
+        <v-btn color="accent" class="ml-2" @click="initialize" dark>
+          Actualizar
+        </v-btn>
       </v-toolbar>
+    </template>
+    <template v-slot:[`item.amount`]="{ item, value }">
+      {{ value | money }} - {{ item?.currency?.name }}
+    </template>
+    <template v-slot:[`item.is_applied`]="{ item, value }">
+      <v-icon :color="value ? 'primary' : 'grey'" @click="deleteItem(item)">
+        mdi-check-circle
+      </v-icon>
+    </template>
+  
+    <template v-slot:[`item.created_at`]="{ value }">
+      {{ $appFormatters.formatDate(value, "L") }}
     </template>
     <template v-slot:[`item.actions`]="{ item }">
       <v-icon small class="mr-2" @click="editItem(item)"> mdi-pencil </v-icon>
@@ -97,45 +183,80 @@
 
 <script>
 export default {
+  props: ["propTipoPoliza"],
   data: () => ({
     dialog: false,
     dialogDelete: false,
     headers: [
-      { text: "Nombre Banco", value: "bank_name" },
       {
-        text: "Sucursal",
+        text: "Cuenta Afectada",
         align: "start",
         sortable: false,
-        value: "agency.title",
+        value: "apply_agency_bank_account.bank_name",
       },
-      { text: "Numero Cuenta", value: "account_number" },
-      { text: "Balance", value: "balance" },
+      { text: "Forma PAgo", value: "payment_source.title" },
+      { text: "Importe", value: "amount" },
+      { text: "Categoria", value: "category.name" },
+      { text: "Fecha Registro", value: "created_at" },
+      { text: "Usuario Registro", value: "created_user.name" },
+      { text: "Aplicado", value: "is_applied" },
+      
       { text: "Actions", value: "actions", sortable: false },
     ],
     items: [],
     options: {
-      agencies: [],
+      agency_bank_accounts: [],
+      currencies: [],
+      payment_sources: [],
+      category: [],
     },
+    pagination: {
+      itemsPerPage: 10,
+      page: 1,
+    },
+    totalItems: 0,
     editedIndex: -1,
     editedItem: {
-      id: null,
-      agency_id: null,
-      bank_name: null,
-      account_number: null,
-      balance: null,
+      // external_id: null,
+      reference_number: null,
+      reference_name: null,
+      reference_concept: null,
+      description: null,
+      amount: 0,
+      currency_id: 1,
+      payment_source_id: 1,
+      tipo_poliza_id: 1,
+      category_id: null,
+      // origen_bank_accounts_id: null,
+      apply_bank_accounts_id: null,
+      is_applied: false,
+      // apply_date: null,
+      // user_created: null,
+      // user_updated: null,
     },
     defaultItem: {
-      id: null,
-      agency_id: null,
-      bank_name: null,
-      account_number: null,
-      balance: null,
+      // external_id: null,
+      reference_number: null,
+      reference_name: null,
+      reference_concept: null,
+      description: null,
+      amount: 0,
+      currency_id: 1,
+      payment_source_id: 1,
+      tipo_poliza_id: 1,
+      category_id: null,
+      // origen_bank_accounts_id: null,
+      apply_bank_accounts_id: null,
+      is_applied: false,
+      // apply_date: null,
+      // user_created: null,
+      // user_updated: null,
     },
   }),
 
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? "Nueva Cuenta" : "Editar Cuenta";
+      return this.editedIndex === -1 ? "Registrar Poliza" : "Editar Poliza";
     },
   },
 
@@ -146,21 +267,36 @@ export default {
     dialogDelete(val) {
       val || this.closeDelete();
     },
+    pagination: {
+      handler: _.debounce(function (v) {
+        this.initialize(() => {});
+      }, 700),
+      deep: true,
+    },
   },
 
-  created() {
+  mounted() {
     this.initialize();
+    this.getOptions();
   },
 
   methods: {
     async initialize() {
       const _this = this;
+
+      let params = {
+        tipo_poliza: "ingreso",
+        page: _this.pagination.page,
+        per_page: _this.pagination.itemsPerPage,
+      };
+
       try {
         let {
           data: { data, message },
-        } = await axios.get("/admin/agency-bank-accounts");
-        _this.items = data.accounts;
-        _this.options = data.options;
+        } = await axios.get("/admin/polizas", { params });
+        _this.items = data.data;
+        _this.totalItems = data.data.total;
+        _this.pagination.totalItems = data.data.total;
 
         _this.$store.commit("showSnackbar", {
           message: message,
@@ -192,7 +328,7 @@ export default {
       const _this = this;
       try {
         console.log("DELETE", _this.editedIndex);
-        await axios.delete(`/admin/agency-bank-accounts/${_this.editedIndex}`);
+        await axios.delete(`/admin/polizas/${_this.editedIndex}`);
       } catch (error) {}
       this.closeDelete();
       this.initialize();
@@ -204,7 +340,6 @@ export default {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
       });
-      
     },
 
     closeDelete() {
@@ -220,17 +355,42 @@ export default {
       if (this.editedIndex > -1) {
         try {
           await axios.put(
-            `/admin/agency-bank-accounts/${_this.editedIndex}`,
+            `/admin/polizas/${_this.editedIndex}`,
             _this.editedItem
           );
-        } catch (error) {}
+        } catch (error) {
+          return;
+        }
       } else {
         try {
-          await axios.post(`/admin/agency-bank-accounts`, _this.editedItem);
-        } catch (error) {}
+          await axios.post(`/admin/polizas`, _this.editedItem);
+        } catch (error) {
+          return;
+        }
       }
       this.close();
       this.initialize();
+    },
+    async getOptions() {
+      const _this = this;
+      try {
+        let {
+          data: { data, message },
+        } = await axios.get("/admin/polizas/create");
+        _this.options = data.options;
+
+        _this.$store.commit("showSnackbar", {
+          message: message,
+          color: "success",
+          duration: 3000,
+        });
+      } catch (error) {
+        _this.$store.commit("showSnackbar", {
+          message: error.response.data.message,
+          color: "error",
+          duration: 3000,
+        });
+      }
     },
   },
 };
