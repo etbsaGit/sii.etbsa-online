@@ -316,7 +316,7 @@ class SinglePageController extends AdminController
                 'visible' => true,
                 'children' => [
                     new MenuItem([
-                        'group_requirements' => ['Super User'],
+                        'group_requirements' => [],
                         'permission_requirements' => [],
                         'label' => 'Historico Ventas',
                         'nav_type' => MenuItem::$NAV_TYPE_NAV,
@@ -326,7 +326,7 @@ class SinglePageController extends AdminController
                         'visible' => false,
                     ]),
                     new MenuItem([
-                        'group_requirements' => ['Super User'],
+                        'group_requirements' => [],
                         'permission_requirements' => [],
                         'label' => 'Ventas Clientes',
                         'nav_type' => MenuItem::$NAV_TYPE_NAV,
