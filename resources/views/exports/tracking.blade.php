@@ -3,7 +3,9 @@
         <tr>
             <th>FOLIO</th>
             <th>Nombre Prospecto</th>
-            <th>Compañia</th>
+            <th>Tactica JD</th>
+            <th>Cap, Tech,Segmentacion, Calf. Credito</th>
+            <th>Cultivos</th>
             <th>Tel. Prospecto</th>
             <th>Email. Prospecto</th>
             <th>Domicilio</th>
@@ -33,7 +35,11 @@
             <tr>
                 <td>{{ $item->id }}</td>
                 <td>{{ $item->prospect->full_name }}</td>
-                <td>{{ $item->prospect->company ?? '' }}</td>
+                {{-- <td>{{ $item->prospect->company ?? '' }}</td> --}}
+                <td>{{ $item->prospect->tactica_jd ?? '' }}</td>
+                <td>{{ $item->prospect->capacidad_tech }}, {{ $item->prospect->segmentacion }},
+                    {{ $item->prospect->rating }} </td>
+                <td>{{ implode(', ', $item->prospect->cultivos ?? []) }}</td>
                 <td>{{ $item->prospect->phone }}</td>
                 <td>{{ $item->prospect->email ?? '' }}</td>
                 <td>{{ $item->prospect->town ?? '' }}</td>

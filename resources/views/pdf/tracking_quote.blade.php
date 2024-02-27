@@ -320,7 +320,9 @@
                                 </td>
                                 <td style="text-align: left;">
                                     <b>{{ $data->tracking->prospect->full_name }}</b><br />
-                                    {{ $data->tracking->prospect->town }}, {{ $data->tracking->prospect->township->estate->name }}, {{ $data->tracking->prospect->township->name }}
+                                    {{ $data->tracking->prospect->town }},
+                                    {{ $data->tracking->prospect->township->name ?? ' ' }},
+                                    {{ $data->tracking->prospect->township->estate->name ?? ' ' }}
                                     <br>
                                     <b>{{ $data->tracking->prospect->phone }}</b>
                                 </td>
