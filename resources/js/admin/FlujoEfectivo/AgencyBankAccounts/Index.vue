@@ -1,5 +1,4 @@
 <template>
-  <div>
     <v-data-table :headers="headers" :items="items" class="elevation-1" dense>
       <template v-slot:top>
         <v-toolbar flat class="align-center">
