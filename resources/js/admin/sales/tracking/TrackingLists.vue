@@ -722,7 +722,7 @@ export default {
         departments: [],
         sellers: [],
         dates: [],
-        estatus: "todos",
+        estatus: "activo",
         first_contact: null,
       },
 
