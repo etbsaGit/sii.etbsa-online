@@ -449,7 +449,7 @@
                                     Costos de Envío / Flete se definen de acuerdo a la zona <b>**NO INCLUIDO EN EL
                                         PRECIO PUBLICADO**</b>, El costo del producto puede variar sin previo aviso,
                                     favor de verificar con nosotros antes de apartar. <b>**ETBSA Nunca le Solicitara que
-                                        deposite dinero sin antes haber visto la Maquinaria**</b><br>
+                                        deposite dinero sin antes haber visto la Maquinaria**</b> <b>**Este Documento NO es un Comprobante de Pago**</b><br>
                                     <!-- Táctica de mano de obra con el precio normal de los 22mas iva y automáticamente el
                                     descuento quedando a $ 8120 y que te arroje un cupón que diga 20 % de descuento en
                                     el compra del paquete de refacciones de mantenimiento <br> -->
