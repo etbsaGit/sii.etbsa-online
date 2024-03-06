@@ -40,10 +40,19 @@
             hide-details
           ></v-text-field>
         </v-col>
-        <v-col cols="12">
+        <v-col cols="12" md="6">
           <v-text-field
             v-model="form.email"
             label="Email"
+            outlined
+            dense
+            hide-details
+          ></v-text-field>
+        </v-col>
+        <v-col cols="12" md="6">
+          <v-text-field
+            v-model="form.phone"
+            label="Telefono Vendedor"
             outlined
             dense
             hide-details
@@ -86,10 +95,13 @@ export default {
 
       let formData = new FormData();
       formData.append("_method", "put");
-      formData.append("photo", _this.PhotoInput);
+      if (_this.PhotoInput) {
+        formData.append("photo", _this.PhotoInput);
+      }
       formData.append("seller_key", _this.form.seller_key);
       formData.append("name", _this.form.name);
       formData.append("email", _this.form.email);
+      formData.append("phone", _this.form.phone);
 
       axios
         .post(`/admin/sellers/${_this.form.id}`, formData)

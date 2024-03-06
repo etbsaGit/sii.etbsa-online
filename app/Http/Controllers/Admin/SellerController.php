@@ -67,7 +67,7 @@ class SellerController extends AdminController
         $validate = validator($request->all(), [
             'seller_key' => ['required', 'max:50', Rule::unique('users', 'seller_key')->ignore($seller)],
             'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($seller)],
-            'photo' => 'file',
+            'photo' => ['nullable','file'],
 
         ]);
 
@@ -83,7 +83,7 @@ class SellerController extends AdminController
         $payload = array_merge(
             $request->all(),
             [
-                'photo_path' => $request->file("photo") ? $request->file("photo")->store($seller->getFolderPath(), 's3') : null,
+                'photo_path' => $request->file("photo") ? $request->file("photo")->store($seller->getFolderPath(), 's3') : $seller->photo_path,
             ]
         );
 
