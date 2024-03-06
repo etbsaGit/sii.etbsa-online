@@ -32,8 +32,18 @@
       </v-tooltip>
       <v-spacer />
       <v-btn
+        v-if="Tracking.owner == user_id"
         color="primary"
+        dark
+        @click="sendWhatsAppSupport"
+      >
+        <v-icon left>mdi-whatsapp</v-icon>
+        Solicitar Apoyo
+      </v-btn>
+      <v-btn
+        color="blue lighten-3"
         class="ml-2"
+        dark
         @click="
           $router.push({
             name: 'tracking.edit',
@@ -54,7 +64,8 @@
             <v-tab>Actividades</v-tab>
             <v-tab>Cotizaciones</v-tab>
             <v-tab>Archivos</v-tab>
-            <v-tab>Mensajes de Apoyo</v-tab>
+            <!-- <v-tab>Notas</v-tab> -->
+            <!-- <v-tab>Mensajes de Apoyo</v-tab> -->
             <!-- <v-tab>Credito</v-tab>
             <v-tab>Mapa</v-tab> -->
 
@@ -107,12 +118,12 @@
               <tracking-files :files="Files"></tracking-files>
             </v-tab-item>
 
-            <v-tab-item>
+            <!-- <v-tab-item>
               <message-tracking
                 :seller-id="propTracking.owner"
                 :tracking-id="propTracking.id"
               ></message-tracking>
-            </v-tab-item>
+            </v-tab-item> -->
 
             <!-- <v-tab-item></v-tab-item>
             <v-tab-item></v-tab-item> -->
@@ -131,6 +142,7 @@ import Assertiveness from "@admin/sales/tracking/resources/assertiveness.json";
 import TrackingActivity from "@admin/sales/tracking/components/TrackingActivityComponent.vue";
 import TrackingQuoteComponent from "@admin/sales/tracking/components/TrackingQuoteComponent.vue";
 import TrackingFiles from "./TrackingFiles.vue";
+import { mapGetters } from "vuex";
 
 export default {
   components: {
@@ -172,6 +184,7 @@ export default {
     });
   },
   computed: {
+    ...mapGetters("user", ["user_id"]),
     timeline() {
       return this.Tracking.historical.slice().reverse();
     },
@@ -239,6 +252,18 @@ export default {
       _this.files = [];
       // _this.$eventBus.$emit("ORDERS_REFRESH");
       _this.loadTracking(() => {});
+    },
+    sendWhatsAppSupport() {
+      const _this = this;
+
+      let currentUrl = window.location.href;
+      let message = `CRM SIIETBSA - Solicito Apoyo del Folio:${_this.propTrackingId}. 
+      \nCliente: ${_this.Tracking.prospect.full_name}
+      \nVer Seguimiento: ${currentUrl}`;
+
+      let link = `https://wa.me/?text=${encodeURIComponent(message)}`;
+
+      window.open(link, "_blank");
     },
   },
 };
