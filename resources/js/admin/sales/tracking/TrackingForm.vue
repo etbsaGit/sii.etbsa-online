@@ -611,7 +611,7 @@ const _paymentCondition = [
   {
     text: "Contado",
     value: "contado",
-    config: [1, 2, 3, 10, 5, 6, 11, 16, 9, 17, 14],
+    config: [1, 2, 3, 10, 5, 6, 11, 16, 9, 17, 14, 8],
   },
   { text: "JDF 2 años", value: "jdf_2y", config: [1, 2, 3, 10, 17] },
   { text: "JDF 5 años", value: "jdf_5y", config: [1] },
