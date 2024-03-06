@@ -223,6 +223,7 @@ class TrackingProspectController extends AdminController
             'owner' => $tracking->attended->id,
             'attended_by' => $tracking->attended->name,
             'attended_email' => $tracking->attended->email,
+            'attended_phone' => $tracking->attended->phone,
             'assigned_by' => $tracking->assigned->name,
             'registered_by' => $tracking->registered->name,
             'estatus' => $tracking->estatus->only('id', 'title', 'key'),
