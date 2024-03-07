@@ -5,6 +5,7 @@ namespace App\Components\Tracking\Models;
 use App\Components\Common\Models\Currency;
 use App\Components\Common\Models\Estatus;
 use App\Components\Common\Models\Message;
+use App\Components\Common\Models\Notes;
 use App\Components\User\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use App\Components\Core\Utilities\Helpers;
@@ -116,6 +117,10 @@ class TrackingProspect extends Model
     public function messages()
     {
         return $this->morphMany(Message::class, 'messageable');
+    }
+    public function notes()
+    {
+        return $this->morphMany(Notes::class, 'noteable');
     }
 
     public function scopeFilter($query, array $filters)
