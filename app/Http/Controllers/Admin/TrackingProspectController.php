@@ -293,6 +293,24 @@ class TrackingProspectController extends AdminController
         return $this->sendResponseOk([], "Seguimiento Guardado.");
     }
 
+    public function addNoteTracking(Request $request, $id){
+
+        $request['created_by'] = auth()->user()->id;
+        $validate = validator($request->all(), [
+            'message' => 'required|string',
+         
+        ], [
+            'message.required' => 'El mensaje es requerido',
+        ]);
+        $tracking = $this->trackingRepository->find($id);
+        $tracking->notes()->create($request->all());
+
+        return $this->sendResponseOk([], "Nota Creada.");
+
+    }
+
+
+
     public function edit(TrackingProspect $tracking)
     {
         $data = $tracking->only(
