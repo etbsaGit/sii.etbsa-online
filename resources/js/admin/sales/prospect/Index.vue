@@ -6,6 +6,9 @@
         :options.sync="pagination"
         :items="items"
         :server-items-length="totalItems"
+        single-expand
+        show-expand
+        :expanded.sync="expanded"
         class="elevation-1 text-uppercase font-weight-bold caption ma-2"
         fixed-header
         dense
@@ -20,7 +23,6 @@
             }
           }
         "
-        height="400"
       >
         <template #top>
           <search-panel
@@ -183,6 +185,37 @@
             </v-list>
           </v-menu>
         </template>
+        <template v-slot:expanded-item="{ headers, item }">
+          <td :colspan="headers.length" class="pa-0">
+            <v-simple-table v-if="item.tracking" dense dark>
+              <template v-slot:default>
+                <thead>
+                  <tr>
+                    <th class="text-left blue--text">Folio</th>
+                    <th class="text-left blue--text">Titulo</th>
+                    <th class="text-left blue--text">Estatus</th>
+                    <th class="text-left blue--text">Atendido Por</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="item in item.tracking" :key="item.id">
+                    <td>{{ item.id }}</td>
+                    <td>
+                      <div class="d-flex flex-column">
+                        <span>
+                          {{ item.reference }}
+                        </span>
+                        <small>{{ item.title }}</small>
+                      </div>
+                    </td>
+                    <td>{{ item.estatus.title }}</td>
+                    <td>{{ item.attended.name }}</td>
+                  </tr>
+                </tbody>
+              </template>
+            </v-simple-table>
+          </td>
+        </template>
       </v-data-table>
     </v-col>
     <v-scroll-x-transition mode="out-in">
@@ -296,6 +329,7 @@ export default {
   },
   data() {
     return {
+      expanded: [],
       show: false,
       itemRow: {},
       showSearchPanel: false,
@@ -322,6 +356,7 @@ export default {
           align: "center",
           sortable: false,
         },
+        { text: "", value: "data-table-expand" },
       ],
       items: [],
       totalItems: 0,
