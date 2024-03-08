@@ -195,6 +195,7 @@
                     <th class="text-left blue--text">Titulo</th>
                     <th class="text-left blue--text">Estatus</th>
                     <th class="text-left blue--text">Atendido Por</th>
+                    <th class="text-left blue--text"></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -210,6 +211,19 @@
                     </td>
                     <td>{{ item.estatus.title }}</td>
                     <td>{{ item.attended.name }}</td>
+                    <td>
+                      <v-btn
+                        v-if="
+                          $gates.hasRole('Super User') ||
+                          item.attended.id == user_id ||
+                          item.assigned.id == user_id
+                        "
+                        icon
+                        @click="(dialogs.id = item.id), (dialogs.show = true)"
+                      >
+                        <v-icon color="primary ">mdi-open-in-new</v-icon>
+                      </v-btn>
+                    </td>
                   </tr>
                 </tbody>
               </template>
@@ -310,6 +324,19 @@
         </v-card>
       </v-col>
     </v-scroll-x-transition>
+
+    <dialog-component
+      :show="dialogs.show"
+      @close="(dialogs.show = false), (dialogs.id = null)"
+      title="Detalle Seguimiento"
+      fullscreen
+      closeable
+    >
+      <tracking-prospect
+        v-if="dialogs.show && dialogs.id"
+        :propTrackingId="dialogs.id"
+      ></tracking-prospect>
+    </dialog-component>
   </v-row>
 </template>
 
@@ -319,6 +346,8 @@ import ProspectCreate from "./ProspectCreate.vue";
 import ProspectEdit from "./ProspectEdit.vue";
 import SearchPanel from "@admin/components/shared/SearchPanel.vue";
 import TableHeaderButtons from "@admin/components/shared/TableHeaderButtons.vue";
+import TrackingProspect from "../tracking/TrackingProspect.vue";
+import { mapGetters } from "vuex";
 export default {
   components: {
     DialogComponent,
@@ -326,6 +355,7 @@ export default {
     ProspectEdit,
     SearchPanel,
     TableHeaderButtons,
+    TrackingProspect,
   },
   data() {
     return {
@@ -335,6 +365,10 @@ export default {
       showSearchPanel: false,
       dialogCreate: false,
       dialogEdit: false,
+      dialogs: {
+        show: false,
+        id: null,
+      },
       headers: [
         { text: "Action", value: "action", align: "left", sortable: false },
         {
@@ -416,6 +450,7 @@ export default {
     };
   },
   computed: {
+    ...mapGetters("user", ["user_id"]),
     rightDrawer: {
       get() {
         return this.showSearchPanel;
