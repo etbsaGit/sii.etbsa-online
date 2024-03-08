@@ -817,7 +817,7 @@ export default {
     filters: {
       handler: _.debounce(function (v) {
         this.loadTrackings(() => {});
-      }, 700),
+      }, 1800),
       deep: true,
     },
   },
