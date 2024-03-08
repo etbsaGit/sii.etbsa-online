@@ -451,7 +451,7 @@
             </v-row>
             <v-row>
               <v-col cols="12">
-                <p class="text-14 mb-1">Vendedor Asigando</p>
+                <p class="text-14 mb-1">Vendedor Asignado</p>
                 <v-autocomplete
                   v-model="form.attended_by"
                   :disabled="availableSeller"
