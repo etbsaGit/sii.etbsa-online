@@ -103,6 +103,23 @@
                   persistent-hint
                   clearable
                 ></v-combobox>
+                <v-autocomplete
+                  v-model="filters.township"
+                  label="Municipios"
+                  :items="options.municipios"
+                  item-value="id"
+                  item-text="name"
+                  class="ml-2"
+                  multiple
+                  chips
+                  deletable-chips
+                  outlined
+                  persistent-hint
+                  clearable
+                  hide-details
+                  filled
+                  dense
+                ></v-autocomplete>
               </v-row>
             </v-form>
           </search-panel>
@@ -117,6 +134,23 @@
               filled
               dense
             ></v-text-field>
+            <v-autocomplete
+              v-model="filters.township"
+              label="Municipios"
+              :items="options.municipios"
+              item-value="id"
+              item-text="name"
+              class="ml-2"
+              multiple
+              chips
+              deletable-chips
+              outlined
+              persistent-hint
+              clearable
+              hide-details
+              filled
+              dense
+            ></v-autocomplete>
             <v-spacer></v-spacer>
             <table-header-buttons
               :updateSearchPanel="updateSearchPanel"
@@ -163,6 +197,14 @@
         </template>
         <template #[`item.phone`]="{ value }">
           {{ value | VMask("(###) ###-####") }}
+        </template>
+        <template #[`item.municipio`]="{ item }">
+          <div class="d-flex flex-column">
+            <span>
+              {{ item?.township?.name }}
+            </span>
+            <small>{{ item?.township?.estate?.name }}</small>
+          </div>
         </template>
         <template #[`item.action`]="{ item }">
           <v-menu offset-x>
@@ -385,6 +427,12 @@ export default {
         },
         { text: "Telefono", value: "phone", align: "left", sortable: false },
         {
+          text: "Municipio",
+          value: "municipio",
+          align: "left",
+          sortable: false,
+        },
+        {
           text: "Seguimientos Activos:",
           value: "tracking_count",
           align: "center",
@@ -400,6 +448,7 @@ export default {
       editedId: null,
       options: {
         customers: [],
+        municipios: [],
         cultivos: [
           "Ajo",
           "Alfalfa",
@@ -478,7 +527,7 @@ export default {
     filters: {
       handler: _.debounce(function (v) {
         this.loadProspects(() => {});
-      }, 700),
+      }, 1800),
       deep: true,
     },
   },
@@ -519,8 +568,9 @@ export default {
       });
     },
     async getOptions() {
-      let res = await axios.get("/admin/options/prospects");
-      this.options.customers = res.data.data.options.customers;
+      let { data: data } = await axios.get("/admin/options/prospects");
+      this.options.customers = data.data.options.customers;
+      this.options.municipios = data.data.options.municipios;
     },
   },
 };
