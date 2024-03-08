@@ -136,7 +136,7 @@
                       elevation="4"
                       icon="mdi-key-remove"
                     >
-                      Sin Permisos Especiales Asigandos
+                      Sin Permisos Especiales Asignados
                     </v-banner>
                   </v-col>
                 </v-row>

@@ -403,7 +403,7 @@
                               ></v-select>
                             </v-col>
                             <v-col>
-                              <p class="text-14 mb-1">Vendedor Asigando</p>
+                              <p class="text-14 mb-1">Vendedor Asignado</p>
                               <v-autocomplete
                                 v-model="form.attended_by"
                                 :disabled="availableSeller"

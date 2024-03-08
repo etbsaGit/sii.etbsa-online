@@ -458,7 +458,7 @@ export default {
         .put("/admin/vehicles/" + item.id, item)
         .then(function (response) {
           _this.$store.commit("showSnackbar", {
-            message: "Usuario Asigando",
+            message: "Usuario Asignado",
             color: "success",
             duration: 3000,
           });
