@@ -124,6 +124,8 @@ class Prospect extends Model
             foreach (Helpers::commasToArray($rating) as $rate) {
                 $query->where('rating', 'like', "%{$rate}%");
             }
+        })->when($filters['township'] ?? null, function ($query, $township) {
+            $query->whereIn('township_id', $township);
         });
 
     }

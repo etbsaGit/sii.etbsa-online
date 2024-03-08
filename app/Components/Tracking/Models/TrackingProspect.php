@@ -162,6 +162,10 @@ class TrackingProspect extends Model
             $query->whereHas('department', function ($query) use ($departments) {
                 $query->whereIn('id', Helpers::commasToArray($departments));
             });
+        })->when($filters['township'] ?? null, function ($query, $township) {
+            $query->whereHas('prospect', function ($query) use ($township) {
+                $query->whereIn('township_id', $township);
+            });
         })->when($filters['estatus'] ?? null, function ($query, $estatus) {
             if ($estatus !== "todos") {
                 $query->whereHas('estatus', function ($query) use ($estatus) {
@@ -191,7 +195,7 @@ class TrackingProspect extends Model
                 $dates = Helpers::commasToArray($dates) ?? null;
                 if (count($dates) == 2) {
                     $from = date($dates[0]);
-                    $to = date($dates[1].' 23:59:59');
+                    $to = date($dates[1] . ' 23:59:59');
                     $query->whereBetween($searchBy, [$from, $to]);
                 }
             });
@@ -243,7 +247,7 @@ class TrackingProspect extends Model
 
     public function getAmountAttribute()
     {
-        return  $this->currency_id == 1 ?  $this->price :  $this->price * $this->exchange_value;
+        return $this->currency_id == 1 ? $this->price : $this->price * $this->exchange_value;
     }
     // public function getFilesAttribute()
     // {

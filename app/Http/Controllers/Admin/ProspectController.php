@@ -44,6 +44,7 @@ class ProspectController extends AdminController
     {
 
         $options['customers'] = $this->customerRepository->list(['paginate' => 'no'])->map->only('id', 'full_name', 'rfc');
+        $options['municipios'] = Township::all();
 
 
         return $this->sendResponseOk(compact('options'), "list prospect ok.");
