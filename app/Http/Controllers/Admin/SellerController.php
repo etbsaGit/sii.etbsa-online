@@ -46,7 +46,7 @@ class SellerController extends AdminController
      */
     public function show($id)
     {
-        $seller = $this->sellerRepository->find($id, ['seller_type', 'seller_agency', 'seller_category','seller_category_metas']);
+        $seller = $this->sellerRepository->find($id, ['seller_type', 'seller_agency', 'seller_category']);
 
         if (!$seller) {
             return $this->sendResponseNotFound();
