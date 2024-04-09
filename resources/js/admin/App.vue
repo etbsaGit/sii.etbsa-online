@@ -44,6 +44,12 @@
             <v-img v-if="photo" :src="photo"></v-img>
             <v-icon v-else>mdi-account</v-icon>
           </v-list-item-avatar>
+          <v-spacer />
+          <v-list-item-action>
+            <v-btn icon text color="purple" @click="logout('/logout', '/')" dark>
+              <v-icon>mdi-logout-variant</v-icon>
+            </v-btn>
+          </v-list-item-action>
         </v-list-item>
 
         <v-list-item link>
