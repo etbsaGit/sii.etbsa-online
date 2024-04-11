@@ -1,33 +1,38 @@
 <table>
     <thead>
         <tr>
-            <th>FOLIO</th>
-            <th>Nombre Prospecto</th>
-            <th>Tactica JD</th>
-            <th>Cap, Tech,Segmentacion, Calf. Credito</th>
-            <th>Cultivos</th>
-            <th>Tel. Prospecto</th>
-            <th>Email. Prospecto</th>
-            <th>Domicilio</th>
-            <th>Municipio</th>
-            <th>Estado</th>
-            <th>Categoria</th>
-            <th>Referencia</th>
-            <th>Precio</th>
-            <th>T. Moneda</th>
-            <th>Agencia</th>
-            <th>Departamento</th>
-            <th>Certeza</th>
-            <th>Vendedor Asignado</th>
-            <th>Registrado por</th>
-            <th>Estatus</th>
-            <th>Medio Contacto</th>
-            <th>Ultimo Cambio</th>
-            <th>Fecha Registro</th>
-            <th>Fecha Factura</th>
-            <th>Folio Factura</th>
-            <th>Importe Factura</th>
+            <th>FOLIO </th>
+            <th>Nombre Prospecto </th>
+            <th>Compañia </th>
+            <th>Tel. Prospecto </th>
+            <th>Email. Prospecto </th>
+            <th>Domicilio </th>
+            <th>Municipio </th>
+            <th>Estado </th>
+            <th>Categoria </th>
+            <th>Referencia </th>
+            <th>Precio </th>
+            <th>T. Moneda </th>
+            <th>Agencia </th>
+            <th>Departamento </th>
+            <th>Certeza </th>
+            <th>Vendedor Asignado </th>
+            <th>Registrado por </th>
+            <th>Estatus </th>
+            <th>Medio Contacto </th>
+            <th>Ultimo Cambio </th>
+            <th>Fecha Registro </th>
+            <th>Fecha Factura </th>
+            <th>Folio Factura </th>
+            <th>Importe Factura </th>
             <th>Utimo Comentario</th>
+            <th>Capacidad Tech</th>
+            <th>Segmentacion</th>
+            <th>Calf. Credito</th>
+            <th>Tactica JD</th>
+            <th>Cultivos</th>
+
+
         </tr>
     </thead>
     <tbody>
@@ -35,11 +40,8 @@
             <tr>
                 <td>{{ $item->id }}</td>
                 <td>{{ $item->prospect->full_name }}</td>
-                {{-- <td>{{ $item->prospect->company ?? '' }}</td> --}}
-                <td>{{ $item->prospect->tactica_jd ?? '' }}</td>
-                <td>{{ $item->prospect->capacidad_tech }}, {{ $item->prospect->segmentacion }},
-                    {{ $item->prospect->rating }} </td>
-                <td>{{ implode(', ', $item->prospect->cultivos ?? []) }}</td>
+                <td>{{ $item->prospect->company ?? '' }}</td>
+                
                 <td>{{ $item->prospect->phone }}</td>
                 <td>{{ $item->prospect->email ?? '' }}</td>
                 <td>{{ $item->prospect->town ?? '' }}</td>
@@ -58,10 +60,15 @@
                 <td>{{ $item->first_contact ?? 'S/A' }}</td>
                 <td>{{ \Carbon\Carbon::parse($item->updated_at)->format('d/m/Y g:i:s') ?? 'S/A' }}</td>
                 <td>{{ \Carbon\Carbon::parse($item->created_at)->format('d/m/Y g:i:s') ?? 'S/A' }}</td>
-                <td>{{ \Carbon\Carbon::parse($item->date_won_sale)->format('d/m/Y') ?? 'S/A' }}</td>
+                <td>{{ \Carbon\Carbon::parse($item->date_invoice)->format('d/m/Y') ?? 'S/A' }}</td>
                 <td>{{ $item->invoice ?? '' }}</td>
                 <td>{{ '$' . $item->price ?? 'S/A' }} {{ $item->currency ?? 'MXN' }}</td>
                 <td>{{ $item->historical->last()->message ?? '' }}</td>
+                <td>{{ $item->prospect->capacidad_tech }}</td>
+                <td>{{ $item->prospect->segmentacion }}</td>
+                <td>{{ $item->prospect->rating }} </td>
+                <td>{{ $item->prospect->tactica_jd ?? '' }}</td>
+                <td>{{ implode(', ', $item->prospect->cultivos ?? []) }}</td>
             </tr>
         @endforeach
     </tbody>

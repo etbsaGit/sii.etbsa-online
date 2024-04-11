@@ -102,11 +102,11 @@ trait UserTrait
     {
         return $this->belongsToMany(SellerCategory::class, 'seller_category_pivot', 'user_id', 'category_id');
     }
-    public function seller_category_metas()
-    {
-        return $this->belongsToMany(SellerCategory::class, 'seller_category_metas_pivot', 'user_id', 'category_id')
-            ->withPivot('value_unit', "value_amount", "term")->withTimestamps();
-    }
+    // public function seller_category_metas()
+    // {
+    //     return $this->belongsToMany(SellerCategory::class, 'seller_category_metas_pivot', 'user_id', 'category_id')
+    //         ->withPivot('value_unit', "value_amount", "term")->withTimestamps();
+    // }
 
     // public function agency()
     // {

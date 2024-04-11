@@ -35,6 +35,7 @@ class User extends Authenticatable
         'active',
         'activation_key',
         'seller_key',
+        'phone',
         'photo_path'
     ];
     // 'agency_id', 'departments_id', 'job_title', 'seller_key'

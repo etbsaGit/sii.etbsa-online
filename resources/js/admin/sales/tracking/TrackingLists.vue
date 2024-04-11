@@ -149,6 +149,22 @@
                 filled
                 dense
               ></v-select>
+
+              <v-autocomplete
+                v-model="filters.township"
+                label="Municipios"
+                :items="options.municipios"
+                item-value="id"
+                item-text="name"
+                prepend-icon="mdi-filter-variant"
+                multiple
+                chips
+                deletable-chips
+                clearable
+                hide-details
+                filled
+                dense
+              ></v-autocomplete>
             </v-row>
           </v-form>
         </search-panel>
@@ -722,6 +738,7 @@ export default {
         departments: [],
         sellers: [],
         dates: [],
+        township: [],
         estatus: "activo",
         first_contact: null,
       },
@@ -731,6 +748,7 @@ export default {
         agencies: [],
         departments: [],
         sellers: [],
+        municipios: [],
         categories: Categories,
         assertiveness: Assertiveness,
         estatus: [
@@ -754,7 +772,7 @@ export default {
     self.$store.commit("setBreadcrumbs", [{ label: "Seguimientos", name: "" }]);
     self.loadResources(() => {});
     self.$eventBus.$on(["REFRESH_TRACKING"], () => {
-      self.refresh()
+      self.refresh();
     });
     self.$eventBus.$on(["CLOSE_TRACKING_DIALOG"], () => {
       self.dialogs = Object.assign(
@@ -799,7 +817,7 @@ export default {
     filters: {
       handler: _.debounce(function (v) {
         this.loadTrackings(() => {});
-      }, 700),
+      }, 1800),
       deep: true,
     },
   },
@@ -863,6 +881,7 @@ export default {
           self.options.agencies = Data.agencies;
           self.options.departments = Data.departments;
           self.options.prospects = Data.prospects;
+          self.options.municipios = Data.municipios;
         });
 
       axios.get("/admin/sellers", { params: params }).then(function (response) {

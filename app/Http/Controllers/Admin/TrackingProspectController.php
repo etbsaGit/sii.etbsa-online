@@ -6,6 +6,7 @@ use App\Components\Common\Models\Currency;
 use App\Components\Common\Models\Estatus;
 use App\Components\Common\Models\ExchangeRates;
 use App\Components\Common\Models\SellerCategory;
+use App\Components\Common\Models\Township;
 use App\Components\File\Services\FileService;
 use App\Components\Product\Models\ProductCategory;
 use App\Components\RRHH\Models\Employee;
@@ -130,7 +131,7 @@ class TrackingProspectController extends AdminController
             $currency_name = Currency::where('id', $request['currency.id'])->first();
 
             $date_next_lead = $request->get('date_next_tracking', Carbon::now()->addDays(15));
-            if (empty($date_next_lead) || is_null($date_next_lead)) {
+            if (empty ($date_next_lead) || is_null($date_next_lead)) {
                 $date_next_lead = Carbon::now()->addDays(15);
                 $request['date_next_tracking'] = Carbon::now()->addDays(15);
             }
@@ -223,11 +224,12 @@ class TrackingProspectController extends AdminController
             'owner' => $tracking->attended->id,
             'attended_by' => $tracking->attended->name,
             'attended_email' => $tracking->attended->email,
+            'attended_phone' => $tracking->attended->phone,
             'assigned_by' => $tracking->assigned->name,
             'registered_by' => $tracking->registered->name,
             'estatus' => $tracking->estatus->only('id', 'title', 'key'),
-            'prospect' => $tracking->prospect()->with('township','customer:id,full_name')->first()
-                ->only('id','full_name', 'email', 'is_moral', 'customer','customer_id','company', 'rfc', 'town', 'phone', 'township'),
+            'prospect' => $tracking->prospect()->with('township', 'customer:id,full_name')->first()
+                ->only('id', 'full_name', 'email', 'is_moral', 'customer', 'customer_id', 'company', 'rfc', 'town', 'phone', 'township'),
             'customer' => $tracking->customer,
             'historical' => $tracking->historical->map(function ($H) {
                 return [
@@ -291,6 +293,25 @@ class TrackingProspectController extends AdminController
 
         return $this->sendResponseOk([], "Seguimiento Guardado.");
     }
+
+    public function addNoteTracking(Request $request, $id)
+    {
+
+        $request['created_by'] = auth()->user()->id;
+        $validate = validator($request->all(), [
+            'message' => 'required|string',
+
+        ], [
+            'message.required' => 'El mensaje es requerido',
+        ]);
+        $tracking = $this->trackingRepository->find($id);
+        $tracking->notes()->create($request->all());
+
+        return $this->sendResponseOk([], "Nota Creada.");
+
+    }
+
+
 
     public function edit(TrackingProspect $tracking)
     {
@@ -396,7 +417,10 @@ class TrackingProspectController extends AdminController
         $currency = DB::table('currency')->get(['id', 'name']);
         $prospects = Prospect::with('township')->get()->map->only(['id', 'full_name', 'email', 'company', 'rfc', 'town', 'phone', 'township']);
         $exchange_value = ExchangeRates::latest()->first()->value;
-        return $this->sendResponseOk(compact('agencies', 'departments', 'prospects', 'currency', 'categories', 'exchange_value'));
+
+        $municipios = Township::all();
+
+        return $this->sendResponseOk(compact('agencies', 'departments', 'prospects', 'currency', 'categories', 'exchange_value', 'municipios'));
     }
 
 
@@ -441,7 +465,7 @@ class TrackingProspectController extends AdminController
 
     public function print(TrackingProspect $trackingProspect)
     {
-        $data = $trackingProspect->load('prospect','prospect.township', 'assigned');
+        $data = $trackingProspect->load('prospect', 'prospect.township', 'assigned');
         $pdf = \PDF::loadView('pdf.quote', compact('data'));
         return $pdf->stream();
     }

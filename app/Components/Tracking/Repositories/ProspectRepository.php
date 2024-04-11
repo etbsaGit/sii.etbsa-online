@@ -21,10 +21,11 @@ class ProspectRepository extends BaseRepository
     public function listProspect($params)
     {
 
-        return $this->get($params, ['user', 'customer:id,full_name'], function ($q) use ($params) {
+        return $this->get($params, ['user', 'township:id,name,estate_id', 'township.estate:id,name', 'customer:id,full_name', 'tracking', 'tracking.attended', 'tracking.estatus'], function ($q) use ($params) {
             $q->meta();
             $q->search($params['search'] ?? '');
             $q->filter($params ?? []);
+            $q->owner();
 
 
             return $q;

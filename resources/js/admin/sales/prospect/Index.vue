@@ -6,6 +6,9 @@
         :options.sync="pagination"
         :items="items"
         :server-items-length="totalItems"
+        single-expand
+        show-expand
+        :expanded.sync="expanded"
         class="elevation-1 text-uppercase font-weight-bold caption ma-2"
         fixed-header
         dense
@@ -20,7 +23,6 @@
             }
           }
         "
-        height="400"
       >
         <template #top>
           <search-panel
@@ -101,6 +103,23 @@
                   persistent-hint
                   clearable
                 ></v-combobox>
+                <v-autocomplete
+                  v-model="filters.township"
+                  label="Municipios"
+                  :items="options.municipios"
+                  item-value="id"
+                  item-text="name"
+                  class="ml-2"
+                  multiple
+                  chips
+                  deletable-chips
+                  outlined
+                  persistent-hint
+                  clearable
+                  hide-details
+                  filled
+                  dense
+                ></v-autocomplete>
               </v-row>
             </v-form>
           </search-panel>
@@ -115,6 +134,23 @@
               filled
               dense
             ></v-text-field>
+            <v-autocomplete
+              v-model="filters.township"
+              label="Municipios"
+              :items="options.municipios"
+              item-value="id"
+              item-text="name"
+              class="ml-2"
+              multiple
+              chips
+              deletable-chips
+              outlined
+              persistent-hint
+              clearable
+              hide-details
+              filled
+              dense
+            ></v-autocomplete>
             <v-spacer></v-spacer>
             <table-header-buttons
               :updateSearchPanel="updateSearchPanel"
@@ -162,6 +198,14 @@
         <template #[`item.phone`]="{ value }">
           {{ value | VMask("(###) ###-####") }}
         </template>
+        <template #[`item.municipio`]="{ item }">
+          <div class="d-flex flex-column">
+            <span>
+              {{ item?.township?.name }}
+            </span>
+            <small>{{ item?.township?.estate?.name }}</small>
+          </div>
+        </template>
         <template #[`item.action`]="{ item }">
           <v-menu offset-x>
             <template #activator="{ on, attrs }">
@@ -182,6 +226,51 @@
               </v-list-item-group>
             </v-list>
           </v-menu>
+        </template>
+        <template v-slot:expanded-item="{ headers, item }">
+          <td :colspan="headers.length" class="pa-0">
+            <v-simple-table v-if="item.tracking" dense dark>
+              <template v-slot:default>
+                <thead>
+                  <tr>
+                    <th class="text-left blue--text">Folio</th>
+                    <th class="text-left blue--text">Titulo</th>
+                    <th class="text-left blue--text">Estatus</th>
+                    <th class="text-left blue--text">Atendido Por</th>
+                    <th class="text-left blue--text"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="item in item.tracking" :key="item.id">
+                    <td>{{ item.id }}</td>
+                    <td>
+                      <div class="d-flex flex-column">
+                        <span>
+                          {{ item.reference }}
+                        </span>
+                        <small>{{ item.title }}</small>
+                      </div>
+                    </td>
+                    <td>{{ item.estatus.title }}</td>
+                    <td>{{ item.attended.name }}</td>
+                    <td>
+                      <v-btn
+                        v-if="
+                          $gates.hasRole('Super User') ||
+                          item.attended.id == user_id ||
+                          item.assigned.id == user_id
+                        "
+                        icon
+                        @click="(dialogs.id = item.id), (dialogs.show = true)"
+                      >
+                        <v-icon color="primary ">mdi-open-in-new</v-icon>
+                      </v-btn>
+                    </td>
+                  </tr>
+                </tbody>
+              </template>
+            </v-simple-table>
+          </td>
         </template>
       </v-data-table>
     </v-col>
@@ -277,6 +366,19 @@
         </v-card>
       </v-col>
     </v-scroll-x-transition>
+
+    <dialog-component
+      :show="dialogs.show"
+      @close="(dialogs.show = false), (dialogs.id = null)"
+      title="Detalle Seguimiento"
+      fullscreen
+      closeable
+    >
+      <tracking-prospect
+        v-if="dialogs.show && dialogs.id"
+        :propTrackingId="dialogs.id"
+      ></tracking-prospect>
+    </dialog-component>
   </v-row>
 </template>
 
@@ -286,6 +388,8 @@ import ProspectCreate from "./ProspectCreate.vue";
 import ProspectEdit from "./ProspectEdit.vue";
 import SearchPanel from "@admin/components/shared/SearchPanel.vue";
 import TableHeaderButtons from "@admin/components/shared/TableHeaderButtons.vue";
+import TrackingProspect from "../tracking/TrackingProspect.vue";
+import { mapGetters } from "vuex";
 export default {
   components: {
     DialogComponent,
@@ -293,14 +397,20 @@ export default {
     ProspectEdit,
     SearchPanel,
     TableHeaderButtons,
+    TrackingProspect,
   },
   data() {
     return {
+      expanded: [],
       show: false,
       itemRow: {},
       showSearchPanel: false,
       dialogCreate: false,
       dialogEdit: false,
+      dialogs: {
+        show: false,
+        id: null,
+      },
       headers: [
         { text: "Action", value: "action", align: "left", sortable: false },
         {
@@ -317,11 +427,18 @@ export default {
         },
         { text: "Telefono", value: "phone", align: "left", sortable: false },
         {
+          text: "Municipio",
+          value: "municipio",
+          align: "left",
+          sortable: false,
+        },
+        {
           text: "Seguimientos Activos:",
           value: "tracking_count",
           align: "center",
           sortable: false,
         },
+        { text: "", value: "data-table-expand" },
       ],
       items: [],
       totalItems: 0,
@@ -331,6 +448,7 @@ export default {
       editedId: null,
       options: {
         customers: [],
+        municipios: [],
         cultivos: [
           "Ajo",
           "Alfalfa",
@@ -381,6 +499,7 @@ export default {
     };
   },
   computed: {
+    ...mapGetters("user", ["user_id"]),
     rightDrawer: {
       get() {
         return this.showSearchPanel;
@@ -408,7 +527,7 @@ export default {
     filters: {
       handler: _.debounce(function (v) {
         this.loadProspects(() => {});
-      }, 700),
+      }, 1800),
       deep: true,
     },
   },
@@ -449,8 +568,9 @@ export default {
       });
     },
     async getOptions() {
-      let res = await axios.get("/admin/options/prospects");
-      this.options.customers = res.data.data.options.customers;
+      let { data: data } = await axios.get("/admin/options/prospects");
+      this.options.customers = data.data.options.customers;
+      this.options.municipios = data.data.options.municipios;
     },
   },
 };
