@@ -46,7 +46,7 @@ class SellerController extends AdminController
      */
     public function show($id)
     {
-        $seller = $this->sellerRepository->find($id, ['seller_type', 'seller_agency', 'seller_category','seller_category_metas']);
+        $seller = $this->sellerRepository->find($id, ['seller_type', 'seller_agency', 'seller_category']);
 
         if (!$seller) {
             return $this->sendResponseNotFound();
@@ -67,7 +67,7 @@ class SellerController extends AdminController
         $validate = validator($request->all(), [
             'seller_key' => ['required', 'max:50', Rule::unique('users', 'seller_key')->ignore($seller)],
             'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($seller)],
-            'photo' => 'file',
+            'photo' => ['nullable','file'],
 
         ]);
 
@@ -83,7 +83,7 @@ class SellerController extends AdminController
         $payload = array_merge(
             $request->all(),
             [
-                'photo_path' => $request->file("photo") ? $request->file("photo")->store($seller->getFolderPath(), 's3') : null,
+                'photo_path' => $request->file("photo") ? $request->file("photo")->store($seller->getFolderPath(), 's3') : $seller->photo_path,
             ]
         );
 

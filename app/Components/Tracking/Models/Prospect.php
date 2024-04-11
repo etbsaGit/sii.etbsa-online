@@ -124,6 +124,8 @@ class Prospect extends Model
             foreach (Helpers::commasToArray($rating) as $rate) {
                 $query->where('rating', 'like', "%{$rate}%");
             }
+        })->when($filters['township'] ?? null, function ($query, $township) {
+            $query->whereIn('township_id', $township);
         });
 
     }
@@ -138,5 +140,19 @@ class Prospect extends Model
     {
         $alias = (empty($alias)) ? $this->getMetaTable() : $alias;
         return $query->leftJoin($this->getMetaTable() . ' AS ' . $alias, $this->getQualifiedKeyName(), '=', $alias . '.' . $this->getMetaKeyName())->where('key', '=', $key)->where('value', '=', $value)->select($this->getTable() . '.*');
+    }
+
+    public function scopeOwner($query)
+    {
+        $current_user = auth()->user();
+
+        // dd($current_user->inGroup("Super User"));
+
+        return $query->where(function ($q) use ($current_user) {
+            $q->whereHas('tracking', function ($query) use ($current_user) {
+                $query->where('attended_by', '=', $current_user->id)
+                    ->orWhere('assigned_by', '=', $current_user->id);
+            })->orWhere('registered_by', '=', $current_user->id);
+        });
     }
 }

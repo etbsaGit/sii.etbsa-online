@@ -28,16 +28,20 @@ Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function
     Route::get('tracking/{tracking}/message', 'TrackingProspectMessageController@index')->name('tracking-message.index');
     Route::post('tracking/{tracking}/message', 'TrackingProspectMessageController@store')->name('tracking-message.store');
 
+    Route::get('tracking/{tracking}/notes', 'TrackingProspectNotesController@index')->name('tracking-notes.index');
+    Route::post('tracking/{tracking}/notes', 'TrackingProspectNotesController@store')->name('tracking-notes.store');
+    Route::delete('notes/{note}', 'TrackingProspectNotesController@destroy')->name('tracking-notes.destroy');
+
     // TRACKING QUOTES
     Route::resource('quotes', 'TrackingQuoteController');
     Route::get('quote/options', 'TrackingQuoteController@getOptions')->name('tracking-quote.getOptions');
     Route::get('quote/products_by_category/{product_category}', 'TrackingQuoteController@getProductsByCategory')->name('tracking-quote.getProductsByCategory');
     Route::get('quote/{quote}/print', 'TrackingQuoteController@printQuote')->name('tracking-quote.print');
-    
-    // FILES
-    Route::delete('tracking-file/{file}','TrackingProspectController@destroyFile')->name('tracking-file.destroy');
-    Route::post('tracking-file/attach/{tracking}','TrackingProspectController@attachFiles')->name('tracking-file.attach');
 
-    
+    // FILES
+    Route::delete('tracking-file/{file}', 'TrackingProspectController@destroyFile')->name('tracking-file.destroy');
+    Route::post('tracking-file/attach/{tracking}', 'TrackingProspectController@attachFiles')->name('tracking-file.attach');
+
+
 
 });

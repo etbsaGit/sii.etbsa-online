@@ -44,6 +44,7 @@ class ProspectController extends AdminController
     {
 
         $options['customers'] = $this->customerRepository->list(['paginate' => 'no'])->map->only('id', 'full_name', 'rfc');
+        $options['municipios'] = Township::all();
 
 
         return $this->sendResponseOk(compact('options'), "list prospect ok.");
@@ -80,7 +81,7 @@ class ProspectController extends AdminController
         $prospect = $this->prospectRepository->create($request->all());
 
         if (!$prospect) {
-            return $this->sendResponseBadRequest('Pospecto no Credo');
+            return $this->sendResponseBadRequest('Prospecto no Credo');
         }
 
         $prospect->setMeta('cultivos', $request->cultivos);
