@@ -42,6 +42,22 @@
                 Telefono:
               </v-col>
               <v-col cols="6">{{ item.phone }}</v-col>
+              <v-col class="text-right mr-4 mb-2" tag="strong" cols="5">
+                Segmentacion cliente:
+              </v-col>
+              <v-col cols="6">{{ item.phone }}</v-col>
+              <v-col class="text-right mr-4 mb-2" tag="strong" cols="5">
+                Capacidad tecnologica:
+              </v-col>
+              <v-col cols="6">{{ item.phone }}</v-col>
+              <v-col class="text-right mr-4 mb-2" tag="strong" cols="5">
+                Tacticas John Deere:
+              </v-col>
+              <v-col cols="6">{{ item.phone }}</v-col>
+              <v-col class="text-right mr-4 mb-2" tag="strong" cols="5">
+                Clasificacion construccion:
+              </v-col>
+              <v-col cols="6">{{ item.phone }}</v-col>
             </v-row>
           </v-card>
           <!-- </v-col>
