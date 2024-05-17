@@ -48,7 +48,7 @@ export default {
       const _this = this;
       if (!_this.$refs.ChipForm.$refs.form.validate()) return;
       await axios
-        .post("admin/chips/", _this.form)
+        .post("admin/chips", _this.form)
         .then(function (response) {
           _this.$store.commit("showSnackbar", {
             message: response.data.message,

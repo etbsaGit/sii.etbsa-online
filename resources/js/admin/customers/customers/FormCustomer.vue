@@ -164,6 +164,50 @@
           ></v-select>
 
         </v-col>
+        <v-col cols="12" md="6">
+          <v-select
+          v-model="form.seg"
+          :items="['Chico', 'Mediano', 'Grande', 'Agroindustrial','Jardinero']"
+          label="Segmentacion Cliente"
+          outlined
+          filled
+          dense
+          ></v-select>
+
+        </v-col>
+        <v-col cols="12" md="6">
+          <v-select
+          v-model="form.tech"
+          :items="['Baja', 'Mediana', 'Alta', 'Experto']"
+          label="Capacidad tecnologica"
+          outlined
+          filled
+          dense
+          ></v-select>
+
+        </v-col>
+        <v-col cols="12" md="6">
+          <v-select
+          v-model="form.tjd"
+          :items="['Xperimentar', 'Conociendo el territorio', 'Liderazgo sostenido', 'Relacionamiento','Embajadores']"
+          label="Tacticas John Deere"
+          outlined
+          filled
+          dense
+          ></v-select>
+
+        </v-col>
+        <v-col cols="12" md="6">
+          <v-select
+          v-model="form.ct"
+          :items="['Inmoviliario','Renta','Gubernamental','Ganadero','Industrial']"
+          label="Clasificacion construccion"
+          outlined
+          filled
+          dense
+          ></v-select>
+
+        </v-col>
     </v-row>
   </v-form>
 </template>
