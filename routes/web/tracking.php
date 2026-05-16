@@ -43,5 +43,6 @@ Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function
     Route::post('tracking-file/attach/{tracking}', 'TrackingProspectController@attachFiles')->name('tracking-file.attach');
 
 
-
+    // PROSPECTS
+    Route::get('prospect/search', 'ProspectController@search')->name('prospects.search');
 });
