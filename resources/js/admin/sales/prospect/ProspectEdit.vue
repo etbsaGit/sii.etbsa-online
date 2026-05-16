@@ -12,7 +12,7 @@ export default {
   components: { ProspectForm },
   props: {
     propProspectId: {
-      type: [Number, String],
+      type: [Number],
       required: true,
     },
   },

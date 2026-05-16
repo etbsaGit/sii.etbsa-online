@@ -7,12 +7,7 @@
             <v-subheader>DATOS DEL Seguimiento:</v-subheader>
             <v-spacer />
             <template v-if="form.withQuote != undefined">
-              <v-switch
-                v-model="form.withQuote"
-                label="Crear Cotizacion"
-                class="pr-4"
-                dense
-              ></v-switch>
+              <v-switch v-model="form.withQuote" label="Crear Cotizacion" class="pr-4" dense></v-switch>
             </template>
           </div>
           <v-divider> </v-divider>
@@ -30,28 +25,13 @@
                   </div>
                   <v-divider> </v-divider>
                   <v-card-text class="pa-4">
-                    <v-autocomplete
-                      v-model="form.prospect_id"
-                      :items="options.prospects"
-                      item-text="full_name"
-                      item-value="id"
-                      placeholder="Buscar por Nombre o Telefono o Razon social"
-                      :rules="[(v) => !!v || 'Es Requerido']"
-                      :filter="customFilter"
-                      hide-details
-                      clearable
-                      outlined
-                      filled
-                      class="overline align-center"
-                    >
+                    <v-autocomplete v-model="selectedProspect" :items="options.prospects" :loading="loadingProspects"
+                      :search-input.sync="searchProspect" item-text="full_name" item-value="id"
+                      placeholder="Buscar por Nombre o Telefono o Razon social" :rules="[(v) => !!v || 'Es Requerido']"
+                      hide-details clearable outlined filled class="overline align-center" no-filter return-object
+                      hide-no-data>
                       <template v-slot:prepend-item>
-                        <v-btn
-                          @click="dialog = true"
-                          color="green"
-                          class="ma-2"
-                          dark
-                          block
-                        >
+                        <v-btn @click="dialog = true" color="green" class="ma-2" dark block>
                           Registrar Prospecto
                           <v-icon right>mdi-account-plus </v-icon>
                         </v-btn>
@@ -62,9 +42,7 @@
                           <v-list-item-subtitle>
                             {{ item.company }}
                           </v-list-item-subtitle>
-                          <v-list-item-title
-                            class="text-uppercase font-weight-bold"
-                          >
+                          <v-list-item-title class="text-uppercase font-weight-bold">
                             {{ item.full_name }}
                           </v-list-item-title>
                           <v-list-item-subtitle>
@@ -77,60 +55,37 @@
 
                     <v-divider></v-divider>
                     <v-scroll-y-transition mode="out-in">
-                      <div
-                        v-if="!SelectedProspect"
-                        class="text-h6 grey--text text--lighten-1 font-weight-light"
-                        style="align-self: center"
-                      >
+                      <div v-if="!SelectedProspect" class="text-h6 grey--text text--lighten-1 font-weight-light"
+                        style="align-self: center">
                         Selecciona a un Prospecto
                       </div>
                       <v-card v-else :key="SelectedProspect.id" flat>
                         <v-row dense>
-                          <v-col
-                            class="text-left mr-4 mb-2"
-                            tag="strong"
-                            cols="6"
-                          >
+                          <v-col class="text-left mr-4 mb-2" tag="strong" cols="6">
                             Nombre:
                           </v-col>
                           <v-col class="overline text-right">
                             {{ SelectedProspect.full_name }}
                           </v-col>
-                          <v-col
-                            class="text-left mr-4 mb-2"
-                            tag="strong"
-                            cols="6"
-                          >
+                          <v-col class="text-left mr-4 mb-2" tag="strong" cols="6">
                             Razon Social:
                           </v-col>
                           <v-col class="overline text-right">
                             {{ SelectedProspect.company }}
                           </v-col>
-                          <v-col
-                            class="text-left mr-4 mb-2"
-                            tag="strong"
-                            cols="6"
-                          >
+                          <v-col class="text-left mr-4 mb-2" tag="strong" cols="6">
                             RFC:
                           </v-col>
                           <v-col class="overline text-right">
                             {{ SelectedProspect.rfc }}
                           </v-col>
-                          <v-col
-                            class="text-left mr-4 mb-2"
-                            tag="strong"
-                            cols="6"
-                          >
+                          <v-col class="text-left mr-4 mb-2" tag="strong" cols="6">
                             Telefono:
                           </v-col>
                           <v-col class="overline text-right">
                             {{ SelectedProspect.phone }}
                           </v-col>
-                          <v-col
-                            class="text-left mr-4 mb-2"
-                            tag="strong"
-                            cols="6"
-                          >
+                          <v-col class="text-left mr-4 mb-2" tag="strong" cols="6">
                             Domicilio:
                           </v-col>
                           <v-col class="overline text-right">
@@ -142,12 +97,7 @@
                   </v-card-text>
                   <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn
-                      :disabled="!SelectedProspect"
-                      color="blue"
-                      dark
-                      @click="dialogEdit = true"
-                    >
+                    <v-btn :disabled="!SelectedProspect" color="blue" dark @click="dialogEdit = true">
                       Editar Prospecto
                       <v-icon right> mdi-pencil </v-icon>
                     </v-btn>
@@ -162,108 +112,49 @@
                 <p class="text-14 mb-1">
                   Titulo del Seguimiento (Modelo o Nombre Proyecto)
                 </p>
-                <v-text-field
-                  v-model="form.reference"
+                <v-text-field v-model="form.reference"
                   placeholder="(Nombre Proyecto, Modelo del Equipo o Algo Referente a la Oportunidad)"
-                  :rules="[(v) => !!v || 'Es Requerido']"
-                  clearable
-                  hide-details
-                  outlined
-                  filled
-                  dense
-                >
+                  :rules="[(v) => !!v || 'Es Requerido']" clearable hide-details outlined filled dense>
                 </v-text-field>
               </v-col>
               <v-col cols="12" md="4">
                 <p class="text-14 mb-1">Categoria de Seguimiento</p>
-                <v-autocomplete
-                  v-model="form.title"
-                  :items="options.categories"
-                  item-value="name"
-                  item-text="name"
-                  placeholder="Seleccionar"
-                  hide-details
-                  outlined
-                  filled
-                  dense
-                >
+                <v-autocomplete v-model="form.title" :items="options.categories" item-value="name" item-text="name"
+                  placeholder="Seleccionar" hide-details outlined filled dense>
                 </v-autocomplete>
               </v-col>
               <!-- </v-row> -->
               <!-- <v-row> -->
               <v-col cols="12" md="4">
                 <p class="text-14 mb-1">Valor Estimado</p>
-                <v-currency-field
-                  v-model.number="form.price"
-                  :default-value="form.price"
-                  placeholder="0.00"
-                  :rules="[(v) => !!v || 'Es Requerido']"
-                  type="number"
-                  prefix="$"
-                  hide-details
-                  outlined
-                  filled
-                  dense
-                ></v-currency-field>
+                <v-currency-field v-model.number="form.price" :default-value="form.price" placeholder="0.00"
+                  :rules="[(v) => !!v || 'Es Requerido']" type="number" prefix="$" hide-details outlined filled
+                  dense></v-currency-field>
               </v-col>
               <v-col cols="12" md="4">
                 <p class="text-14 mb-1">Moneda</p>
-                <v-select
-                  v-model.number="form.currency_id"
-                  :items="options.currency"
-                  item-value="id"
-                  item-text="name"
-                  placeholder="Moneda"
-                  :rules="[(v) => !!v || 'Es Requerido']"
-                  hide-details
-                  outlined
-                  filled
-                  dense
-                ></v-select>
+                <v-select v-model.number="form.currency_id" :items="options.currency" item-value="id" item-text="name"
+                  placeholder="Moneda" :rules="[(v) => !!v || 'Es Requerido']" hide-details outlined filled
+                  dense></v-select>
               </v-col>
               <v-col cols="12" md="4">
                 <p class="text-14 mb-1">T.C.</p>
-                <v-currency-field
-                  v-model.number="ExchangeRate"
-                  :default-value="form.exchange_value"
-                  placeholder="0.00"
-                  :rules="[(v) => !!v || 'Es Requerido']"
-                  type="number"
-                  prefix="$"
-                  hide-details
-                  readonly
-                  outlined
-                  filled
-                  dense
-                  disabled
-                ></v-currency-field>
+                <v-currency-field v-model.number="ExchangeRate" :default-value="form.exchange_value" placeholder="0.00"
+                  :rules="[(v) => !!v || 'Es Requerido']" type="number" prefix="$" hide-details readonly outlined filled
+                  dense disabled></v-currency-field>
               </v-col>
               <!-- </v-row> -->
 
               <!-- <v-row> -->
               <v-col cols="12" md="6">
                 <p class="text-14 mb-1">Origen del Seguimiento</p>
-                <v-select
-                  v-model="form.first_contact"
-                  :items="options.origin"
-                  :rules="[(v) => !!v || 'Es Requerido']"
-                  hide-details
-                  outlined
-                  filled
-                  dense
-                ></v-select>
+                <v-select v-model="form.first_contact" :items="options.origin" :rules="[(v) => !!v || 'Es Requerido']"
+                  hide-details outlined filled dense></v-select>
               </v-col>
               <v-col cols="12" md="6">
                 <p class="text-14 mb-1">Condicion de Pago</p>
-                <v-select
-                  v-model="form.tracking_condition"
-                  :items="PaymentConditionConfig"
-                  placeholder="Placeholder"
-                  hide-details
-                  outlined
-                  filled
-                  dense
-                ></v-select>
+                <v-select v-model="form.tracking_condition" :items="PaymentConditionConfig" placeholder="Placeholder"
+                  hide-details outlined filled dense></v-select>
               </v-col>
             </v-row>
           </v-card-text>
@@ -274,43 +165,23 @@
                   <p class="text-14 mb-1">
                     Titulo del Seguimiento (Modelo o Nombre Proyecto)
                   </p>
-                  <v-text-field
-                    v-model="form.reference"
+                  <v-text-field v-model="form.reference"
                     placeholder="(Nombre Proyecto, Modelo del Equipo o Algo Referente a la Oportunidad)"
-                    :rules="[(v) => !!v || 'Es Requerido']"
-                    clearable
-                    hide-details
-                    outlined
-                    filled
-                    dense
-                  >
+                    :rules="[(v) => !!v || 'Es Requerido']" clearable hide-details outlined filled dense>
                   </v-text-field>
                 </v-col>
                 <v-col cols="12" md="6">
                   <p class="text-14 mb-1">Origen del Seguimiento</p>
-                  <v-select
-                    v-model="form.first_contact"
-                    :items="options.origin"
-                    :rules="[(v) => !!v || 'Es Requerido']"
-                    hide-details
-                    outlined
-                    filled
-                    dense
-                  ></v-select>
+                  <v-select v-model="form.first_contact" :items="options.origin" :rules="[(v) => !!v || 'Es Requerido']"
+                    hide-details outlined filled dense></v-select>
                 </v-col>
               </v-row>
             </v-card-text>
             <v-card-text class="pa-0">
-              <quote-concept-table
-                :dialogForm="dialogQuote"
-                @edit="dialogQuote = true"
-                @close="dialogQuote = false"
-                :items.sync="form.products"
-                :paymentCondition="form.tracking_condition"
-                :Category_id="Category ? Category.id : null"
-                :propCurrency="form.currency"
-                @payment="(v) => (v ? (form.tracking_condition = v) : '')"
-                @currency="(v) => (form.currency = v)"
+              <quote-concept-table :dialogForm="dialogQuote" @edit="dialogQuote = true" @close="dialogQuote = false"
+                :items.sync="form.products" :paymentCondition="form.tracking_condition"
+                :Category_id="Category ? Category.id : null" :propCurrency="form.currency"
+                @payment="(v) => (v ? (form.tracking_condition = v) : '')" @currency="(v) => (form.currency = v)"
                 @SELECTED_CATEGRORY="
                   (v) => {
                     if (v) {
@@ -319,9 +190,7 @@
                       ).name;
                     }
                   }
-                "
-                :optionsPaymentcondition="PaymentConditionConfig"
-              ></quote-concept-table>
+                " :optionsPaymentcondition="PaymentConditionConfig"></quote-concept-table>
             </v-card-text>
             <v-card-actions>
               <v-btn dark color="blue" block @click="ShowProducts">
@@ -331,13 +200,8 @@
             <v-card-text>
               <v-row>
                 <v-col cols="12" md="4">
-                  <v-textarea
-                    v-model="form.observation"
-                    label="Nota de Vendedor"
-                    outlined
-                    filled
-                    hide-details
-                  ></v-textarea>
+                  <v-textarea v-model="form.observation" label="Nota de Vendedor" outlined filled
+                    hide-details></v-textarea>
                 </v-col>
                 <v-col cols="12" md="8" class="px-0">
                   <v-simple-table dense class="pa-0">
@@ -352,11 +216,7 @@
                         <tr>
                           <td>IVA:</td>
                           <td class="d-flex justify-end">
-                            <v-checkbox
-                              v-model="CheckedTax"
-                              class="ma-0"
-                              hide-details
-                            >
+                            <v-checkbox v-model="CheckedTax" class="ma-0" hide-details>
                               <template v-slot:label>
                                 <div>IVA: {{ form.tax | percent }}</div>
                               </template>
@@ -370,25 +230,13 @@
                             {{ ExchangeRate | currency }} MXN
                           </td>
                         </tr>
-                        <tr
-                          style="height: 50px"
-                          v-if="$gate.allow('isGerente', 'tracking')"
-                        >
+                        <tr style="height: 50px" v-if="$gate.allow('isGerente', 'tracking')">
                           <td>Descuento:</td>
                           <td>
                             <span class="d-flex justify-end px-0">
-                              <v-currency-field
-                                v-model.number="form.discount"
-                                :default-value="form.discount"
-                                type="number"
-                                outlined
-                                suffix="$"
-                                hide-details
-                                :prefix="form.currency.name"
-                                reverse
-                                style="max-width: 250px"
-                                dense
-                              ></v-currency-field>
+                              <v-currency-field v-model.number="form.discount" :default-value="form.discount"
+                                type="number" outlined suffix="$" hide-details :prefix="form.currency.name" reverse
+                                style="max-width: 250px" dense></v-currency-field>
                             </span>
                           </td>
                         </tr>
@@ -420,51 +268,23 @@
             <v-row>
               <v-col cols="12" md="6">
                 <p class="text-14 mb-1">Sucursal</p>
-                <v-select
-                  v-model="form.agency_id"
-                  :items="options.agencies"
-                  item-text="title"
-                  item-value="id"
-                  placeholder="Seleccionar"
-                  :rules="[(v) => !!v || 'Es Requerido']"
-                  hide-details
-                  outlined
-                  filled
-                  dense
-                ></v-select>
+                <v-select v-model="form.agency_id" :items="options.agencies" item-text="title" item-value="id"
+                  placeholder="Seleccionar" :rules="[(v) => !!v || 'Es Requerido']" hide-details outlined filled
+                  dense></v-select>
               </v-col>
               <v-col cols="12" md="6">
                 <p class="text-14 mb-1">Departamento</p>
-                <v-select
-                  v-model="form.department_id"
-                  :items="options.departments"
-                  item-text="title"
-                  item-value="id"
-                  placeholder="Seleccionar"
-                  :rules="[(v) => !!v || 'Es Requerido']"
-                  hide-details
-                  outlined
-                  filled
-                  dense
-                ></v-select>
+                <v-select v-model="form.department_id" :items="options.departments" item-text="title" item-value="id"
+                  placeholder="Seleccionar" :rules="[(v) => !!v || 'Es Requerido']" hide-details outlined filled
+                  dense></v-select>
               </v-col>
             </v-row>
             <v-row>
               <v-col cols="12">
                 <p class="text-14 mb-1">Vendedor Asignado</p>
-                <v-autocomplete
-                  v-model="form.attended_by"
-                  :disabled="availableSeller"
-                  :items="options.sellers"
-                  item-text="name"
-                  item-value="id"
-                  placeholder="Seleccionar"
-                  :rules="[(v) => !!v || 'Es Requerido']"
-                  hide-details
-                  outlined
-                  filled
-                  dense
-                ></v-autocomplete>
+                <v-autocomplete v-model="form.attended_by" :disabled="availableSeller" :items="options.sellers"
+                  item-text="name" item-value="id" placeholder="Seleccionar" :rules="[(v) => !!v || 'Es Requerido']"
+                  hide-details outlined filled dense></v-autocomplete>
               </v-col>
             </v-row>
           </v-card-text>
@@ -479,16 +299,9 @@
           <v-card-text class="pt-0">
             <v-col cols="12" class="px-0">
               <p class="text-14 mb-1">Certeza del Seguimiento</p>
-              <v-select
-                v-model="form.assertiveness"
-                :items="options.assertiveness"
-                :rules="[(v) => !!v || 'Es Requerido']"
-                prepend-inner-icon="mdi-circle-slice-2"
-                hide-details
-                outlined
-                filled
-                dense
-              >
+              <v-select v-model="form.assertiveness" :items="options.assertiveness"
+                :rules="[(v) => !!v || 'Es Requerido']" prepend-inner-icon="mdi-circle-slice-2" hide-details outlined
+                filled dense>
                 <template v-slot:item="{ item }">
                   <v-list-item-content>
                     <v-list-item-title> {{ item.text }} </v-list-item-title>
@@ -502,37 +315,19 @@
               </v-select>
             </v-col>
             <v-col cols="12" class="px-0">
-              <v-dialog
-                ref="dialog"
-                v-model="modal"
-                :return-value.sync="form.date_next_tracking"
-                persistent
-                width="290px"
-              >
+              <v-dialog ref="dialog" v-model="modal" :return-value.sync="form.date_next_tracking" persistent
+                width="290px">
                 <template v-slot:activator="{ on, attrs }">
-                  <v-text-field
-                    v-model="form.date_next_tracking"
-                    label="Fecha Proximo Seguimiento"
-                    prepend-icon="mdi-calendar"
-                    readonly
-                    v-bind="attrs"
-                    v-on="on"
-                    hide-details
-                    outlined
-                    filled
-                    dense
-                  ></v-text-field>
+                  <v-text-field v-model="form.date_next_tracking" label="Fecha Proximo Seguimiento"
+                    prepend-icon="mdi-calendar" readonly v-bind="attrs" v-on="on" hide-details outlined filled
+                    dense></v-text-field>
                 </template>
                 <v-date-picker v-model="form.date_next_tracking" scrollable>
                   <v-spacer></v-spacer>
                   <v-btn text color="primary" @click="modal = false">
                     Cancel
                   </v-btn>
-                  <v-btn
-                    text
-                    color="primary"
-                    @click="$refs.dialog.save(form.date_next_tracking)"
-                  >
+                  <v-btn text color="primary" @click="$refs.dialog.save(form.date_next_tracking)">
                     OK
                   </v-btn>
                 </v-date-picker>
@@ -540,57 +335,31 @@
             </v-col>
             <v-col cols="12" class="px-0">
               <p class="text-14 mb-1">Motivo del Seguimiento</p>
-              <v-textarea
-                v-model="form.description_topic"
-                :rules="[(v) => !!v || 'Es requrido']"
-                placeholder="Escribir a detalle el motivo del Seguimiento"
-                height="100%"
-                filled
-                hide-details
-                outlined
-                dense
-              />
+              <v-textarea v-model="form.description_topic" :rules="[(v) => !!v || 'Es requrido']"
+                placeholder="Escribir a detalle el motivo del Seguimiento" height="100%" filled hide-details outlined
+                dense />
             </v-col>
           </v-card-text>
         </v-card>
       </v-col>
     </v-row>
-    <dialog-component
-      :show="dialog"
-      @close="(dialog = false), loadOptions()"
-      :fullscreen="$vuetify.breakpoint.mobile"
-      title="Registrar Nuevo Prospecto"
-      :maxWidth="600"
-      closeable
-      key="create"
-    >
-      <prospect-create
-        @success="
-          (prospect_id) => {
-            form.prospect_id = prospect_id;
-            $nextTick(() => {
-              dialog = false;
-              loadOptions();
-            });
-          }
-        "
-      ></prospect-create>
+    <dialog-component :show="dialog" @close="(dialog = false), loadOptions()" :fullscreen="$vuetify.breakpoint.mobile"
+      title="Registrar Nuevo Prospecto" :maxWidth="600" closeable key="create">
+      <prospect-create @success="
+        (prospect_id) => {
+          form.prospect_id = prospect_id;
+          $nextTick(() => {
+            dialog = false;
+            loadOptions();
+          });
+        }
+      "></prospect-create>
     </dialog-component>
-    <dialog-component
-      v-if="dialogEdit && SelectedProspect.id"
-      :show="dialogEdit"
-      @close="(dialogEdit = false), loadOptions()"
-      :fullscreen="$vuetify.breakpoint.mobile"
-      title="Editar Prospecto"
-      :maxWidth="600"
-      closeable
-      key="edit"
-    >
-      <prospect-edit
-        v-if="!!SelectedProspect"
-        :propProspectId="SelectedProspect.id"
-        :key="`edit-${SelectedProspect.id}`"
-      ></prospect-edit>
+    <dialog-component v-if="dialogEdit && SelectedProspect.id" :show="dialogEdit"
+      @close="(dialogEdit = false), loadOptions()" :fullscreen="$vuetify.breakpoint.mobile" title="Editar Prospecto"
+      :maxWidth="600" closeable key="edit">
+      <prospect-edit v-if="!!SelectedProspect" :propProspectId="SelectedProspect.id"
+        :key="`edit-${SelectedProspect.id}`"></prospect-edit>
     </dialog-component>
   </v-form>
 </template>
@@ -647,6 +416,13 @@ export default {
     return {
       //
       valid: true,
+
+      lastSearch: null,
+      searchTimeout: null,
+      selectedProspect: null,
+      loadingProspects: false,
+      searchProspect: null,
+
       dialogQuote: false,
       modal: false,
       dialog: false,
@@ -676,11 +452,40 @@ export default {
     this.loadOptions();
   },
   watch: {
+
+    selectedProspect(v) {
+
+      this.form.prospect_id = v ? v.id : null;
+
+    },
+    searchProspect(v) {
+
+      // Evitar búsqueda cuando se selecciona un prospecto
+      if (
+        this.selectedProspect &&
+        (
+          v === this.selectedProspect.full_name ||
+          v === this.selectedProspect.phone ||
+          v === this.selectedProspect.company
+        )
+      ) {
+        return;
+      }
+
+      clearTimeout(this.searchTimeout);
+
+      this.searchTimeout = setTimeout(() => {
+
+        this.searchProspects(v);
+
+      }, 400);
+
+    },
     "form.agency_id": function (v) {
-      if (!!this.form.department_id && v) this.loadSellers(() => {});
+      if (!!this.form.department_id && v) this.loadSellers(() => { });
     },
     "form.department_id": function (v) {
-      if (!!this.form.agency_id && v) this.loadSellers(() => {});
+      if (!!this.form.agency_id && v) this.loadSellers(() => { });
     },
     "form.withQuote": function (v) {
       const _this = this;
@@ -696,12 +501,7 @@ export default {
       },
     },
     SelectedProspect() {
-      const _this = this;
-      if (_this.form.prospect_id) {
-        return this.options.prospects.find(
-          (e) => e.id == this.form.prospect_id
-        );
-      } else return null;
+      return this.selectedProspect;
     },
     availableSeller() {
       const self = this;
@@ -780,10 +580,10 @@ export default {
       return _this.form.tracking_condition !== "por_definir"
         ? (_this.dialogQuote = true)
         : _this.$store.commit("showSnackbar", {
-            message: "Seleccionar una Condicion de Pago",
-            color: "warning",
-            duration: 3000,
-          });
+          message: "Seleccionar una Condicion de Pago",
+          color: "warning",
+          duration: 3000,
+        });
     },
     async loadOptions() {
       const _this = this;
@@ -793,14 +593,14 @@ export default {
           let {
             agencies,
             departments,
-            prospects,
+            // prospects,
             currency,
             categories,
             exchange_value,
           } = response.data.data;
           _this.options.agencies = agencies;
           _this.options.departments = departments;
-          _this.options.prospects = prospects;
+          // _this.options.prospects = prospects;
           _this.options.currency = currency;
           _this.options.categories = categories;
           _this.options.exchange_value = exchange_value;
@@ -822,28 +622,40 @@ export default {
           _this.$store.commit("hideLoader");
         });
     },
-    customFilter(item, queryText, itemText) {
-      const words = queryText.toLowerCase().split(" ");
+    async searchProspects(search) {
 
-      return words.every((word) => {
-        const nameMatch = item.full_name.toLowerCase().includes(word);
-        const phoneMatch = item.phone
-          ? item.phone.toLowerCase().includes(word)
-          : false;
-        const companyMatch = item.company
-          ? item.company.toLowerCase().includes(word)
-          : false;
+      if (!search || search.length < 2) {
+        this.options.prospects = [];
+        return;
+      }
 
-        return nameMatch || phoneMatch || companyMatch;
-      });
+      // evitar múltiples requests iguales
+      if (this.lastSearch === search) return;
 
-      // const textName = item.full_name.toLowerCase();
-      // const textPhone = item.phone.toLowerCase();
-      // const searchText = queryText.toLowerCase();
+      this.lastSearch = search;
 
-      // return (
-      //   textName.indexOf(searchText) > -1 || textPhone.indexOf(searchText) > -1
-      // );
+      this.loadingProspects = true;
+
+      try {
+
+        const response = await axios.get(
+          "/admin/prospect/search",
+          {
+            params: { search }
+          }
+        );
+
+        this.options.prospects = response.data.data;
+
+      } catch (error) {
+
+        console.error(error);
+
+      } finally {
+
+        this.loadingProspects = false;
+
+      }
     },
   },
 };

@@ -415,12 +415,12 @@ class TrackingProspectController extends AdminController
         $categories = DB::table('cat_product_category')->get(['id', 'name']);
 
         $currency = DB::table('currency')->get(['id', 'name']);
-        $prospects = Prospect::with('township')->get()->map->only(['id', 'full_name', 'email', 'company', 'rfc', 'town', 'phone', 'township']);
+        // $prospects = Prospect::with('township')->get()->map->only(['id', 'full_name', 'email', 'company', 'rfc', 'town', 'phone', 'township']);
         $exchange_value = ExchangeRates::latest()->first()->value;
 
-        $municipios = Township::all();
+        // $municipios = Township::all();
 
-        return $this->sendResponseOk(compact('agencies', 'departments', 'prospects', 'currency', 'categories', 'exchange_value', 'municipios'));
+        return $this->sendResponseOk(compact('agencies', 'departments', 'currency', 'categories', 'exchange_value'));
     }
 
 

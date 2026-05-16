@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Components\Common\Models\Township;
 use App\Components\Customers\Repositories\CustomerRepository;
+use App\Components\Tracking\Models\Prospect;
 use App\Components\Tracking\Repositories\ProspectRepository;
 use Illuminate\Http\Request;
 use Auth;
@@ -160,5 +161,36 @@ class ProspectController extends AdminController
             return $this->sendResponseBadRequest("Failed to delete");
         }
         return $this->sendResponseDeleted();
+    }
+
+    public function search(Request $request)
+    {
+        $search = trim($request->search);
+
+        if (!$search || strlen($search) < 2) {
+            return response()->json([]);
+        }
+
+        $prospects = Prospect::query()
+            ->select([
+                'id',
+                'full_name',
+                'company',
+                'phone',
+                'email',
+                'rfc',
+                'town'
+            ])
+            ->where(function ($query) use ($search) {
+                $query->where('full_name', 'like', "%{$search}%")
+                    ->orWhere('company', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            })
+            ->orderBy('full_name')
+            ->limit(30)
+            ->get();
+
+        return $this->sendResponseOk($prospects);
     }
 }
