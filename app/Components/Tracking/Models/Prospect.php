@@ -37,7 +37,7 @@ class Prospect extends Model
         'capacidad_tech',
         'registered_by',
     ];
-    protected $appends = ['tracking_count'];
+    // protected $appends = ['tracking_count'];
 
 
     /**
@@ -89,45 +89,28 @@ class Prospect extends Model
                     ->orWhere('phone', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%")
                     ->orWhere('company', 'like', "%{$search}%");
-            })->orWhere('prospect_meta.value', 'like', "%{$search}%");
-            ;
+            });
         });
     }
 
     public function scopeFilter($query, array $filters)
     {
+        $query
+            ->when($filters['full_name'] ?? null, function ($query, $full_name) {
+                $query->where('full_name', 'like', '%' . $full_name . '%');
+            })
 
-        // $query->meta();
+            ->when($filters['phone'] ?? null, function ($query, $phone) {
+                $query->where('phone', 'like', '%' . $phone . '%');
+            })
 
+            ->when($filters['township'] ?? null, function ($query, $townships) {
 
-        $query->when($filters['full_name'] ?? null, function ($query, $full_name) {
-            $query->where('full_name', 'like', '%' . $full_name . '%');
-        })->when($filters['phone'] ?? null, function ($query, $phone) {
-            $query->where('phone', 'like', '%' . $phone . '%');
-        })->when($filters['cultivos'] ?? null, function ($query, $cultivos) {
-            foreach (Helpers::commasToArray($cultivos) as $cultivo) {
-                $query->where('prospect_meta.value', 'like', "%{$cultivo}%");
-            }
-        })->when($filters['tactica_jd'] ?? null, function ($query, $tactica_jd) {
-            foreach (Helpers::commasToArray($tactica_jd) as $tactica) {
-                $query->where('tactica_jd', 'like', "%{$tactica}%");
-            }
-        })->when($filters['segmentacion'] ?? null, function ($query, $segmentacion) {
-            foreach (Helpers::commasToArray($segmentacion) as $segmento) {
-                $query->where('segmentacion', 'like', "%{$segmento}%");
-            }
-        })->when($filters['capacidad_tech'] ?? null, function ($query, $capacidad_tech) {
-            foreach (Helpers::commasToArray($capacidad_tech) as $capacidad) {
-                $query->where('capacidad_tech', 'like', "%{$capacidad}%");
-            }
-        })->when($filters['rating'] ?? null, function ($query, $rating) {
-            foreach (Helpers::commasToArray($rating) as $rate) {
-                $query->where('rating', 'like', "%{$rate}%");
-            }
-        })->when($filters['township'] ?? null, function ($query, $township) {
-            $query->whereIn('township_id', $township);
-        });
+                if (is_array($townships) && count($townships) > 0) {
 
+                    $query->whereIn('township_id', $townships);
+                }
+            });
     }
 
     public function scopeMeta($query, $alias = null)
@@ -146,13 +129,17 @@ class Prospect extends Model
     {
         $current_user = auth()->user();
 
-        // dd($current_user->inGroup("Super User"));
-
         return $query->where(function ($q) use ($current_user) {
-            $q->whereHas('tracking', function ($query) use ($current_user) {
-                $query->where('attended_by', '=', $current_user->id)
-                    ->orWhere('assigned_by', '=', $current_user->id);
-            })->orWhere('registered_by', '=', $current_user->id);
+
+            $q->where('registered_by', $current_user->id)
+
+                ->orWhereIn('id', function ($sub) use ($current_user) {
+
+                    $sub->select('prospect_id')
+                        ->from('tracking_prospect')
+                        ->where('attended_by', $current_user->id)
+                        ->orWhere('assigned_by', $current_user->id);
+                });
         });
     }
 }

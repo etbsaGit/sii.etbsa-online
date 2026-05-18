@@ -1,18 +1,9 @@
 <template>
   <v-row no-gutters>
     <v-col>
-      <v-data-table
-        v-bind:headers="headers"
-        :options.sync="pagination"
-        :items="items"
-        :server-items-length="totalItems"
-        single-expand
-        show-expand
-        :expanded.sync="expanded"
-        class="elevation-1 text-uppercase font-weight-bold caption ma-2"
-        fixed-header
-        dense
-        @click:row="
+      <v-data-table v-bind:headers="headers" :options.sync="pagination" :items="items" :server-items-length="totalItems"
+        single-expand show-expand :expanded.sync="expanded"
+        class="elevation-1 text-uppercase font-weight-bold caption ma-2" fixed-header dense @click:row="
           (row) => {
             if (Object.keys(row).length > 0 && itemRow?.id != row.id) {
               show = true;
@@ -22,140 +13,46 @@
               itemRow = {};
             }
           }
-        "
-      >
+        ">
         <template #top>
-          <search-panel
-            :rightDrawer="rightDrawer"
-            @cancelSearch="cancelSearch"
-            @resetFilter="resetFilter"
-          >
+          <search-panel :rightDrawer="rightDrawer" @cancelSearch="cancelSearch" @resetFilter="resetFilter">
             <v-form ref="formFilter">
               <v-row class="mr-2 offset-1 overline" dense>
-                <v-text-field
-                  v-model="filters.full_name"
-                  label="Buscar Nombre:"
-                  prepend-icon="mdi-magnify"
-                  outlined
-                  clearable
-                  dense
-                ></v-text-field>
-                <v-text-field
-                  v-model="filters.phone"
-                  label="Buscar telefono:"
-                  prepend-icon="mdi-magnify"
-                  outlined
-                  clearable
-                  dense
-                ></v-text-field>
+                <v-text-field v-model="filters.full_name" label="Buscar Nombre:" prepend-icon="mdi-magnify" outlined
+                  clearable dense></v-text-field>
+                <v-text-field v-model="filters.phone" label="Buscar telefono:" prepend-icon="mdi-magnify" outlined
+                  clearable dense></v-text-field>
 
-                <v-select
-                  v-model="filters.capacidad_tech"
-                  :items="['Baja', 'Mediana', 'Alta', 'Experto']"
-                  label="Capacidad de Tecnologia"
-                  outlined
-                  filled
-                  dense
-                  multiple
-                  chips
-                  deletable-chips
-                  clearable
-                ></v-select>
-                <v-select
-                  v-model="filters.rating"
-                  :items="['AAA', 'AA', 'A', 'Lista Negra']"
-                  label="Calificacion"
-                  outlined
-                  filled
-                  dense
-                  multiple
-                  chips
-                  deletable-chips
-                  clearable
-                ></v-select>
-                <v-select
-                  v-model="filters.tactica_jd"
-                  :items="[
-                    'XPERIMENTAR',
-                    'CONOCIENDO EL TERRITORIO',
-                    'LIDERAZGO SOSTENIDO',
-                    'RELACIONAMIENTO',
-                    'EMBAJADORES',
-                  ]"
-                  label="Tácticas John Deere"
-                  outlined
-                  filled
-                  dense
-                  multiple
-                  chips
-                  deletable-chips
-                  clearable
-                ></v-select>
-                <v-combobox
-                  v-model="filters.cultivos"
-                  label="Cultivos"
-                  :items="options.cultivos"
-                  multiple
-                  chips
-                  deletable-chips
-                  outlined
-                  hint="Lo que usualmente cultiva"
-                  persistent-hint
-                  clearable
-                ></v-combobox>
-                <v-autocomplete
-                  v-model="filters.township"
-                  label="Municipios"
-                  :items="options.municipios"
-                  item-value="id"
-                  item-text="name"
-                  class="ml-2"
-                  multiple
-                  chips
-                  deletable-chips
-                  outlined
-                  persistent-hint
-                  clearable
-                  hide-details
-                  filled
-                  dense
-                ></v-autocomplete>
+                <v-select v-model="filters.capacidad_tech" :items="['Baja', 'Mediana', 'Alta', 'Experto']"
+                  label="Capacidad de Tecnologia" outlined filled dense multiple chips deletable-chips
+                  clearable></v-select>
+                <v-select v-model="filters.rating" :items="['AAA', 'AA', 'A', 'Lista Negra']" label="Calificacion"
+                  outlined filled dense multiple chips deletable-chips clearable></v-select>
+                <v-select v-model="filters.tactica_jd" :items="[
+                  'XPERIMENTAR',
+                  'CONOCIENDO EL TERRITORIO',
+                  'LIDERAZGO SOSTENIDO',
+                  'RELACIONAMIENTO',
+                  'EMBAJADORES',
+                ]" label="Tácticas John Deere" outlined filled dense multiple chips deletable-chips
+                  clearable></v-select>
+                <v-combobox v-model="filters.cultivos" label="Cultivos" :items="options.cultivos" multiple chips
+                  deletable-chips outlined hint="Lo que usualmente cultiva" persistent-hint clearable></v-combobox>
+                <v-autocomplete v-model="filters.township" label="Municipios" :items="options.municipios"
+                  item-value="id" item-text="name" class="ml-2" multiple chips deletable-chips outlined persistent-hint
+                  clearable hide-details filled dense></v-autocomplete>
               </v-row>
             </v-form>
           </search-panel>
           <v-card flat class="py-4 px-2 d-flex flex-row align-center">
-            <v-text-field
-              v-model="filters.search"
-              prepend-icon="mdi-magnify"
-              label="Fitrar por Nombre / Telefono"
-              hide-details
-              clearable
-              outlined
-              filled
-              dense
-            ></v-text-field>
-            <v-autocomplete
-              v-model="filters.township"
-              label="Municipios"
-              :items="options.municipios"
-              item-value="id"
-              item-text="name"
-              class="ml-2"
-              multiple
-              chips
-              deletable-chips
-              outlined
-              persistent-hint
-              clearable
-              hide-details
-              filled
-              dense
-            ></v-autocomplete>
+            <v-text-field v-model="filters.search" prepend-icon="mdi-magnify" label="Filtrar por Nombre / Telefono"
+              hide-details clearable outlined filled dense></v-text-field>
+            <v-autocomplete v-model="filters.township" label="Municipios" :items="options.municipios" item-value="id"
+              item-text="name" class="ml-2" multiple chips deletable-chips outlined persistent-hint clearable
+              hide-details filled dense></v-autocomplete>
             <v-spacer></v-spacer>
-            <table-header-buttons
-              :updateSearchPanel="updateSearchPanel"
-              :reloadTable="loadProspects"
-            ></table-header-buttons>
+            <table-header-buttons :updateSearchPanel="updateSearchPanel"
+              :reloadTable="loadProspects"></table-header-buttons>
             <!-- @click="$router.push({ name: 'prospect.create' })" -->
           </v-card>
           <v-card>
@@ -171,27 +68,12 @@
             </v-btn> -->
             </v-card-title>
           </v-card>
-          <dialog-component
-            :show="dialogEdit"
-            @close="dialogEdit = false"
-            closeable
-            :fullscreen="$vuetify.breakpoint.mobile"
-            title="Editar Prospecto"
-            :maxWidth="600"
-          >
-            <prospect-edit
-              :propProspectId="editedId"
-              :key="editedId"
-            ></prospect-edit>
+          <dialog-component :show="dialogEdit" @close="dialogEdit = false" closeable
+            :fullscreen="$vuetify.breakpoint.mobile" title="Editar Prospecto" :maxWidth="600">
+            <prospect-edit :propProspectId="editedId" :key="editedId"></prospect-edit>
           </dialog-component>
-          <dialog-component
-            :show="dialogCreate"
-            @close="dialogCreate = false"
-            closeable
-            :fullscreen="$vuetify.breakpoint.mobile"
-            title="Registrar Nuevo Prospecto"
-            :maxWidth="600"
-          >
+          <dialog-component :show="dialogCreate" @close="dialogCreate = false" closeable
+            :fullscreen="$vuetify.breakpoint.mobile" title="Registrar Nuevo Prospecto" :maxWidth="600">
             <prospect-create></prospect-create>
           </dialog-component>
         </template>
@@ -254,15 +136,11 @@
                     <td>{{ item.estatus.title }}</td>
                     <td>{{ item.attended.name }}</td>
                     <td>
-                      <v-btn
-                        v-if="
-                          $gates.hasRole('Super User') ||
-                          item.attended.id == user_id ||
-                          item.assigned.id == user_id
-                        "
-                        icon
-                        @click="(dialogs.id = item.id), (dialogs.show = true)"
-                      >
+                      <v-btn v-if="
+                        $gates.hasRole('Super User') ||
+                        item.attended.id == user_id ||
+                        item.assigned.id == user_id
+                      " icon @click="(dialogs.id = item.id), (dialogs.show = true)">
                         <v-icon color="primary ">mdi-open-in-new</v-icon>
                       </v-btn>
                     </td>
@@ -367,17 +245,9 @@
       </v-col>
     </v-scroll-x-transition>
 
-    <dialog-component
-      :show="dialogs.show"
-      @close="(dialogs.show = false), (dialogs.id = null)"
-      title="Detalle Seguimiento"
-      fullscreen
-      closeable
-    >
-      <tracking-prospect
-        v-if="dialogs.show && dialogs.id"
-        :propTrackingId="dialogs.id"
-      ></tracking-prospect>
+    <dialog-component :show="dialogs.show" @close="(dialogs.show = false), (dialogs.id = null)"
+      title="Detalle Seguimiento" fullscreen closeable>
+      <tracking-prospect v-if="dialogs.show && dialogs.id" :propTrackingId="dialogs.id"></tracking-prospect>
     </dialog-component>
   </v-row>
 </template>
@@ -432,12 +302,12 @@ export default {
           align: "left",
           sortable: false,
         },
-        {
-          text: "Seguimientos Activos:",
-          value: "tracking_count",
-          align: "center",
-          sortable: false,
-        },
+        // {
+        //   text: "Seguimientos Activos:",
+        //   value: "tracking_count",
+        //   align: "center",
+        //   sortable: false,
+        // },
         { text: "", value: "data-table-expand" },
       ],
       items: [],
@@ -520,14 +390,14 @@ export default {
   watch: {
     pagination: {
       handler: _.debounce(function (v) {
-        this.loadProspects(() => {});
+        this.loadProspects(() => { });
       }, 700),
       deep: true,
     },
     filters: {
       handler: _.debounce(function (v) {
-        this.loadProspects(() => {});
-      }, 1800),
+        this.loadProspects(() => { });
+      }, 500),
       deep: true,
     },
   },
@@ -548,12 +418,9 @@ export default {
       const _this = this;
 
       let params = {
-        ..._this.filters,
-        cultivos: _this.filters?.cultivos.join(","),
-        segmentacion: _this.filters?.segmentacion.join(","),
-        rating: _this.filters?.rating.join(","),
-        tactica_jd: _this.filters?.tactica_jd.join(","),
-        capacidad_tech: _this.filters?.capacidad_tech.join(","),
+        search: _this.filters.search,
+        township: _this.filters.township,
+
         order_sort: _this.pagination.sortDesc[0] ? "asc" : "desc",
         order_by: _this.pagination.sortBy[0] || "id",
         page: _this.pagination.page,
