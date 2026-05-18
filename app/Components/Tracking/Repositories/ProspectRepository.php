@@ -20,38 +20,16 @@ class ProspectRepository extends BaseRepository
      */
     public function listProspect($params)
     {
-        return $this->get(
-            $params,
-            [
-                'user:id,name',
-                'township:id,name,estate_id',
-                'township.estate:id,name',
-                'customer:id,full_name',
-            ],
-            function ($q) use ($params) {
 
-                $q->select([
-                    'id',
-                    'full_name',
-                    'phone',
-                    'township_id',
-                    'customer_id',
-                    // 'meta_data',
-                    'rating',
-                    'capacidad_tech',
-                    'tactica_jd',
-                    'segmentacion',
-                ]);
+        return $this->get($params, ['user', 'township:id,name,estate_id', 'township.estate:id,name', 'customer:id,full_name', 'tracking', 'tracking.attended', 'tracking.estatus'], function ($q) use ($params) {
+            $q->meta();
+            $q->search($params['search'] ?? '');
+            $q->filter($params ?? []);
+            // $q->owner();
 
 
-                // $q->meta();
-                $q->search($params['search'] ?? '');
-                $q->filter($params ?? []);
-                $q->owner();
-
-                return $q;
-            }
-        );
+            return $q;
+        });
     }
 
     public function resource($params)
@@ -72,7 +50,8 @@ class ProspectRepository extends BaseRepository
 
             if (!$Prospect) {
                 return false;
-            };
+            }
+            ;
 
             $Prospect->delete();
         }
