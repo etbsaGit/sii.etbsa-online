@@ -71,11 +71,11 @@ class TrackingProspectController extends AdminController
             'profiable',
             [Employee::class],
         )->whereHas(
-                'groups',
-                function ($query) {
-                    return $query->whereIn('groups.name', ['Vendedor']);
-                }
-            )->with('profiable:id,name,last_name,agency_id,department_id')->get();
+            'groups',
+            function ($query) {
+                return $query->whereIn('groups.name', ['Vendedor']);
+            }
+        )->with('profiable:id,name,last_name,agency_id,department_id')->get();
 
         return $this->sendResponseOk(
             compact(
@@ -131,7 +131,7 @@ class TrackingProspectController extends AdminController
             $currency_name = Currency::where('id', $request['currency.id'])->first();
 
             $date_next_lead = $request->get('date_next_tracking', Carbon::now()->addDays(15));
-            if (empty ($date_next_lead) || is_null($date_next_lead)) {
+            if (empty($date_next_lead) || is_null($date_next_lead)) {
                 $date_next_lead = Carbon::now()->addDays(15);
                 $request['date_next_tracking'] = Carbon::now()->addDays(15);
             }
@@ -308,7 +308,6 @@ class TrackingProspectController extends AdminController
         $tracking->notes()->create($request->all());
 
         return $this->sendResponseOk([], "Nota Creada.");
-
     }
 
 
@@ -416,11 +415,12 @@ class TrackingProspectController extends AdminController
 
         $currency = DB::table('currency')->get(['id', 'name']);
         // $prospects = Prospect::with('township')->get()->map->only(['id', 'full_name', 'email', 'company', 'rfc', 'town', 'phone', 'township']);
+        $prospects = DB::table('prospect')->get(['full_name', 'email', 'company', 'rfc', 'town', 'phone', 'township_id', 'id']);
         $exchange_value = ExchangeRates::latest()->first()->value;
 
         // $municipios = Township::all();
 
-        return $this->sendResponseOk(compact('agencies', 'departments', 'currency', 'categories', 'exchange_value'));
+        return $this->sendResponseOk(compact('agencies', 'departments', 'currency', 'categories', 'exchange_value', 'prospects'), "Resources for Tracking Prospect");
     }
 
 
@@ -545,7 +545,6 @@ class TrackingProspectController extends AdminController
                     $errorMessage = "Failed to create record.";
                     break;
                 }
-
             }
             if ($error) {
                 return $this->sendResponseBadRequest($errorMessage);
@@ -554,5 +553,4 @@ class TrackingProspectController extends AdminController
             return $this->sendResponseCreated();
         }
     }
-
 }
