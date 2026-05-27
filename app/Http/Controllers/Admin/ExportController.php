@@ -93,9 +93,10 @@ class ExportController extends AdminController
 
     public function exportTracking(Request $request)
     {
-        $data = $this->trackingRepository->listTracking($request->all());
-
-        return Excel::download(new TrackingExport($data), 'tracking.xlsx');
+        return Excel::download(
+            new TrackingExport($request->all()),
+            'tracking.xlsx'
+        );
     }
 
     public function exportSupplier(Request $request)
